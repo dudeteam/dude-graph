@@ -1,0 +1,10 @@
+{
+  "name": "CodeGraph",
+  "description": "Simple tool for visual programming.",
+  "version": "0.0.1",
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.3",
+    "font-awesome": "~4.3.0",
+    "raphael": "~2.1.3"
+  }
+}
