@@ -1,5 +1,6 @@
 /**
  * Create a action block.
+ * @param graph {Graph} the parent graph.
  * @param x {Number} x coordinate to create the action on the area.
  * @param y {Number} y coordinate to create the action on the area.
  * @param name {String} The name of the function which will be called.
@@ -7,7 +8,8 @@
  * @param outputs {Array<Object>} The list of the values returned by the action.
  * @param onMove {Function} Called when the action object is moved.
  */
-Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
+Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
+    var self = this;
     var obj = this.set();
     obj.disabled = false;
     obj.box = this.rect(x, y, 150, 40 + Math.max(inputs.length, outputs.length) * 20, 5);
@@ -29,14 +31,7 @@ Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
             "text-anchor": "start",
             "fill": "#888"
         });
-        var inputPoint = this.circle(x + 7, y + 40 + i * 20, 3).attr({
-            "fill": "#ccc",
-            "stroke": "none"
-        });
-        inputPoint.mousedown(function (e) {
-            console.log(e);
-            obj.disabled = true;
-        });
+        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input');
         obj.push(inputLabel);
         obj.push(inputPoint);
         obj.inputs[inputs[i].name] = inputPoint;
@@ -47,14 +42,20 @@ Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
             "text-anchor": "end",
             "fill": "#888"
         });
-        var outputPoint = this.circle(x + obj.getBBox().width - 7, y + 40 + i * 20, 3).attr({
-            "fill": "#ccc",
-            "stroke": "none"
-        });
+        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output');
         obj.push(outputLabel);
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;
     }
+    obj.mousedown(function () {
+        for (var name in graph.actions) {
+            if (graph.actions.hasOwnProperty(name)) {
+                graph.actions[name].box.attr("stroke-width", 1);
+            }
+        }
+        graph.currentAction = obj;
+        obj.box.attr("stroke-width", 3);
+    });
     obj.draggable(function () {
         return onMove.call(obj);
     }, function () {
