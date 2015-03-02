@@ -29,6 +29,22 @@ Raphael.fn.graph = function (data) {
             obj.connections.push(connection);
             actionFrom.connections.push(connection);
             actionTo.connections.push(connection);
+        },
+        toJSON: function () {
+            var result = {};
+            result.actions = {};
+            result.connections = [];
+            obj.actions.forEach(function (action, name) {
+                var box = action.getBBox();
+                result.actions[name] = {"x": box.x, "y": box.y};
+            });
+            for (var i = 0; i < obj.connections.length; ++i) {
+                result.connections.push({
+                    "to": obj.connections[i].obj1.action.id + "." + obj.connections[i].obj1.name,
+                    "from": obj.connections[i].obj2.action.id + "." + obj.connections[i].obj2.name
+                });
+            }
+            return result;
         }
     };
     var getMatchingPoint = function (pt, radius) {

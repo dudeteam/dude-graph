@@ -3,6 +3,7 @@ var Grid = function () {
 };
 
 Grid.prototype.push = function (name, obj) {
+    obj.id = this.elements.length;
     this.elements.push(obj);
     return obj;
 };

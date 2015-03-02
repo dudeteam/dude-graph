@@ -17,6 +17,8 @@ Raphael.fn.connection = function (obj1, obj2, step) {
         return ["M", x1, y1, "C", x1 + step, y1, x4 - step, y4, x4, y4].join(",");
     };
     var obj = this.path(generatePath(obj1, obj2));
+    obj.obj1 = obj1;
+    obj.obj2 = obj2;
     obj.update = function () {
         obj.attr({path: generatePath(obj1, obj2)});
     };

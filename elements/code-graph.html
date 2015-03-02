@@ -35,6 +35,7 @@
                         {"from": "1.gl_FragColor", "to": "2.first"}
                     ]
                 });
+                window.graph = graph;
                 jwerty.key('⇧+a', function () {
                     var name = window.prompt("Add new action:");
                     if (ACTIONS[name] === undefined) {

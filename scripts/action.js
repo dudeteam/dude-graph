@@ -11,6 +11,7 @@
 Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     var self = this;
     var obj = this.set();
+    obj.id = 0;
     obj.name = name;
     obj.connections = [];
     obj.select = function () {
@@ -52,7 +53,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
             "text-anchor": "start",
             "fill": "#aaa"
         });
-        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input', inputs[i].type);
+        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input', inputs[i]);
         obj.push(inputLabel);
         obj.push(inputPoint);
         obj.inputs[inputs[i].name] = inputPoint;
@@ -63,7 +64,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
             "text-anchor": "end",
             "fill": "#aaa"
         });
-        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output', outputs[i].type);
+        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output', outputs[i]);
         obj.push(outputLabel);
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;
