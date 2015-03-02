@@ -1,26 +1,26 @@
 var ACTIONS = {
-    "roundedRect": {
+    "rounded_rect": {
         "inputs": [
             {"type": "color", "name": "color", value: "#fff"},
-            {"type": "number", "name": "aspectRatio", value: 1.0},
-            {"type": "number", "name": "strokeSize", value: 1.0},
-            {"type": "number", "name": "borderRadius", value: 0.2},
-            {"type": "boolean", "name": "isSolid", value: true}
+            {"type": "number", "name": "aspect_ratio", value: 1.0},
+            {"type": "number", "name": "stroke_size", value: 1.0},
+            {"type": "number", "name": "border_radius", value: 0.2},
+            {"type": "boolean", "name": "is_solid", value: true}
         ],
         "outputs": [
-            {"type": "color", "name": "gl_FragColor"}
+            {"type": "color", "name": "frag_color"}
         ]
     },
-    "blurShader": {
+    "blur": {
         "inputs": [
             {"type": "number", "name": "diameter"},
             {"type": "vec2", "name": "resolution"}
         ],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+        "outputs": [{"type": "color", "name": "frag_color"}]
     },
-    "bwShader": {
+    "black_and_white": {
         "inputs": [],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+        "outputs": [{"type": "color", "name": "frag_color"}]
     },
     "mix": {
         "inputs": [
@@ -28,9 +28,9 @@ var ACTIONS = {
             {"type": "color", "name": "second"},
             {"type": "number", "name": "ratio"}
         ],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+        "outputs": [{"type": "color", "name": "frag_color"}]
     },
-    "finalOutput": {
+    "output": {
         "inputs": [{"type": "color", "name": "result"}],
         "outputs": []
     }

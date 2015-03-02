@@ -72,6 +72,9 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;
     }
+    obj.dblclick(function () {
+        graph.emit("open", obj);
+    });
     obj.mousedown(function () {
         obj.select();
     });

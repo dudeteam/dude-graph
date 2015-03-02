@@ -24,20 +24,23 @@
                 var r = Raphael(this.$.area);
                 var graph = r.graph({
                     "actions": {
-                        "blurShader": {"x": 150, "y": 300},
-                        "bwShader": {"x": 250, "y": 100},
+                        "blur": {"x": 150, "y": 300},
+                        "black_and_white": {"x": 250, "y": 100},
                         "mix": {"x": 450, "y": 150},
-                        "finalOutput": {"x": 700, "y": 200},
-                        "roundedRect": {"x": 950, "y": 300}
+                        "output": {"x": 700, "y": 200},
+                        "rounded_rect": {"x": 950, "y": 300}
                     },
                     "connections": [
-                        {"from": "0.gl_FragColor", "to": "2.second"},
-                        {"from": "1.gl_FragColor", "to": "2.first"}
+                        {"from": "0.frag_color", "to": "2.second"},
+                        {"from": "1.frag_color", "to": "2.first"}
                     ]
                 });
                 window.graph = graph;
                 graph.on("error", function (message) {
                     window.alert("Error: " + message);
+                });
+                graph.on("open", function (action) {
+                    console.log("Open: ", action.name);
                 });
                 jwerty.key('⇧+a', function () {
                     var name = window.prompt("Add new action:");
