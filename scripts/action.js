@@ -28,6 +28,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
                 obj.connections[i].remove();
             }
         }
+        graph.actions.remove(obj);
         obj.remove();
     };
     obj.disabled = false;

@@ -9,7 +9,11 @@ Grid.prototype.push = function (name, obj) {
 
 Grid.prototype.get = function (i) {
     return this.elements[i];
-}
+};
+
+Grid.prototype.remove = function (obj) {
+    this.elements.splice(this.elements.indexOf(obj), 1);
+};
 
 Grid.prototype.forEach = function (fn) {
     for (var i = 0; i < this.elements.length; ++i) {

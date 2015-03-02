@@ -85,12 +85,7 @@ Raphael.fn.graph = function (data) {
         if (obj.newPoint !== null) {
             var point = getMatchingPoint(obj.newPoint, 20);
             if (point === null) {
-                var n = window.prompt("Add new action:"); // TODO: refactor
-                if (ACTIONS[n] === undefined) {
-                    window.alert("No action named " + n + " registered.");
-                } else {
-                    obj.addAction(n, obj.cursor.x, obj.cursor.y);
-                }
+                console.log("TODO add actions that matches the connection type.");
             } else {
                 var connection = self.connection(point, obj.targetPoint, point.pointType === 'input' ? -40 : 40);
                 connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
