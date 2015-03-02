@@ -25,7 +25,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
             index = graph.connections.indexOf(obj.connections[i]);
             if (index !== -1) {
                 graph.connections.splice(index, 1);
-                obj.connections[i].remove();
+                obj.connections[i].destroy();
             }
         }
         graph.actions.remove(obj);
@@ -39,9 +39,10 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
         "cursor": "move"
     });
     obj.push(obj.box);
-    obj.label = this.text(x + obj.getBBox().width / 2, y + 10, name);
+    obj.label = this.text(x + obj.getBBox().width / 2, y + 15, name);
     obj.label.attr({
-        "fill": "#ccc"
+        "fill": "#ccc",
+        "font-size": 12
     });
     obj.push(obj.label);
     var i;
@@ -49,9 +50,9 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     for (i = 0; i < inputs.length; ++i) {
         var inputLabel = this.text(x + 15 , y + 40 + i * 20, inputs[i].name).attr({
             "text-anchor": "start",
-            "fill": "#888"
+            "fill": "#aaa"
         });
-        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input');
+        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input', inputs[i].type);
         obj.push(inputLabel);
         obj.push(inputPoint);
         obj.inputs[inputs[i].name] = inputPoint;
@@ -60,9 +61,9 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     for (i = 0; i < outputs.length; ++i) {
         var outputLabel = this.text(x + obj.getBBox().width - 15 , y + 40 + i * 20, outputs[i].name).attr({
             "text-anchor": "end",
-            "fill": "#888"
+            "fill": "#aaa"
         });
-        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output');
+        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output', outputs[i].type);
         obj.push(outputLabel);
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;

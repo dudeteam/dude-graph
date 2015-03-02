@@ -20,5 +20,8 @@ Raphael.fn.connection = function (obj1, obj2, step) {
     obj.update = function () {
         obj.attr({path: generatePath(obj1, obj2)});
     };
+    obj.destroy = function () {
+        obj.remove();
+    };
     return obj;
 };

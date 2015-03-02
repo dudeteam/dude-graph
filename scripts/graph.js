@@ -1,26 +1,3 @@
-ACTIONS = {
-    "blurShader": {
-        "inputs": [],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
-    },
-    "bwShader": {
-        "inputs": [],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
-    },
-    "mix": {
-        "inputs": [
-            {"type": "color", "name": "first"},
-            {"type": "color", "name": "second"},
-            {"type": "number", "name": "ratio"}
-        ],
-        "outputs": [{"type": "color", "name": "gl_FragColor"}]
-    },
-    "finalOutput": {
-        "inputs": [{"type": "color", "name": "result"}],
-        "outputs": []
-    }
-}
-
 Raphael.fn.graph = function (data) {
     var self = this;
     var obj = {
@@ -48,7 +25,7 @@ Raphael.fn.graph = function (data) {
             var actionFrom = obj.actions.get(~~from[0]);
             var actionTo = obj.actions.get(~~to[0]);
             var connection = self.connection(actionFrom.outputs[from[1]], actionTo.inputs[to[1]]);
-            connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
+            connection.attr({stroke: TYPES[actionFrom.outputs[from[1]].valueType], "stroke-width": 2, fill: "none"});
             obj.connections.push(connection);
             actionFrom.connections.push(connection);
             actionTo.connections.push(connection);
@@ -87,11 +64,15 @@ Raphael.fn.graph = function (data) {
             if (point === null) {
                 console.log("TODO add actions that matches the connection type.");
             } else {
-                var connection = self.connection(point, obj.targetPoint, point.pointType === 'input' ? -40 : 40);
-                connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
-                obj.connections.push(connection);
-                obj.targetPoint.action.connections.push(connection);
-                point.action.connections.push(connection);
+                if (obj.targetPoint.valueType !== point.valueType) {
+                    console.warn("Types " + obj.targetPoint.valueType + " and " + point.valueType + " mismatch.");
+                } else {
+                    var connection = self.connection(point, obj.targetPoint, point.pointType === 'input' ? -40 : 40);
+                    connection.attr({stroke: TYPES[obj.targetPoint.valueType], "stroke-width": 2, fill: "none"});
+                    obj.connections.push(connection);
+                    obj.targetPoint.action.connections.push(connection);
+                    point.action.connections.push(connection);
+                }
             }
             obj.newPoint.remove();
             obj.newPoint = null;
