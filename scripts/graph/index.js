@@ -129,7 +129,7 @@ Raphael.fn.graph = function (data) {
             obj.newConnection = null;
         }
         if (obj.newPoint !== null) {
-            var point = getMatchingPoint(obj.newPoint, 20);
+            var point = getMatchingPoint(obj.newPoint, 10);
             if (point === null) {
                 console.log("TODO add actions that matches the connection type.");
             } else {
