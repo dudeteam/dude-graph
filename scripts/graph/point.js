@@ -11,8 +11,8 @@
 Raphael.fn.point = function (graph, action, x, y, pointType, data) {
     var self = this;
     var obj = this.circle(x, y, 3).attr({
-        "fill": TYPES[data.type],
-        "stroke": "none"
+        "fill": "#222",
+        "stroke": TYPES[data.type]
     });
     obj.action = action;
     obj.name = data.name;

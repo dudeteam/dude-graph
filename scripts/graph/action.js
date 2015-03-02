@@ -33,7 +33,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
         obj.remove();
     };
     obj.disabled = false;
-    obj.box = this.rect(x, y, 150, 40 + Math.max(inputs.length, outputs.length) * 20, 5);
+    obj.box = this.rect(x, y, 170, 40 + Math.max(inputs.length, outputs.length) * 20, 5); // TODO adapt with from values
     obj.box.attr({
         "fill": "rgba(0, 0, 0, .4)",
         "stroke": "#ccc",
@@ -43,28 +43,31 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     obj.label = this.text(x + obj.getBBox().width / 2, y + 15, name);
     obj.label.attr({
         "fill": "#ccc",
-        "font-size": 12
+        "font-size": 12,
+        "font-family": "Varela Round"
     });
     obj.push(obj.label);
     var i;
     obj.inputs = {};
     for (i = 0; i < inputs.length; ++i) {
-        var inputLabel = this.text(x + 15 , y + 40 + i * 20, inputs[i].name).attr({
+        var inputLabel = this.text(x + 20 , y + 40 + i * 20, inputs[i].name).attr({
             "text-anchor": "start",
-            "fill": "#aaa"
+            "fill": "#aaa",
+            "font-family": "Varela Round"
         });
-        var inputPoint = this.point(graph, obj, x + 7, y + 40 + i * 20, 'input', inputs[i]);
+        var inputPoint = this.point(graph, obj, x + 10, y + 40 + i * 20, 'input', inputs[i]);
         obj.push(inputLabel);
         obj.push(inputPoint);
         obj.inputs[inputs[i].name] = inputPoint;
     }
     obj.outputs = {};
     for (i = 0; i < outputs.length; ++i) {
-        var outputLabel = this.text(x + obj.getBBox().width - 15 , y + 40 + i * 20, outputs[i].name).attr({
+        var outputLabel = this.text(x + obj.getBBox().width - 20 , y + 40 + i * 20, outputs[i].name).attr({
             "text-anchor": "end",
-            "fill": "#aaa"
+            "fill": "#aaa",
+            "font-family": "Varela Round"
         });
-        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 7, y + 40 + i * 20, 'output', outputs[i]);
+        var outputPoint = this.point(graph, obj, x + obj.getBBox().width - 10, y + 40 + i * 20, 'output', outputs[i]);
         obj.push(outputLabel);
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;

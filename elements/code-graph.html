@@ -4,31 +4,31 @@
         <style>
             #area {
                 background: #1d283a;
-                width: 1200px;
-                height: 480px;
+                height: 600px;
             }
         </style>
         <div id="area"></div>
     </template>
     <script src="../bower_components/jwerty/jwerty.js"></script>
     <script src="../bower_components/raphael/raphael.js"></script>
-    <script src="../scripts/draggable.js"></script>
-    <script src="../scripts/config.js"></script>
-    <script src="../scripts/connection.js"></script>
-    <script src="../scripts/point.js"></script>
-    <script src="../scripts/grid.js"></script>
-    <script src="../scripts/action.js"></script>
-    <script src="../scripts/graph.js"></script>
+    <script src="../scripts/graph/draggable.js"></script>
+    <script src="../scripts/graph/config.js"></script>
+    <script src="../scripts/graph/connection.js"></script>
+    <script src="../scripts/graph/point.js"></script>
+    <script src="../scripts/graph/grid.js"></script>
+    <script src="../scripts/graph/action.js"></script>
+    <script src="../scripts/graph/index.js"></script>
     <script>
         Polymer({
             ready: function() {
-                var r = Raphael(this.$.area, 1200, 480);
+                var r = Raphael(this.$.area);
                 var graph = r.graph({
                     "actions": {
                         "blurShader": {"x": 150, "y": 300},
                         "bwShader": {"x": 250, "y": 100},
                         "mix": {"x": 450, "y": 150},
-                        "finalOutput": {"x": 700, "y": 200}
+                        "finalOutput": {"x": 700, "y": 200},
+                        "roundedRect": {"x": 950, "y": 300}
                     },
                     "connections": [
                         {"from": "0.gl_FragColor", "to": "2.second"},

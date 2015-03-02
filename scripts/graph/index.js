@@ -75,6 +75,10 @@ Raphael.fn.graph = function (data) {
         obj.cursor.y = e.y;
     });
     window.addEventListener("mouseup", function () {
+        if (obj.newConnection !== null) {
+            obj.newConnection.destroy();
+            obj.newConnection = null;
+        }
         if (obj.newPoint !== null) {
             var point = getMatchingPoint(obj.newPoint, 20);
             if (point === null) {
@@ -93,10 +97,6 @@ Raphael.fn.graph = function (data) {
             obj.newPoint.remove();
             obj.newPoint = null;
             obj.targetPoint = null;
-        }
-        if (obj.newConnection !== null) {
-            obj.newConnection.remove();
-            obj.newConnection = null;
         }
         obj.actions.forEach(function (action) {
             action.disabled = false;

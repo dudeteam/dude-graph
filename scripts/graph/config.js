@@ -1,6 +1,21 @@
 var ACTIONS = {
+    "roundedRect": {
+        "inputs": [
+            {"type": "color", "name": "color", value: "#fff"},
+            {"type": "number", "name": "aspectRatio", value: 1.0},
+            {"type": "number", "name": "strokeSize", value: 1.0},
+            {"type": "number", "name": "borderRadius", value: 0.2},
+            {"type": "boolean", "name": "isSolid", value: true}
+        ],
+        "outputs": [
+            {"type": "color", "name": "gl_FragColor"}
+        ]
+    },
     "blurShader": {
-        "inputs": [],
+        "inputs": [
+            {"type": "number", "name": "diameter"},
+            {"type": "vec2", "name": "resolution"}
+        ],
         "outputs": [{"type": "color", "name": "gl_FragColor"}]
     },
     "bwShader": {
