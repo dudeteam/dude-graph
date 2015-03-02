@@ -9,6 +9,7 @@
  */
 Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
     var obj = this.set();
+    obj.disabled = false;
     obj.box = this.rect(x, y, 150, 40 + Math.max(inputs.length, outputs.length) * 20, 5);
     obj.box.attr({
         "fill": "rgba(0, 0, 0, .4)",
@@ -34,12 +35,7 @@ Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
         });
         inputPoint.mousedown(function (e) {
             console.log(e);
-        });
-        inputPoint.mousemove(function (e) {
-            console.log("move", e);
-        });
-        inputPoint.mouseup(function (e) {
-            console.log("up", e);
+            obj.disabled = true;
         });
         obj.push(inputLabel);
         obj.push(inputPoint);
@@ -59,7 +55,9 @@ Raphael.fn.action = function (x, y, name, inputs, outputs, onMove) {
         obj.push(outputPoint);
         obj.outputs[outputs[i].name] = outputPoint;
     }
-    obj.draggable(onMove, function () {
+    obj.draggable(function () {
+        return onMove.call(obj);
+    }, function () {
         obj.box.attr("fill", "rgba(0, 0, 0, .8)");
     }, function () {
         obj.box.attr("fill", "rgba(0, 0, 0, .4)");

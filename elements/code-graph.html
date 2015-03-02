@@ -14,62 +14,44 @@
     <script src="../scripts/draggable.js"></script>
     <script src="../scripts/connection.js"></script>
     <script src="../scripts/action.js"></script>
+    <script src="../scripts/graph.js"></script>
     <script>
         Polymer({
             ready: function() {
-
-                var dragStart = function () {
-                    this.ox = this.type == "rect" ? this.attr("x") : this.attr("cx");
-                    this.oy = this.type == "rect" ? this.attr("y") : this.attr("cy");
-                    this.animate({"fill-opacity": .2}, 100);
-                };
-                var dragMove = function (dx, dy) {
-                    var att = this.type == "rect" ? {x: this.ox + dx, y: this.oy + dy} : {cx: this.ox + dx, cy: this.oy + dy};
-                    this.attr(att);
-                    for (var i = connections.length; i--;) {
-                        connections[i].update();
-                    }
-                    r.safari();
-                };
-                var dragEnd = function () {
-                    this.animate({"fill-opacity": 0}, 100);
-                };
                 var r = Raphael(this.$.area, 1200, 480);
-                var connections = [];
-                var updateConnections = function () {
-                    for (var i = 0; i < connections.length; ++i) {
-                        connections[i].update();
-                    }
-                    return true;
-                };
-                var blurShader = r.action(150, 300, "blurShader", [], [{"type": "color", "name": "gl_FragColor"}], updateConnections);
-                var bwShader = r.action(250, 100, "bwShader", [], [{"type": "color", "name": "gl_FragColor"}], updateConnections);
-                var mixShaders = r.action(450, 150, "mixShaders",
-                        [{"type": "color", "name": "first"}, {"type": "color", "name": "second"}],
-                        [{"type": "color", "name": "gl_FragColor"}],
-                        updateConnections
-                );
-                var finalOutput = r.action(700, 200, "finalOutput", [{"type": "color", "name": "result"}], [], updateConnections);
-                connections.push(r.connection(blurShader.outputs['gl_FragColor'], mixShaders.inputs['second']).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-                connections.push(r.connection(bwShader.outputs['gl_FragColor'], mixShaders.inputs['first']).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-//                connections.push(r.connection(mixShaders.outputs['gl_FragColor'], finalOutput.inputs['result']).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-
-//                var connections = [];
-//                var shapes = [
-//                    r.ellipse(190, 100, 30, 20),
-//                    r.rect(290, 80, 60, 40, 10),
-//                    r.rect(290, 180, 60, 40, 2),
-//                    r.ellipse(450, 100, 20, 20)
-//                ];
-//                for (var i = 0, ii = shapes.length; i < ii; i++) {
-//                    var color = Raphael.getColor();
-//                    shapes[i].attr({fill: color, stroke: color, "fill-opacity": 0, "stroke-width": 2, cursor: "move"});
-//                    shapes[i].drag(dragMove, dragStart, dragEnd);
-//                }
-//                connections.push(r.connection(shapes[0], shapes[1]).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-//                connections.push(r.connection(shapes[1], shapes[2]).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-//                connections.push(r.connection(shapes[1], shapes[3]).attr({stroke: "#ccc", "stroke-width": 2, fill: "none"}));
-
+                r.graph({
+                    "actions": {
+                        "blurShader": {
+                            "x": 150,
+                            "y": 300,
+                            "inputs": [],
+                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
+                        },
+                        "bwShader": {
+                            "x": 250,
+                            "y": 100,
+                            "inputs": [],
+                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
+                        },
+                        "mixShaders": {
+                            "x": 450,
+                            "y": 150,
+                            "inputs": [{"type": "color", "name": "first"}, {"type": "color", "name": "second"}],
+                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
+                        },
+                        "finalOutput": {
+                            "x": 700,
+                            "y": 200,
+                            "inputs": [{"type": "color", "name": "result"}],
+                            "outputs": []
+                        }
+                    },
+                    "connections": [
+                        {"from": "blurShader.gl_FragColor", "to": "mixShaders.second"},
+                        {"from": "bwShader.gl_FragColor", "to": "mixShaders.first"}//,
+//                        {"from": "mixShaders.gl_FragColor", "to": "finalOutput.result"}
+                    ]
+                });
             }
         });
     </script>
