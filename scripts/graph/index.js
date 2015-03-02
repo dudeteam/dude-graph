@@ -1,3 +1,8 @@
+/**
+ * Create a code graph from the given JSON data.
+ * @param data {JSON}
+ * @returns {{actions: Grid, connections: Array, newPoint: null, newConnection: null, cursor: {x: number, y: number}, _listeners: {}, on: Function, emit: Function, addAction: Function, addConnection: Function, toJSON: Function}}
+ */
 Raphael.fn.graph = function (data) {
     var self = this;
     var obj = {
@@ -6,6 +11,39 @@ Raphael.fn.graph = function (data) {
         newPoint: null,
         newConnection: null,
         cursor: {x: 0, y: 0},
+        _listeners: {},
+
+        /**
+         * Add a listener for the given name.
+         * @param name
+         * @param fn
+         */
+        on: function (name, fn) {
+            if (obj._listeners[name] === undefined) {
+                obj._listeners[name] = [];
+            }
+            obj._listeners[name].push(fn);
+        },
+
+        /**
+         * Emit an event for the given name.
+         * @param name
+         */
+        emit: function (name) {
+            if (obj._listeners[name] === undefined) {
+                return;
+            }
+            for (var i = 0; i < obj._listeners[name].length; ++i) {
+                obj._listeners[name][i].apply(obj, Array.prototype.slice.call(arguments, 1));
+            }
+        },
+
+        /**
+         * Add an action into the graph.
+         * @param name {String} The name of the action to add.
+         * @param x {Number} The x screen's coordinate.
+         * @param y {Number} The y screen's coordinate.
+         */
         addAction: function (name, x, y) {
             var data = ACTIONS[name];
             var action = obj.actions.push(name, self.action(obj, x, y, name, data.inputs, data.outputs, function () {
@@ -19,6 +57,12 @@ Raphael.fn.graph = function (data) {
             }));
             action.select();
         },
+
+        /**
+         * Add a connection between 2 actions of the graph.
+         * @param data.from {String} `action_id`.`point_name`
+         * @param data.to {String} `action_id`.`point_name`
+         */
         addConnection: function (data) {
             var from = data.from.split('.');
             var to = data.to.split('.');
@@ -30,6 +74,11 @@ Raphael.fn.graph = function (data) {
             actionFrom.connections.push(connection);
             actionTo.connections.push(connection);
         },
+
+        /**
+         * Serialize the graph to a JSON object.
+         * @returns {JSON}
+         */
         toJSON: function () {
             var result = {};
             result.actions = {};
@@ -85,7 +134,7 @@ Raphael.fn.graph = function (data) {
                 console.log("TODO add actions that matches the connection type.");
             } else {
                 if (obj.targetPoint.valueType !== point.valueType) {
-                    console.warn("Types " + obj.targetPoint.valueType + " and " + point.valueType + " mismatch.");
+                    obj.emit("error", "Types " + obj.targetPoint.valueType + " and " + point.valueType + " mismatch.");
                 } else {
                     var connection = self.connection(point, obj.targetPoint, point.pointType === 'input' ? -40 : 40);
                     connection.attr({stroke: TYPES[obj.targetPoint.valueType], "stroke-width": 2, fill: "none"});

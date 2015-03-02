@@ -36,6 +36,9 @@
                     ]
                 });
                 window.graph = graph;
+                graph.on("error", function (message) {
+                    window.alert("Error: " + message);
+                });
                 jwerty.key('⇧+a', function () {
                     var name = window.prompt("Add new action:");
                     if (ACTIONS[name] === undefined) {
