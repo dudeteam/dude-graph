@@ -1,8 +1,28 @@
 Raphael.fn.graph = function (data) {
     var self = this;
     var obj = {
+        actions: {},
+        connections: [],
         newPoint: null,
-        newConnection: null
+        newConnection: null,
+        addAction: function (name, data) {
+            obj.actions[name] = self.action(obj, data.x, data.y, name, data.inputs, data.outputs, function () {
+                if (this.disabled) {
+                    return false;
+                }
+                for (var i = 0; i < obj.connections.length; ++i) {
+                    obj.connections[i].update();
+                }
+                return true;
+            });
+        },
+        addConnection: function (data) {
+            var from = data.from.split('.');
+            var to = data.to.split('.');
+            var connection = self.connection(obj.actions[from[0]].outputs[from[1]], obj.actions[to[0]].inputs[to[1]]);
+            connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
+            obj.connections.push(connection);
+        }
     };
     var getMatchingPoint = function (pt, radius) {
         var resultPoint = null;
@@ -24,8 +44,6 @@ Raphael.fn.graph = function (data) {
         }
         return resultPoint;
     };
-    obj.actions = {};
-    obj.connections = [];
     window.addEventListener("mousemove", function (e) {
         if (obj.newPoint !== null && obj.newConnection !== null) {
             obj.newPoint.attr('cx', e.x);
@@ -59,24 +77,11 @@ Raphael.fn.graph = function (data) {
     });
     for (var name in data.actions) {
         if (data.actions.hasOwnProperty(name)) {
-            var action = data.actions[name];
-            obj.actions[name] = this.action(obj, action.x, action.y, name, action.inputs, action.outputs, function () {
-                if (this.disabled) {
-                    return false;
-                }
-                for (var i = 0; i < obj.connections.length; ++i) {
-                    obj.connections[i].update();
-                }
-                return true;
-            });
+            obj.addAction(name, data.actions[name]);
         }
     }
     for (var i = 0; i < data.connections.length; ++i) {
-        var from = data.connections[i].from.split('.');
-        var to = data.connections[i].to.split('.');
-        var connection = this.connection(obj.actions[from[0]].outputs[from[1]], obj.actions[to[0]].inputs[to[1]]);
-        connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
-        obj.connections.push(connection);
+        obj.addConnection(data.connections[i]);
     }
     return obj;
 };
