@@ -10,6 +10,7 @@
         </style>
         <div id="area"></div>
     </template>
+    <script src="../bower_components/jwerty/jwerty.js"></script>
     <script src="../bower_components/raphael/raphael.js"></script>
     <script src="../scripts/draggable.js"></script>
     <script src="../scripts/connection.js"></script>
@@ -20,37 +21,30 @@
         Polymer({
             ready: function() {
                 var r = Raphael(this.$.area, 1200, 480);
-                r.graph({
-                    "actions": {
-                        "blurShader": {
-                            "x": 150,
-                            "y": 300,
-                            "inputs": [],
-                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
-                        },
-                        "bwShader": {
-                            "x": 250,
-                            "y": 100,
-                            "inputs": [],
-                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
-                        },
-                        "mixShaders": {
-                            "x": 450,
-                            "y": 150,
-                            "inputs": [{"type": "color", "name": "first"}, {"type": "color", "name": "second"}],
-                            "outputs": [{"type": "color", "name": "gl_FragColor"}]
-                        },
-                        "finalOutput": {
-                            "x": 700,
-                            "y": 200,
-                            "inputs": [{"type": "color", "name": "result"}],
-                            "outputs": []
-                        }
-                    },
+                var graph = r.graph({
+                    "actions": ["blurShader", "bwShader", "mix", "finalOutput"],
                     "connections": [
-                        {"from": "blurShader.gl_FragColor", "to": "mixShaders.second"},
-                        {"from": "bwShader.gl_FragColor", "to": "mixShaders.first"}
+                        {"from": "blurShader.gl_FragColor", "to": "mix.second"},
+                        {"from": "bwShader.gl_FragColor", "to": "mix.first"}
                     ]
+                });
+                var currentCursor = {x: 0, y: 0};
+                window.addEventListener("mousemove", function (e) {
+                    currentCursor.x = e.x;
+                    currentCursor.y = e.y;
+                });
+                jwerty.key('⇧+a', function () {
+                    var name = window.prompt("Add new action:");
+                    if (ACTIONS[name] === undefined) {
+                        window.alert("No action named " + name + " registered.");
+                    } else {
+                        graph.addAction(name, currentCursor.x, currentCursor.y);
+                    }
+                });
+                jwerty.key('⌫/x', function () {
+                    if (window.confirm("Are you sure to delete action " + graph.currentAction.name + "?")) {
+                        graph.currentAction.destroy();
+                    }
                 });
             }
         });

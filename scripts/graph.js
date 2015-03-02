@@ -1,3 +1,34 @@
+ACTIONS = {
+    "blurShader": {
+        "x": 150,
+        "y": 300,
+        "inputs": [],
+        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+    },
+    "bwShader": {
+        "x": 250,
+        "y": 100,
+        "inputs": [],
+        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+    },
+    "mix": {
+        "x": 450,
+        "y": 150,
+        "inputs": [
+            {"type": "color", "name": "first"},
+            {"type": "color", "name": "second"},
+            {"type": "number", "name": "ratio"}
+        ],
+        "outputs": [{"type": "color", "name": "gl_FragColor"}]
+    },
+    "finalOutput": {
+        "x": 700,
+        "y": 200,
+        "inputs": [{"type": "color", "name": "result"}],
+        "outputs": []
+    }
+}
+
 Raphael.fn.graph = function (data) {
     var self = this;
     var obj = {
@@ -5,8 +36,10 @@ Raphael.fn.graph = function (data) {
         connections: [],
         newPoint: null,
         newConnection: null,
-        addAction: function (name, data) {
-            obj.actions[name] = self.action(obj, data.x, data.y, name, data.inputs, data.outputs, function () {
+        addAction: function (name, x, y) {
+            var data = ACTIONS[name];
+            console.log(x, y);
+            obj.actions[name] = self.action(obj, x || data.x, y || data.y, name, data.inputs, data.outputs, function () {
                 if (this.disabled) {
                     return false;
                 }
@@ -15,6 +48,7 @@ Raphael.fn.graph = function (data) {
                 }
                 return true;
             });
+            obj.actions[name].select();
         },
         addConnection: function (data) {
             var from = data.from.split('.');
@@ -22,6 +56,8 @@ Raphael.fn.graph = function (data) {
             var connection = self.connection(obj.actions[from[0]].outputs[from[1]], obj.actions[to[0]].inputs[to[1]]);
             connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
             obj.connections.push(connection);
+            obj.actions[from[0]].connections.push(connection);
+            obj.actions[to[0]].connections.push(connection);
         }
     };
     var getMatchingPoint = function (pt, radius) {
@@ -60,6 +96,8 @@ Raphael.fn.graph = function (data) {
                 var connection = self.connection(point, obj.targetPoint, point.pointType === 'input' ? -40 : 40);
                 connection.attr({stroke: "#ccc", "stroke-width": 2, fill: "none"});
                 obj.connections.push(connection);
+                obj.targetPoint.action.connections.push(connection);
+                point.action.connections.push(connection);
             }
             obj.newPoint.remove();
             obj.newPoint = null;
@@ -75,13 +113,11 @@ Raphael.fn.graph = function (data) {
             }
         }
     });
-    for (var name in data.actions) {
-        if (data.actions.hasOwnProperty(name)) {
-            obj.addAction(name, data.actions[name]);
-        }
+    for (var itAction = 0; itAction < data.actions.length; ++itAction) {
+        obj.addAction(data.actions[itAction]);
     }
-    for (var i = 0; i < data.connections.length; ++i) {
-        obj.addConnection(data.connections[i]);
+    for (var itConnection = 0; itConnection < data.connections.length; ++itConnection) {
+        obj.addConnection(data.connections[itConnection]);
     }
     return obj;
 };

@@ -11,6 +11,27 @@
 Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     var self = this;
     var obj = this.set();
+    obj.name = name;
+    obj.connections = [];
+    obj.select = function () {
+        for (var name in graph.actions) {
+            if (graph.actions.hasOwnProperty(name)) {
+                graph.actions[name].box.attr("stroke-width", 1);
+            }
+        }
+        graph.currentAction = obj;
+        obj.box.attr("stroke-width", 3);
+    };
+    obj.destroy = function () {
+        for (var i = 0; i < obj.connections.length; ++i) {
+            index = graph.connections.indexOf(obj.connections[i]);
+            if (index !== -1) {
+                graph.connections.splice(index, 1);
+                obj.connections[i].remove();
+            }
+        }
+        obj.remove();
+    };
     obj.disabled = false;
     obj.box = this.rect(x, y, 150, 40 + Math.max(inputs.length, outputs.length) * 20, 5);
     obj.box.attr({
@@ -48,13 +69,7 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
         obj.outputs[outputs[i].name] = outputPoint;
     }
     obj.mousedown(function () {
-        for (var name in graph.actions) {
-            if (graph.actions.hasOwnProperty(name)) {
-                graph.actions[name].box.attr("stroke-width", 1);
-            }
-        }
-        graph.currentAction = obj;
-        obj.box.attr("stroke-width", 3);
+        obj.select();
     });
     obj.draggable(function () {
         return onMove.call(obj);

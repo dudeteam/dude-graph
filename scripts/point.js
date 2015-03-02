@@ -4,11 +4,12 @@ Raphael.fn.point = function (graph, action, x, y, type) {
         "fill": "#ccc",
         "stroke": "none"
     });
+    obj.action = action;
     obj.pointType = type;
     obj.mousedown(function (e) {
         action.disabled = true;
         graph.targetPoint = obj;
-        graph.newPoint = self.circle(e.x - 10, e.y - 10, 3).attr({
+        graph.newPoint = self.circle(e.x, e.y, 3).attr({
             "fill": "#ccc",
             "stroke": "none"
         });
