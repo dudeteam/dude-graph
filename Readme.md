@@ -1,6 +1,8 @@
 CodeGraph
 =========
 
+![Graph](graph.png)
+
 TODO
 ----
 
