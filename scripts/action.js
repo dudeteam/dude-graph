@@ -14,11 +14,9 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
     obj.name = name;
     obj.connections = [];
     obj.select = function () {
-        for (var name in graph.actions) {
-            if (graph.actions.hasOwnProperty(name)) {
-                graph.actions[name].box.attr("stroke-width", 1);
-            }
-        }
+        graph.actions.forEach(function (action) {
+            action.box.attr("stroke-width", 1);
+        });
         graph.currentAction = obj;
         obj.box.attr("stroke-width", 3);
     };

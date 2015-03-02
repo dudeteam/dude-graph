@@ -1,9 +1,14 @@
 CodeGraph
 =========
 
+Bugs
+----
+
+- Auto add
+
 TODO
 ----
 
 - Handle types
 - Configuration modal
-- Handle multiple actions with the same name
+- Add shortcuts settings in graph

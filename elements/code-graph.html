@@ -15,6 +15,7 @@
     <script src="../scripts/draggable.js"></script>
     <script src="../scripts/connection.js"></script>
     <script src="../scripts/point.js"></script>
+    <script src="../scripts/grid.js"></script>
     <script src="../scripts/action.js"></script>
     <script src="../scripts/graph.js"></script>
     <script>
@@ -22,23 +23,23 @@
             ready: function() {
                 var r = Raphael(this.$.area, 1200, 480);
                 var graph = r.graph({
-                    "actions": ["blurShader", "bwShader", "mix", "finalOutput"],
+                    "actions": {
+                        "blurShader": {"x": 150, "y": 300},
+                        "bwShader": {"x": 250, "y": 100},
+                        "mix": {"x": 450, "y": 150},
+                        "finalOutput": {"x": 700, "y": 200}
+                    },
                     "connections": [
-                        {"from": "blurShader.gl_FragColor", "to": "mix.second"},
-                        {"from": "bwShader.gl_FragColor", "to": "mix.first"}
+                        {"from": "0.gl_FragColor", "to": "2.second"},
+                        {"from": "1.gl_FragColor", "to": "2.first"}
                     ]
-                });
-                var currentCursor = {x: 0, y: 0};
-                window.addEventListener("mousemove", function (e) {
-                    currentCursor.x = e.x;
-                    currentCursor.y = e.y;
                 });
                 jwerty.key('⇧+a', function () {
                     var name = window.prompt("Add new action:");
                     if (ACTIONS[name] === undefined) {
                         window.alert("No action named " + name + " registered.");
                     } else {
-                        graph.addAction(name, currentCursor.x, currentCursor.y);
+                        graph.addAction(name, graph.cursor.x, graph.cursor.y);
                     }
                 });
                 jwerty.key('⌫/x', function () {
