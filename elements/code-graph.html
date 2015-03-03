@@ -51,17 +51,24 @@
                                 {"type": "number", "name": "a"}
                             ],
                             "output": [
-                                {"type": "color", "name": "result"}
+                                {"type": "color", "name": "color"}
                             ]
+                        },
+                        "output": {
+                            "inputs": [
+                                {"type": "color", "name": "color"}
+                            ],
+                            "outputs": []
                         }
                     },
-                    "actions": {
-                        "mix": {
-                            "position": [50, 50]
-                        }
-                    }
+                    "actions": [
+                        {"name": "mix", "position": [50, 50] },
+                        {"name": "output", "position": [200, 150] }
+                    ],
+                    "connections": [
+                        {"from": [0, "color"], "to": [1, "color"]}
+                    ]
                 });
-                graph.addModel(new cg.Model("rounded_rect"));
                 renderer.render(paper, graph);
             }
         });
