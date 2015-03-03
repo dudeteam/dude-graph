@@ -21,6 +21,9 @@ Raphael.fn.connection = function (obj1, obj2, step) {
     obj.obj2 = obj2;
     obj1.attr({"fill": TYPES[obj1.valueType], "stroke": "none"});
     obj2.attr({"fill": TYPES[obj2.valueType], "stroke": "none"});
+    obj.click(function () {
+        console.log("line clicked!");
+    });
     obj.update = function () {
         obj.attr({path: generatePath(obj1, obj2)});
     };
