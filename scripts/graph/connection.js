@@ -25,7 +25,10 @@ Raphael.fn.connection = function (obj1, obj2, step) {
         obj.attr({path: generatePath(obj1, obj2)});
     };
     obj.destroy = function () {
-        obj1.attr({"fill": "#222", "stroke": TYPES[obj1.valueType]});
+        // remove the color only if there is no other connections on this point
+        if (obj1.action.countConnection(obj1) < 1) {
+            obj1.attr({"fill": "#222", "stroke": TYPES[obj1.valueType]});
+        }
         obj2.attr({"fill": "#222", "stroke": TYPES[obj2.valueType]});
         obj.remove();
     };

@@ -21,6 +21,16 @@ Raphael.fn.action = function (graph, x, y, name, inputs, outputs, onMove) {
         graph.currentAction = obj;
         obj.box.attr("stroke-width", 3);
     };
+    obj.countConnection = function (obj) {
+        var count = 0;
+        for (var i = 0; i < obj.action.connections.length; ++i) {
+            var connection = obj.action.connections[i];
+            if (connection.obj1 === obj || connection.obj2 == obj) {
+                ++count;
+            }
+        }
+        return count;
+    };
     obj.destroy = function () {
         for (var i = 0; i < obj.connections.length; ++i) {
             index = graph.connections.indexOf(obj.connections[i]);
