@@ -30,13 +30,52 @@
     <script src="../lib/nodes/action.js"></script>
     <script src="../lib/nodes/connection.js"></script>
     <script src="../lib/visitors/renderer.js"></script>
-    <script src="../lib/visitors/serializer.js"></script>
+    <script src="../lib/visitors/saver.js"></script>
 
     <script>
         Polymer({
             ready: function () {
                 var snap = Snap(this.$.svg);
                 var graph = new cg.Graph();
+
+                graph.registerActions({
+                    "rounded_rect": {
+                        "inputs": [
+                            {"type": "color", "name": "color", value: "#fff"},
+                            {"type": "number", "name": "aspect_ratio", value: 1.0},
+                            {"type": "number", "name": "stroke_size", value: 1.0},
+                            {"type": "number", "name": "border_radius", value: 0.2},
+                            {"type": "boolean", "name": "is_solid", value: true}
+                        ],
+                        "outputs": [
+                            {"type": "color", "name": "frag_color"}
+                        ]
+                    },
+                    "blur": {
+                        "inputs": [
+                            {"type": "number", "name": "diameter"},
+                            {"type": "vec2", "name": "resolution"}
+                        ],
+                        "outputs": [{"type": "color", "name": "frag_color"}]
+                    },
+                    "black_and_white": {
+                        "inputs": [],
+                        "outputs": [{"type": "color", "name": "frag_color"}]
+                    },
+                    "mix": {
+                        "inputs": [
+                            {"type": "color", "name": "first"},
+                            {"type": "color", "name": "second"},
+                            {"type": "number", "name": "ratio"}
+                        ],
+                        "outputs": [{"type": "color", "name": "frag_color"}]
+                    },
+                    "output": {
+                        "inputs": [{"type": "color", "name": "result"}],
+                        "outputs": []
+                    }
+                });
+
                 var renderer = new cg.Renderer();
 
                 renderer.render(snap, graph);
