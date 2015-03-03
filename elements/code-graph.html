@@ -6,55 +6,39 @@
                 background: #1d283a;
                 height: 600px;
             }
+            #svg {
+                width: 100%;
+                height: 100%;
+            }
         </style>
-        <div id="area"></div>
+        <div id="area">
+            <svg id="svg">
+
+            </svg>
+        </div>
     </template>
-    <script src="../bower_components/jwerty/jwerty.js"></script>
-    <script src="../bower_components/raphael/raphael.js"></script>
-    <script src="../scripts/graph/draggable.js"></script>
-    <script src="../scripts/graph/config.js"></script>
-    <script src="../scripts/graph/connection.js"></script>
-    <script src="../scripts/graph/point.js"></script>
-    <script src="../scripts/graph/grid.js"></script>
-    <script src="../scripts/graph/action.js"></script>
-    <script src="../scripts/graph/index.js"></script>
+    <!-- Vendors -->
+    <!--<script src="../bower_components/jwerty/jwerty.js"></script>-->
+    <script src="../bower_components/Snap.svg/dist/snap.svg.js"></script>
+    <script src="../bower_components/snap.svg.zpd/snap.svg.zpd.js"></script>
+    <!-- CodeGraph library -->
+    <script src="../lib/index.js"></script>
+    <script src="../lib/utils/vec2.js"></script>
+    <script src="../lib/nodes/graph.js"></script>
+    <script src="../lib/nodes/point.js"></script>
+    <script src="../lib/nodes/action.js"></script>
+    <script src="../lib/nodes/connection.js"></script>
+    <script src="../lib/visitors/renderer.js"></script>
+    <script src="../lib/visitors/serializer.js"></script>
+
     <script>
         Polymer({
-            ready: function() {
-                var r = Raphael(this.$.area);
-                var graph = r.graph({
-                    "actions": {
-                        "blur": {"x": 150, "y": 300},
-                        "black_and_white": {"x": 250, "y": 100},
-                        "mix": {"x": 450, "y": 150},
-                        "output": {"x": 700, "y": 200},
-                        "rounded_rect": {"x": 950, "y": 300}
-                    },
-                    "connections": [
-                        {"from": "0.frag_color", "to": "2.second"},
-                        {"from": "1.frag_color", "to": "2.first"}
-                    ]
-                });
-                window.graph = graph;
-                graph.on("error", function (message) {
-                    window.alert("Error: " + message);
-                });
-                graph.on("open", function (action) {
-                    console.log("Open: ", action.name);
-                });
-                jwerty.key('⇧+a', function () {
-                    var name = window.prompt("Add new action:");
-                    if (ACTIONS[name] === undefined) {
-                        window.alert("No action named " + name + " registered.");
-                    } else {
-                        graph.addAction(name, graph.cursor.x, graph.cursor.y);
-                    }
-                });
-                jwerty.key('⌫/x', function () {
-                    if (window.confirm("Are you sure to delete action " + graph.currentAction.name + "?")) {
-                        graph.currentAction.destroy();
-                    }
-                });
+            ready: function () {
+                var snap = Snap(this.$.svg);
+                var graph = new cg.Graph();
+                var renderer = new cg.Renderer();
+
+                renderer.render(snap, graph);
             }
         });
     </script>
