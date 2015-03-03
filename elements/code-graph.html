@@ -33,14 +33,34 @@
     <script src="../lib/nodes/graph.js"></script>
     <script src="../lib/visitors/renderer.js"></script>
     <script src="../lib/visitors/saver.js"></script>
-
+    <script src="../lib/visitors/loader.js"></script>
     <script>
         Polymer({
             ready: function () {
                 var paper = Snap(this.$.svg);
                 var graph = new cg.Graph();
+                var loader = new cg.Loader();
                 var renderer = new cg.Renderer();
 
+                loader.load(graph, {
+                    "models": {
+                        "mix": {
+                            "inputs": [
+                                {"type": "color", "name": "x"},
+                                {"type": "color", "name": "y"},
+                                {"type": "number", "name": "a"}
+                            ],
+                            "output": [
+                                {"type": "color", "name": "result"}
+                            ]
+                        }
+                    },
+                    "actions": {
+                        "mix": {
+                            "position": [50, 50]
+                        }
+                    }
+                });
                 graph.addModel(new cg.Model("rounded_rect"));
                 renderer.render(paper, graph);
             }
