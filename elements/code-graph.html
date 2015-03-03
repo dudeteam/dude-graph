@@ -37,13 +37,12 @@
     <script>
         Polymer({
             ready: function () {
-                var snap = Snap(this.$.svg);
+                var paper = Snap(this.$.svg);
                 var graph = new cg.Graph();
                 var renderer = new cg.Renderer();
 
                 graph.addModel(new cg.Model("rounded_rect"));
-
-                renderer.render(snap, graph);
+                renderer.render(paper, graph);
             }
         });
     </script>
