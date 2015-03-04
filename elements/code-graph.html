@@ -77,56 +77,45 @@
                 var paper = Snap(this.$.svg);
                 var graph = new cg.Graph();
                 var loader = new cg.Loader();
+                var saver = new cg.Saver();
                 var renderer = new cg.Renderer(paper);
                 loader.load(graph, {
                     "models": {
-                        "rounded_rect": {
+                        "situation": {
                             "inputs": [
-                                {"type": "color", "name": "color", value: "#fff"},
-                                {"type": "number", "name": "aspect_ratio", value: 1.0},
-                                {"type": "number", "name": "stroke_size", value: 1.0},
-                                {"type": "number", "name": "border_radius", value: 0.2},
-                                {"type": "boolean", "name": "is_solid", value: true}
+                                {"type": "color", "name": "in", value: "#fff"},
+                                {"type": "boolean", "name": "sound", value: "#fff"},
+                                {"type": "number", "name": "title", value: 1.0}
                             ],
                             "outputs": [
-                                {"type": "color", "name": "frag_color"}
+                                {"type": "color", "name": "out"},
+                                {"type": "color", "name": "out2"}
                             ]
                         },
-                        "blur": {
+                        "choice": {
                             "inputs": [
-                                {"type": "number", "name": "diameter"},
-                                {"type": "vec2", "name": "resolution"}
+                                {"type": "color", "name": "situation"}
                             ],
-                            "outputs": [{"type": "color", "name": "frag_color"}]
-                        },
-                        "black_and_white": {
-                            "inputs": [],
-                            "outputs": [{"type": "color", "name": "frag_color"}]
-                        },
-                        "mix": {
-                            "inputs": [
-                                {"type": "color", "name": "x"},
-                                {"type": "color", "name": "y"},
-                                {"type": "number", "name": "a"}
-                            ],
-                            "outputs": [{"type": "color", "name": "frag_color"}]
-                        },
-                        "output": {
-                            "inputs": [{"type": "color", "name": "frag_color"}],
-                            "outputs": []
+                            "outputs": [{"type": "color", "name": "situation"}]
                         }
                     },
                     "actions": [
-                        {"name": "blur", "position": [150, 50]},
-                        {"name": "black_and_white", "position": [200, 250]},
-                        {"name": "mix", "position": [450, 150] },
-                        {"name": "output", "position": [800, 200] }
+                        {"name": "situation", "position": [150, 50]},
+                        {"name": "choice", "position": [500, 180]},
+                        {"name": "choice", "position": [500, 380]},
+                        {"name": "situation", "position": [900, 250]},
+                        {"name": "situation", "position": [900, 450]}
                     ],
                     "connections": [
-                        {"from": [2, "frag_color"], "to": [3, "frag_color"]}
+                        {"from": [0, "out"], "to": [1, "situation"]}
                     ]
                 });
                 renderer.render(graph);
+
+                window.graph = graph;
+                window.renderer = renderer;
+                window.loader = loader;
+                window.saver = saver;
             }
         });
     </script>
