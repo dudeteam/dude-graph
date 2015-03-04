@@ -86,33 +86,50 @@
                 var renderer = new cg.Renderer(paper);
                 loader.load(graph, {
                     "models": {
-                        "situation": {
+                        "rounded_rect": {
                             "inputs": [
-                                {"type": "color", "name": "in", value: "#fff"},
-                                {"type": "boolean", "name": "sound", value: "#fff"},
-                                {"type": "number", "name": "title", value: 1.0}
+                                {"type": "color", "name": "color", value: "#fff"},
+                                {"type": "number", "name": "aspect_ratio", value: 1.0},
+                                {"type": "number", "name": "stroke_size", value: 1.0},
+                                {"type": "number", "name": "border_radius", value: 0.2},
+                                {"type": "boolean", "name": "is_solid", value: true}
                             ],
                             "outputs": [
-                                {"type": "color", "name": "out"},
-                                {"type": "color", "name": "out2"}
+                                {"type": "color", "name": "frag_color"}
                             ]
                         },
-                        "choice": {
+                        "blur": {
                             "inputs": [
-                                {"type": "color", "name": "situation"}
+                                {"type": "number", "name": "diameter"},
+                                {"type": "vec2", "name": "resolution"}
                             ],
-                            "outputs": [{"type": "color", "name": "situation"}]
+                            "outputs": [{"type": "color", "name": "frag_color"}]
+                        },
+                        "black_and_white": {
+                            "inputs": [],
+                            "outputs": [{"type": "color", "name": "frag_color"}]
+                        },
+                        "mix": {
+                            "inputs": [
+                                {"type": "color", "name": "x"},
+                                {"type": "color", "name": "y"},
+                                {"type": "number", "name": "a"}
+                            ],
+                            "outputs": [{"type": "color", "name": "frag_color"}]
+                        },
+                        "output": {
+                            "inputs": [{"type": "color", "name": "frag_color"}],
+                            "outputs": []
                         }
                     },
                     "actions": [
-                        {"name": "situation", "position": [150, 50]},
-                        {"name": "choice", "position": [500, 180]},
-                        {"name": "choice", "position": [500, 380]},
-                        {"name": "situation", "position": [900, 250]},
-                        {"name": "situation", "position": [900, 450]}
+                        {"name": "blur", "position": [150, 50]},
+                        {"name": "black_and_white", "position": [200, 250]},
+                        {"name": "mix", "position": [450, 150] },
+                        {"name": "output", "position": [800, 200] }
                     ],
                     "connections": [
-                        {"from": [0, "out"], "to": [1, "situation"]}
+                        {"from": [2, "frag_color"], "to": [3, "frag_color"]}
                     ]
                 });
                 renderer.render(graph);
