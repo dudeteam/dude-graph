@@ -4,7 +4,9 @@
         <style>
             #area {
                 background: #1d283a;
-                height: 600px;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
             }
 
             #svg {
@@ -92,7 +94,7 @@
                         {"from": [2, "frag_color"], "to": [3, "frag_color"]}
                     ]
                 });
-                renderer.init(paper);
+                renderer.initialize(paper);
                 renderer.render(graph);
             }
         });
