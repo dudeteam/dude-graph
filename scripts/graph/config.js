@@ -24,14 +24,14 @@ var ACTIONS = {
     },
     "mix": {
         "inputs": [
-            {"type": "color", "name": "first"},
-            {"type": "color", "name": "second"},
-            {"type": "number", "name": "ratio"}
+            {"type": "color", "name": "x"},
+            {"type": "color", "name": "y"},
+            {"type": "number", "name": "a"}
         ],
         "outputs": [{"type": "color", "name": "frag_color"}]
     },
     "output": {
-        "inputs": [{"type": "color", "name": "result"}],
+        "inputs": [{"type": "color", "name": "frag_color"}],
         "outputs": []
     }
 };
