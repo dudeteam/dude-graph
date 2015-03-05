@@ -43,3 +43,7 @@
     fill: transparent;
     stroke-width: 1px;
 }
+
+#svg .toto rect {
+    fill: red !important;
+}
