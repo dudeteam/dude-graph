@@ -83,6 +83,14 @@
                         "output": {
                             "inputs": [{"type": "color", "name": "frag_color"}],
                             "outputs": []
+                        },
+                        "hello_world": {
+                            "inputs": [],
+                            "outputs": [{"type": "string", "name": "message"}]
+                        },
+                        "print": {
+                            "inputs": [{"type": "string", "name": "message"}],
+                            "outputs": []
                         }
                     },
                     "actions": [
@@ -90,11 +98,14 @@
                         {"name": "black_and_white", "position": [200, 250]},
                         {"name": "mix", "position": [450, 150] },
                         {"name": "output", "position": [800, 200] },
-                        {"name": "rounded_rect", "position": [1100, 150] }
+                        {"name": "rounded_rect", "position": [1100, 150] },
+                        {"name": "hello_world", "position": [200, 400]},
+                        {"name": "print", "position": [500, 300]}
                     ],
                     "connections": [
                         {"from": [0, "frag_color"], "to": [2, "x"]},
-                        {"from": [1, "frag_color"], "to": [2, "y"]}
+                        {"from": [1, "frag_color"], "to": [2, "y"]},
+                        {"from": [5, "message"], "to": [6, "message"]}
                     ]
                 });
                 renderer.render(graph);
