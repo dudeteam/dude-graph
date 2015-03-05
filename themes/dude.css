@@ -45,7 +45,7 @@
 }
 
 #svg .text-input rect {
-    fill: transparent;
+    fill: rgba(255, 255, 255, 0.1);
     stroke: #ccc;
     stroke-width: 1px;
 }
