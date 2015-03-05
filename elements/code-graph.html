@@ -66,7 +66,10 @@
     <script src="../lib/utils/vec2.js"></script>
     <script src="../lib/utils/event-emitter.js"></script>
     <script src="../lib/utils/misc.js"></script>
+    <script src="../lib/utils/graphError.js"></script>
+    <script src="../lib/nodes/node.js"></script>
     <script src="../lib/nodes/container.js"></script>
+    <script src="../lib/nodes/group.js"></script>
     <script src="../lib/nodes/point.js"></script>
     <script src="../lib/nodes/model.js"></script>
     <script src="../lib/nodes/action.js"></script>
@@ -122,17 +125,17 @@
                             "outputs": []
                         }
                     },
-                    "actions": [
-                        {"name": "blur", "position": [150, 50]},
-                        {"name": "black_and_white", "position": [200, 250]},
-                        {"name": "mix", "position": [450, 150] },
-                        {"name": "output", "position": [800, 200] },
-                        {"name": "rounded_rect", "position": [1100, 150] }
+                    "children": [
+                        {"_type": "action", "_id": 1, "name": "rounded_rect", position: [100, 100]},
+                        {"_type": "group", "_id": 123, "name": "My Group", position: [100, 100], children: [
+                            {"_type": "action", "_id": 2, "name": "rounded_rect", position: [100, 100]},
+                            {"_type": "group", "_id": 4, "name": "My Group", position: [100, 100], children: [
+                                {"_type": "action", "_id": 3, "name": "rounded_rect", position: [100, 100]}
+                            ]}
+                        ]}
                     ],
                     "connections": [
-                        {"from": [0, "frag_color"], "to": [2, "x"]},
-                        {"from": [1, "frag_color"], "to": [2, "y"]},
-                        {"from": [2, "frag_color"], "to": [3, "frag_color"]}
+                        {"from": {"action": 1, "point": "frag_color"}, "to": {"action": 3, "point": "color"}}
                     ]
                 });
                 renderer.render(graph);
