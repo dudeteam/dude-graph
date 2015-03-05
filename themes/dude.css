@@ -44,6 +44,14 @@
     stroke-width: 1px;
 }
 
-#svg .toto rect {
-    fill: red !important;
+#svg .text-input rect {
+    fill: transparent;
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+#svg .text-input text {
+    fill: #aaa;
+    font-family: "Varela Round", sans-serif;
+    font-size: .7em;
 }
