@@ -36,6 +36,7 @@
 #svg .type-vec3 { fill: #3498db; stroke: #3498db; }
 #svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
 #svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
+#svg .type-string { fill: #e5678d; stroke: #e5678d; }
 #svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
 #svg .type-dictionary { fill: #e67e22; stroke: #e67e22; }
 #svg .empty {
