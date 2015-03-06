@@ -90,15 +90,12 @@
                     },
                     "children": [
                         {"_type": "action", "_id": 1, "name": "rounded_rect", position: [100, 100]},
-                        {"_type": "group", "_id": 123, "name": "My Group", position: [100, 100], children: [
-                            {"_type": "action", "_id": 2, "name": "rounded_rect", position: [100, 100]},
-                            {"_type": "group", "_id": 4, "name": "My Group", position: [100, 100], children: [
-                                {"_type": "action", "_id": 3, "name": "rounded_rect", position: [100, 100]}
-                            ]}
+                        {"_type": "group", "_id": 123, "name": "My Group", position: [400, 120], children: [
+                            {"_type": "action", "_id": 2, "name": "rounded_rect", position: [10, 0]}
                         ]}
                     ],
                     "connections": [
-                        {"from": {"action": 1, "point": "frag_color"}, "to": {"action": 3, "point": "color"}}
+                        {"from": {"action": 1, "point": "frag_color"}, "to": {"action": 2, "point": "color"}}
                     ]
                 });
                 renderer.render(graph);
