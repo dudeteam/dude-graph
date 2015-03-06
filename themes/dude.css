@@ -38,7 +38,8 @@
 #svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
 #svg .type-string { fill: #e5678d; stroke: #e5678d; }
 #svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#svg .type-dictionary { fill: #e67e22; stroke: #e67e22; }
+#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
+#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
 #svg .empty {
     fill: transparent;
     stroke-width: 1px;
@@ -64,15 +65,18 @@
 #svg .picker-string text {
     font-family: "Varela Round", sans-serif;
     fill: rgba(0, 0, 0, .8);
-    /*fill: #888;*/
     font-size: .6em;
 }
 
 #svg .picker-string rect {
-    /*fill: transparent;*/
-    /*stroke: #888;*/
-    /*stroke-width: 1px;*/
     fill: rgba(200, 200, 200, 0.5);
+}
+
+#svg .picker-string:hover rect,
+#svg .picker-vec2:hover rect,
+#svg .picker-vec3:hover rect,
+#svg .picker-resource:hover rect {
+    fill: rgba(200, 200, 200, 0.8);
 }
 
 #svg .picker-boolean {
@@ -93,4 +97,22 @@
 
 #svg .picker-boolean.selected path {
     stroke: #ccc;
+}
+
+#svg .picker-resource {
+    cursor: pointer;
+}
+
+#svg .picker-resource rect {
+    fill: rgba(200, 200, 200, 0.5);
+}
+
+#svg .picker-resource path {
+    fill: rgba(0, 0, 0, .8);
+}
+
+#svg .picker-resource text {
+    font-family: "Varela Round", sans-serif;
+    fill: rgba(0, 0, 0, .8);
+    font-size: .6em;
 }
