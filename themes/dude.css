@@ -44,23 +44,7 @@
     stroke-width: 1px;
 }
 
-#svg .text-input rect {
-    fill: rgba(255, 255, 255, 0.1);
-    stroke: #ccc;
-    stroke-width: 1px;
-}
-
-#svg .text-input text {
-    fill: #aaa;
-    font-family: "Varela Round", sans-serif;
-    font-size: .7em;
-}
-
-#svg .text-input.focused rect {
-    fill: transparent;
-}
-
-#svg .text-input input {
+#svg .dom-element input {
     outline: none;
     font-family: "Varela Round", sans-serif;
     color: #ccc;
@@ -68,4 +52,7 @@
     padding: 2px;
     border-radius: 5px;
     background: transparent;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
