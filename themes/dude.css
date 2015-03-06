@@ -55,3 +55,17 @@
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
 }
+
+#svg .text-input.focused rect {
+    fill: transparent;
+}
+
+#svg .text-input input {
+    outline: none;
+    font-family: "Varela Round", sans-serif;
+    color: #ccc;
+    border: 1px solid #ccc;
+    padding: 2px;
+    border-radius: 5px;
+    background: transparent;
+}
