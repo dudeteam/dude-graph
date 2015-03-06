@@ -9,16 +9,16 @@
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#svg .action rect {
+#svg .action > rect {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
     cursor: move;
 }
-#svg .action:hover rect {
+#svg .action:hover > rect {
     fill: rgba(15, 30, 40, 0.8);
 }
-#svg .action.selected rect {
+#svg .action.selected > rect {
     stroke-width: 2px;
 }
 #svg .action .title {
@@ -64,12 +64,15 @@
 #svg .picker-string text {
     font-family: "Varela Round", sans-serif;
     fill: rgba(0, 0, 0, .8);
-    /*fill: #aaa;*/
+    /*fill: #888;*/
     font-size: .6em;
 }
 
 #svg .picker-string rect {
-    fill: rgba(200, 200, 200, 0.8);
+    /*fill: transparent;*/
+    /*stroke: #888;*/
+    /*stroke-width: 1px;*/
+    fill: rgba(200, 200, 200, 0.5);
 }
 
 #svg .picker-boolean {
@@ -78,7 +81,7 @@
 
 #svg .picker-boolean rect {
     fill: transparent;
-    stroke: #ccc;
+    stroke: #888;
     stroke-width: 1px;
 }
 

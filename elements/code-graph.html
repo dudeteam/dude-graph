@@ -29,7 +29,7 @@
     <script src="../lib/utils/bbox.js"></script>
     <script src="../lib/utils/event-emitter.js"></script>
     <script src="../lib/utils/misc.js"></script>
-    <script src="../lib/utils/graphError.js"></script>
+    <script src="../lib/utils/graph-error.js"></script>
     <script src="../lib/nodes/node.js"></script>
     <script src="../lib/nodes/container.js"></script>
     <script src="../lib/nodes/group.js"></script>
@@ -95,6 +95,9 @@
                                 {"type": "vec2", "name": "uv", "value": {"x": 0, "y": 0}},
                                 {"type": "string", "name": "name", "value": "default.glsl"},
                                 {"type": "boolean", "name": "enabled", "value": true}
+                            ],
+                            "outputs": [
+                                {"type": "color", "name": "frag_color"}
                             ]
                         }
                     },
