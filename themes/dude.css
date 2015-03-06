@@ -56,3 +56,38 @@
     height: 100%;
     box-sizing: border-box;
 }
+
+#svg .picker-string {
+    cursor: pointer;
+}
+
+#svg .picker-string text {
+    font-family: "Varela Round", sans-serif;
+    fill: rgba(0, 0, 0, .8);
+    /*fill: #aaa;*/
+    font-size: .6em;
+}
+
+#svg .picker-string rect {
+    fill: rgba(200, 200, 200, 0.8);
+}
+
+#svg .picker-boolean {
+    cursor: pointer;
+}
+
+#svg .picker-boolean rect {
+    fill: transparent;
+    stroke: #ccc;
+    stroke-width: 1px;
+}
+
+#svg .picker-boolean path {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 2px;
+}
+
+#svg .picker-boolean.selected path {
+    stroke: #ccc;
+}

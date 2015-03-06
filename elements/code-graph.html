@@ -39,6 +39,7 @@
     <script src="../lib/nodes/connection.js"></script>
     <script src="../lib/nodes/graph.js"></script>
     <script src="../lib/renderer/utils.js"></script>
+    <script src="../lib/renderer/pickers.js"></script>
     <script src="../lib/renderer/zoom.js"></script>
     <script src="../lib/renderer/index.js"></script>
     <script src="../lib/serialization/saver.js"></script>
@@ -87,9 +88,18 @@
                         "output": {
                             "inputs": [{"type": "color", "name": "frag_color"}],
                             "outputs": []
+                        },
+                        "shader": {
+                            "inputs": [
+                                {"type": "vec3", "name": "position", "value": {"x": 0, "y": 0, "z": 0}},
+                                {"type": "vec2", "name": "uv", "value": {"x": 0, "y": 0}},
+                                {"type": "string", "name": "name", "value": "default.glsl"},
+                                {"type": "boolean", "name": "enabled", "value": true}
+                            ]
                         }
                     },
                     "children": [
+                        {"_type": "action", "_id": 10, "name": "shader", "position": [100, 300]},
                         {"_type": "action", "_id": 1, "name": "rounded_rect", position: [100, 100]},
                         {"_type": "group", "_id": 123, "name": "My Group", position: [400, 120], children: [
                             {"_type": "action", "_id": 2, "name": "rounded_rect", position: [10, 0]}
