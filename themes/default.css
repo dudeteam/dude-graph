@@ -1,0 +1,55 @@
+/* General */
+#svg {
+    background: #333;
+}
+
+/* Group */
+#svg .group rect {
+    fill: rgba(0, 0, 0, 0.5);
+}
+#svg .group:hover rect {
+    fill: rgba(0, 0, 0, .6);
+}
+#svg .group .title {
+    fill: #ccc;
+    font-family: helvetica, sans-serif;
+    font-size: .9em;
+}
+
+/* Action */
+#svg .action > rect {
+    fill: rgba(0, 0, 0, 0.5);
+}
+#svg .action:hover > rect {
+    fill: rgba(0, 0, 0, .6);
+}
+#svg .action.selected > rect {
+    stroke-width: 2px;
+}
+#svg .action .title {
+    font-family: helvetica, sans-serif;
+    font-size: .9em;
+}
+#svg .action .text {
+    fill: #999;
+    font-family: helvetica, sans-serif;
+    font-size: .7em;
+}
+#svg .action-default .title {
+    fill: #ccc;
+}
+
+/* Types */
+#svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
+#svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
+#svg .type-vec3 { fill: #3498db; stroke: #3498db; }
+#svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
+#svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
+#svg .type-string { fill: #e5678d; stroke: #e5678d; }
+#svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
+#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
+#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
+#svg .empty {
+    fill: transparent;
+    stroke-width: 1px;
+}

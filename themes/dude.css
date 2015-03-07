@@ -1,6 +1,8 @@
 /**
  * CodeGraph theme for DudeEngine.
  */
+
+/* Global*/
 #svg {
     background: #1d283a;
 }
@@ -9,31 +11,24 @@
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#svg .group rect {
+
+/* Group */
+#svg .group > rect {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
-    cursor: move;
 }
 #svg .group .title {
     fill: #ccc;
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
 }
+
+/* Action */
 #svg .action > rect {
     fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
-    cursor: move;
 }
-
-#svg .action-default > rect {
-    stroke: #ccc;
-}
-
-#svg .action-default .title {
-    fill: #ccc;
-}
-
 #svg .action:hover > rect {
     fill: rgba(15, 30, 40, 0.8);
 }
@@ -49,6 +44,16 @@
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
 }
+
+/* Action default */
+#svg .action-default > rect {
+    stroke: #ccc;
+}
+#svg .action-default .title {
+    fill: #ccc;
+}
+
+/* Types */
 #svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
 #svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
 #svg .type-vec3 { fill: #3498db; stroke: #3498db; }
