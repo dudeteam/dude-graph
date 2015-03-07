@@ -102,22 +102,32 @@
                                 {"type": "vec2", "name": "uv", "value": {"x": 0, "y": 0}},
                                 {"type": "string", "name": "name", "value": "default.glsl"},
                                 {"type": "boolean", "name": "enabled", "value": true},
-                                {"type": "resource", "name": "image"}
+                                {"type": "resource", "name": "image"},
+                                {"type": "vec3", "name": "position"},
+                                {"type": "vec2", "name": "uv"},
+                                {"type": "string", "name": "name"},
+                                {"type": "boolean", "name": "enabled"}
                             ],
                             "outputs": [
                                 {"type": "color", "name": "frag_color"}
                             ]
+                        },
+                        "name": {
+                            "type": "getter",
+                            "outputs": [{"type": "string", "name": "value"}]
                         }
                     },
                     "children": [
-                        {"_type": "action", "_id": 10, "name": "shader", "position": [100, 300]},
+                        {"_type": "action", "_id": 10, "name": "shader", "position": [300, 200]},
                         {"_type": "group", "_id": 324, "name": "The best group in the world", "position": [0, 0], "size": [400, 100], "children": []},
-                        {"_type": "group", "_id": 123, "name": "My Group", "position": [450, 200], "size": [400, 300],  "children": [
+                        {"_type": "group", "_id": 123, "name": "My Group", "position": [700, 200], "size": [400, 300],  "children": [
                             {"_type": "action", "_id": 3, "name": "rounded_rect", "position": [30, 130]}
-                        ]}
+                        ]},
+                        {"_type": "action", "_id": 211, "name": "name", "position": [20, 400]}
                     ],
                     "connections": [
-                        {"from": {"action": 10, "point": "frag_color"}, "to": {"action": 3, "point": "color"}}
+                        {"from": {"action": 10, "point": "frag_color"}, "to": {"action": 3, "point": "color"}},
+                        {"from": {"action": 211, "point": "value"}, "to": {"action": 10, "point": "name"}}
                     ]
                 });
                 renderer.render(graph);
