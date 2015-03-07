@@ -1,11 +1,12 @@
 /* General */
 #svg {
-    background: #333;
+    background: #222;
 }
 
 /* Group */
 #svg .group rect {
     fill: rgba(0, 0, 0, 0.5);
+    stroke: #444;
 }
 #svg .group:hover rect {
     fill: rgba(0, 0, 0, .6);
@@ -37,6 +38,9 @@
 }
 #svg .action-default .title {
     fill: #ccc;
+}
+#svg .action-default > rect {
+    stroke: #444;
 }
 
 /* Types */
