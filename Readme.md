@@ -1,14 +1,7 @@
 CodeGraph
 =========
 
+CodeGraph is a graphic tool to draw graphs which represent some logical behaviors. You can create actions, connect
+them together and order them into groups.
+
 ![Graph](graph.png)
-
-TODO
-----
-
-- Configuration modal
-- Add shortcuts settings in graph
-- Change point style when not connected
-- Automatically add action when create connection that cannot link to another action
-- Adapt action width
-- Adapt bezier curve
