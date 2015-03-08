@@ -23,7 +23,7 @@
         </div>
     </template>
     <!-- Vendors -->
-    <!--<script src="../bower_components/jwerty/jwerty.js"></script>-->
+    <script src="../bower_components/jwerty/jwerty.js"></script>
     <script src="../bower_components/Snap.svg/dist/snap.svg.js"></script>
     <!-- CodeGraph library -->
     <script src="../lib/index.js"></script>
@@ -118,6 +118,7 @@
                 var loader = new cg.Loader();
                 var saver = new cg.Saver();
                 var renderer = new cg.Renderer(paper, themes["dude"]);
+                renderer.initialize(graph);
                 loader.load(graph, {
                     "models": {
                         "rounded_rect": {
@@ -192,7 +193,15 @@
                     alert(error.message);
                 });
                 renderer.render(graph);
-
+                jwerty.key('A', function () {
+                    var action = new cg.Action(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
+                    graph.addChild(action);
+                });
+                jwerty.key('X', function () {
+                    renderer._paper.selectAll(".selected").forEach(function (element) {
+                        renderer._getNode(element).remove();
+                    });
+                });
                 window.graph = graph;
                 window.renderer = renderer;
                 window.loader = loader;
