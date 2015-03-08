@@ -18,6 +18,9 @@
     stroke: #ccc;
     stroke-width: 1px;
 }
+#svg .group.selected > rect {
+    stroke-width: 2px;
+}
 #svg .group .title {
     fill: #ccc;
     font-family: "Varela Round", sans-serif;
