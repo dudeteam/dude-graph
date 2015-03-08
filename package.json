@@ -1,0 +1,29 @@
+{
+  "name": "CodeGraph",
+  "version": "1.0.0",
+  "description": "CodeGraph is a graphic tool to draw graphs which represent some logical behaviors. You can create actions, connect them together and order them into groups.",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeremt/CodeGraph.git"
+  },
+  "keywords": [
+    "graph",
+    "blueprint"
+  ],
+  "author": "DudeTeam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jeremt/CodeGraph/issues"
+  },
+  "homepage": "https://github.com/jeremt/CodeGraph",
+  "dependencies": {
+    "gulp": "^3.8.11",
+    "gulp-concat": "^2.5.2",
+    "gulp-uglify": "^1.1.0",
+    "gulp-jshint": "^1.9.2"
+  }
+}
