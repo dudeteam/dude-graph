@@ -13,12 +13,12 @@
 }
 
 /* Group */
-#svg .group > rect {
+#svg .group .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
 }
-#svg .group.selected > rect {
+#svg .group.selected .background {
     stroke-width: 2px;
 }
 #svg .group .title {

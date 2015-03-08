@@ -2,8 +2,8 @@
 <polymer-element name="code-graph">
     <template>
         <link rel="stylesheet" href="../themes/base.css">
-        <!--<link rel="stylesheet" href="../themes/default.css">-->
         <link rel="stylesheet" href="../themes/dude.css">
+        <!--<link rel="stylesheet" href="../themes/default.css">-->
         <style>
             #area {
                 width: 100%;
@@ -59,59 +59,20 @@
             ready: function () {
                 var themes = {
                     "default": {
-                        "group": {
-                            "heading": 20,
-                            "border-radius": 0
-                        },
-                        "action": {
-                            "min-width": 250,
-                            "border-radius": 0,
-                            "padding": 10,
-                            "heading": 40
-                        },
-                        "point": {
-                            "height": 20,
-                            "padding": 5
-                        },
-                        "background-grid": {
-                            "pattern-size": 10,
-                            "step-size": 5,
-                            "line": {
-                                "stroke": "rgba(0, 0, 0, 0.2)",
-                                "stroke-width": 2
-                            },
-                            "big-line": {
-                                "stroke": "rgba(0, 0, 0, 0.4)",
-                                "stroke-width": 3
-                            }
-                        }
                     },
                     "dude": {
                         "group": {
-                            "heading": 20,
                             "border-radius": 5
                         },
                         "action": {
-                            "min-width": 250,
-                            "border-radius": 5,
-                            "padding": 15,
-                            "heading": 40,
-                            "center-spacing": 20
-                        },
-                        "point": {
-                            "height": 20,
-                            "padding": 5
+                            "border-radius": 5
                         },
                         "background-grid": {
-                            "pattern-size": 10,
-                            "step-size": 5,
                             "line": {
                                 "stroke": "rgba(255, 255, 255, 0.05)",
-                                "stroke-width": 2
                             },
                             "big-line": {
                                 "stroke": "rgba(255, 255, 255, 0.2)",
-                                "stroke-width": 3
                             }
                         }
                     }
@@ -120,8 +81,8 @@
                 var graph = new cg.Graph();
                 var loader = new cg.Loader();
                 var saver = new cg.Saver();
-                var renderer = new cg.Renderer(paper, themes["dude"]);
-                renderer.initialize(graph);
+                var renderer = new cg.Renderer(paper);
+                renderer.initialize(graph, themes["dude"]);
                 loader.load(graph, {
                     "models": {
                         "rounded_rect": {
