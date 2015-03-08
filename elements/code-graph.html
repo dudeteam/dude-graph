@@ -188,6 +188,9 @@
                         {"from": {"action": 211, "point": "value"}, "to": {"action": 10, "point": "name"}}
                     ]
                 });
+                graph.on("error", function (error) {
+                    alert(error.message);
+                });
                 renderer.render(graph);
 
                 window.graph = graph;
