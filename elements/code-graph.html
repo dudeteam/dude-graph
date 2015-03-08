@@ -165,8 +165,8 @@
                     graph.addChild(group);
                 });
                 jwerty.key('X', function () {
-                    renderer._paper.selectAll(".selected").forEach(function (element) {
-                        renderer._getNode(element).remove();
+                    renderer.selectedNodes().forEach(function (node) {
+                        node.remove();
                     });
                 });
                 window.graph = graph;
