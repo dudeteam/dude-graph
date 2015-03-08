@@ -43,6 +43,7 @@
     <script src="../lib/nodes/block.js"></script>
     <script src="../lib/nodes/connection.js"></script>
     <script src="../lib/nodes/graph.js"></script>
+    <script src="../lib/renderer/renderer-error.js"></script>
     <script src="../lib/renderer/index.js"></script>
     <script src="../lib/renderer/cursor-point.js"></script>
     <script src="../lib/renderer/utils.js"></script>
@@ -142,7 +143,16 @@
                             ]
                         },
                         "name": {"type": "getter", "value-type": "string"},
-                        "delta_value": {"type": "getter", "value-type": "number"}
+                        "delta_value": {"type": "getter", "value-type": "number"},
+                        "picker-boolean": {"type": "picker", "value-type": "boolean", "default": true},
+                        "picker-number": {"type": "picker", "value-type": "number", "default": 0},
+                        "picker-vec3": {"type": "picker", "value-type": "vec3", "default": [0, 0, 0]},
+                        "picker-vec2": {"type": "picker", "value-type": "vec2", "default": [0, 0]},
+                        "picker-color": {"type": "picker", "value-type": "color", "default": "#fff"},
+                        "picker-string": {"type": "picker", "value-type": "string", "default": ""},
+                        "picker-list": {"type": "picker", "value-type": "list", "default": []},
+                        "picker-dictionary": {"type": "picker", "value-type": "dictionary", "default": {}},
+                        "picker-resource": {"type": "picker", "value-type": "resource", "default": "none"}
                     },
                     "children": [
                         {"_type": "block", "_id": 1241, "name": "blur", "position": [200, 150]},
@@ -154,7 +164,11 @@
                             {"_type": "block", "_id": 3, "name": "rounded_rect", "position": [30, 130]}
                         ]},
                         {"_type": "block", "_id": 211, "name": "name", "position": [20, 600]},
-                        {"_type": "block", "_id": 400, "name": "delta_value", "position": [400, 350]}
+                        {"_type": "block", "_id": 400, "name": "delta_value", "position": [400, 350]},
+                        {"_type": "block", "_id": 400, "name": "picker-boolean", "position": [50, 150]},
+                        {"_type": "block", "_id": 400, "name": "picker-string", "position": [50, 200], "value": "Hello world"},
+                        {"_type": "block", "_id": 400, "name": "picker-vec2", "position": [50, 250]},
+                        {"_type": "block", "_id": 400, "name": "picker-color", "position": [50, 300], "value": "#820"}
                     ],
                     "connections": [
                         {"from": {"block": 10, "point": "frag_color"}, "to": {"block": 3, "point": "color"}}
