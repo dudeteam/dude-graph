@@ -12,6 +12,21 @@
     stroke-width: 1px;
 }
 
+/* Types */
+#svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
+#svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
+#svg .type-vec3 { fill: #3498db; stroke: #3498db; }
+#svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
+#svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
+#svg .type-string { fill: #e5678d; stroke: #e5678d; }
+#svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
+#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
+#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
+#svg .empty {
+    fill: transparent;
+    stroke-width: 1px;
+}
+
 /* Group */
 #svg .group .background {
     fill: rgba(25, 35, 50, 0.8);
@@ -50,19 +65,15 @@
     font-size: .7em;
 }
 
-/* Types */
-#svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
-#svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
-#svg .type-vec3 { fill: #3498db; stroke: #3498db; }
-#svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
-#svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
-#svg .type-string { fill: #e5678d; stroke: #e5678d; }
-#svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
-#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
-#svg .empty {
-    fill: transparent;
+/* Getters */
+#svg .getter .background {
+    fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
+}
+#svg .getter .title {
+    font-family: "Varela Round", sans-serif;
+    font-size: .9em;
+    stroke: transparent;
 }
 
 #svg .dom-element input {

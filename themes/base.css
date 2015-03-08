@@ -3,10 +3,7 @@
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#svg .group {
-    cursor: move;
-}
-#svg .action {
+#svg .group, #svg .action, #svg .getter {
     cursor: move;
 }
 #svg .action > text {
