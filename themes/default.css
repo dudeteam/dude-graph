@@ -22,23 +22,23 @@
 }
 
 /* Action */
-#svg .action .background {
+#svg .action .background, .getter .background {
     fill: rgba(0, 0, 0, 0.5);
     stroke: #444;
 }
-#svg .action:hover .background {
+#svg .action:hover .background, .getter .background {
     fill: rgba(0, 0, 0, .6);
 }
-#svg .action.selected .background {
+#svg .action.selected .background, .getter .background {
     stroke-width: 2px;
     stroke: #666;
 }
-#svg .action .title {
+#svg .action .title, .getter .title {
     font-family: helvetica, sans-serif;
     font-size: .9em;
     fill: #ccc;
 }
-#svg .action .text {
+#svg .action .text, .getter .text {
     fill: #999;
     font-family: helvetica, sans-serif;
     font-size: .7em;
