@@ -52,8 +52,8 @@
     <script src="../lib/renderer/render-action.js"></script>
     <script src="../lib/renderer/render-point.js"></script>
     <script src="../lib/renderer/render-connection.js"></script>
-    <script src="../lib/serialization/saver.js"></script>
-    <script src="../lib/serialization/loader.js"></script>
+    <script src="../lib/serialization/json-saver.js"></script>
+    <script src="../lib/serialization/json-loader.js"></script>
     <script>
         Polymer({
             ready: function () {
@@ -79,8 +79,8 @@
                 };
                 var paper = Snap(this.$.svg);
                 var graph = new cg.Graph();
-                var loader = new cg.Loader();
-                var saver = new cg.Saver();
+                var loader = new cg.JSONLoader();
+                var saver = new cg.JSONSaver();
                 var renderer = new cg.Renderer(paper);
                 renderer.initialize(graph, themes["dude"]);
                 loader.load(graph, {
