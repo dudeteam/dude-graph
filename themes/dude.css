@@ -28,32 +28,26 @@
 }
 
 /* Action */
-#svg .action > rect {
+#svg .action .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
+    stroke: #ccc;
 }
-#svg .action:hover > rect {
+#svg .action:hover .background {
     fill: rgba(15, 30, 40, 0.8);
 }
-#svg .action.selected > rect {
+#svg .action.selected .background {
     stroke-width: 2px;
 }
 #svg .action .title {
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
+    fill: #ccc;
 }
 #svg .action .text {
     fill: #999;
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
-}
-
-/* Action default */
-#svg .action-default > rect {
-    stroke: #ccc;
-}
-#svg .action-default .title {
-    fill: #ccc;
 }
 
 /* Types */
