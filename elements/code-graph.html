@@ -41,6 +41,7 @@
     <script src="../lib/nodes/connection.js"></script>
     <script src="../lib/nodes/graph.js"></script>
     <script src="../lib/renderer/index.js"></script>
+    <script src="../lib/renderer/cursor-point.js"></script>
     <script src="../lib/renderer/utils.js"></script>
     <script src="../lib/renderer/pickers.js"></script>
     <script src="../lib/renderer/zoom.js"></script>
@@ -172,13 +173,15 @@
                         }
                     },
                     "children": [
-                        {"_type": "action", "_id": 10, "name": "shader", "position": [300, 200]},
-                        {"_type": "action", "_id": 120, "name": "mix", "position": [400, 300]},
+                        {"_type": "action", "_id": 1241, "name": "blur", "position": [200, 150]},
+                        {"_type": "action", "_id": 1251, "name": "black_and_white", "position": [200, 300]},
+                        {"_type": "action", "_id": 120, "name": "mix", "position": [500, 200]},
+                        {"_type": "action", "_id": 10, "name": "shader", "position": [300, 500]},
                         {"_type": "group", "_id": 324, "name": "The best group in the world", "position": [0, 0], "size": [200, 100], "children": []},
-                        {"_type": "group", "_id": 123, "name": "My Group", "position": [700, 200], "size": [400, 300],  "children": [
+                        {"_type": "group", "_id": 123, "name": "My Group", "position": [700, 400], "size": [400, 300],  "children": [
                             {"_type": "action", "_id": 3, "name": "rounded_rect", "position": [30, 130]}
                         ]},
-                        {"_type": "action", "_id": 211, "name": "name", "position": [20, 400]}
+                        {"_type": "action", "_id": 211, "name": "name", "position": [20, 600]}
                     ],
                     "connections": [
                         {"from": {"action": 10, "point": "frag_color"}, "to": {"action": 3, "point": "color"}},
