@@ -158,11 +158,16 @@
                 renderer.render(graph);
                 jwerty.key('A', function () {
                     var action = new cg.Action(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
-                    graph.addChild(action);
+                    graph.addNode(action, graph);
                 });
                 jwerty.key('G', function () {
                     var group = new cg.Group(prompt("_id"), prompt("name"), renderer._mousePosition.clone(), new cg.Vec2(300, 300));
-                    graph.addChild(group);
+                    graph.addNode(group, graph);
+                    renderer.selectedNodes().forEach(function (node) {
+                        if (node.parent && node.parent instanceof cg.Graph) {
+                            group.addChild(node);
+                        }
+                    });
                 });
                 jwerty.key('X', function () {
                     renderer.selectedNodes().forEach(function (node) {
