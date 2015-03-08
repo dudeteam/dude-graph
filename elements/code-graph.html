@@ -160,6 +160,10 @@
                     var action = new cg.Action(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
                     graph.addChild(action);
                 });
+                jwerty.key('G', function () {
+                    var group = new cg.Group(prompt("_id"), prompt("name"), renderer._mousePosition.clone(), new cg.Vec2(300, 300));
+                    graph.addChild(group);
+                });
                 jwerty.key('X', function () {
                     renderer._paper.selectAll(".selected").forEach(function (element) {
                         renderer._getNode(element).remove();
