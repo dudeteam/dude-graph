@@ -177,6 +177,9 @@
                 graph.on("error", function (error) {
                     alert(error.message);
                 });
+                renderer.on("picker.edit", function (picker) {
+                    picker.value = prompt("New value: ");
+                });
                 renderer.render(graph);
                 jwerty.key('A', function () {
                     var action = new cg.Action(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
