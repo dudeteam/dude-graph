@@ -182,7 +182,7 @@
                 });
                 renderer.render(graph);
                 jwerty.key('A', function () {
-                    var action = new cg.Action(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
+                    var action = new cg.Block(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
                     graph.addNode(action, graph);
                 });
                 jwerty.key('G', function () {
