@@ -177,7 +177,11 @@
                     alert(error.message);
                 });
                 renderer.on("picker.edit", function (picker) {
-                    picker.value = prompt("New value: ");
+                    var value = prompt("New value: ");
+                    if (picker.model.valueType === "vec2" || picker.model.valueType === "vec3") {
+                        value = value.split(" ");
+                    }
+                    picker.value = value;
                 });
                 renderer.initialize(graph, themes["dude"]);
                 loader.load(graph, graphData);
