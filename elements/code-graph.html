@@ -31,18 +31,18 @@
     <script src="../lib/utils/box2.js"></script>
     <script src="../lib/utils/event-emitter.js"></script>
     <script src="../lib/utils/misc.js"></script>
-    <script src="../lib/utils/graph-error.js"></script>
-    <script src="../lib/nodes/node.js"></script>
-    <script src="../lib/nodes/container.js"></script>
-    <script src="../lib/nodes/group.js"></script>
-    <script src="../lib/nodes/point.js"></script>
-    <script src="../lib/nodes/model.js"></script>
-    <script src="../lib/nodes/models/getter.js"></script>
-    <script src="../lib/nodes/models/picker.js"></script>
-    <script src="../lib/nodes/models/action.js"></script>
-    <script src="../lib/nodes/block.js"></script>
-    <script src="../lib/nodes/connection.js"></script>
-    <script src="../lib/nodes/graph.js"></script>
+    <script src="../lib/graph/utils/graph-error.js"></script>
+    <script src="../lib/graph/nodes/node.js"></script>
+    <script src="../lib/graph/utils/container.js"></script>
+    <script src="../lib/graph/nodes/group.js"></script>
+    <script src="../lib/graph/nodes/point.js"></script>
+    <script src="../lib/graph/nodes/model.js"></script>
+    <script src="../lib/graph/models/getter.js"></script>
+    <script src="../lib/graph/models/picker.js"></script>
+    <script src="../lib/graph/models/action.js"></script>
+    <script src="../lib/graph/nodes/block.js"></script>
+    <script src="../lib/graph/nodes/connection.js"></script>
+    <script src="../lib/graph/nodes/graph.js"></script>
     <script src="../lib/renderer/renderer-error.js"></script>
     <script src="../lib/renderer/index.js"></script>
     <script src="../lib/renderer/cursor-point.js"></script>
@@ -86,8 +86,7 @@
                 var loader = new cg.JSONLoader();
                 var saver = new cg.JSONSaver();
                 var renderer = new cg.Renderer(paper);
-                renderer.initialize(graph, themes["dude"]);
-                loader.load(graph, {
+                var graphData = {
                     "models": {
                         "rounded_rect": {
                             "type": "action",
@@ -165,21 +164,23 @@
                         ]},
                         {"_type": "block", "_id": 211, "name": "name", "position": [20, 600]},
                         {"_type": "block", "_id": 400, "name": "delta_value", "position": [400, 350]},
-                        {"_type": "block", "_id": 400, "name": "picker-boolean", "position": [50, 150]},
-                        {"_type": "block", "_id": 400, "name": "picker-string", "position": [50, 200], "value": "Hello world"},
-                        {"_type": "block", "_id": 400, "name": "picker-vec2", "position": [50, 250]},
-                        {"_type": "block", "_id": 400, "name": "picker-color", "position": [50, 300], "value": "#820"}
+                        {"_type": "block", "_id": 401, "name": "picker-boolean", "position": [50, 150]},
+                        {"_type": "block", "_id": 402, "name": "picker-string", "position": [50, 200], "value": "Hello world"},
+                        {"_type": "block", "_id": 403, "name": "picker-vec2", "position": [50, 250]},
+                        {"_type": "block", "_id": 404, "name": "picker-color", "position": [50, 300], "value": "#820"}
                     ],
                     "connections": [
                         {"from": {"block": 10, "point": "frag_color"}, "to": {"block": 3, "point": "color"}}
                     ]
-                });
+                };
                 graph.on("error", function (error) {
                     alert(error.message);
                 });
                 renderer.on("picker.edit", function (picker) {
                     picker.value = prompt("New value: ");
                 });
+                renderer.initialize(graph, themes["dude"]);
+                loader.load(graph, graphData);
                 renderer.render(graph);
                 jwerty.key('A', function () {
                     var action = new cg.Block(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
