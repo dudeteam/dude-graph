@@ -52,7 +52,7 @@ gulp.task('default', function() {
     return gulp.src(sources.map(function(e) { return paths.lib + e; }))
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
-        .pipe(uglify())
         .pipe(concat("codegraph.min.js"))
+        .pipe(uglify())
         .pipe(gulp.dest(paths.dist));
 });
