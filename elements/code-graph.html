@@ -195,7 +195,7 @@
                 });
                 jwerty.key('X', function () {
                     renderer.selectedNodes().forEach(function (node) {
-                        node.remove();
+                        graph.removeNode(node);
                     });
                 });
                 window.graph = graph;

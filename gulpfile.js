@@ -20,24 +20,25 @@ var sources = [
     "utils/box2.js",
     "utils/event-emitter.js",
     "utils/misc.js",
-    "utils/graph-error.js",
-    "nodes/node.js",
-    "nodes/container.js",
-    "nodes/group.js",
-    "nodes/point.js",
-    "nodes/model.js",
-    "nodes/models/getter.js",
-    "nodes/models/picker.js",
-    "nodes/models/action.js",
-    "nodes/block.js",
-    "nodes/connection.js",
-    "nodes/graph.js",
+    "graph/utils/graph-error.js",
+    "graph/nodes/node.js",
+    "graph/utils/container.js",
+    "graph/nodes/group.js",
+    "graph/nodes/point.js",
+    "graph/nodes/model.js",
+    "graph/models/getter.js",
+    "graph/models/picker.js",
+    "graph/models/action.js",
+    "graph/nodes/block.js",
+    "graph/nodes/connection.js",
+    "graph/nodes/graph.js",
+    "renderer/renderer-error.js",
     "renderer/index.js",
     "renderer/cursor-point.js",
     "renderer/utils.js",
     "renderer/pickers.js",
     "renderer/zoom.js",
-    "renderer/background-grid.js",
+    "renderer/grid.js",
     "renderer/render-graph.js",
     "renderer/render-container.js",
     "renderer/render-group.js",
@@ -53,6 +54,6 @@ gulp.task('default', function() {
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
         .pipe(concat("codegraph.min.js"))
-        .pipe(uglify())
+        .pipe(uglify({mangle: false}))
         .pipe(gulp.dest(paths.dist));
 });
