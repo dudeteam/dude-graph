@@ -194,9 +194,7 @@
                     renderer.createGroup(prompt("id"), prompt("name"));
                 });
                 jwerty.key('X', function () {
-                    renderer.selectedNodes().forEach(function (node) {
-                        graph.removeNode(node);
-                    });
+                    renderer.removeSelectedNodes();
                 });
                 window.graph = graph;
                 window.renderer = renderer;
