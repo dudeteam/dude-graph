@@ -16,10 +16,6 @@ var paths = {
 
 var sources = [
     "index.js",
-    "utils/vec2.js",
-    "utils/box2.js",
-    "utils/event-emitter.js",
-    "utils/misc.js",
     "graph/utils/graph-error.js",
     "graph/nodes/node.js",
     "graph/utils/container.js",
