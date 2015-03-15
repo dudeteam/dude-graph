@@ -152,7 +152,7 @@
                         "picker-resource": {"type": "picker", "value-type": "resource", "default": "none"}
                     },
                     "children": [
-                        {"_type": "block", "_id": 1241, "name": "blur", "position": [200, 150]},
+                        {"_type": "block", "_id": 0, "name": "blur", "position": [200, 150]},
                         {"_type": "block", "_id": 1251, "name": "black_and_white", "position": [200, 300]},
                         {"_type": "block", "_id": 120, "name": "mix", "position": [500, 200]},
                         {"_type": "block", "_id": 10, "name": "shader", "position": [300, 500]},
@@ -185,11 +185,13 @@
                 loader.load(graph, graphData);
                 renderer.render(graph);
                 jwerty.key('A', function () {
-                    var action = new cg.Block(prompt("_id"), graph.getModel(prompt("model")), renderer._mousePosition.clone());
+                    var _id = graph.getNextBlockId();
+                    var action = new cg.Block(_id, graph.getModel(prompt("model")), renderer._mousePosition.clone());
                     graph.addNode(action, graph);
                 });
                 jwerty.key('G', function () {
-                    renderer.createGroup(prompt("id"), prompt("name"));
+                    var _id = graph.getNextGroupId();
+                    renderer.createGroup(_id, prompt("name"));
                 });
                 jwerty.key('X', function () {
                     renderer.removeSelectedNodes();
