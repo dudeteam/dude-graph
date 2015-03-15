@@ -1,27 +1,29 @@
+<!--
+It's the most important polymer component of CodeGraph. It creates the SVG graph and handle user inputs interactions
+to add blocks/groups, remove or move them.
+
+@attribute url {String} This is the url of the graph data to load. If you create the graph like so
+    <cg-graph url="path/to/graph.json"></cg-graph> the graph will be loaded from the given url.
+@attribute theme {String?} This is the theme to apply on this graph. A theme is composed of 2 files, the config and
+    the stylesheet. All themes are stored in CodeGraph's themes/ folder. If you create the graph like so
+    <cg-graph url="graph.json" theme="dude"></cg-graph> the files themes/dude.json and themes/dude.css will be loaded.
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../elements/cg-error.html">
 <polymer-element name="cg-graph" attributes="theme url">
     <template>
         <link rel="stylesheet" href="../themes/base.css">
         <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
         <style>
-            #area {
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-            }
-
             #cg {
                 width: 100%;
                 height: 100%;
             }
         </style>
-        <div id="area">
-            <svg id="cg">
-
-            </svg>
-        </div>
+        <svg id="cg"></svg>
+        <cg-error message="The error message goes here!"></cg-error>
     </template>
     <!-- Vendors -->
     <script src="../bower_components/jwerty/jwerty.js"></script>

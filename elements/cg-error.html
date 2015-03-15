@@ -1,0 +1,24 @@
+<!--
+This component displays errors messages that occurs into the graph.
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="cg-error" attributes="message">
+    <template>
+        <style>
+            :host {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                background: rgba(231, 76, 60, 0.8);
+                font-size: .8em;
+                padding: 10px;
+                color: white;
+                font-family: helvetica, arial, clean, sans-serif;
+            }
+        </style>
+        {{message}}
+    </template>
+    <script>
+        Polymer({});
+    </script>
+</polymer-element>
