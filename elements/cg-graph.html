@@ -1,0 +1,153 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<polymer-element name="cg-graph" attributes="theme url">
+    <template>
+        <link rel="stylesheet" href="../themes/base.css">
+        <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
+        <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
+        <style>
+            #area {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            #cg {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <div id="area">
+            <svg id="cg">
+
+            </svg>
+        </div>
+    </template>
+    <!-- Vendors -->
+    <script src="../bower_components/jwerty/jwerty.js"></script>
+    <script src="../bower_components/interact/interact.js"></script>
+    <script src="../bower_components/Snap.svg/dist/snap.svg.js"></script>
+    <script src="../bower_components/pandora/lib/pandora.js"></script>
+    <!-- CodeGraph library -->
+    <script src="../lib/index.js"></script>
+    <script src="../lib/graph/utils/graph-error.js"></script>
+    <script src="../lib/graph/nodes/node.js"></script>
+    <script src="../lib/graph/utils/container.js"></script>
+    <script src="../lib/graph/nodes/group.js"></script>
+    <script src="../lib/graph/nodes/point.js"></script>
+    <script src="../lib/graph/models/model.js"></script>
+    <script src="../lib/graph/models/getter.js"></script>
+    <script src="../lib/graph/models/picker.js"></script>
+    <script src="../lib/graph/models/action.js"></script>
+    <script src="../lib/graph/nodes/block.js"></script>
+    <script src="../lib/graph/nodes/connection.js"></script>
+    <script src="../lib/graph/nodes/graph.js"></script>
+    <script src="../lib/renderer/renderer-error.js"></script>
+    <script src="../lib/renderer/index.js"></script>
+    <script src="../lib/renderer/cursor-point.js"></script>
+    <script src="../lib/renderer/utils.js"></script>
+    <script src="../lib/renderer/pickers.js"></script>
+    <script src="../lib/renderer/zoom.js"></script>
+    <script src="../lib/renderer/grid.js"></script>
+    <script src="../lib/renderer/render-graph.js"></script>
+    <script src="../lib/renderer/render-container.js"></script>
+    <script src="../lib/renderer/render-group.js"></script>
+    <script src="../lib/renderer/render-block.js"></script>
+    <script src="../lib/renderer/render-point.js"></script>
+    <script src="../lib/renderer/render-connection.js"></script>
+    <script src="../lib/serialization/json-saver.js"></script>
+    <script src="../lib/serialization/json-loader.js"></script>
+    <script>
+        Polymer({
+            theme: "dude",
+            data: null,
+            config: null,
+
+            /**
+             * Dynamically load a theme to apply on the graph.
+             * @param name {String} the name of the theme to apply
+             */
+            addTheme: function (name) {
+                var link = document.createElement('link');
+                link.type = 'text/css';
+                link.rel = 'stylesheet';
+                link.href = '../themes/' + name + '.css';
+                this.shadowRoot.appendChild(link);
+                this.element.convertSheetsToStyles(this.shadowRoot);
+            },
+
+            /**
+             * Create the graph when its config and data are loaded.
+             */
+            createGraph: function () {
+                var paper = Snap(this.$.cg);
+                var graph = new cg.Graph();
+                var loader = new cg.JSONLoader();
+                var saver = new cg.JSONSaver();
+                var renderer = new cg.Renderer(paper);
+                loader.on("error", function (error) {
+                    console.log(arguments);
+                    throw error;
+                });
+                saver.on("error", function (error) {
+                    console.log(arguments);
+                    throw error;
+                });
+                graph.on("error", function (error) {
+                    alert(error.message);
+                });
+                renderer.on("picker.edit", function (picker) {
+                    var value = prompt("New value: ");
+                    if (picker.model.valueType === "vec2" || picker.model.valueType === "vec3") {
+                        value = value.split(" ");
+                    }
+                    picker.value = value;
+                });
+                renderer.initialize(graph, this.config);
+                loader.load(graph, this.data);
+                renderer.render(graph);
+                jwerty.key('A', function () {
+                    var _id = graph.getNextBlockId();
+                    var modelName = prompt("model");
+                    var model = graph.getModel(modelName);
+                    if (model === undefined) {
+                        alert("Undefined model " + modelName + ".");
+                    } else {
+                        var action = new cg.Block(_id, model, renderer._mousePosition.clone());
+                        graph.addNode(action, graph);
+                    }
+                });
+                jwerty.key('G', function () {
+                    var _id = graph.getNextGroupId();
+                    renderer.createGroup(_id, prompt("name"));
+                });
+                jwerty.key('X', function () {
+                    renderer.removeSelectedNodes();
+                });
+                window.graph = graph;
+                window.renderer = renderer;
+                window.loader = loader;
+                window.saver = saver;
+            },
+
+            /**
+             * Load config and data then call createGraph().
+             */
+            ready: function () {
+                this.addTheme(this.theme);
+                this.$.config.addEventListener("core-complete", function () {
+                    this.config = this.$.config.response;
+                    if (this.data !== null) {
+                        this.createGraph();
+                    }
+                }.bind(this));
+                this.$.data.addEventListener("core-complete", function () {
+                    this.data = this.$.data.response;
+                    if (this.config !== null) {
+                        this.createGraph();
+                    }
+                }.bind(this));
+            }
+        });
+    </script>
+</polymer-element>

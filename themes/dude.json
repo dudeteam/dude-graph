@@ -1,0 +1,16 @@
+{
+  "group": {
+    "border-radius": 5
+  },
+  "block": {
+    "border-radius": 5
+  },
+  "background-grid": {
+    "line": {
+      "stroke": "rgba(255, 255, 255, 0.05)"
+    },
+    "big-line": {
+      "stroke": "rgba(255, 255, 255, 0.2)"
+    }
+  }
+}

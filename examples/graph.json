@@ -1,0 +1,279 @@
+{
+  "models": {
+    "rounded_rect": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "color",
+          "name": "color",
+          "value": "#fff"
+        },
+        {
+          "type": "number",
+          "name": "aspect_ratio",
+          "value": 1
+        },
+        {
+          "type": "number",
+          "name": "stroke_size",
+          "value": 1
+        },
+        {
+          "type": "number",
+          "name": "border_radius",
+          "value": 0.2
+        },
+        {
+          "type": "boolean",
+          "name": "is_solid",
+          "value": true
+        }
+      ],
+      "outputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ]
+    },
+    "blur": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "diameter"
+        },
+        {
+          "type": "vec2",
+          "name": "resolution"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ]
+    },
+    "black_and_white": {
+      "type": "action",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ]
+    },
+    "mix": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "color",
+          "name": "x"
+        },
+        {
+          "type": "color",
+          "name": "y"
+        },
+        {
+          "type": "number",
+          "name": "a"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ]
+    },
+    "output": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ],
+      "outputs": []
+    },
+    "shader": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "vec3",
+          "name": "position",
+          "value": {"x": 0, "y": 0, "z": 0}
+        },
+        {
+          "type": "vec2",
+          "name": "uv",
+          "value": {"x": 0, "y": 0}
+        },
+        {
+          "type": "string",
+          "name": "name",
+          "value": "default.glsl"
+        },
+        {
+          "type": "boolean",
+          "name": "enabled",
+          "value": true
+        },
+        {
+          "type": "resource",
+          "name": "image"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "color",
+          "name": "frag_color"
+        }
+      ]
+    },
+    "name": {
+      "type": "getter",
+      "value-type": "string"
+    },
+    "delta_value": {
+      "type": "getter",
+      "value-type": "number"
+    },
+    "picker-boolean": {
+      "type": "picker",
+      "value-type": "boolean",
+      "default": true
+    },
+    "picker-number": {
+      "type": "picker",
+      "value-type": "number",
+      "default": 0
+    },
+    "picker-vec3": {
+      "type": "picker",
+      "value-type": "vec3",
+      "default": [0, 0, 0]
+    },
+    "picker-vec2": {
+      "type": "picker",
+      "value-type": "vec2",
+      "default": [0, 0]
+    },
+    "picker-color": {
+      "type": "picker",
+      "value-type": "color",
+      "default": "#fff"
+    },
+    "picker-string": {
+      "type": "picker",
+      "value-type": "string",
+      "default": ""
+    },
+    "picker-list": {
+      "type": "picker",
+      "value-type": "list",
+      "default": []
+    },
+    "picker-dictionary": {
+      "type": "picker",
+      "value-type": "dictionary",
+      "default": {}
+    },
+    "picker-resource": {
+      "type": "picker",
+      "value-type": "resource",
+      "default": "none"
+    }
+  },
+  "children": [
+    {
+      "_type": "block",
+      "_id": 0,
+      "name": "blur",
+      "position": [200, 150]
+    },
+    {
+      "_type": "block",
+      "_id": 1251,
+      "name": "black_and_white",
+      "position": [200, 300]
+    },
+    {
+      "_type": "block",
+      "_id": 120,
+      "name": "mix",
+      "position": [500, 200]
+    },
+    {
+      "_type": "block",
+      "_id": 10,
+      "name": "shader",
+      "position": [474, 5]
+    },
+    {
+      "_type": "group",
+      "_id": 324,
+      "name": "The best group in the world",
+      "position": [0, 0],
+      "size": [200, 100],
+      "children": []
+    },
+    {
+      "_type": "group",
+      "_id": 123,
+      "name": "My Group",
+      "position": [810, 48],
+      "size": [400, 300
+      ],
+      "children": [
+        {
+          "_type": "block",
+          "_id": 3,
+          "name": "rounded_rect",
+          "position": [30, 130]
+        }
+      ]
+    },
+    {
+      "_type": "block",
+      "_id": 211,
+      "name": "name",
+      "position": [281, 66]
+    },
+    {
+      "_type": "block",
+      "_id": 400,
+      "name": "delta_value",
+      "position": [400, 350]
+    },
+    {
+      "_type": "block",
+      "_id": 401,
+      "name": "picker-boolean",
+      "position": [50, 150]
+    },
+    {
+      "_type": "block",
+      "_id": 402,
+      "name": "picker-string",
+      "position": [50, 200]
+    },
+    {
+      "_type": "block",
+      "_id": 403,
+      "name": "picker-vec2",
+      "position": [50, 250]
+    },
+    {
+      "_type": "block",
+      "_id": 404,
+      "name": "picker-color",
+      "position": [50, 300]
+    }
+  ],
+  "connections": [
+    { "from": { "block": 10, "point": "frag_color" }, "to": { "block": 3, "point": "color" } }
+  ]
+}
