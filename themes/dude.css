@@ -3,76 +3,76 @@
  */
 
 /* Global*/
-#svg {
+#cg {
     background: #1d283a;
 }
-#svg #selection {
+#cg #selection {
     fill: rgba(255, 255, 255, 0.2);
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
 
 /* Types */
-#svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
-#svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
-#svg .type-vec3 { fill: #3498db; stroke: #3498db; }
-#svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
-#svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
-#svg .type-string { fill: #e5678d; stroke: #e5678d; }
-#svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
-#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
-#svg .empty {
+#cg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
+#cg .type-number { fill: #2ecc71; stroke: #2ecc71; }
+#cg .type-vec3 { fill: #3498db; stroke: #3498db; }
+#cg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
+#cg .type-color { fill: #9b59b6; stroke: #9b59b6; }
+#cg .type-string { fill: #e5678d; stroke: #e5678d; }
+#cg .type-list { fill: #f1c40f; stroke: #f1c40f; }
+#cg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
+#cg .type-resource { fill: #e67e22; stroke: #e67e22; }
+#cg .empty {
     fill: transparent;
     stroke-width: 1px;
 }
 
 /* Group */
-#svg .group .background {
+#cg .group .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
 }
-#svg .group.selected .background {
+#cg .group.selected .background {
     stroke-width: 2px;
 }
-#svg .group .title {
+#cg .group .title {
     fill: #ccc;
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
 }
 
 /* Block */
-#svg .block .background {
+#cg .block .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
 }
-#svg .block:hover .background {
+#cg .block:hover .background {
     fill: rgba(15, 30, 40, 0.8);
 }
-#svg .block .title {
+#cg .block .title {
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
     stroke: transparent;
 }
-#svg .block.selected .background {
+#cg .block.selected .background {
     stroke-width: 2px;
 }
 
 /* Action */
-#svg .action .background {
+#cg .action .background {
     stroke: #ccc;
 }
-#svg .action .title {
+#cg .action .title {
     fill: #ccc;
 }
-#svg .action .text {
+#cg .action .text {
     fill: #999;
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
 }
 
 /* Picker */
-#svg .picker .element {
+#cg .picker .element {
     cursor: pointer;
 }

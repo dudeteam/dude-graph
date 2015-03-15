@@ -1,60 +1,60 @@
 /* General */
-#svg {
-    background: #222;
-}
-
-/* Group */
-#svg .group .background {
-    fill: rgba(0, 0, 0, 0.5);
-    stroke: #444;
-}
-#svg .group:hover .background {
-    fill: rgba(0, 0, 0, .6);
-}
-#svg .group.selected .background {
-    stroke-width: 2px;
-    stroke: #666;
-}
-#svg .group .title {
-    fill: #ccc;
-    font-family: helvetica, sans-serif;
-    font-size: .9em;
-}
-
-/* Action */
-#svg .action .background, .getter .background {
-    fill: rgba(0, 0, 0, 0.5);
-    stroke: #444;
-}
-#svg .action:hover .background, .getter .background {
-    fill: rgba(0, 0, 0, .6);
-}
-#svg .action.selected .background, .getter .background {
-    stroke-width: 2px;
-    stroke: #666;
-}
-#svg .action .title, .getter .title {
-    font-family: helvetica, sans-serif;
-    font-size: .9em;
-    fill: #ccc;
-}
-#svg .action .text, .getter .text {
-    fill: #999;
-    font-family: helvetica, sans-serif;
-    font-size: .7em;
+#cg {
+    background: #2b2b2b;
 }
 
 /* Types */
-#svg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
-#svg .type-number { fill: #2ecc71; stroke: #2ecc71; }
-#svg .type-vec3 { fill: #3498db; stroke: #3498db; }
-#svg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
-#svg .type-color { fill: #9b59b6; stroke: #9b59b6; }
-#svg .type-string { fill: #e5678d; stroke: #e5678d; }
-#svg .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#svg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
-#svg .type-resource { fill: #e67e22; stroke: #e67e22; }
-#svg .empty {
+#cg .type-boolean { fill: rgba(28, 188, 156, 0.8); stroke: rgba(28, 188, 156, 0.8); }
+#cg .type-number { fill: rgba(46, 204, 113, 0.8); stroke: rgba(46, 204, 113, 0.8); }
+#cg .type-vec3 { fill: rgba(52, 152, 219, 0.8); stroke: rgba(52, 152, 219, 0.8); }
+#cg .type-vec2 { fill: rgba(41, 128, 185, 0.8); stroke: rgba(41, 128, 185, 0.8); }
+#cg .type-color { fill: rgba(155, 89, 182, 0.8); stroke: rgba(155, 89, 182, 0.8); }
+#cg .type-string { fill: rgba(229, 103, 141, 0.8); stroke: rgba(229, 103, 141, 0.8); }
+#cg .type-list { fill: rgba(241, 196, 15, 0.8); stroke: rgba(241, 196, 15, 0.8); }
+#cg .type-dictionary { fill: rgba(243, 156, 18, 0.8); stroke: rgba(243, 156, 18, 0.8); }
+#cg .type-resource { fill: rgba(230, 126, 34, 0.8); stroke: rgba(230, 126, 34, 0.8); }
+#cg .empty {
     fill: transparent;
     stroke-width: 1px;
+}
+
+/* Block and groups */
+#cg .group .title, #cg .block .title {
+    font-family: helvetica, sans-serif;
+    /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
+    font-weight: 200;
+    font-size: .9em;
+    stroke: transparent;
+}
+#cg .group .background, #cg .block .background {
+    fill: rgba(30, 30, 30, 0.8);
+}
+#cg .group:hover .background, #cg .block:hover .background {
+    fill: rgba(20, 20, 20, .8);
+}
+#cg .group.selected .background, #cg .block.selected .background {
+    fill: rgba(20, 20, 20, .8);
+    stroke-width: 2px;
+}
+
+/* Blocks */
+#cg .block .text {
+    fill: #999;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
+    font-size: .7em;
+}
+
+/* Group and Action */
+#cg .group .background, #cg .action .background {
+    stroke: black;
+}
+#cg .group .title, #cg .action .title {
+    fill: #c4c4c4;
+}
+
+/* Getter */
+#cg .getter .title, #cg .picker .title {
+    font-size: .8em;
 }

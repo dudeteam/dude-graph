@@ -1,14 +1,14 @@
-#svg #selection {
+#cg #selection {
     fill: rgba(255, 255, 255, 0.2);
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#svg .group, #svg .block {
+#cg .group, #cg .block {
     cursor: move;
 }
-#svg .action > text {
+#cg .action > text {
     text-anchor: middle;
 }
-#svg .input, #svg .output {
+#cg .input, #cg .output {
     cursor: pointer;
 }
