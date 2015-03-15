@@ -71,10 +71,10 @@
                         },
                         "background-grid": {
                             "line": {
-                                "stroke": "rgba(255, 255, 255, 0.05)",
+                                "stroke": "rgba(255, 255, 255, 0.05)"
                             },
                             "big-line": {
-                                "stroke": "rgba(255, 255, 255, 0.2)",
+                                "stroke": "rgba(255, 255, 255, 0.2)"
                             }
                         }
                     }
@@ -186,8 +186,14 @@
                 renderer.render(graph);
                 jwerty.key('A', function () {
                     var _id = graph.getNextBlockId();
-                    var action = new cg.Block(_id, graph.getModel(prompt("model")), renderer._mousePosition.clone());
-                    graph.addNode(action, graph);
+                    var modelName = prompt("model");
+                    var model = graph.getModel(modelName);
+                    if (model === undefined) {
+                        alert("Undefined model " + modelName + ".");
+                    } else {
+                        var action = new cg.Block(_id, model, renderer._mousePosition.clone());
+                        graph.addNode(action, graph);
+                    }
                 });
                 jwerty.key('G', function () {
                     var _id = graph.getNextGroupId();
