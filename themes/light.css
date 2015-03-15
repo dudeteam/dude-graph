@@ -1,0 +1,56 @@
+/* General */
+#cg {
+    background: #e7e7e7;
+}
+
+/* Types */
+#cg .type-boolean { fill: rgba(28, 188, 156, 0.8); stroke: rgba(28, 188, 156, 0.8); }
+#cg .type-number { fill: rgba(46, 204, 113, 0.8); stroke: rgba(46, 204, 113, 0.8); }
+#cg .type-vec3 { fill: rgba(52, 152, 219, 0.8); stroke: rgba(52, 152, 219, 0.8); }
+#cg .type-vec2 { fill: rgba(41, 128, 185, 0.8); stroke: rgba(41, 128, 185, 0.8); }
+#cg .type-color { fill: rgba(155, 89, 182, 0.8); stroke: rgba(155, 89, 182, 0.8); }
+#cg .type-string { fill: rgba(229, 103, 141, 0.8); stroke: rgba(229, 103, 141, 0.8); }
+#cg .type-list { fill: rgba(241, 196, 15, 0.8); stroke: rgba(241, 196, 15, 0.8); }
+#cg .type-dictionary { fill: rgba(243, 156, 18, 0.8); stroke: rgba(243, 156, 18, 0.8); }
+#cg .type-resource { fill: rgba(230, 126, 34, 0.8); stroke: rgba(230, 126, 34, 0.8); }
+#cg .empty {
+    fill: transparent;
+    stroke-width: 1px;
+}
+
+/* Block and groups */
+#cg .group .title, #cg .block .title {
+    fill: #666;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    font-size: .9em;
+    stroke: transparent;
+}
+#cg .group .background, #cg .block .background {
+    fill: rgba(240, 240, 240, 0.8);
+}
+#cg .group:hover .background, #cg .block:hover .background {
+    fill: rgba(255, 255, 255, .8);
+}
+#cg .group.selected .background, #cg .block.selected .background {
+    fill: rgba(255, 255, 255, .8);
+    stroke-width: 2px;
+}
+
+/* Blocks */
+#cg .block .text {
+    fill: #999;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    font-size: .7em;
+}
+
+/* Group and Action */
+#cg .group .background, #cg .action .background {
+    stroke: #b4b4b4;
+}
+
+/* Getter */
+#cg .getter .title, #cg .picker .title {
+    font-size: .8em;
+}

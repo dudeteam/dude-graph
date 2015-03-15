@@ -1,0 +1,12 @@
+{
+  "background-grid": {
+    "line": {
+      "stroke-width": 1,
+      "stroke": "rgba(210, 210, 210, 0.8)"
+    },
+    "big-line": {
+      "stroke-width": 1,
+      "stroke": "rgba(150, 150, 150, 1)"
+    }
+  }
+}
