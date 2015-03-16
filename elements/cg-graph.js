@@ -70,8 +70,7 @@ Polymer({
 
     createGroup: function () {
         var _id = graph.getNextGroupId();
-        renderer.createGroupFromSelection(_id, this.groupTitle
-        );
+        renderer.createGroup(_id, this.groupTitle);
     },
 
     createAction: function () {
