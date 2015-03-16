@@ -7,16 +7,33 @@
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="index.css">
+    <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
     <link rel="import" href="elements/cg-graph.html">
 </head>
-<style>
-    html, body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-    }
-</style>
-<body>
-    <cg-graph theme="dude" url="examples/graph.json"></cg-graph>
+<body vertical layout fullbleed unresolved>
+    <core-header-panel flex>
+        <core-toolbar id="header">
+            <paper-icon-button src="images/dude_logo.png"></paper-icon-button>
+            <span flex></span>
+            <!--<paper-button class="cg-toolbar-button"><core-icon icon="add-circle"></core-icon> add</paper-button>-->
+            <!--<paper-button class="cg-toolbar-button"><core-icon icon="remove-circle"></core-icon> remove</paper-button>-->
+            <!--<paper-button class="cg-toolbar-button"><core-icon icon="undo"></core-icon> undo</paper-button>-->
+            <!--<paper-button class="cg-toolbar-button"><core-icon icon="redo"></core-icon> redo</paper-button>-->
+            <!--<paper-button class="cg-toolbar-button"><core-icon icon="fullscreen"></core-icon> select</paper-button>-->
+            <paper-icon-button icon="add-circle"></paper-icon-button>
+            <paper-icon-button icon="remove-circle"></paper-icon-button>
+            <paper-icon-button icon="undo"></paper-icon-button>
+            <paper-icon-button icon="redo"></paper-icon-button>
+            <paper-icon-button icon="fullscreen"></paper-icon-button>
+        </core-toolbar>
+        <cg-graph theme="dude" url="examples/graph.json"></cg-graph>
+    </core-header-panel>
 </body>
+<!--<body>-->
+    <!--<cg-graph theme="dude" url="examples/graph.json"></cg-graph>-->
+<!--</body>-->
 </html>
