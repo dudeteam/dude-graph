@@ -21,10 +21,20 @@ to add blocks/groups, remove or move them.
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
         <svg id="graph"></svg>
         <paper-toast id="error"></paper-toast>
-        <paper-action-dialog id="group" heading="Create a new group" transition="core-transition-top" backdrop>
+        <paper-action-dialog id="groupDialog" heading="Create a new group" transition="core-transition-top" backdrop>
             <paper-input autofocus value="{{groupTitle}}" label="Group title"></paper-input>
             <paper-button dismissive>Cancel</paper-button>
             <paper-button on-click="{{createGroup}}" affirmative default>Create</paper-button>
+        </paper-action-dialog>
+        <paper-action-dialog id="actionDialog" heading="Add a new action" transition="core-transition-top" backdrop>
+            <paper-input autofocus value="{{actionModel}}" label="Action model"></paper-input>
+            <div>
+                <template repeat="{{ model in modelList | filterModels(actionModel) }}">
+                    <div>{{ model }}</div>
+                </template>
+            </div>
+            <paper-button dismissive>Cancel</paper-button>
+            <paper-button on-click="{{createAction}}" affirmative default>Create</paper-button>
         </paper-action-dialog>
     </template>
     <!-- Vendors -->
