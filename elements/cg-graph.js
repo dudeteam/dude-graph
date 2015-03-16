@@ -62,9 +62,10 @@ Polymer({
         this.$.error.show();
     },
 
-    filterModels: function (modelPattern) {
-        console.log(modelPattern);
-        return false;
+    modelChanged: function (value) {
+        this.modelList = this.graph.findModels({
+            pattern: new RegExp(value, "g")
+        });
     },
 
     createGroup: function () {

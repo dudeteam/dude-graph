@@ -19,7 +19,18 @@ to add blocks/groups, remove or move them.
         <link rel="stylesheet" href="cg-graph.css">
         <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
-        <svg id="graph"></svg>
+        <svg id="graph">
+            <filter id="dropshadow" height="130%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.2"/>
+                </feComponentTransfer>
+                <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </svg>
         <paper-toast id="error"></paper-toast>
         <paper-action-dialog id="groupDialog" heading="Create a new group" transition="core-transition-top" backdrop>
             <paper-input autofocus value="{{groupTitle}}" label="Group title"></paper-input>
@@ -27,9 +38,9 @@ to add blocks/groups, remove or move them.
             <paper-button on-click="{{createGroup}}" affirmative default>Create</paper-button>
         </paper-action-dialog>
         <paper-action-dialog id="actionDialog" heading="Add a new action" transition="core-transition-top" backdrop>
-            <paper-input autofocus value="{{actionModel}}" label="Action model"></paper-input>
+            <paper-input autofocus value="{{model}}" label="Action model"></paper-input>
             <div>
-                <template repeat="{{ model in modelList | filterModels(actionModel) }}">
+                <template repeat="{{ model in modelList }}">
                     <div>{{ model }}</div>
                 </template>
             </div>
