@@ -78,7 +78,7 @@ Polymer({
         });
         jwerty.key('G', function () {
             var _id = graph.getNextGroupId();
-            renderer.createGroup(_id, prompt("name"));
+            renderer.createGroupFromSelection(_id, prompt("name"));
         });
         jwerty.key('X', function () {
             renderer.removeSelectedNodes();
