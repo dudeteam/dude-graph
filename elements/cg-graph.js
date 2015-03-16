@@ -43,6 +43,11 @@ Polymer({
         this.$.error.show();
     },
 
+    createGroup: function () {
+        var _id = graph.getNextGroupId();
+        renderer.createGroupFromSelection(_id, this.groupTitle);
+    },
+
     /**
      * Create the graph when its config and data are loaded.
      */
@@ -77,9 +82,8 @@ Polymer({
             }
         });
         jwerty.key('G', function () {
-            var _id = graph.getNextGroupId();
-            renderer.createGroupFromSelection(_id, prompt("name"));
-        });
+            this.$.group.open();
+        }.bind(this));
         jwerty.key('X', function () {
             renderer.removeSelectedNodes();
         });
@@ -105,6 +109,9 @@ Polymer({
             if (this.config !== null) {
                 this.createGraph();
             }
+        }.bind(this));
+        this.$.group.addEventListener("core-overlay-close-completed", function () {
+            this.groupTitle = "";
         }.bind(this));
     }
 });

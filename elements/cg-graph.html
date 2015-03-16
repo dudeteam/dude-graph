@@ -5,6 +5,15 @@ to add blocks/groups, remove or move them.
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-action-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<style>
+    #group {
+        border-radius: 5px;
+        font-family: "Varela Round", sans-serif;
+    }
+</style>
 <polymer-element name="cg-graph" attributes="theme url">
     <template>
         <link rel="stylesheet" href="cg-graph.css">
@@ -12,6 +21,11 @@ to add blocks/groups, remove or move them.
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
         <svg id="graph"></svg>
         <paper-toast id="error"></paper-toast>
+        <paper-action-dialog id="group" heading="Create a new group" transition="core-transition-top" backdrop>
+            <paper-input autofocus value="{{groupTitle}}" label="Group title"></paper-input>
+            <paper-button dismissive>Cancel</paper-button>
+            <paper-button on-click="{{createGroup}}" affirmative default>Create</paper-button>
+        </paper-action-dialog>
     </template>
     <!-- Vendors -->
     <script src="../bower_components/jwerty/jwerty.js"></script>
