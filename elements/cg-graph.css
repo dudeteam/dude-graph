@@ -1,14 +1,18 @@
-#cg #selection {
+#graph {
+    width: 100%;
+    height: 100%;
+}
+#graph #selection {
     fill: rgba(255, 255, 255, 0.2);
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#cg .group, #cg .block {
+#graph .group, #graph .block {
     cursor: move;
 }
-#cg .action > text {
+#graph .action > text {
     text-anchor: middle;
 }
-#cg .input, #cg .output {
+#graph .input, #graph .output {
     cursor: pointer;
 }

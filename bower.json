@@ -9,6 +9,7 @@
     "Snap.svg": "~0.3.0",
     "pandora": "~0.0.7",
     "interact": "~1.2.4",
-    "core-ajax": "Polymer/core-ajax#~0.5.5"
+    "core-ajax": "Polymer/core-ajax#~0.5.5",
+    "paper-toast": "Polymer/paper-toast#~0.5.5"
   }
 }

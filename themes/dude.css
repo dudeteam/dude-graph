@@ -3,76 +3,79 @@
  */
 
 /* Global*/
-#cg {
-    background: #1d283a;
+#error {
+    background: rgba(231, 76, 60, 0.8);
+    color: rgba(255, 255, 255, 0.8);
+    font-family: "Varela Round", sans-serif;
+    font-size: .8em;
+    border-radius: 5px;
+    box-shadow: none;
 }
-#cg #selection {
-    fill: rgba(255, 255, 255, 0.2);
-    stroke: rgba(255, 255, 255, 0.5);
-    stroke-width: 1px;
+#graph {
+    background: #1d283a;
 }
 
 /* Types */
-#cg .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
-#cg .type-number { fill: #2ecc71; stroke: #2ecc71; }
-#cg .type-vec3 { fill: #3498db; stroke: #3498db; }
-#cg .type-vec2 { fill: #2980b9; stroke: #2980b9; }
-#cg .type-color { fill: #9b59b6; stroke: #9b59b6; }
-#cg .type-string { fill: #e5678d; stroke: #e5678d; }
-#cg .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#cg .type-dictionary { fill: #f39c12; stroke: #f39c12; }
-#cg .type-resource { fill: #e67e22; stroke: #e67e22; }
-#cg .empty {
+#graph .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
+#graph .type-number { fill: #2ecc71; stroke: #2ecc71; }
+#graph .type-vec3 { fill: #3498db; stroke: #3498db; }
+#graph .type-vec2 { fill: #2980b9; stroke: #2980b9; }
+#graph .type-color { fill: #9b59b6; stroke: #9b59b6; }
+#graph .type-string { fill: #e5678d; stroke: #e5678d; }
+#graph .type-list { fill: #f1c40f; stroke: #f1c40f; }
+#graph .type-dictionary { fill: #f39c12; stroke: #f39c12; }
+#graph .type-resource { fill: #e67e22; stroke: #e67e22; }
+#graph .empty {
     fill: transparent;
     stroke-width: 1px;
 }
 
 /* Group */
-#cg .group .background {
+#graph .group .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
 }
-#cg .group.selected .background {
+#graph .group.selected .background {
     stroke-width: 2px;
 }
-#cg .group .title {
+#graph .group .title {
     fill: #ccc;
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
 }
 
 /* Block */
-#cg .block .background {
+#graph .block .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
 }
-#cg .block:hover .background {
+#graph .block:hover .background {
     fill: rgba(15, 30, 40, 0.8);
 }
-#cg .block .title {
+#graph .block .title {
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
     stroke: transparent;
 }
-#cg .block.selected .background {
+#graph .block.selected .background {
     stroke-width: 2px;
 }
 
 /* Action */
-#cg .action .background {
+#graph .action .background {
     stroke: #ccc;
 }
-#cg .action .title {
+#graph .action .title {
     fill: #ccc;
 }
-#cg .action .text {
+#graph .action .text {
     fill: #999;
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
 }
 
 /* Picker */
-#cg .picker .element {
+#graph .picker .element {
     cursor: pointer;
 }
