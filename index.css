@@ -6,15 +6,12 @@ html, body {
 
 #header {
     color: #ddd;
-    background: #151c2f;
+    background: #15202f;
     /*background: rgb(21, 32, 52);*/
     font-family: "Varela round", sans-serif;
+    border-bottom: 1px solid #ccc;
 }
 
-.cg-toolbar-button {
-    font-size: .7em;
-}
-
-.cg-toolbar-button core-icon {
-    margin-right: 10px;
+[disabled] {
+    opacity: 0.7;
 }
