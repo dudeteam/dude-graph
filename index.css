@@ -3,15 +3,3 @@ html, body {
     /*height: 100%;*/
     margin: 0;
 }
-
-#header {
-    color: #ddd;
-    background: #15202f;
-    /*background: rgb(21, 32, 52);*/
-    font-family: "Varela round", sans-serif;
-    border-bottom: 1px solid #ccc;
-}
-
-[disabled] {
-    opacity: 0.7;
-}

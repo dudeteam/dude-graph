@@ -14,17 +14,20 @@
 #graph {
     background: #1d283a;
 }
+#group {
+    font-family: "Varela Round", sans-serif;
+}
 
 /* Types */
-#graph .type-boolean { fill: #1abc9c; stroke: #1abc9c; }
-#graph .type-number { fill: #2ecc71; stroke: #2ecc71; }
-#graph .type-vec3 { fill: #3498db; stroke: #3498db; }
-#graph .type-vec2 { fill: #2980b9; stroke: #2980b9; }
-#graph .type-color { fill: #9b59b6; stroke: #9b59b6; }
-#graph .type-string { fill: #e5678d; stroke: #e5678d; }
-#graph .type-list { fill: #f1c40f; stroke: #f1c40f; }
-#graph .type-dictionary { fill: #f39c12; stroke: #f39c12; }
-#graph .type-resource { fill: #e67e22; stroke: #e67e22; }
+#graph .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
+#graph .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+#graph .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+#graph .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-list { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-dictionary { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-resource { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
 #graph .empty {
     fill: transparent;
     stroke-width: 1px;
