@@ -1,9 +1,9 @@
 {
   "group": {
-    "border-radius": 5
+    "borderRadius": 5
   },
   "block": {
-    "border-radius": 5
+    "borderRadius": 5
   },
   "background-grid": {
     "line": {

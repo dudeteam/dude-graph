@@ -16,7 +16,7 @@
 #svg .group, #svg .block {
     cursor: move;
 }
-#svg .action > text {
+#svg .action .title {
     text-anchor: middle;
 }
 #svg .input, #svg .output {
