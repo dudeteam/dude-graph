@@ -83,3 +83,15 @@
 #graph .picker .element {
     cursor: pointer;
 }
+
+#graph .picker .checkbox rect {
+    fill: transparent;
+}
+
+#graph .picker .checkbox path {
+    fill: transparent;
+    stroke-width: 2px;
+}
+#graph .picker .checkbox:not(.selected) path {
+    stroke: transparent;
+}

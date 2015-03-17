@@ -53,7 +53,7 @@ Polymer({
         renderer.createGroup(_id, title);
     },
 
-    createAction: function (name, position) {
+    createBlock: function (name, position) {
         var _id = this.graph.getNextBlockId();
         var model = this.graph.getModel(name);
         this.graph.addNode(new cg.Block(_id, model, position), this.graph);
