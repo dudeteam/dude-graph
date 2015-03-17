@@ -118,12 +118,14 @@ Polymer({
                 this.createGraph();
             }
         }.bind(this));
+        this.$.config.go();
         this.$.data.addEventListener("core-complete", function () {
             this.data = this.$.data.response;
             if (this.config !== null) {
                 this.createGraph();
             }
         }.bind(this));
+        this.$.data.go();
         this.$.groupDialog.addEventListener("core-overlay-close-completed", function () {
             this.groupTitle = "";
         }.bind(this));

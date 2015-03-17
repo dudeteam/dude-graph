@@ -17,8 +17,8 @@ to add blocks/groups, remove or move them.
 <polymer-element name="cg-graph" attributes="theme url">
     <template>
         <link rel="stylesheet" href="cg-graph.css">
-        <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
-        <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
+        <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json"></core-ajax>
+        <core-ajax id="data" url="{{url}}" handleAs="json"></core-ajax>
         <svg id="graph">
             <filter id="dropshadow" height="130%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
