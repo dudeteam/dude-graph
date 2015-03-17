@@ -9,13 +9,14 @@
         <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="index.css">
         <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
-        <link rel="import" href="elements/cg-graph.html">
-        <link rel="import" href="elements/cg-toolbar.html">
+        <link rel="import" href="elements/cg-app.html">
+        <link rel="import" href="elements/cg-renderer.html">
     </head>
     <body vertical layout fullbleed unresolved>
         <core-header-panel mode="seamed" flex>
-            <cg-toolbar logo="images/dude_logo.png"></cg-toolbar>
-            <cg-graph id="graph" theme="dude" url="examples/graph.json"></cg-graph>
+            <cg-app logo="images/dude_logo.png">
+                <cg-renderer id="graph" theme="dude" url="examples/graph.json"></cg-renderer>
+            </cg-app>
         </core-header-panel>
     </body>
 </html>
