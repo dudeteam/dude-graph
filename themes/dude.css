@@ -19,6 +19,7 @@
 }
 
 /* Types */
+#graph .type-flux { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
 #graph .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
 #graph .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
 #graph .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
