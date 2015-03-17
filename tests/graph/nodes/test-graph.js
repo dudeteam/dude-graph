@@ -5,7 +5,7 @@ describe("Graph creation", function () {
     it("should create a new empty graph", function () {
         var graph = new cg.Graph();
 
-        assert.equal(graph.children._nodes.length, 0);
+        assert.equal(graph.children._entities.length, 0);
     });
     it("should create a new empty graph and add one child", function () {
         var graph = new cg.Graph();
@@ -16,8 +16,8 @@ describe("Graph creation", function () {
             assert.equal(node, group);
             ok = true;
         });
-        graph.addNode(group, graph);
-        assert.equal(graph.children._nodes.length, 1);
+        graph.addEntity(group, graph);
+        assert.equal(graph.children._entities.length, 1);
         assert.ok(ok);
     });
     it("should create a new empty graph and add one graph as a child an fail adding graph", function () {
@@ -31,8 +31,8 @@ describe("Graph creation", function () {
         graph.on("node.add", function (node) {
             assert.fail();
         });
-        graph.addNode(graph2, graph);
-        assert.equal(graph.children._nodes.length, 0);
+        graph.addEntity(graph2, graph);
+        assert.equal(graph.children._entities.length, 0);
         assert.ok(ok);
     });
     it("should create a new empty graph and add multiple childs", function () {
@@ -44,9 +44,9 @@ describe("Graph creation", function () {
             ++added;
         });
         for (var i = 0; i < toAdd; ++i) {
-            graph.addNode(new cg.Group(i), graph);
+            graph.addEntity(new cg.Group(i), graph);
         }
-        assert.equal(graph.children._nodes.length, toAdd);
+        assert.equal(graph.children._entities.length, toAdd);
         assert.equal(added, toAdd);
     });
     it("should create a new empty graph and create 2 groups, add a child in the first group and moves it to the other group", function () {
@@ -66,12 +66,12 @@ describe("Graph creation", function () {
                 moveGroup2 = true;
             }
         });
-        graph.addNode(group1, graph);
-        graph.addNode(group2, graph);
-        assert.equal(graph.children._nodes.length, 2);
-        graph.addNode(child, group1);
-        assert.equal(group1.children._nodes.length, 1);
-        graph.moveNode(child, group2);
+        graph.addEntity(group1, graph);
+        graph.addEntity(group2, graph);
+        assert.equal(graph.children._entities.length, 2);
+        graph.addEntity(child, group1);
+        assert.equal(group1.children._entities.length, 1);
+        graph.moveEntity(child, group2);
         assert.ok(addGroup1);
         assert.ok(moveGroup2);
     });

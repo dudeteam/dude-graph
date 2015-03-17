@@ -4,21 +4,21 @@
     width: 100%;
     height: 100%;
 }
-#graph {
+#svg {
     width: 100%;
     height: 100%;
 }
-#graph #selection {
+#svg #selection {
     fill: rgba(255, 255, 255, 0.2);
     stroke: rgba(255, 255, 255, 0.5);
     stroke-width: 1px;
 }
-#graph .group, #graph .block {
+#svg .group, #svg .block {
     cursor: move;
 }
-#graph .action > text {
+#svg .action > text {
     text-anchor: middle;
 }
-#graph .input, #graph .output {
+#svg .input, #svg .output {
     cursor: pointer;
 }

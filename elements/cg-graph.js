@@ -63,9 +63,11 @@ Polymer({
     },
 
     modelChanged: function (value) {
+        /*
         this.modelList = this.graph.findModels({
             pattern: new RegExp(value, "g")
         });
+        */
     },
 
     createGroup: function () {
@@ -77,34 +79,17 @@ Polymer({
         var _id = this.graph.getNextBlockId();
         var modelName = "mix";
         var model = this.graph.getModel(modelName);
-        this.graph.addNode(new cg.Block(_id, model, this.renderer._mousePosition.clone()), this.graph);
+        this.graph.addEntity(new cg.Block(_id, model, this.renderer._mousePosition.clone()), this.graph);
     },
 
     /**
      * Create the graph when its config and data are loaded.
      */
     createGraph: function () {
-        this.renderer.on("picker.edit", function (picker) {
-            var value = prompt("New value: ");
-            if (picker.model.valueType === "vec2" || picker.model.valueType === "vec3") {
-                value = value.split(" ");
-            }
-            picker.value = value;
-        });
-        this.renderer.initialize(this.graph, this.config);
-        this.loader.load(this.graph, this.data);
-        this.renderer.render(this.graph);
-    },
-
-    /**
-     * Load config and data then call createGraph().
-     */
-    ready: function () {
-        this.paper = Snap(this.$.graph);
         this.graph = new cg.Graph();
         this.loader = new cg.JSONLoader();
         this.saver = new cg.JSONSaver();
-        this.renderer = new cg.Renderer(this.paper);
+        this.renderer = new cg.Renderer(this.graph, this.$.svg, this.config);
         window.graph = this.graph;
         window.renderer = this.renderer;
         window.loader = this.loader;
@@ -112,6 +97,21 @@ Polymer({
         this.handleErrors();
         this.handleKeyboard();
         this.addTheme(this.theme);
+        this.renderer.on("picker.edit", function (picker) {
+            var value = prompt("New value: ");
+            if (picker.model.valueType === "vec2" || picker.model.valueType === "vec3") {
+                value = value.split(" ");
+            }
+            picker.value = value;
+        });
+        this.loader.load(this.graph, this.data);
+        this.renderer.render();
+    },
+
+    /**
+     * Load config and data then call createGraph().
+     */
+    ready: function () {
         this.$.config.addEventListener("core-complete", function () {
             this.config = this.$.config.response;
             if (this.data !== null) {

@@ -19,7 +19,7 @@ to add blocks/groups, remove or move them.
         <link rel="stylesheet" href="cg-graph.css">
         <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
-        <svg id="graph">
+        <svg id="svg">
             <filter id="dropshadow" height="130%">
                 <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
                 <feComponentTransfer>
@@ -49,14 +49,14 @@ to add blocks/groups, remove or move them.
         </paper-action-dialog>
     </template>
     <!-- Vendors -->
+    <script src="../bower_components/d3/d3.js"></script>
     <script src="../bower_components/jwerty/jwerty.js"></script>
-    <script src="../bower_components/interact/interact.js"></script>
-    <script src="../bower_components/Snap.svg/dist/snap.svg.js"></script>
     <script src="../bower_components/pandora/lib/pandora.js"></script>
     <!-- CodeGraph library -->
     <script src="../lib/index.js"></script>
+    <!-- CodeGraph graph -->
     <script src="../lib/graph/utils/graph-error.js"></script>
-    <script src="../lib/graph/nodes/node.js"></script>
+    <script src="../lib/graph/nodes/entity.js"></script>
     <script src="../lib/graph/utils/container.js"></script>
     <script src="../lib/graph/nodes/group.js"></script>
     <script src="../lib/graph/nodes/point.js"></script>
@@ -67,20 +67,17 @@ to add blocks/groups, remove or move them.
     <script src="../lib/graph/nodes/block.js"></script>
     <script src="../lib/graph/nodes/connection.js"></script>
     <script src="../lib/graph/nodes/graph.js"></script>
-    <script src="../lib/renderer/renderer-error.js"></script>
-    <script src="../lib/renderer/index.js"></script>
-    <script src="../lib/renderer/cursor-point.js"></script>
-    <script src="../lib/renderer/utils.js"></script>
-    <script src="../lib/renderer/pickers.js"></script>
-    <script src="../lib/renderer/zoom.js"></script>
-    <script src="../lib/renderer/grid.js"></script>
-    <script src="../lib/renderer/render-graph.js"></script>
-    <script src="../lib/renderer/render-container.js"></script>
-    <script src="../lib/renderer/render-group.js"></script>
-    <script src="../lib/renderer/render-block.js"></script>
-    <script src="../lib/renderer/render-point.js"></script>
-    <script src="../lib/renderer/render-connection.js"></script>
+    <!-- CodeGraph renderer -->
+    <script src="../lib/renderer/renderer.js"></script>
+    <script src="../lib/renderer/render/render.js"></script>
+    <script src="../lib/renderer/render/render-graph.js"></script>
+    <script src="../lib/renderer/render/render-container.js"></script>
+    <script src="../lib/renderer/render/render-block.js"></script>
+    <script src="../lib/renderer/render/render-group.js"></script>
+    <script src="../lib/renderer/render/render-connection.js"></script>
+    <!-- CodeGraph serialization -->
     <script src="../lib/serialization/json-saver.js"></script>
     <script src="../lib/serialization/json-loader.js"></script>
+    <!-- CodeGraph misc -->
     <script src="cg-graph.js"></script>
 </polymer-element>
