@@ -3,6 +3,9 @@ Polymer({
     get renderer() {
         return this.$.renderer.getDistributedNodes()[0];
     },
+    showToolbar: function () {
+        this.activeBar = 'tool';
+    },
     runCommand: function (event, detail) {
         if (this[detail.command] === undefined) {
             console.warn("Command " + detail.command + " doesnt exists");
@@ -14,7 +17,7 @@ Polymer({
         this.activeBar = "group";
     },
     addBlock: function () {
-        //this.modelList = this.graph.findModels();
+        this.modelList = ["mix", "blur", "black_and_white"]; // replace this hardcoded prompt
         this.$.blockDialog.open();
     },
     removeSelectedNodes: function () {
@@ -39,10 +42,6 @@ Polymer({
         this.renderer.addEventListener("picker.edit", function (e) {
             console.log("edit picker", e.detail.picker);
         });
-        this.$.groupDialog.addEventListener("core-overlay-close-completed", function () {
-            this.groupTitle = "";
-        }.bind(this));
-
         jwerty.key('alt+A', this.addBlock.bind(this));
         jwerty.key('alt+G', this.addGroup.bind(this));
         jwerty.key('alt+X', this.removeSelectedNodes.bind(this));
