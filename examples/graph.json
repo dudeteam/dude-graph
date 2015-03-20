@@ -274,6 +274,7 @@
     }
   ],
   "connections": [
-    { "from": { "block": 10, "point": "frag_color" }, "to": { "block": 3, "point": "color" } }
+    { "from": { "block": 10, "point": "frag_color" }, "to": { "block": 3, "point": "color" } },
+    { "from": { "block": 211, "point": "name" }, "to": { "block": 10, "point": "name" } }
   ]
 }
