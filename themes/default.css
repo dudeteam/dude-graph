@@ -13,15 +13,16 @@
 }
 
 /* Types */
-#svg .type-boolean { fill: rgba(28, 188, 156, 0.8); stroke: rgba(28, 188, 156, 0.8); }
-#svg .type-number { fill: rgba(46, 204, 113, 0.8); stroke: rgba(46, 204, 113, 0.8); }
-#svg .type-vec3 { fill: rgba(52, 152, 219, 0.8); stroke: rgba(52, 152, 219, 0.8); }
-#svg .type-vec2 { fill: rgba(41, 128, 185, 0.8); stroke: rgba(41, 128, 185, 0.8); }
-#svg .type-color { fill: rgba(155, 89, 182, 0.8); stroke: rgba(155, 89, 182, 0.8); }
-#svg .type-string { fill: rgba(229, 103, 141, 0.8); stroke: rgba(229, 103, 141, 0.8); }
-#svg .type-list { fill: rgba(241, 196, 15, 0.8); stroke: rgba(241, 196, 15, 0.8); }
-#svg .type-dictionary { fill: rgba(243, 156, 18, 0.8); stroke: rgba(243, 156, 18, 0.8); }
-#svg .type-resource { fill: rgba(230, 126, 34, 0.8); stroke: rgba(230, 126, 34, 0.8); }
+#svg .type-flux { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+#svg .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
+#svg .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+#svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+#svg .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#svg .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#svg .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#svg .type-list { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#svg .type-dictionary { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#svg .type-resource { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
 #svg .empty {
     fill: transparent;
     stroke-width: 1px;
@@ -47,10 +48,11 @@
 }
 
 /* Blocks */
-#svg .block .text {
+#svg .block .description {
     fill: #999;
     font-family: helvetica, sans-serif;
     font-weight: 200;
+    stroke: transparent;
     /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
     font-size: .7em;
 }

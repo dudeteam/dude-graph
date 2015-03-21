@@ -264,7 +264,8 @@
       "_type": "block",
       "_id": 403,
       "name": "picker-vec2",
-      "position": [50, 250]
+      "position": [50, 250],
+      "value": [512, 512]
     },
     {
       "_type": "block",
@@ -272,6 +273,13 @@
       "name": "picker-color",
       "position": [50, 300],
       "value": "#6BDB41"
+    },
+    {
+      "_type": "block",
+      "_id": 405,
+      "name": "picker-number",
+      "position": [50, 350],
+      "value": "7.5"
     }
   ],
   "connections": [
