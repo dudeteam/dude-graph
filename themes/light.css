@@ -13,15 +13,27 @@
 }
 
 /* Types */
-#svg .type-boolean { fill: rgba(28, 188, 156, 0.8); stroke: rgba(28, 188, 156, 0.8); }
-#svg .type-number { fill: rgba(46, 204, 113, 0.8); stroke: rgba(46, 204, 113, 0.8); }
-#svg .type-vec3 { fill: rgba(52, 152, 219, 0.8); stroke: rgba(52, 152, 219, 0.8); }
-#svg .type-vec2 { fill: rgba(41, 128, 185, 0.8); stroke: rgba(41, 128, 185, 0.8); }
-#svg .type-color { fill: rgba(155, 89, 182, 0.8); stroke: rgba(155, 89, 182, 0.8); }
-#svg .type-string { fill: rgba(229, 103, 141, 0.8); stroke: rgba(229, 103, 141, 0.8); }
-#svg .type-list { fill: rgba(241, 196, 15, 0.8); stroke: rgba(241, 196, 15, 0.8); }
-#svg .type-dictionary { fill: rgba(243, 156, 18, 0.8); stroke: rgba(243, 156, 18, 0.8); }
-#svg .type-resource { fill: rgba(230, 126, 34, 0.8); stroke: rgba(230, 126, 34, 0.8); }
+#svg .type-flux { fill: rgba(50, 50, 50, 1); stroke: rgba(50, 50, 50, 1); }
+#svg .type-boolean { fill: rgba(28, 188, 156, 0.7); stroke: rgba(28, 188, 156, 0.7); }
+#svg .type-number { fill: rgba(241, 196, 15, 0.7); stroke: rgba(241, 196, 15, 0.7); }
+#svg .type-string { fill: rgba(230, 126, 34, 0.7); stroke: rgba(230, 126, 34, 0.7); }
+#svg .type-vec3 { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+#svg .type-vec2 { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+#svg .type-color { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+#svg .type-list { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+#svg .type-dictionary { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+#svg .type-resource { fill: rgba(52, 152, 219, 0.7); stroke: rgba(52, 152, 219, 0.7); }
+
+#svg .type-boolean:hover, #svg .type-boolean.selected { fill: rgba(28, 188, 156, 0.9); stroke: rgba(28, 188, 156, 0.9); }
+#svg .type-number:hover, #svg .type-number.selected { fill: rgba(241, 196, 15, 0.9); stroke: rgba(241, 196, 15, 0.9); }
+#svg .type-string:hover, #svg .type-string.selected { fill: rgba(230, 126, 34, 0.9); stroke: rgba(230, 126, 34, 0.9); }
+#svg .type-vec3:hover, #svg .type-vec3.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+#svg .type-vec2:hover, #svg .type-vec2.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+#svg .type-color:hover, #svg .type-color.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+#svg .type-list:hover, #svg .type-list.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+#svg .type-dictionary:hover, #svg .type-dictionary.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+#svg .type-resource:hover, #svg .type-resource.selected { fill: rgba(52, 152, 219, 0.9); stroke: rgba(52, 152, 219, 0.9); }
+
 #svg .empty {
     fill: transparent;
     stroke-width: 1px;
@@ -47,8 +59,9 @@
 }
 
 /* Blocks */
-#svg .block .text {
+#svg .block .description {
     fill: #999;
+    stroke: transparent;
     font-family: helvetica, sans-serif;
     font-weight: 200;
     font-size: .7em;
@@ -58,17 +71,20 @@
 #svg .group .background, #svg .block .background {
     /*filter:url(#dropshadow);*/
     /*filter: drop-shadow(0 0 3px rgba(0, 0, 0, .2));*/
-    stroke: #ccc;
+    stroke: #666;
     stroke-width: 1px;
 }
 
 /* Getter */
 #svg .getter .title, #svg .picker .title {
-    fill: #eee;
+    fill: #fff;
     font-size: .8em;
 }
 
-#svg .getter circle, #svg .picker circle {
+#svg .getter circle.empty, #svg .picker circle.empty {
     fill: #eee;
-    stroke: #ee;
+}
+
+#svg .getter circle, #svg .picker circle {
+    stroke: #444;
 }
