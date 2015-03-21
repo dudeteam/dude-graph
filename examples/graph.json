@@ -270,7 +270,8 @@
       "_type": "block",
       "_id": 404,
       "name": "picker-color",
-      "position": [50, 300]
+      "position": [50, 300],
+      "value": "#6BDB41"
     }
   ],
   "connections": [

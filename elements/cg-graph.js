@@ -39,9 +39,10 @@ Polymer({
     },
 
     handleErrors: function () {
-        this.loader.on("error", function (error) { this.showError(error.message); }.bind(this));
+        this.loader.on("error", function (error) { this.showError(error); }.bind(this));
         this.saver.on("error", function (error) { this.showError(error); }.bind(this));
         this.graph.on("error", function (error) { this.showError(error); }.bind(this));
+        this.renderer.on("error", function (error) { this.showError(error); }.bind(this));
     },
 
     handleKeyboard: function () {
@@ -57,8 +58,8 @@ Polymer({
         }.bind(this));
     },
 
-    showError: function (message) {
-        this.$.error.text = message;
+    showError: function (error) {
+        this.$.error.text = error.message;
         this.$.error.show();
     },
 

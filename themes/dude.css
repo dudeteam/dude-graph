@@ -34,6 +34,12 @@
     stroke-width: 1px;
 }
 
+/* Connections */
+.connection-layer > path {
+    stroke-linecap: round;
+    /*stroke-dasharray: 10, 10;*/
+}
+
 /* Group */
 #svg .group .background {
     fill: rgba(25, 35, 50, 0.8);
