@@ -8,29 +8,14 @@ to add blocks/groups, remove or move them.
 <link rel="import" href="../bower_components/paper-dialog/paper-action-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
-<style>
-    #group {
-        border-radius: 5px;
-        font-family: "Varela Round", sans-serif;
-    }
-</style>
 <polymer-element name="cg-graph" attributes="theme url">
     <template>
         <link rel="stylesheet" href="cg-graph.css">
         <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json" auto></core-ajax>
         <core-ajax id="data" url="{{url}}" handleAs="json" auto></core-ajax>
-        <svg id="svg">
-            <filter id="dropshadow" height="130%">
-                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                <feComponentTransfer>
-                    <feFuncA type="linear" slope="0.2"/>
-                </feComponentTransfer>
-                <feMerge>
-                    <feMergeNode/>
-                    <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-            </filter>
-        </svg>
+       <div id="shadow-dom-bug">
+           <svg id="svg"></svg>
+       </div>
         <paper-toast id="error"></paper-toast>
         <paper-action-dialog id="groupDialog" heading="Create a new group" transition="core-transition-top" backdrop>
             <paper-input autofocus value="{{groupTitle}}" label="Group title"></paper-input>
@@ -69,7 +54,11 @@ to add blocks/groups, remove or move them.
     <script src="../lib/graph/nodes/graph.js"></script>
     <!-- CodeGraph renderer -->
     <script src="../lib/renderer/renderer.js"></script>
+    <script src="../lib/renderer/utils/renderer-error.js"></script>
+    <script src="../lib/renderer/utils/renderer-position.js"></script>
     <script src="../lib/renderer/render/render.js"></script>
+    <script src="../lib/renderer/render/render-selection.js"></script>
+    <script src="../lib/renderer/render/render-zoom.js"></script>
     <script src="../lib/renderer/render/render-block.js"></script>
     <script src="../lib/renderer/render/render-group.js"></script>
     <script src="../lib/renderer/render/render-connection.js"></script>
