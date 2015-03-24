@@ -34,10 +34,9 @@
     stroke-width: 1px;
 }
 
-/* Connections */
-.connection-layer > path {
-    stroke-linecap: round;
-    /*stroke-dasharray: 10, 10;*/
+/* Connection */
+#svg .connection.selected {
+    stroke-dasharray: 10, 5;
 }
 
 /* Group */

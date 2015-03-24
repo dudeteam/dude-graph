@@ -28,6 +28,11 @@
     stroke-width: 1px;
 }
 
+/* Connection */
+#svg .connection.selected {
+    stroke-dasharray: 10, 5;
+}
+
 /* Block and groups */
 #svg .group .title, #svg .block .title {
     font-family: helvetica, sans-serif;
