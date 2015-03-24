@@ -32,7 +32,7 @@ Polymer({
 
     createGroup: function (title) {
         var _id = graph.getNextGroupId();
-        renderer.createGroup(_id, title);
+        renderer.createSmartGroup(_id, title);
     },
 
     createBlock: function (name, position) {
