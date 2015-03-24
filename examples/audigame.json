@@ -4,41 +4,83 @@
       "type": "action",
       "inputs": [],
       "outputs": [
-        {"type": "stream", "name": "choice"}
+        {
+          "type": "stream",
+          "name": "choice"
+        }
       ]
     },
     "step": {
       "type": "action",
       "inputs": [
-        {"type": "stream", "name": "input"},
-        {"type": "string", "name": "description"},
-        {"type": "sound", "name": "sound"}
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "string",
+          "name": "description"
+        },
+        {
+          "type": "sound",
+          "name": "sound"
+        }
       ],
       "outputs": [
-        {"type": "stream", "name": "first choice"},
-        {"type": "stream", "name": "second choice"}
+        {
+          "type": "stream",
+          "name": "first choice"
+        },
+        {
+          "type": "stream",
+          "name": "second choice"
+        }
       ]
     },
     "end": {
       "type": "action",
       "inputs": [
-        {"type": "stream", "name": "input"},
-        {"type": "string", "name": "description"},
-        {"type": "sound", "name": "sound"}
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "string",
+          "name": "description"
+        },
+        {
+          "type": "sound",
+          "name": "sound"
+        }
       ],
-      "outputs": [
-      ]
+      "outputs": []
     },
     "condition": {
       "type": "action",
       "inputs": [
-        {"type": "stream", "name": "input"},
-        {"type": "boolean", "name": "is first?"}
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "boolean",
+          "name": "test"
+        }
       ],
       "outputs": [
-        {"type": "stream", "name": "first choice"},
-        {"type": "stream", "name": "second choice"}
+        {
+          "type": "stream",
+          "name": "yes"
+        },
+        {
+          "type": "stream",
+          "name": "no"
+        }
       ]
+    },
+    "can enter?": {
+      "type": "getter",
+      "value-type": "boolean"
     },
     "picker-string": {
       "type": "picker",
@@ -54,60 +96,300 @@
   "children": [
     {
       "_type": "block",
+      "_id": 20,
+      "name": "can enter?",
+      "position": [
+        626,
+        229
+      ]
+    },
+    {
+      "_type": "block",
       "_id": 10,
       "name": "picker-string",
-      "value": "Start",
-      "position": [250, 150]
+      "position": [
+        251.178466796875,
+        189.0297393798828
+      ],
+      "value": "Enter into the camp"
     },
     {
       "_type": "block",
       "_id": 11,
       "name": "picker-string",
-      "value": "Knock out",
-      "position": [550, 50]
+      "position": [
+        974.3270874023438,
+        170.26763153076172
+      ],
+      "value": "Kill the guard"
     },
     {
       "_type": "block",
       "_id": 12,
       "name": "picker-string",
-      "value": "Kill",
-      "position": [550, 250]
+      "position": [
+        254.38671875,
+        404.6468048095703
+      ],
+      "value": "Knock out the guard"
+    },
+    {
+      "_type": "block",
+      "_id": 13,
+      "name": "picker-string",
+      "position": [
+        658.3569946289062,
+        403.4181365966797
+      ],
+      "value": "Extract the hostage"
+    },
+    {
+      "_type": "block",
+      "_id": 14,
+      "name": "picker-string",
+      "position": [
+        1108.3956909179688,
+        350.11741638183594
+      ],
+      "value": "Mission failed"
+    },
+    {
+      "_type": "block",
+      "_id": 15,
+      "name": "picker-string",
+      "position": [
+        1331.0303344726562,
+        246.27447509765625
+      ],
+      "value": "Mission succeed"
     },
     {
       "_type": "block",
       "_id": 0,
       "name": "start",
-      "position": [50, 100]
+      "position": [
+        14,
+        18
+      ]
     },
     {
       "_type": "block",
       "_id": 1,
       "name": "step",
-      "position": [250, 200]
+      "position": [
+        250.178466796875,
+        79.02973937988281
+      ]
     },
     {
       "_type": "block",
       "_id": 2,
       "name": "step",
-      "position": [550, 100]
+      "position": [
+        972.3047485351562,
+        57.47213363647461
+      ]
     },
     {
       "_type": "block",
       "_id": 3,
       "name": "step",
-      "position": [550, 300]
+      "position": [
+        255.39788818359375,
+        293.8736114501953
+      ]
     },
     {
       "_type": "block",
       "_id": 4,
       "name": "end",
-      "position": [850, 200]
+      "position": [
+        1366.8010864257812,
+        136.09735107421875
+      ]
     },
     {
       "_type": "block",
       "_id": 5,
       "name": "condition",
-      "position": [50, 400]
+      "position": [
+        627.0110778808594,
+        138.05210876464844
+      ]
+    },
+    {
+      "_type": "block",
+      "_id": 6,
+      "name": "step",
+      "position": [
+        655.2892456054688,
+        291.4429473876953
+      ]
+    },
+    {
+      "_type": "block",
+      "_id": 7,
+      "name": "end",
+      "position": [
+        1131.7696838378906,
+        239.4128074645996
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": {
+        "block": 0,
+        "point": "choice"
+      },
+      "to": {
+        "block": 1,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 10
+      },
+      "to": {
+        "block": 1,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 1,
+        "point": "first choice"
+      },
+      "to": {
+        "block": 5,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 5,
+        "point": "no"
+      },
+      "to": {
+        "block": 1,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 5,
+        "point": "yes"
+      },
+      "to": {
+        "block": 2,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 11
+      },
+      "to": {
+        "block": 2,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 2,
+        "point": "first choice"
+      },
+      "to": {
+        "block": 4,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 15
+      },
+      "to": {
+        "block": 4,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 1,
+        "point": "second choice"
+      },
+      "to": {
+        "block": 3,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 12
+      },
+      "to": {
+        "block": 3,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 3,
+        "point": "first choice"
+      },
+      "to": {
+        "block": 6,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 13
+      },
+      "to": {
+        "block": 6,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 20,
+        "point": "can enter?"
+      },
+      "to": {
+        "block": 5,
+        "point": "test"
+      }
+    },
+    {
+      "from": {
+        "block": 14
+      },
+      "to": {
+        "block": 7,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 6,
+        "point": "second choice"
+      },
+      "to": {
+        "block": 7,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 6,
+        "point": "first choice"
+      },
+      "to": {
+        "block": 4,
+        "point": "input"
+      }
     }
   ]
 }
