@@ -1,14 +1,15 @@
 <!--
-It's the most important polymer component of CodeGraph. It creates the SVG graph and handle user inputs interactions
-to add blocks/groups, remove or move them.
+    It's the most important polymer component of CodeGraph. It creates the SVG from JSON data and provide an API to add,
+    remove or select data of this graph.
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<polymer-element name="cg-renderer" attributes="theme url">
+<link rel="import" href="cg-style.html">
+<polymer-element name="cg-renderer" attributes="configUrl graphUrl" extends="cg-style">
     <template>
         <link rel="stylesheet" href="cg-renderer.css">
-        <core-ajax id="config" url="themes/{{theme}}.json" handleAs="json"></core-ajax>
-        <core-ajax id="data" url="{{url}}" handleAs="json"></core-ajax>
+        <core-ajax id="config" url="{{configUrl}}" handleAs="json"></core-ajax>
+        <core-ajax id="data" url="{{graphUrl}}" handleAs="json"></core-ajax>
         <div id="shadow-dom-bug">
             <svg id="svg"></svg>
         </div>

@@ -3,14 +3,6 @@
  */
 
 /* Global*/
-#error {
-    background: rgba(231, 76, 60, 0.8);
-    color: rgba(255, 255, 255, 0.8);
-    font-family: "Varela Round", sans-serif;
-    font-size: .8em;
-    border-radius: 5px;
-    box-shadow: none;
-}
 #svg {
     background: #1d283a;
 }

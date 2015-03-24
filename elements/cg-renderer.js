@@ -3,40 +3,21 @@ Polymer({
 
         /**
          * This is the url of the graph data to load. If you create the graph like so
-         * <cg-graph url="path/to/graph.json"></cg-graph> the graph will be loaded from the given url.
+         * <cg-graph graphUrl="path/to/graph.json"></cg-graph> the graph will be loaded from the given url.
          *
          * @attribute url
          * @type {String}
          */
-        url: null,
+        graphUrl: null,
 
         /**
-         * This is the theme to apply on this graph. A theme is composed of 2 files, the config and the
-         * stylesheet. All themes are stored in CodeGraph's themes/ folder. If you create the graph like so
-         * <cg-graph url="graph.json" theme="dude"></cg-graph> the files themes/dude.json and themes/dude.css
-         * will be loaded.
-         *
-         * @attribute theme
-         * @type {String}
-         * @default "default"
+         * This is the url of a config file that contain all the custom settings of the graph for a given theme that
+         * cannot be given by the stylesheet.
          */
-        theme: "default"
+        configUrl: null
     },
     data: null,
     config: null,
-
-    /**
-     * Dynamically load a theme to apply on the graph.
-     * @param name {String} the name of the theme to apply
-     */
-    addTheme: function (name) {
-        var link = document.createElement("link");
-        link.type = "text/css";
-        link.rel = "stylesheet";
-        link.href = "../themes/" + name + ".css";
-        this.shadowRoot.appendChild(link);
-        this.element.convertSheetsToStyles(this.shadowRoot);
-    },
 
     handleErrors: function () {
         this.loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
@@ -73,7 +54,7 @@ Polymer({
         window.loader = this.loader;
         window.saver = this.saver;
         this.handleErrors();
-        this.addTheme(this.theme);
+        this.addStyle(this.styleUrl);
         this.renderer.on("picker.edit", function (picker) {
             this.fire("picker.edit", {picker: picker});
         }.bind(this));

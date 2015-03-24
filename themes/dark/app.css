@@ -1,0 +1,11 @@
+.notification {
+    color: #eee;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    border-radius: 0;
+    font-size: .8em;
+    box-shadow: none;
+}
+#error { background: rgba(231, 76, 60, 0.8); }
+#info { background: rgba(52, 152, 219, 0.8); }
+#success { background: rgba(46, 204, 113, 0.8); }

@@ -1,0 +1,10 @@
+core-toolbar {
+    color: #ddd;
+    background: #15202f;
+    font-family: "Varela round", sans-serif;
+    border-bottom: 1px solid #ccc;
+}
+
+[disabled] {
+    opacity: 0.7;
+}

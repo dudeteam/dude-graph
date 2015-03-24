@@ -1,0 +1,9 @@
+core-toolbar {
+    color: #444;
+    background: #eee;
+    border-bottom: 1px solid #ccc;
+}
+
+[disabled] {
+    opacity: 0.7;
+}

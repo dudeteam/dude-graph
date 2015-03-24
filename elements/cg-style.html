@@ -1,0 +1,52 @@
+<!--
+    CgStyle is an abstract component that allows to load CSS theme dynamically. Most of CodeGraph's Polymer components
+    inherit from CgStyle so they can load dynamically stylesheet to update their graphic appearance.
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<polymer-element name="cg-style" attributes="styleUrl">
+    <template></template>
+    <script>
+        Polymer({
+            publish: {
+                /**
+                 * This is the stylesheet to apply to the renderer, it mostly apply the style of the SVG graph.
+                 *
+                 * @attribute theme
+                 * @type {String}
+                 * @default "default"
+                 */
+                styleUrl: null
+            },
+
+            /**
+             * Dynamically load a theme to apply on the graph.
+             * @param url {String} the name of the theme to apply
+             */
+            addStyle: function (url) {
+                var link = document.createElement("link");
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                link.href = url;
+                this.shadowRoot.appendChild(link);
+                this.element.convertSheetsToStyles(this.shadowRoot);
+            },
+
+            styleUrlChanged: function () {
+                if (this.styleUrl !== null) {
+                    this.addStyle(this.styleUrl);
+                } else {
+                    console.warn("The styleUrl attribute should not be null");
+                }
+            },
+
+            ready: function () {
+                if (this.styleUrl !== null) {
+                    this.addStyle(this.styleUrl);
+                } else {
+                    console.warn("The styleUrl attribute should not be null");
+                }
+            }
+
+        });
+    </script>
+</polymer-element>

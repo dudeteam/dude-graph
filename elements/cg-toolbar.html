@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-tooltip/core-tooltip.html">
+<link rel="import" href="cg-style.html">
 <polymer-element name="cg-toolbar-command" attributes="command label icon disabled">
     <template>
         <core-tooltip label="{{label}}">
@@ -16,20 +17,8 @@
         });
     </script>
 </polymer-element>
-<polymer-element name="cg-toolbar" attributes="logo">
+<polymer-element name="cg-toolbar" attributes="logo" extends="cg-style">
     <template>
-        <style>
-            core-toolbar {
-                color: #ddd;
-                background: #15202f;
-                font-family: "Varela round", sans-serif;
-                border-bottom: 1px solid #ccc;
-            }
-
-            [disabled] {
-                opacity: 0.7;
-            }
-        </style>
         <core-toolbar>
             <paper-icon-button src="{{logo}}"></paper-icon-button>
             <span flex></span>

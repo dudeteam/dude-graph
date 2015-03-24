@@ -1,4 +1,10 @@
 {
+  "group": {
+    "borderRadius": 3
+  },
+  "block": {
+    "borderRadius": 3
+  },
   "background-grid": {
     "line": {
       "stroke": "rgba(0, 0, 0, 0.1)",

@@ -1,8 +1,5 @@
 Polymer({
     activeBar: "tool",
-    get renderer() {
-        return this.$.renderer.getDistributedNodes()[0];
-    },
     showToolbar: function () {
         this.activeBar = 'tool';
     },
@@ -21,25 +18,26 @@ Polymer({
         this.$.blockDialog.open();
     },
     removeSelectedNodes: function () {
-        this.renderer.removeSelectedNodes();
+        this.$.renderer.removeSelectedNodes();
     },
     createGroup: function () {
-        this.renderer.createGroup(this.groupTitle);
+        this.$.renderer.createGroup(this.groupTitle);
         this.activeBar = "tool";
         this.groupTitle = "";
     },
     createBlock: function () {
-        this.renderer.createBlock("mix", new pandora.Vec2(50, 50));
+        this.$.renderer.createBlock("mix", new pandora.Vec2(50, 50));
     },
     showError: function (error) {
         this.$.error.text = error.message;
         this.$.error.show();
     },
     attached: function () {
-        this.renderer.addEventListener("error", function (e) {
+        this.addStyle("../themes/" + this.theme + "/app.css");
+        this.$.renderer.addEventListener("error", function (e) {
             this.showError(e.detail.error);
         }.bind(this));
-        this.renderer.addEventListener("picker.edit", function (e) {
+        this.$.renderer.addEventListener("picker.edit", function (e) {
             console.log("edit picker", e.detail.picker);
         });
         jwerty.key('alt+A', this.addBlock.bind(this));

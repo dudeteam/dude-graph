@@ -1,0 +1,11 @@
+core-toolbar {
+    color: #ddd;
+    background: #222;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    border-bottom: 1px solid black;
+}
+
+[disabled] {
+    opacity: 0.7;
+}

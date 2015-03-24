@@ -1,0 +1,10 @@
+core-toolbar {
+    color: rgba(230, 126, 34, 1);
+    background: #222;
+    font-family: helvetica, sans-serif;
+    border-bottom: 1px solid rgba(230, 126, 34, 1);
+}
+
+[disabled] {
+    opacity: 0.7;
+}

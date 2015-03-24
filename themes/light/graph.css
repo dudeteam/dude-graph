@@ -7,15 +7,6 @@
 #svg {
     background: #e7e7e7;
 }
-#error {
-    background: rgba(231, 76, 60, 0.8);
-    color: #eee;
-    font-family: helvetica, sans-serif;
-    font-weight: 200;
-    border-radius: 0;
-    font-size: .8em;
-    box-shadow: none;
-}
 
 /* Types */
 #svg .type-flux { fill: rgba(50, 50, 50, 1); stroke: rgba(50, 50, 50, 1); }

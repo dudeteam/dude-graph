@@ -2,15 +2,6 @@
 #svg {
     background: #2b2b2b;
 }
-#error {
-    background: rgba(231, 76, 60, 0.8);
-    color: #eee;
-    font-family: helvetica, sans-serif;
-    font-weight: 200;
-    border-radius: 0;
-    font-size: .8em;
-    box-shadow: none;
-}
 
 /* Types */
 #svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
