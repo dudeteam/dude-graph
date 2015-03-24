@@ -14,8 +14,7 @@ Polymer({
         this.activeBar = "group";
     },
     addBlock: function () {
-        this.modelList = ["mix", "blur", "black_and_white"]; // replace this hardcoded prompt
-        this.$.blockDialog.open();
+        this.activeBar = "block";
     },
     removeSelectedNodes: function () {
         this.$.renderer.removeSelectedNodes();

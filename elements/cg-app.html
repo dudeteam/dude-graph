@@ -24,6 +24,13 @@
                      on-close="{{showToolbar}}"
                      hidden?="{{activeBar != 'group'}}">
         </cg-inputbar>
+        <cg-inputbar label="Search block..."
+                     styleUrl="../themes/{{theme}}/toolbar.css"
+                     value="{{groupTitle}}"
+                     on-submit="{{createGroup}}"
+                     on-close="{{showToolbar}}"
+                     hidden?="{{activeBar != 'block'}}">
+        </cg-inputbar>
         <paper-toast class="notification" id="error"></paper-toast>
         <paper-toast class="notification" id="info"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
@@ -32,16 +39,6 @@
                      configUrl="themes/{{theme}}/config.json"
                      graphUrl="{{graphUrl}}">
         </cg-renderer>
-        <paper-action-dialog id="blockDialog" heading="Add a new action" transition="core-transition-top" backdrop>
-            <paper-input autofocus value="{{model}}" label="Action model"></paper-input>
-            <div>
-                <template repeat="{{ model in modelList }}">
-                    <div>{{ model }}</div>
-                </template>
-            </div>
-            <paper-button dismissive>Cancel</paper-button>
-            <paper-button on-click="{{createBlock}}" affirmative default>Create</paper-button>
-        </paper-action-dialog>
     </template>
     <script src="cg-app.js"></script>
 </polymer-element>
