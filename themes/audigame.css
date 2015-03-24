@@ -1,0 +1,65 @@
+/* General */
+#svg {
+    background: #2b2b2b;
+}
+#error {
+    background: rgba(231, 76, 60, 0.8);
+    color: #eee;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    border-radius: 0;
+    font-size: .8em;
+    box-shadow: none;
+}
+
+/* Types */
+#svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+#svg .type-sound { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+#svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+#svg .type-boolean { fill: rgb(46, 204, 113); stroke: rgb(46, 204, 113); }
+#svg .empty {
+    fill: transparent;
+    stroke-width: 1px;
+}
+
+/* Block and groups */
+#svg .group .title, #svg .block .title {
+    font-family: helvetica, sans-serif;
+    /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
+    font-weight: 200;
+    font-size: .9em;
+    stroke: transparent;
+}
+#svg .group .background, #svg .block .background {
+    fill: rgba(30, 30, 30, 0.8);
+}
+#svg .group:hover .background, #svg .block:hover .background {
+    fill: rgba(20, 20, 20, .8);
+}
+#svg .group.selected .background, #svg .block.selected .background {
+    fill: rgba(20, 20, 20, .8);
+    stroke-width: 2px;
+}
+
+/* Blocks */
+#svg .block .description {
+    fill: #999;
+    font-family: helvetica, sans-serif;
+    font-weight: 200;
+    stroke: transparent;
+    /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
+    font-size: .7em;
+}
+
+/* Group and Action */
+#svg .group .background, #svg .action .background {
+    stroke: black;
+}
+#svg .group .title, #svg .action .title {
+    fill: #c4c4c4;
+}
+
+/* Getter */
+#svg .getter .title, #svg .picker .title {
+    font-size: .8em;
+}
