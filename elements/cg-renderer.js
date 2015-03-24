@@ -30,10 +30,10 @@ Polymer({
      * @param name {String} the name of the theme to apply
      */
     addTheme: function (name) {
-        var link = document.createElement('link');
-        link.type = 'text/css';
-        link.rel = 'stylesheet';
-        link.href = '../themes/' + name + '.css';
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = "../themes/" + name + ".css";
         this.shadowRoot.appendChild(link);
         this.element.convertSheetsToStyles(this.shadowRoot);
     },
@@ -42,6 +42,7 @@ Polymer({
         this.loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
         this.saver.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
         this.graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+        this.renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
     },
 
     removeSelectedNodes: function () {
@@ -63,32 +64,27 @@ Polymer({
      * Create the graph when its config and data are loaded.
      */
     createGraph: function () {
+        this.graph = new cg.Graph();
+        this.loader = new cg.JSONLoader();
+        this.saver = new cg.JSONSaver();
+        this.renderer = new cg.Renderer(this.graph, this.$.svg, this.config);
+        window.graph = this.graph;
+        window.renderer = this.renderer;
+        window.loader = this.loader;
+        window.saver = this.saver;
+        this.handleErrors();
+        this.addTheme(this.theme);
         this.renderer.on("picker.edit", function (picker) {
             this.fire("picker.edit", {picker: picker});
         }.bind(this));
-        this.renderer.initialize(this.graph, this.config);
         this.loader.load(this.graph, this.data);
-        this.renderer.render(this.graph);
+        this.renderer.render();
     },
 
     /**
      * Load config and data then call createGraph().
      */
     ready: function () {
-        this.paper = Snap(this.$.graph);
-        this.graph = new cg.Graph();
-        this.loader = new cg.JSONLoader();
-        this.saver = new cg.JSONSaver();
-        this.renderer = new cg.Renderer(this.paper);
-
-        // For debug
-        window.graph = this.graph;
-        window.renderer = this.renderer;
-        window.loader = this.loader;
-        window.saver = this.saver;
-
-        this.handleErrors();
-        this.addTheme(this.theme);
         this.$.config.addEventListener("core-complete", function () {
             this.config = this.$.config.response;
             if (this.data !== null) {
