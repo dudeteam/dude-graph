@@ -1,16 +1,27 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/core-tooltip/core-tooltip.html">
-<polymer-element name="cg-toolbar" attributes="logo" noscript>
+<polymer-element name="cg-toolbar-command" attributes="command label icon disabled">
+    <template>
+        <core-tooltip label="{{label}}">
+            <paper-icon-button on-click="{{runCommand}}" data-command="{{command}}" icon="{{icon}}" disabled?="{{disabled}}"></paper-icon-button>
+        </core-tooltip>
+    </template>
+    <script>
+        Polymer({
+            runCommand: function (event, detail, target) {
+                this.fire("command", {"command": target.attributes["data-command"].value});
+            }
+        });
+    </script>
+</polymer-element>
+<polymer-element name="cg-toolbar" attributes="logo">
     <template>
         <style>
-            #header {
+            core-toolbar {
                 color: #ddd;
                 background: #15202f;
-                /*background: rgb(21, 32, 52);*/
                 font-family: "Varela round", sans-serif;
                 border-bottom: 1px solid #ccc;
             }
@@ -19,24 +30,18 @@
                 opacity: 0.7;
             }
         </style>
-        <core-toolbar id="header">
+        <core-toolbar>
             <paper-icon-button src="{{logo}}"></paper-icon-button>
             <span flex></span>
-            <core-tooltip label="add a group">
-                <paper-icon-button icon="av:my-library-add"></paper-icon-button>
-            </core-tooltip>
-            <core-tooltip label="add a block">
-                <paper-icon-button icon="add-box"></paper-icon-button>
-            </core-tooltip>
-            <core-tooltip label="remove the selected groups and blocks">
-                <paper-icon-button disabled icon="delete"></paper-icon-button>
-            </core-tooltip>
-            <core-tooltip label="undo the last action">
-                <paper-icon-button icon="undo"></paper-icon-button>
-            </core-tooltip>
-            <core-tooltip label="redo the last action">
-                <paper-icon-button disabled icon="redo"></paper-icon-button>
-            </core-tooltip>
+            <cg-toolbar-command label="add a group" icon="av:my-library-add" command="addGroup"></cg-toolbar-command>
+            <cg-toolbar-command label="add a block" icon="add-box" command="addBlock"></cg-toolbar-command>
+            <cg-toolbar-command label="remove the selected groups and blocks" icon="delete" command="removeSelectedNodes"></cg-toolbar-command>
+            <cg-toolbar-command label="undo the last action" icon="undo" command="undo"></cg-toolbar-command>
+            <cg-toolbar-command label="redo the last action" icon="redo" command="redo" disabled></cg-toolbar-command>
         </core-toolbar>
     </template>
+    <script>
+        Polymer({
+        });
+    </script>
 </polymer-element>

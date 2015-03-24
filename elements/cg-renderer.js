@@ -39,94 +39,69 @@ Polymer({
     },
 
     handleErrors: function () {
-        this.loader.on("error", function (error) { this.showError(error); }.bind(this));
-        this.saver.on("error", function (error) { this.showError(error); }.bind(this));
-        this.graph.on("error", function (error) { this.showError(error); }.bind(this));
-        this.renderer.on("error", function (error) { this.showError(error); }.bind(this));
+        this.loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+        this.saver.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+        this.graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
     },
 
-    handleKeyboard: function () {
-        jwerty.key('alt+A', function () {
-            this.modelList = this.graph.findModels();
-            this.$.actionDialog.open();
-        }.bind(this));
-        jwerty.key('alt+G', function () {
-            this.$.groupDialog.open();
-        }.bind(this));
-        jwerty.key('alt+X', function () {
-            this.renderer.removeSelectedNodes();
-        }.bind(this));
+    removeSelectedNodes: function () {
+        this.renderer.removeSelectedNodes();
     },
 
-    showError: function (error) {
-        this.$.error.text = error.message;
-        this.$.error.show();
-    },
-
-    modelChanged: function (value) {
-        /*
-        this.modelList = this.graph.findModels({
-            pattern: new RegExp(value, "g")
-        });
-        */
-    },
-
-    createGroup: function () {
+    createGroup: function (title) {
         var _id = graph.getNextGroupId();
-        renderer.createGroup(_id, this.groupTitle);
+        renderer.createGroup(_id, title);
     },
 
-    createAction: function () {
+    createBlock: function (name, position) {
         var _id = this.graph.getNextBlockId();
-        var modelName = "mix";
-        var model = this.graph.getModel(modelName);
-        this.graph.addEntity(new cg.Block(_id, model, this.renderer._mousePosition.clone()), this.graph);
+        var model = this.graph.getModel(name);
+        this.graph.addNode(new cg.Block(_id, model, position), this.graph);
     },
 
     /**
      * Create the graph when its config and data are loaded.
      */
     createGraph: function () {
-        this.graph = new cg.Graph();
-        this.loader = new cg.JSONLoader();
-        this.saver = new cg.JSONSaver();
-        this.renderer = new cg.Renderer(this.graph, this.$.svg, this.config);
-        window.graph = this.graph;
-        window.renderer = this.renderer;
-        window.loader = this.loader;
-        window.saver = this.saver;
-        this.handleErrors();
-        this.handleKeyboard();
-        this.addTheme(this.theme);
         this.renderer.on("picker.edit", function (picker) {
-            var value = prompt("New value: ");
-            if (picker.model.valueType === "vec2" || picker.model.valueType === "vec3") {
-                value = value.split(" ");
-            }
-            picker.value = value;
-        });
+            this.fire("picker.edit", {picker: picker});
+        }.bind(this));
+        this.renderer.initialize(this.graph, this.config);
         this.loader.load(this.graph, this.data);
-        this.renderer.render();
+        this.renderer.render(this.graph);
     },
 
     /**
      * Load config and data then call createGraph().
      */
     ready: function () {
+        this.paper = Snap(this.$.graph);
+        this.graph = new cg.Graph();
+        this.loader = new cg.JSONLoader();
+        this.saver = new cg.JSONSaver();
+        this.renderer = new cg.Renderer(this.paper);
+
+        // For debug
+        window.graph = this.graph;
+        window.renderer = this.renderer;
+        window.loader = this.loader;
+        window.saver = this.saver;
+
+        this.handleErrors();
+        this.addTheme(this.theme);
         this.$.config.addEventListener("core-complete", function () {
             this.config = this.$.config.response;
             if (this.data !== null) {
                 this.createGraph();
             }
         }.bind(this));
+        this.$.config.go();
         this.$.data.addEventListener("core-complete", function () {
             this.data = this.$.data.response;
             if (this.config !== null) {
                 this.createGraph();
             }
         }.bind(this));
-        this.$.groupDialog.addEventListener("core-overlay-close-completed", function () {
-            this.groupTitle = "";
-        }.bind(this));
+        this.$.data.go();
     }
 });

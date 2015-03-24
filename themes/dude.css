@@ -11,7 +11,7 @@
     border-radius: 5px;
     box-shadow: none;
 }
-#svg {
+#graph {
     background: #1d283a;
 }
 #group {
@@ -19,74 +19,79 @@
 }
 
 /* Types */
-#svg .type-flux { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-#svg .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
-#svg .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
-#svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
-#svg .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-list { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-dictionary { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-resource { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .empty {
+#graph .type-flux { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+#graph .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
+#graph .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+#graph .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+#graph .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-list { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-dictionary { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .type-resource { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
+#graph .empty {
     fill: transparent;
     stroke-width: 1px;
 }
 
-/* Connections */
-.connection-layer > path {
-    stroke-linecap: round;
-    /*stroke-dasharray: 10, 10;*/
-}
-
 /* Group */
-#svg .group .background {
+#graph .group .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke: #ccc;
     stroke-width: 1px;
 }
-#svg .group.selected .background {
+#graph .group.selected .background {
     stroke-width: 2px;
 }
-#svg .group .title {
+#graph .group .title {
     fill: #ccc;
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
 }
 
 /* Block */
-#svg .block .background {
+#graph .block .background {
     fill: rgba(25, 35, 50, 0.8);
     stroke-width: 1px;
 }
-#svg .block:hover .background {
+#graph .block:hover .background {
     fill: rgba(15, 30, 40, 0.8);
 }
-#svg .block .title {
+#graph .block .title {
     font-family: "Varela Round", sans-serif;
     font-size: .9em;
     stroke: transparent;
 }
-#svg .block.selected .background {
+#graph .block.selected .background {
     stroke-width: 2px;
 }
 
 /* Action */
-#svg .action .background {
+#graph .action .background {
     stroke: #ccc;
 }
-#svg .action .title {
+#graph .action .title {
     fill: #ccc;
 }
-#svg .action .description {
+#graph .action .text {
     fill: #999;
     font-family: "Varela Round", sans-serif;
     font-size: .7em;
-    stroke: transparent;
 }
 
 /* Picker */
-#svg .picker .element {
+#graph .picker .element {
     cursor: pointer;
+}
+
+#graph .picker .checkbox rect {
+    fill: transparent;
+}
+
+#graph .picker .checkbox path {
+    fill: transparent;
+    stroke-width: 2px;
+}
+#graph .picker .checkbox:not(.selected) path {
+    stroke: transparent;
 }

@@ -32,7 +32,6 @@ var sources = [
     "renderer/index.js",
     "renderer/cursor-point.js",
     "renderer/utils.js",
-    "renderer/pickers.js",
     "renderer/zoom.js",
     "renderer/grid.js",
     "renderer/render-graph.js",
