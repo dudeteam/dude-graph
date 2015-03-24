@@ -46,7 +46,7 @@ Polymer({
     },
 
     removeSelectedNodes: function () {
-        this.renderer.removeSelectedNodes();
+        this.renderer.removeSelection();
     },
 
     createGroup: function (title) {
