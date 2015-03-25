@@ -26,20 +26,25 @@ Polymer({
         this.renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
     },
 
-    removeSelectedNodes: function () {
-        this.renderer.removeSelection();
-    },
-
-    createGroup: function (title) {
+    createGroup: function (name) {
         var _id = graph.getNextGroupId();
-        renderer.createSmartGroup(_id, title);
+        renderer.createSmartGroup(_id, name);
     },
 
     createBlock: function (name, position) {
         var _id = this.graph.getNextBlockId();
         var model = this.graph.getModel(name);
-        this.graph.addNode(new cg.Block(_id, model, position), this.graph);
+        this.graph.addEntity(new cg.Block(_id, model, position), this.graph);
     },
+
+    removeSelection: function () {
+        this.renderer.removeSelection();
+    },
+
+    zoomToFit: function () {
+        this.renderer.zoomToFit();
+    },
+
 
     /**
      * Create the graph when its config and data are loaded.

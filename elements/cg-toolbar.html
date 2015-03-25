@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/core-toolbar/core-toolbar.html">
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
+<link rel="import" href="../bower_components/core-icons/image-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-tooltip/core-tooltip.html">
 <link rel="import" href="cg-style.html">
@@ -24,7 +25,8 @@
             <span flex></span>
             <cg-toolbar-command label="add a group" icon="av:my-library-add" command="addGroup"></cg-toolbar-command>
             <cg-toolbar-command label="add a block" icon="add-box" command="addBlock"></cg-toolbar-command>
-            <cg-toolbar-command label="remove the selected groups and blocks" icon="delete" command="removeSelectedNodes"></cg-toolbar-command>
+            <cg-toolbar-command label="remove the selected groups and blocks" icon="delete" command="removeSelection"></cg-toolbar-command>
+            <cg-toolbar-command label="zoom to best fit all elements" icon="image:crop-free" command="zoomToFit"></cg-toolbar-command>
             <cg-toolbar-command label="undo the last action" icon="undo" command="undo"></cg-toolbar-command>
             <cg-toolbar-command label="redo the last action" icon="redo" command="redo" disabled></cg-toolbar-command>
         </core-toolbar>

@@ -16,8 +16,11 @@ Polymer({
     addBlock: function () {
         this.activeBar = "block";
     },
-    removeSelectedNodes: function () {
-        this.$.renderer.removeSelectedNodes();
+    removeSelection: function () {
+        this.$.renderer.removeSelection();
+    },
+    zoomToFit: function() {
+        this.$.renderer.zoomToFit();
     },
     createGroup: function () {
         this.$.renderer.createGroup(this.groupTitle);
@@ -41,6 +44,6 @@ Polymer({
         });
         jwerty.key('alt+A', this.addBlock.bind(this));
         jwerty.key('alt+G', this.addGroup.bind(this));
-        jwerty.key('alt+X', this.removeSelectedNodes.bind(this));
+        jwerty.key('alt+X', this.removeSelection.bind(this));
     }
 });
