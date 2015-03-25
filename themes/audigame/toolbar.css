@@ -2,7 +2,12 @@ core-toolbar {
     color: rgba(230, 126, 34, 1);
     background: #222;
     font-family: helvetica, sans-serif;
+    font-weight: 200;
     border-bottom: 1px solid rgba(230, 126, 34, 1);
+}
+#text-input {
+    margin-left: 20px;
+    color: #444;
 }
 
 [disabled] {

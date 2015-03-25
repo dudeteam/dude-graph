@@ -20,7 +20,7 @@
 <polymer-element name="cg-toolbar" attributes="logo" extends="cg-style">
     <template>
         <core-toolbar>
-            <paper-icon-button src="{{logo}}"></paper-icon-button>
+            <paper-icon-button id="logo" src="{{logo}}"></paper-icon-button>
             <span flex></span>
             <cg-toolbar-command label="add a group" icon="av:my-library-add" command="addGroup"></cg-toolbar-command>
             <cg-toolbar-command label="add a block" icon="add-box" command="addBlock"></cg-toolbar-command>
