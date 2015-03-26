@@ -5,7 +5,7 @@ Polymer({
     },
     runCommand: function (event, detail) {
         if (this[detail.command] === undefined) {
-            console.warn("Command " + detail.command + " doesn't exists");
+            console.warn("Command " + detail.command + " doesn't exist");
             return;
         }
         this[detail.command]();
