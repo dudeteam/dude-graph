@@ -38,6 +38,7 @@
 /* Connection */
 #svg .connection.selected {
     stroke-dasharray: 10, 5;
+    fill: transparent;
 }
 
 /* Block and groups */
