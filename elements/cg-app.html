@@ -5,11 +5,11 @@
 <link rel="import" href="../bower_components/dude-gui/dude-toolbar.html">
 <link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
 <link rel="import" href="../bower_components/dude-gui/dude-command.html">
-<link rel="import" href="cg-style.html">
+<link rel="import" href="../bower_components/dude-gui/dude-style.html">
 <link rel="import" href="cg-renderer.html">
-<polymer-element name="cg-app" attributes="logo theme graphUrl" extends="cg-style">
+<polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
     <template>
-        <dude-panel id="panel" name="story-editor" flex sidebarPosition="left" toolbarPosition="top">
+        <dude-panel id="panel" name="story-editor" flex sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css">
             <dude-toolbar id="toolbar">
                 <div id="root">
                     <dude-command name="addGroup" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
@@ -22,7 +22,7 @@
             <dude-sidebar hidden>
             </dude-sidebar>
             <cg-renderer id="renderer"
-                         styleUrl="../themes/{{theme}}/graph.css"
+                         styleUrl="themes/{{theme}}/graph.css"
                          configUrl="themes/{{theme}}/config.json"
                          graphUrl="{{graphUrl}}"
                          content>

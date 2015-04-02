@@ -39,7 +39,7 @@ Polymer({
         this.$.error.show();
     },
     attached: function () {
-        this.addStyle("../themes/" + this.theme + "/app.css");
+        this.styleUrl = "themes/" + this.theme + "/app.css";
         this.$.renderer.addEventListener("error", function (e) {
             this.showError(e.detail.error);
         }.bind(this));

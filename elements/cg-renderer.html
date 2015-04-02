@@ -4,8 +4,8 @@
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<link rel="import" href="cg-style.html">
-<polymer-element name="cg-renderer" attributes="configUrl graphUrl" extends="cg-style">
+<link rel="import" href="../bower_components/dude-gui/dude-style.html">
+<polymer-element name="cg-renderer" attributes="configUrl graphUrl" extends="dude-style">
     <template>
         <link rel="stylesheet" href="cg-renderer.css">
         <core-ajax id="config" url="{{configUrl}}" handleAs="json"></core-ajax>

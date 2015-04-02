@@ -59,7 +59,6 @@ Polymer({
         window.loader = this.loader;
         window.saver = this.saver;
         this.handleErrors();
-        this.addStyle(this.styleUrl);
         this.renderer.on("picker.edit", function (picker) {
             this.fire("picker.edit", {picker: picker});
         }.bind(this));
