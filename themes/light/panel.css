@@ -1,18 +1,16 @@
-@import url(http://fonts.googleapis.com/css?family=Varela+Round);
-
 ::content dude-toolbar {
     padding: 10px;
-    font-family: "Varela Round", sans-serif;
-    color: #ddd;
-    background: #15202f;
+    font-family: arial, sans-serif;
+    color: #444;
+    background: #eee;
 }
 ::content dude-toolbar.top { border-bottom: 1px solid #ccc; }
 ::content dude-toolbar.bottom { border-top: 1px solid #ccc; }
 
 ::content dude-sidebar {
-    font-family: "Varela Round", sans-serif;
-    color: #eee;
-    background: #15202f;
+    font-family: arial, sans-serif;
+    color: #444;
+    background: #eee;
     padding: 10px;
 }
 ::content dude-sidebar.left { border-right: 1px solid #ccc; }

@@ -44,8 +44,7 @@
 /* Block and groups */
 #svg .group .title, #svg .block .title {
     fill: #666;
-    font-family: helvetica, sans-serif;
-    font-weight: 200;
+    font-family: arial, sans-serif;
     font-size: .9em;
     stroke: transparent;
 }
@@ -67,8 +66,7 @@
 #svg .block .description {
     fill: #999;
     stroke: transparent;
-    font-family: helvetica, sans-serif;
-    font-weight: 200;
+    font-family: arial, sans-serif;
     font-size: .7em;
 }
 
