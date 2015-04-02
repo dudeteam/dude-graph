@@ -12,6 +12,12 @@
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
     <template>
+        <style>
+            dude-toolbar [data-state="root"] {
+                margin: auto;
+                max-width: 500px;
+            }
+        </style>
         <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
