@@ -11,10 +11,10 @@
     <template>
         <dude-panel id="panel" name="story-editor" flex sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css">
             <dude-toolbar id="toolbar">
-                <div id="root">
+                <div data-state="root">
                     <dude-command name="addGroup" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
                 </div>
-                <div id="addGroup">
+                <div data-state="addGroup">
                     <input type="text" autofocus/>
                     <dude-command name="root" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
                 </div>
