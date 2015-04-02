@@ -9,7 +9,7 @@
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
     <template>
-        <dude-panel id="panel" name="story-editor" flex sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css">
+        <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex >
             <dude-toolbar id="toolbar">
                 <div data-state="root">
                     <dude-command name="addGroup" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
