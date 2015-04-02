@@ -4,14 +4,18 @@ Polymer({
         this.activeBar = 'tool';
     },
     runCommand: function (event, detail) {
-        if (this[detail.command] === undefined) {
-            console.warn("Command " + detail.command + " doesn't exist");
+        console.log(event, detail)
+        if (this[detail.name] === undefined) {
+            console.warn("Command " + detail.name + " doesn't exist");
             return;
         }
-        this[detail.command]();
+        this[detail.name]();
+    },
+    root: function() {
+        this.$.toolbar.reset();
     },
     addGroup: function () {
-        this.activeBar = "group";
+        this.$.toolbar.state = "addGroup";
     },
     addBlock: function () {
         this.activeBar = "block";

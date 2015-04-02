@@ -10,8 +10,8 @@
         <link rel="stylesheet" href="cg-renderer.css">
         <core-ajax id="config" url="{{configUrl}}" handleAs="json"></core-ajax>
         <core-ajax id="data" url="{{graphUrl}}" handleAs="json"></core-ajax>
-        <div id="shadow-dom-bug">
-            <svg id="svg"></svg>
+        <div id="shadow-dom-bug" layout horizontal flex>
+            <svg id="svg" flex></svg>
         </div>
     </template>
     <!-- Vendors -->

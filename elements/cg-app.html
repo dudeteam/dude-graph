@@ -1,44 +1,36 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/core-tooltip/core-tooltip.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-action-dialog.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/core-input/core-input.html">
-<link rel="import" href="cg-toolbar.html">
-<link rel="import" href="cg-inputbar.html">
+<link rel="import" href="../bower_components/core-icons/av-icons.html">
+<link rel="import" href="../bower_components/dude-gui/dude-panel.html">
+<link rel="import" href="../bower_components/dude-gui/dude-toolbar.html">
+<link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
+<link rel="import" href="../bower_components/dude-gui/dude-command.html">
 <link rel="import" href="cg-style.html">
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="cg-style">
     <template>
-        <cg-toolbar logo="{{logo}}"
-                    styleUrl="../themes/{{theme}}/toolbar.css"
-                    on-command="{{runCommand}}"
-                    hidden?="{{activeBar != 'tool'}}">
-        </cg-toolbar>
-        <cg-inputbar label="Group title..."
-                     styleUrl="../themes/{{theme}}/toolbar.css"
-                     value="{{groupTitle}}"
-                     on-submit="{{createGroup}}"
-                     on-close="{{showToolbar}}"
-                     hidden?="{{activeBar != 'group'}}">
-        </cg-inputbar>
-        <cg-inputbar label="Search block..."
-                     styleUrl="../themes/{{theme}}/toolbar.css"
-                     value="{{groupTitle}}"
-                     on-submit="{{createBlock}}"
-                     on-close="{{showToolbar}}"
-                     hidden?="{{activeBar != 'block'}}">
-        </cg-inputbar>
+        <dude-panel id="panel" name="story-editor" flex sidebarPosition="left" toolbarPosition="top">
+            <dude-toolbar id="toolbar">
+                <div id="root">
+                    <dude-command name="addGroup" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
+                </div>
+                <div id="addGroup">
+                    <input type="text" autofocus/>
+                    <dude-command name="root" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-command>
+                </div>
+            </dude-toolbar>
+            <dude-sidebar hidden>
+            </dude-sidebar>
+            <cg-renderer id="renderer"
+                         styleUrl="../themes/{{theme}}/graph.css"
+                         configUrl="themes/{{theme}}/config.json"
+                         graphUrl="{{graphUrl}}"
+                         content>
+            </cg-renderer>
+        </dude-panel>
         <paper-toast class="notification" id="error"></paper-toast>
         <paper-toast class="notification" id="info"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
-        <cg-renderer id="renderer"
-                     styleUrl="../themes/{{theme}}/graph.css"
-                     configUrl="themes/{{theme}}/config.json"
-                     graphUrl="{{graphUrl}}">
-        </cg-renderer>
     </template>
     <script src="cg-app.js"></script>
 </polymer-element>

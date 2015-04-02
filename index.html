@@ -1,22 +1,21 @@
 <!doctype html>
 <html>
-    <head>
-        <title>CodeGraph</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-        <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
-        <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
-        <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="index.css">
-        <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
-        <link rel="import" href="elements/cg-app.html">
-    </head>
-    <body vertical layout fullbleed unresolved>
-        <core-header-panel mode="seamed" flex>
-            <cg-app logo="images/dude_logo_dark.png"
-                    graphUrl="examples/graph.json"
-                    theme="light">
-            </cg-app>
-        </core-header-panel>
-    </body>
+<head>
+    <title>CodeGraph</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="index.css">
+    <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="elements/cg-app.html">
+</head>
+<body vertical layout fullbleed unresolved>
+<cg-app logo="images/dude_logo_dark.png"
+        graphUrl="examples/graph.json"
+        theme="dude"
+        layout horizontal flex>
+</cg-app>
+</body>
 </html>
