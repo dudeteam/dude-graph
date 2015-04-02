@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
+<link rel="import" href="../bower_components/core-splitter/core-splitter.html">
 <link rel="import" href="../bower_components/dude-gui/dude-panel.html">
 <link rel="import" href="../bower_components/dude-gui/dude-style.html">
 <link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
@@ -14,7 +15,11 @@
             <dude-toolbar id="toolbar"
                           styleUrl="themes/{{theme}}/toolbar.css">
                 <div data-state="root">
-                    <dude-toolbar-command name="addGroup" label="Create group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command label="add a group" icon="av:my-library-add" name="addGroup" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command label="add a block" icon="add-box" name="addBlock" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command label="remove the selected groups and blocks" icon="delete" name="removeSelectedNodes" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command label="undo the last action" icon="undo" name="undo" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command label="redo the last action" icon="redo" name="redo" on-trigger="{{runCommand}}" disabled></dude-toolbar-command>
                 </div>
                 <div data-state="addGroup">
                     <dude-toolbar-input name="createGroup" value="" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-input>
@@ -29,6 +34,16 @@
                          content>
             </cg-renderer>
         </dude-panel>
+        <!--<core-splitter class="panel-splitter" direction="right"></core-splitter>-->
+        <!--<dude-panel name="audio-editor" styleUrl="themes/{{theme}}/panel.css">-->
+            <!--<dude-toolbar root="hello">-->
+                <!--<div data-state="hello">-->
+                    <!--Audio Editor-->
+                <!--</div>-->
+            <!--</dude-toolbar>-->
+            <!--<dude-sidebar>Here comes the tools.</dude-sidebar>-->
+            <!--<div content flex>Here comes some edition content</div>-->
+        <!--</dude-panel>-->
         <paper-toast class="notification" id="error"></paper-toast>
         <paper-toast class="notification" id="info"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
