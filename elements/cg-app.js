@@ -13,11 +13,11 @@ Polymer({
     root: function() {
         this.$.toolbar.reset();
     },
-    addGroup: function () {
-        this.$.toolbar.state = "addGroup";
+    openGroup: function () {
+        this.$.toolbar.state = "group";
     },
-    addBlock: function () {
-        this.activeBar = "block";
+    openBlock: function () {
+        this.$.toolbar.state = "block";
     },
     removeSelection: function () {
         this.$.renderer.removeSelection();
@@ -30,7 +30,8 @@ Polymer({
         this.$.toolbar.reset();
     },
     createBlock: function () {
-        this.$.renderer.createBlock("mix", new pandora.Vec2(50, 50));
+        console.log("create block");
+        //this.$.renderer.createBlock("mix", new pandora.Vec2(50, 50));
         this.$.toolbar.reset();
     },
     showError: function (error) {
@@ -44,8 +45,8 @@ Polymer({
         this.$.renderer.addEventListener("picker.edit", function (e) {
             console.log("edit picker", e.detail.picker);
         });
-        jwerty.key('alt+A', this.addBlock.bind(this));
-        jwerty.key('alt+G', this.addGroup.bind(this));
+        jwerty.key('alt+B', this.openBlock.bind(this));
+        jwerty.key('alt+G', this.openGroup.bind(this));
         jwerty.key('alt+X', this.removeSelection.bind(this));
     }
 });

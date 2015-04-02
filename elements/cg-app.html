@@ -18,15 +18,47 @@
                 max-width: 500px;
             }
         </style>
-        <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex>
+        <dude-panel id="panel"
+                    name="story-editor"
+                    sidebarPosition="left"
+                    toolbarPosition="top"
+                    styleUrl="themes/{{theme}}/panel.css"
+                    flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
-                    <dude-toolbar-command name="addGroup" label="add a group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command name="addBlock" label="add a block" icon="add-box" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command name="removeSelection" label="remove the selected groups and blocks" icon="delete" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command name="zoomToFit" label="zoom to best fit all elements" icon="image:crop-free" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command name="openGroup"
+                                          label="add a group"
+                                          icon="av:my-library-add"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="openBlock"
+                                          label="add a block"
+                                          icon="add-box"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="removeSelection"
+                                          label="remove the selected groups and blocks"
+                                          icon="delete"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="zoomToFit"
+                                          label="zoom to best fit all elements"
+                                          icon="image:crop-free"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
                 </div>
-                <dude-toolbar-input name="createGroup" data-state="addGroup" label="add a group" icon="check" on-trigger="{{runCommand}}"></dude-toolbar-input>
+                <dude-toolbar-input name="createGroup"
+                                    data-state="group"
+                                    label="Group title"
+                                    icon="check"
+                                    on-trigger="{{runCommand}}">
+                </dude-toolbar-input>
+                <dude-toolbar-input name="createBlock"
+                                    data-state="block"
+                                    label="Search block"
+                                    icon="check"
+                                    on-trigger="{{runCommand}}">
+                </dude-toolbar-input>
             </dude-toolbar>
             <dude-sidebar hidden>
             </dude-sidebar>
