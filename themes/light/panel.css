@@ -15,3 +15,7 @@
 }
 ::content dude-sidebar.left { border-right: 1px solid #ccc; }
 ::content dude-sidebar.right { border-left: 1px solid #ccc; }
+
+::content dude-toolbar-input /deep/ input[is="core-input"] {
+    color: #444;
+}

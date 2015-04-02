@@ -12,8 +12,7 @@
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
     <template>
         <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex>
-            <dude-toolbar id="toolbar"
-                          styleUrl="themes/{{theme}}/toolbar.css">
+            <dude-toolbar id="toolbar">
                 <div data-state="root">
                     <dude-toolbar-command label="add a group" icon="av:my-library-add" name="addGroup" on-trigger="{{runCommand}}"></dude-toolbar-command>
                     <dude-toolbar-command label="add a block" icon="add-box" name="addBlock" on-trigger="{{runCommand}}"></dude-toolbar-command>
