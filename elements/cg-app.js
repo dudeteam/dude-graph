@@ -4,12 +4,11 @@ Polymer({
         this.activeBar = 'tool';
     },
     runCommand: function (event, detail) {
-        console.log(event, detail)
         if (this[detail.name] === undefined) {
             console.warn("Command " + detail.name + " doesn't exist");
             return;
         }
-        this[detail.name]();
+        this[detail.name](detail);
     },
     root: function() {
         this.$.toolbar.reset();
@@ -26,20 +25,19 @@ Polymer({
     zoomToFit: function() {
         this.$.renderer.zoomToFit();
     },
-    createGroup: function () {
-        this.$.renderer.createGroup(this.groupTitle);
-        this.activeBar = "tool";
-        this.groupTitle = "";
+    createGroup: function (detail) {
+        this.$.renderer.createGroup(detail.value);
+        this.$.toolbar.reset();
     },
     createBlock: function () {
         this.$.renderer.createBlock("mix", new pandora.Vec2(50, 50));
+        this.$.toolbar.reset();
     },
     showError: function (error) {
         this.$.error.text = error.message;
         this.$.error.show();
     },
     attached: function () {
-        this.styleUrl = "themes/" + this.theme + "/app.css";
         this.$.renderer.addEventListener("error", function (e) {
             this.showError(e.detail.error);
         }.bind(this));

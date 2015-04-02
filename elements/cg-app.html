@@ -1,7 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-splitter/core-splitter.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
-<link rel="import" href="../bower_components/core-splitter/core-splitter.html">
+<link rel="import" href="../bower_components/core-icons/image-icons.html">
 <link rel="import" href="../bower_components/dude-gui/dude-panel.html">
 <link rel="import" href="../bower_components/dude-gui/dude-style.html">
 <link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
@@ -11,24 +12,15 @@
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
     <template>
-        <style>
-            dude-toolbar [data-state="root"] {
-                max-width:600px;
-                margin: auto;
-            }
-        </style>
         <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex>
             <dude-toolbar id="toolbar">
-                <div data-state="root" layout horizontal justified>
-                    <dude-toolbar-command label="add a group" icon="av:my-library-add" name="addGroup" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command label="add a block" icon="add-box" name="addBlock" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command label="remove the selected groups and blocks" icon="delete" name="removeSelectedNodes" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command label="undo the last action" icon="undo" name="undo" on-trigger="{{runCommand}}"></dude-toolbar-command>
-                    <dude-toolbar-command label="redo the last action" icon="redo" name="redo" on-trigger="{{runCommand}}" disabled></dude-toolbar-command>
+                <div data-state="root">
+                    <dude-toolbar-command name="addGroup" label="add a group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command name="addBlock" label="add a block" icon="add-box" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command name="removeSelection" label="remove the selected groups and blocks" icon="delete" on-trigger="{{runCommand}}"></dude-toolbar-command>
+                    <dude-toolbar-command name="zoomToFit" label="zoom to best fit all elements" icon="image:crop-free" on-trigger="{{runCommand}}"></dude-toolbar-command>
                 </div>
-                <div data-state="addGroup">
-                    <dude-toolbar-input name="createGroup" value="" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-input>
-                </div>
+                <dude-toolbar-input name="createGroup" data-state="addGroup" label="add a group" icon="check" on-trigger="{{runCommand}}"></dude-toolbar-input>
             </dude-toolbar>
             <dude-sidebar hidden>
             </dude-sidebar>
@@ -41,13 +33,13 @@
         </dude-panel>
         <!--<core-splitter class="panel-splitter" direction="right"></core-splitter>-->
         <!--<dude-panel name="audio-editor" styleUrl="themes/{{theme}}/panel.css">-->
-            <!--<dude-toolbar root="hello">-->
-                <!--<div data-state="hello">-->
-                    <!--Audio Editor-->
-                <!--</div>-->
-            <!--</dude-toolbar>-->
-            <!--<dude-sidebar>Here comes the tools.</dude-sidebar>-->
-            <!--<div content flex>Here comes some edition content</div>-->
+        <!--<dude-toolbar root="hello">-->
+        <!--<div data-state="hello">-->
+        <!--Audio Editor-->
+        <!--</div>-->
+        <!--</dude-toolbar>-->
+        <!--<dude-sidebar>Here comes the tools.</dude-sidebar>-->
+        <!--<div content flex>Here comes some edition content</div>-->
         <!--</dude-panel>-->
         <paper-toast class="notification" id="error"></paper-toast>
         <paper-toast class="notification" id="info"></paper-toast>
