@@ -1,6 +1,6 @@
 ::content dude-toolbar {
     padding: 10px;
-    font-family: arial, sans-serif;
+    font-family: "Roboto 2", sans-serif;
     color: rgba(230, 126, 34, 1);
     background: #222;
 }
@@ -8,7 +8,7 @@
 ::content dude-toolbar.bottom { border-top: 1px solid rgba(230, 126, 34, 1); }
 
 ::content dude-sidebar {
-    font-family: arial, sans-serif;
+    font-family: "Roboto 2", sans-serif;
     color: #ddd;
     background: #222;
     padding: 10px;
@@ -17,5 +17,6 @@
 ::content dude-sidebar.right { border-left: 1px solid rgba(230, 126, 34, 1); }
 
 ::content dude-toolbar-input /deep/ input[is="core-input"] {
+    font-family: "Roboto 2", sans-serif;
     color: #ccc;
 }

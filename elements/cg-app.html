@@ -14,7 +14,7 @@
     <template>
         <dude-panel id="panel" name="story-editor" sidebarPosition="left" toolbarPosition="top" styleUrl="themes/{{theme}}/panel.css" flex>
             <dude-toolbar id="toolbar">
-                <div data-state="root">
+                <div data-state="root" layout horizontal justified>
                     <dude-toolbar-command name="addGroup" label="add a group" icon="av:my-library-add" on-trigger="{{runCommand}}"></dude-toolbar-command>
                     <dude-toolbar-command name="addBlock" label="add a block" icon="add-box" on-trigger="{{runCommand}}"></dude-toolbar-command>
                     <dude-toolbar-command name="removeSelection" label="remove the selected groups and blocks" icon="delete" on-trigger="{{runCommand}}"></dude-toolbar-command>

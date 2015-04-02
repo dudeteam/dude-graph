@@ -20,7 +20,7 @@
 
 /* Block and groups */
 #svg .group .title, #svg .block .title {
-    font-family: helvetica, sans-serif;
+    font-family: "Roboto 2", sans-serif;
     /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
     font-weight: 200;
     font-size: .9em;
@@ -40,7 +40,7 @@
 /* Blocks */
 #svg .block .description {
     fill: #999;
-    font-family: helvetica, sans-serif;
+    font-family: "Roboto 2", sans-serif;
     font-weight: 200;
     stroke: transparent;
     /*font-family: Monaco, Consolas, "Lucida Console", monospace;*/
