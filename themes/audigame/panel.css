@@ -5,6 +5,7 @@
     font-family: "Varela", sans-serif;
     color: rgba(230, 126, 34, 1);
     background: #222;
+    height: 30px;
 }
 ::content dude-toolbar.top { border-bottom: 1px solid rgba(230, 126, 34, 1); }
 ::content dude-toolbar.bottom { border-top: 1px solid rgba(230, 126, 34, 1); }
