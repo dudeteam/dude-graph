@@ -19,7 +19,10 @@ Polymer({
         this.$.toolbar.state = "action";
         this.$.sidebar.removeAttribute("hidden");
     },
-    openPicker: function () { this.$.toolbar.state = "picker"; },
+    openPicker: function () {
+        this.$.toolbar.state = "picker";
+        this.$.sidebar.removeAttribute("hidden");
+    },
     removeSelection: function () {
         this.$.renderer.removeSelection();
     },
