@@ -11,7 +11,8 @@
 }
 
 /* Types */
-#svg .type-flux { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+#svg [class^="type-"] { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+#svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
 #svg .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
 #svg .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
 #svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }

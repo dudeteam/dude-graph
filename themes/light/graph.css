@@ -9,7 +9,8 @@
 }
 
 /* Types */
-#svg .type-flux { fill: rgba(50, 50, 50, 1); stroke: rgba(50, 50, 50, 1); }
+#svg [class^="type-"] { fill: rgba(50, 50, 50, 1); stroke: rgba(50, 50, 50, 1); }
+#svg .type-stream { fill: rgba(50, 50, 50, 1); stroke: rgba(50, 50, 50, 1); }
 #svg .type-boolean { fill: rgba(28, 188, 156, 0.7); stroke: rgba(28, 188, 156, 0.7); }
 #svg .type-number { fill: rgba(241, 196, 15, 0.7); stroke: rgba(241, 196, 15, 0.7); }
 #svg .type-string { fill: rgba(230, 126, 34, 0.7); stroke: rgba(230, 126, 34, 0.7); }

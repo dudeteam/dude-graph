@@ -82,7 +82,13 @@
                 </dude-toolbar-input>
                 <div data-state="picker">Add a picker</div>
             </dude-toolbar>
-            <dude-sidebar hidden>
+            <dude-sidebar id="sidebar" hidden>
+                <div>
+                    <div>start</div>
+                    <div>end</div>
+                    <div>step</div>
+                    <div>condition</div>
+                </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
                          styleUrl="themes/{{theme}}/graph.css"

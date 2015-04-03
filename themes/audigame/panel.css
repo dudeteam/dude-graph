@@ -1,7 +1,8 @@
+
 /* Toolbar */
 ::content dude-toolbar {
     padding: 5px;
-    font-family: "Roboto 2", sans-serif;
+    font-family: "Varela", sans-serif;
     color: rgba(230, 126, 34, 1);
     background: #222;
 }
@@ -10,7 +11,7 @@
 
 /* Toolbar input */
 ::content dude-toolbar-input /deep/ input[is="core-input"] {
-    font-family: "Roboto 2", sans-serif;
+    font-family: "Lato", sans-serif;
     color: #ccc;
     padding: 5px;
 }
@@ -26,7 +27,7 @@
 
 /* Sidebar */
 ::content dude-sidebar {
-    font-family: "Roboto 2", sans-serif;
+    font-family: "Lato", sans-serif;
     color: #ddd;
     background: #222;
     padding: 10px;
