@@ -5,7 +5,7 @@
   "dependencies": {
     "d3": "~3.5.5",
     "jwerty": "~0.3.2",
-    "pandora": "~0.0.9",
+    "pandora": "~0.0.10",
     "font-awesome": "~4.3.0",
     "polymer": "Polymer/polymer#~0.5.3",
     "core-ajax": "Polymer/core-ajax#~0.5.5",
