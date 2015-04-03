@@ -54,4 +54,5 @@
 /* Getter */
 #svg .getter .title, #svg .picker .title {
     font-size: .8em;
+    font-style: italic;
 }

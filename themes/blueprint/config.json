@@ -1,12 +1,14 @@
 {
+  "group": { "borderRadius": 5 },
+  "action": { "borderRadius": 5 },
+  "picker": { "borderRadius": 5 },
+  "getter": { "borderRadius": 5 },
   "background-grid": {
     "line": {
-      "stroke": "rgba(0, 0, 0, 0.1)",
-      "stroke-width": 1
+      "stroke": "rgba(255, 255, 255, 0.05)"
     },
     "big-line": {
-      "stroke": "rgba(0, 0, 0, 0.8)",
-      "stroke-width": 1
+      "stroke": "rgba(255, 255, 255, 0.2)"
     }
   }
 }
