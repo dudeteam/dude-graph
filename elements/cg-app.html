@@ -84,10 +84,9 @@
             </dude-toolbar>
             <dude-sidebar id="sidebar" noroot>
                 <div data-state="action">
-                    <div>start</div>
-                    <div>end</div>
-                    <div>step</div>
-                    <div>condition</div>
+                    <template repeat="{{model in _actionModels}}">
+                        <div>{{model}}</div>
+                    </template>
                 </div>
                 <div data-state="picker">
                     <div>Some picker content...</div>
@@ -114,5 +113,75 @@
         <paper-toast class="notification" id="info"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
     </template>
-    <script src="cg-app.js"></script>
+    <script>
+        Polymer({
+            runCommand: function (event, detail) {
+                if (this[detail.name] === undefined) {
+                    console.warn("Command " + detail.name + " doesn't exist");
+                    return;
+                }
+                this[detail.name](detail);
+            },
+            root: function() {
+                this.$.toolbar.reset();
+            },
+            hideSidebar: function () {
+                this.$.sidebar.reset();
+            },
+            openGroup: function () {
+                this.$.toolbar.state = "group";
+            },
+            openAction: function () {
+                this.$.toolbar.state = "action";
+                this.$.sidebar.state = "action";
+            },
+            openPicker: function () {
+                this.$.toolbar.state = "picker";
+                this.$.sidebar.state = "picker";
+            },
+            removeSelection: function () {
+                this.$.renderer.removeSelection();
+            },
+            zoomToFit: function() {
+                this.$.renderer.zoomToFit();
+            },
+            createGroup: function (detail) {
+                this.$.renderer.createGroup(detail.value);
+            },
+            createAction: function (detail) {
+                this.$.renderer.createBlock(detail.value, new pandora.Vec2(50, 50));
+            },
+            createPicker: function () {
+                console.log("TODO: add a picker or getter");
+            },
+            showError: function (error) {
+                this.$.error.text = error.message;
+                this.$.error.show();
+            },
+            attached: function () {
+                this.styleUrl = "themes/" + this.theme + "/app.css";
+                this.$.renderer.addEventListener("error", function (e) {
+                    this.showError(e.detail.error);
+                }.bind(this));
+                this.$.renderer.addEventListener("picker.edit", function (e) {
+                    console.log("edit picker", e.detail.picker);
+                });
+                this.$.renderer.addEventListener("ready", function () {
+                    this._actionModels = this.$.renderer.findModels({limit: 5, type: 'action'});
+                }.bind(this));
+                if (navigator.platform.indexOf("Mac") !== -1) {
+                    jwerty.key('cmd+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('cmd+A', function (e) {this.openAction(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('cmd+P', function (e) {this.openPicker(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('cmd+X', function (e) {this.removeSelection(); pandora.preventCallback(e); }.bind(this));
+                } else {
+                    jwerty.key('ctrl+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('ctrl+A', function (e) {this.openAction(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('ctrl+P', function (e) {this.openPicker(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('ctrl+X', function (e) {this.removeSelection(); pandora.preventCallback(e); }.bind(this));
+                }
+
+            }
+        });
+    </script>
 </polymer-element>
