@@ -1,8 +1,4 @@
 Polymer({
-    activeBar: "tool",
-    showToolbar: function () {
-        this.activeBar = 'tool';
-    },
     runCommand: function (event, detail) {
         if (this[detail.name] === undefined) {
             console.warn("Command " + detail.name + " doesn't exist");
@@ -27,12 +23,9 @@ Polymer({
     },
     createGroup: function (detail) {
         this.$.renderer.createGroup(detail.value);
-        this.$.toolbar.reset();
     },
-    createBlock: function () {
-        console.log("create block");
-        //this.$.renderer.createBlock("mix", new pandora.Vec2(50, 50));
-        this.$.toolbar.reset();
+    createBlock: function (detail) {
+        this.$.renderer.createBlock(detail.value, new pandora.Vec2(50, 50));
     },
     showError: function (error) {
         this.$.error.text = error.message;

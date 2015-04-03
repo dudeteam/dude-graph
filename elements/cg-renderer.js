@@ -34,7 +34,11 @@ Polymer({
     createBlock: function (name, position) {
         var _id = this.graph.getNextBlockId();
         var model = this.graph.getModel(name);
-        this.graph.addEntity(new cg.Block(_id, model, position), this.graph);
+        if (model !== undefined) {
+            this.graph.addEntity(new cg.Block(_id, model, position), this.graph);
+        } else {
+            this.fire("error", {error: new pandora.Exception("Model {0} not found", name)});
+        }
     },
 
     removeSelection: function () {
