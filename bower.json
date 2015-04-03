@@ -9,6 +9,7 @@
     "font-awesome": "~4.3.0",
     "polymer": "Polymer/polymer#~0.5.3",
     "core-ajax": "Polymer/core-ajax#~0.5.5",
+    "core-style": "Polymer/core-style#~0.5.5",
     "core-toolbar": "Polymer/core-toolbar#~0.5.5",
     "core-tooltip": "Polymer/core-tooltip#~0.5.5",
     "core-header-panel": "Polymer/core-header-panel#~0.5.5",
@@ -16,7 +17,6 @@
     "paper-dialog": "Polymer/paper-dialog#~0.5.5",
     "paper-input": "Polymer/paper-input#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#~0.5.5",
-    "dude-gui": "~0.0.5",
-    "core-style": "Polymer/core-style#~0.5.5"
+    "dude-gui": "~0.0.7"
   }
 }
