@@ -9,7 +9,12 @@ Polymer({
     root: function() {
         this.$.toolbar.reset();
     },
-    openGroup: function () { this.$.toolbar.state = "group"; },
+    hideSidebar: function () {
+        this.$.sidebar.setAttribute("hidden", "");
+    },
+    openGroup: function () {
+        this.$.toolbar.state = "group";
+    },
     openAction: function () {
         this.$.toolbar.state = "action";
         this.$.sidebar.removeAttribute("hidden");
