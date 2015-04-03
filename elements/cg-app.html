@@ -4,13 +4,13 @@
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
 <link rel="import" href="../bower_components/core-icons/image-icons.html">
 <link rel="import" href="../bower_components/dude-gui/dude-panel.html">
-<link rel="import" href="../bower_components/dude-gui/dude-style.html">
+<link rel="import" href="../bower_components/dude-gui/dude-config.html">
 <link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
 <link rel="import" href="../bower_components/dude-gui/dude-toolbar.html">
 <link rel="import" href="../bower_components/dude-gui/dude-toolbar-command.html">
 <link rel="import" href="../bower_components/dude-gui/dude-toolbar-input.html">
 <link rel="import" href="cg-renderer.html">
-<polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-style">
+<polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
     <template>
         <style>
             dude-toolbar [data-state="root"] {
@@ -21,9 +21,8 @@
         </style>
         <dude-panel id="panel"
                     name="story-editor"
-                    sidebarPosition="left"
-                    toolbarPosition="top"
                     styleUrl="themes/{{theme}}/panel.css"
+                    configUrl="themes/{{theme}}/panel.json"
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
@@ -83,12 +82,15 @@
                 </dude-toolbar-input>
                 <div data-state="picker">Add a picker</div>
             </dude-toolbar>
-            <dude-sidebar id="sidebar" hidden>
-                <div>
+            <dude-sidebar id="sidebar" noroot>
+                <div data-state="action">
                     <div>start</div>
                     <div>end</div>
                     <div>step</div>
                     <div>condition</div>
+                </div>
+                <div data-state="picker">
+                    <div>Some picker content...</div>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"

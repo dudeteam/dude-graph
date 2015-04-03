@@ -2,19 +2,12 @@ Polymer({
     publish: {
 
         /**
-         * This is the url of the graph data to load. If you create the graph like so
-         * <cg-graph graphUrl="path/to/graph.json"></cg-graph> the graph will be loaded from the given url.
-         *
+         * This is the url of the graph data to load.
          * @attribute url
          * @type {String}
          */
-        graphUrl: null,
+        graphUrl: null
 
-        /**
-         * This is the url of a config file that contain all the custom settings of the graph for a given theme that
-         * cannot be given by the stylesheet.
-         */
-        configUrl: null
     },
     data: null,
     config: null,
@@ -52,8 +45,9 @@ Polymer({
 
     /**
      * Create the graph when its config and data are loaded.
+     * @private
      */
-    createGraph: function () {
+    _createGraph: function () {
         this.graph = new cg.Graph();
         this.loader = new cg.JSONLoader();
         this.saver = new cg.JSONSaver();
@@ -66,27 +60,26 @@ Polymer({
         this.renderer.on("picker.edit", function (picker) {
             this.fire("picker.edit", {picker: picker});
         }.bind(this));
-        this.loader.load(this.graph, this.data);
+        this.loader.load(this.graph, this._graphData);
         this.renderer.render();
     },
 
     /**
-     * Load config and data then call createGraph().
+     * Load the graph data from an external JSON file.
+     * @private
      */
+    _loadGraph: function () {
+        this._graphData = this.$.graphData.response;
+        if (this.config !== null) {
+            this._createGraph();
+        }
+    },
+
     ready: function () {
-        this.$.config.addEventListener("core-complete", function () {
-            this.config = this.$.config.response;
-            if (this.data !== null) {
-                this.createGraph();
+        this.addEventListener("dude-config-ready", function () {
+            if (this._graphData !== undefined) {
+                this._createGraph();
             }
-        }.bind(this));
-        this.$.config.go();
-        this.$.data.addEventListener("core-complete", function () {
-            this.data = this.$.data.response;
-            if (this.config !== null) {
-                this.createGraph();
-            }
-        }.bind(this));
-        this.$.data.go();
+        });
     }
 });

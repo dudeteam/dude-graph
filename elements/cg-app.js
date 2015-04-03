@@ -10,18 +10,18 @@ Polymer({
         this.$.toolbar.reset();
     },
     hideSidebar: function () {
-        this.$.sidebar.setAttribute("hidden", "");
+        this.$.sidebar.reset();
     },
     openGroup: function () {
         this.$.toolbar.state = "group";
     },
     openAction: function () {
         this.$.toolbar.state = "action";
-        this.$.sidebar.removeAttribute("hidden");
+        this.$.sidebar.state = "action";
     },
     openPicker: function () {
         this.$.toolbar.state = "picker";
-        this.$.sidebar.removeAttribute("hidden");
+        this.$.sidebar.state = "picker";
     },
     removeSelection: function () {
         this.$.renderer.removeSelection();

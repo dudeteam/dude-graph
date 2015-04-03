@@ -4,12 +4,16 @@
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<link rel="import" href="../bower_components/dude-gui/dude-style.html">
-<polymer-element name="cg-renderer" attributes="configUrl graphUrl" extends="dude-style">
+<link rel="import" href="../bower_components/dude-gui/dude-config.html">
+<polymer-element name="cg-renderer" attributes="graphUrl" extends="dude-config">
     <template>
         <link rel="stylesheet" href="cg-renderer.css">
-        <core-ajax id="config" url="{{configUrl}}" handleAs="json"></core-ajax>
-        <core-ajax id="data" url="{{graphUrl}}" handleAs="json"></core-ajax>
+        <core-ajax id="graphData"
+                   url="{{graphUrl}}"
+                   handleAs="json"
+                   on-core-response="{{_loadGraph}}"
+                   auto>
+        </core-ajax>
         <div id="shadow-dom-bug" layout horizontal flex>
             <svg id="svg" flex></svg>
         </div>

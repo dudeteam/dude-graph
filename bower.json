@@ -17,6 +17,6 @@
     "paper-dialog": "Polymer/paper-dialog#~0.5.5",
     "paper-input": "Polymer/paper-input#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#~0.5.5",
-    "dude-gui": "~0.0.7"
+    "dude-gui": "~0.0.9"
   }
 }
