@@ -15,7 +15,8 @@
         <style>
             dude-toolbar [data-state="root"] {
                 margin: auto;
-                max-width: 500px;
+                padding: 0 20px;
+                max-width: 800px;
             }
         </style>
         <dude-panel id="panel"
@@ -26,14 +27,34 @@
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
+                    <dude-toolbar-command name="openGraph"
+                                          label="open another graph"
+                                          icon="open-in-new"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="save"
+                                          label="save the graph"
+                                          icon="save"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
                     <dude-toolbar-command name="openGroup"
                                           label="add a group"
                                           icon="av:my-library-add"
                                           on-trigger="{{runCommand}}">
                     </dude-toolbar-command>
-                    <dude-toolbar-command name="openBlock"
-                                          label="add a block"
+                    <dude-toolbar-command name="openAction"
+                                          label="add an action"
                                           icon="add-box"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="openPicker"
+                                          label="add a picker"
+                                          icon="add-circle"
+                                          on-trigger="{{runCommand}}">
+                    </dude-toolbar-command>
+                    <dude-toolbar-command name="edit"
+                                          label="edit the selected object"
+                                          icon="create"
                                           on-trigger="{{runCommand}}">
                     </dude-toolbar-command>
                     <dude-toolbar-command name="removeSelection"
@@ -53,12 +74,13 @@
                                     icon="check"
                                     on-submit="{{runCommand}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input name="createBlock"
-                                    data-state="block"
+                <dude-toolbar-input name="createAction"
+                                    data-state="action"
                                     label="Search block"
                                     icon="check"
                                     on-submit="{{runCommand}}">
                 </dude-toolbar-input>
+                <div data-state="picker">Add a picker</div>
             </dude-toolbar>
             <dude-sidebar hidden>
             </dude-sidebar>

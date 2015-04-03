@@ -1,5 +1,6 @@
+/* Toolbar */
 ::content dude-toolbar {
-    padding: 10px;
+    padding: 5px;
     font-family: "Roboto 2", sans-serif;
     color: rgba(230, 126, 34, 1);
     background: #222;
@@ -7,6 +8,23 @@
 ::content dude-toolbar.top { border-bottom: 1px solid rgba(230, 126, 34, 1); }
 ::content dude-toolbar.bottom { border-top: 1px solid rgba(230, 126, 34, 1); }
 
+/* Toolbar input */
+::content dude-toolbar-input /deep/ input[is="core-input"] {
+    font-family: "Roboto 2", sans-serif;
+    color: #ccc;
+    padding: 5px;
+}
+
+/* Toolbar command */
+::content dude-toolbar /deep/ paper-icon-button {
+    padding: 5px;
+}
+::content dude-toolbar /deep/ paper-icon-button /deep/ core-icon[role=img] {
+    width: 15px;
+    height: 15px;
+}
+
+/* Sidebar */
 ::content dude-sidebar {
     font-family: "Roboto 2", sans-serif;
     color: #ddd;
@@ -15,8 +33,3 @@
 }
 ::content dude-sidebar.left { border-right: 1px solid rgba(230, 126, 34, 1); }
 ::content dude-sidebar.right { border-left: 1px solid rgba(230, 126, 34, 1); }
-
-::content dude-toolbar-input /deep/ input[is="core-input"] {
-    font-family: "Roboto 2", sans-serif;
-    color: #ccc;
-}

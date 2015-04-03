@@ -1,10 +1,8 @@
 {
-  "group": {
-    "borderRadius": 5
-  },
-  "block": {
-    "borderRadius": 5
-  },
+  "group": { "borderRadius": 5 },
+  "action": { "borderRadius": 5 },
+  "picker": { "borderRadius": 5 },
+  "getter": { "borderRadius": 5 },
   "background-grid": {
     "line": {
       "stroke": "rgba(255, 255, 255, 0.05)"

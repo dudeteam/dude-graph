@@ -9,12 +9,9 @@ Polymer({
     root: function() {
         this.$.toolbar.reset();
     },
-    openGroup: function () {
-        this.$.toolbar.state = "group";
-    },
-    openBlock: function () {
-        this.$.toolbar.state = "block";
-    },
+    openGroup: function () { this.$.toolbar.state = "group"; },
+    openAction: function () { this.$.toolbar.state = "action"; },
+    openPicker: function () { this.$.toolbar.state = "picker"; },
     removeSelection: function () {
         this.$.renderer.removeSelection();
     },
@@ -24,8 +21,11 @@ Polymer({
     createGroup: function (detail) {
         this.$.renderer.createGroup(detail.value);
     },
-    createBlock: function (detail) {
+    createAction: function (detail) {
         this.$.renderer.createBlock(detail.value, new pandora.Vec2(50, 50));
+    },
+    createPicker: function () {
+        console.log("TODO: add a picker or getter");
     },
     showError: function (error) {
         this.$.error.text = error.message;
@@ -38,8 +38,9 @@ Polymer({
         this.$.renderer.addEventListener("picker.edit", function (e) {
             console.log("edit picker", e.detail.picker);
         });
-        jwerty.key('alt+B', this.openBlock.bind(this));
         jwerty.key('alt+G', this.openGroup.bind(this));
+        jwerty.key('alt+A', this.openAction.bind(this));
+        jwerty.key('alt+P', this.openPicker.bind(this));
         jwerty.key('alt+X', this.removeSelection.bind(this));
     }
 });
