@@ -228,7 +228,7 @@
                     }), new pandora.Vec2(50, 50));
                 }
             },
-            edit: function () {
+            editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 if (entity instanceof cg.Group) {
@@ -239,7 +239,7 @@
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 if (entity instanceof cg.Group) {
-                    entity.name = event.value;
+                    entity.description = event.value;
                     entity.emit("update");
                 }
             },
