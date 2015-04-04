@@ -118,6 +118,9 @@
                 return this.graph.findModels(options);
             },
 
+            getLastSelectedEntity: function() {
+                return this.renderer.getLastSelectedEntity();
+            },
 
             /**
              * Create the graph when its config and data are loaded.

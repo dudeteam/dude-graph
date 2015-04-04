@@ -76,6 +76,12 @@
                                     icon="check"
                                     on-submit="{{runCommand}}">
                 </dude-toolbar-input>
+                <dude-toolbar-input name="editGroup"
+                                    data-state="editGroup"
+                                    label="Group title"
+                                    icon="check"
+                                    on-submit="{{runCommand}}">
+                </dude-toolbar-input>
                 <dude-toolbar-input name="createAction"
                                     value="{{modelPattern}}"
                                     data-state="action"
@@ -138,7 +144,7 @@
                 }
                 this[detail.name](detail);
             },
-            root: function() {
+            root: function () {
                 this.$.toolbar.reset();
             },
             hideSidebar: function () {
@@ -160,7 +166,7 @@
                 this.$.success.text = "Entities successfully removed!";
                 this.$.success.show();
             },
-            zoomToFit: function() {
+            zoomToFit: function () {
                 this.$.renderer.zoomToFit();
             },
             createGroup: function (detail) {
@@ -187,6 +193,21 @@
                     "value-type": this._pickerType,
                     "default": this._pickerValue
                 }), new pandora.Vec2(50, 50));
+            },
+            edit: function () {
+                var selection = this.$.renderer.getLastSelectedEntity();
+                var entity = selection ? selection.datum() : null;
+                if (entity instanceof cg.Group) {
+                    this.$.toolbar.state = "editGroup";
+                }
+            },
+            editGroup: function (event) {
+                var selection = this.$.renderer.getLastSelectedEntity();
+                var entity = selection ? selection.datum() : null;
+                if (entity instanceof cg.Group) {
+                    entity.name = event.value;
+                    entity.emit("update");
+                }
             },
             showError: function (error) {
                 this.$.error.text = error.message;
