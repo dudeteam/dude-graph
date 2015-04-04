@@ -7,5 +7,12 @@
     box-shadow: none;
 }
 #error { background: rgba(231, 76, 60, 0.8); }
-#info { background: rgba(52, 152, 219, 0.8); }
 #success { background: rgba(46, 204, 113, 0.8); }
+dude-sidebar .search-result {
+    text-align: center;
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+dude-sidebar .search-result:last-child {
+    border-bottom: none;
+}

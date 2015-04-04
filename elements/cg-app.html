@@ -18,6 +18,9 @@
                 padding: 0 20px;
                 max-width: 800px;
             }
+            dude-sidebar [data-state] {
+                width: 200px;
+            }
         </style>
         <dude-panel id="panel"
                     name="story-editor"
@@ -74,8 +77,9 @@
                                     on-submit="{{runCommand}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="createAction"
+                                    value="{{modelPattern}}"
                                     data-state="action"
-                                    label="Search block"
+                                    label="Search action..."
                                     icon="check"
                                     on-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
@@ -84,8 +88,11 @@
             </dude-toolbar>
             <dude-sidebar id="sidebar" noroot>
                 <div data-state="action">
+                    <template if="{{_actionModels.length === 0}}">
+                        <div>No results.</div>
+                    </template>
                     <template repeat="{{model in _actionModels}}">
-                        <div>{{model}}</div>
+                        <div class="search-result">{{model}}</div>
                     </template>
                 </div>
                 <div data-state="picker">
@@ -110,7 +117,6 @@
         <!--<div content flex>Here comes some edition content</div>-->
         <!--</dude-panel>-->
         <paper-toast class="notification" id="error"></paper-toast>
-        <paper-toast class="notification" id="info"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
     </template>
     <script>
@@ -147,9 +153,22 @@
             },
             createGroup: function (detail) {
                 this.$.renderer.createGroup(detail.value);
+                this.$.success.text = "Group " + detail.value + " successfully created!";
+                this.$.success.show();
             },
-            createAction: function (detail) {
-                this.$.renderer.createBlock(detail.value, new pandora.Vec2(50, 50));
+            createAction: function () {
+                var models = this.$.renderer.findModels({
+                    limit: 5,
+                    modelType: 'action',
+                    pattern: this.modelPattern
+                });
+                if (models.length === 0) {
+                    this.showError(new pandora.Exception("Model {0} doesnt exist", this.modelPattern));
+                } else {
+                    this.$.renderer.createBlock(models[0], new pandora.Vec2(50, 50));
+                    this.$.success.text = "Action " + models[0] + " successfully created!";
+                    this.$.success.show();
+                }
             },
             createPicker: function () {
                 console.log("TODO: add a picker or getter");
@@ -167,7 +186,7 @@
                     console.log("edit picker", e.detail.picker);
                 });
                 this.$.renderer.addEventListener("ready", function () {
-                    this._actionModels = this.$.renderer.findModels({limit: 5, type: 'action'});
+                    this._actionModels = this.$.renderer.findModels({limit: 5, modelType: 'action'});
                 }.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
                     jwerty.key('cmd+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
@@ -181,6 +200,13 @@
                     jwerty.key('ctrl+X', function (e) {this.removeSelection(); pandora.preventCallback(e); }.bind(this));
                 }
 
+            },
+            modelPatternChanged: function (old) {
+                this._actionModels = this.$.renderer.findModels({
+                    limit: 5,
+                    modelType: 'action',
+                    pattern: this.modelPattern
+                });
             }
         });
     </script>
