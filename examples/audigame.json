@@ -82,6 +82,30 @@
       "type": "getter",
       "value-type": "boolean"
     },
+    "has key?": {
+      "type": "getter",
+      "value-type": "boolean"
+    },
+    "can climb?": {
+      "type": "getter",
+      "value-type": "boolean"
+    },
+    "alarm disabled?": {
+      "type": "getter",
+      "value-type": "boolean"
+    },
+    "intro": {
+      "type": "getter",
+      "value-type": "string"
+    },
+    "game over": {
+      "type": "getter",
+      "value-type": "string"
+    },
+    "mission success": {
+      "type": "getter",
+      "value-type": "string"
+    },
     "picker-string": {
       "type": "picker",
       "value-type": "string",

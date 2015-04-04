@@ -1,8 +1,13 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-splitter/core-splitter.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/core-splitter/core-splitter.html">
 <link rel="import" href="../bower_components/core-icons/av-icons.html">
 <link rel="import" href="../bower_components/core-icons/image-icons.html">
+<link rel="import" href="../bower_components/core-dropdown-menu/core-dropdown-menu.html">
+<link rel="import" href="../bower_components/core-dropdown/core-dropdown.html">
+<link rel="import" href="../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="../bower_components/core-menu/core-menu.html">
+<link rel="import" href="../bower_components/core-item/core-item.html">
 <link rel="import" href="../bower_components/dude-gui/dude-panel.html">
 <link rel="import" href="../bower_components/dude-gui/dude-config.html">
 <link rel="import" href="../bower_components/dude-gui/dude-sidebar.html">
@@ -20,6 +25,33 @@
             }
             dude-sidebar [data-state] {
                 width: 200px;
+            }
+            core-dropdown-menu {
+                box-sizing: border-box;
+                width: 170px;
+                outline: none;
+                background: transparent;
+            }
+            core-dropdown {
+                box-sizing: border-box;
+                min-width: 170px;
+                color: white;
+                z-index: 10;
+                border-radius: 3px;
+            }
+            core-item {
+                z-index: 10;
+                overflow: hidden;
+                white-space: nowrap;
+                color: #444;
+                text-overflow: ellipsis;
+            }
+            core-collapse {
+                border: 1px solid #ccc;
+                padding: 8px;
+            }
+            .constrained-height {
+                height: 150px;
             }
         </style>
         <dude-panel id="panel"
@@ -50,7 +82,7 @@
                                     on-submit="{{runCommand}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="createAction"
-                                    value="{{modelPattern}}"
+                                    value="{{_actionName}}"
                                     data-state="action"
                                     label="Search action..."
                                     icon="check"
@@ -58,9 +90,9 @@
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="createPicker"
-                                    value="{{pickerPattern}}"
+                                    value="{{_pickerName}}"
                                     data-state="picker"
-                                    label="<type>:<value>"
+                                    label="Search by name..."
                                     icon="check"
                                     on-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
@@ -68,16 +100,39 @@
             </dude-toolbar>
             <dude-sidebar id="sidebar" noroot>
                 <div data-state="action">
-                    <template if="{{_actionModels.length === 0}}">
+                    <template if="{{_actionList.length === 0}}">
                         <div>No results.</div>
                     </template>
-                    <template repeat="{{model in _actionModels}}">
-                        <div class="search-result">{{model.name}}</div>
+                    <template repeat="{{action in _actionList}}">
+                        <div class="search-result">{{action.name}}</div>
                     </template>
                 </div>
                 <div data-state="picker">
-                    <div>Type: {{_pickerType}}</div>
-                    <div>Value: {{_pickerValue}}</div>
+                    <div>
+                        <core-dropdown-menu label="boolean">
+                            <core-dropdown class="dropdown">
+                                <core-menu>
+                                    <template repeat="{{type in _types}}">
+                                        <core-item>{{type}}</core-item>
+                                    </template>
+                                </core-menu>
+                            </core-dropdown>
+                        </core-dropdown-menu>
+                    </div>
+                    <!--<div>-->
+                        <!--<input is="core-input"-->
+                               <!--value="{{_pickerValue}}"-->
+                               <!--placeholder="Type your string..."-->
+                               <!--flex>-->
+                    <!--</div>-->
+                    <div>
+                        <template if="{{_pickerList.length === 0}}">
+                            <div>No results.</div>
+                        </template>
+                        <template repeat="{{picker in _pickerList}}">
+                            <div class="search-result">{{picker.name}}</div>
+                        </template>
+                    </div>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -102,6 +157,7 @@
     </template>
     <script>
         Polymer({
+            _types: ["boolean", "string", "sound"],
             _commands: [
                 {name: "openGraph", label: "open another graph", icon: "open-in-new"},
                 {name: "saveGraph", label: "save the graph", icon: "save"},
@@ -112,8 +168,11 @@
                 {name: "removeSelection", label: "remove all the selected objects", icon: "delete"},
                 {name: "zoomToFit", label: "zoom to best fit all objects", icon: "image:crop-free"}
             ],
-            _pickerType: "Unknown",
-            _pickerValue: "Undefined",
+            _pickerList: [],
+            _pickerType: "boolean",
+            _pickerName: null,
+            _actionList: [],
+            _actionName: null,
             runCommand: function (event, detail) {
                 if (this[detail.name] === undefined) {
                     console.warn("Command " + detail.name + " doesn't exist");
@@ -152,24 +211,32 @@
                 this.$.success.show();
             },
             createAction: function () {
-                var models = this.$.renderer.findModels({
-                    limit: 5,
-                    modelType: 'action',
-                    pattern: this.modelPattern
-                });
-                if (models.length === 0) {
-                    this.showError(new pandora.Exception("Model {0} doesnt exist", this.modelPattern));
+//                var models = this.$.renderer.findModels({
+//                    limit: 5,
+//                    modelType: 'action',
+//                    pattern: this._actionName
+//                });
+                if (this._actionList.length === 0) {
+                    this.showError(new pandora.Exception("Model {0} doesnt exist", this._actionName));
                 } else {
-                    this.$.renderer.createBlock(models[0].data, new pandora.Vec2(50, 50));
-                    this.$.success.text = "Action \"" + models[0].name + "\" successfully created!";
+                    this.$.renderer.createBlock(this._actionList[0].data, new pandora.Vec2(50, 50));
+                    this.$.success.text = "Action \"" + this._actionList[0].name + "\" successfully created!";
                     this.$.success.show();
                 }
             },
             createPicker: function () {
-                this.$.renderer.createBlock(new cg.Picker({
-                    "value-type": this._pickerType,
-                    "default": this._pickerValue
-                }), new pandora.Vec2(50, 50));
+//                this.$.renderer.createBlock(new cg.Picker({
+//                    "value-type": this._pickerType,
+//                    "default": this._pickerValue
+//                }), new pandora.Vec2(50, 50));
+                if (this._pickerList.length === 0) {
+                    this.showError(new pandora.Exception("Model {0} doesnt exist", this._pickerName));
+                } else {
+                    this.$.renderer.createBlock(new cg.Getter({
+                        "value-type": "boolean",
+                        "name": this._pickerList[0].name
+                    }), new pandora.Vec2(50, 50));
+                }
             },
             edit: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
@@ -199,7 +266,8 @@
                     console.log("edit picker", e.detail.picker);
                 });
                 this.$.renderer.addEventListener("ready", function () {
-                    this._actionModels = this.$.renderer.findModels({limit: 5, modelType: 'action'});
+                    this._pickerNameChanged();
+                    this._actionNameChanged();
                 }.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
                     jwerty.key('cmd+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
@@ -214,17 +282,21 @@
                 }
 
             },
-            modelPatternChanged: function () {
-                this._actionModels = this.$.renderer.findModels({
+            _actionNameChanged: function () {
+                this._actionList = this.$.renderer.findModels({
                     limit: 5,
                     modelType: 'action',
-                    pattern: this.modelPattern
+                    pattern: this._actionName
                 });
             },
-            pickerPatternChanged: function () {
-                var pair = this.pickerPattern.split(':');
-                this._pickerType = pair[0] || 'Unknown';
-                this._pickerValue = pair[1] || 'Undefined';
+            _pickerNameChanged: function () {
+                this._pickerList = this.$.renderer.findModels({
+                    limit: 5,
+                    modelType: 'getter',
+                    pattern: this._pickerName,
+                    isInput: false,
+                    type: 'boolean'
+                });
             }
         });
     </script>
