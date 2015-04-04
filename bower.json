@@ -21,6 +21,8 @@
     "paper-dialog": "Polymer/paper-dialog#~0.5.5",
     "paper-input": "Polymer/paper-input#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#~0.5.5",
-    "dude-gui": "~0.1.1"
+    "dude-gui": "~0.1.1",
+    "paper-dropdown": "Polymer/paper-dropdown#~0.5.5",
+    "paper-dropdown-menu": "Polymer/paper-dropdown-menu#~0.5.5"
   }
 }

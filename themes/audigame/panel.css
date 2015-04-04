@@ -1,14 +1,18 @@
 
+:host {
+    background: #333;
+}
+
 /* Toolbar */
 ::content dude-toolbar {
     padding: 5px;
     font-family: "Varela", sans-serif;
-    color: rgba(230, 126, 34, 1);
+    color: rgb(243, 156, 18);
     background: #222;
     height: 40px;
 }
-::content dude-toolbar.top { border-bottom: 1px solid rgba(230, 126, 34, 1); }
-::content dude-toolbar.bottom { border-top: 1px solid rgba(230, 126, 34, 1); }
+::content dude-toolbar.top { border-bottom: 1px solid rgb(243, 156, 18); }
+::content dude-toolbar.bottom { border-top: 1px solid rgb(243, 156, 18); }
 
 /* Toolbar input */
 ::content dude-toolbar-input /deep/ input[is="core-input"] {
@@ -34,8 +38,8 @@
     transition: .2s;
     width: 200px;
 }
-::content dude-sidebar.left { border-right: 1px solid rgba(230, 126, 34, 1); }
-::content dude-sidebar.right { border-left: 1px solid rgba(230, 126, 34, 1); }
+::content dude-sidebar.left { border-right: 1px solid rgb(243, 156, 18); }
+::content dude-sidebar.right { border-left: 1px solid rgb(243, 156, 18); }
 ::content dude-sidebar:not(.selected) {
     width: 0;
     padding: 0;

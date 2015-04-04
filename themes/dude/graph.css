@@ -13,9 +13,9 @@
 /* Types */
 #svg [class^="type-"] { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
 #svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-#svg .type-boolean { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
-#svg .type-number { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
-#svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+#svg .type-string { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
+#svg .type-boolean { fill: rgb(241, 102, 189); stroke: rgb(241, 102, 189); }
+#svg .type-number { fill: rgb(155, 89, 182); stroke: rgb(155, 89, 182); }
 #svg .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
 #svg .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
 #svg .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }

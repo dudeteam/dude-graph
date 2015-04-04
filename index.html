@@ -12,13 +12,29 @@
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Cherry+Cream+Soda' rel='stylesheet' type='text/css'>
     <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
     <link rel="import" href="elements/cg-app.html">
+    <style>
+        core-toolbar {
+            background: rgb(243, 156, 18);
+            color: #222;
+        }
+        core-toolbar span {
+            font-family: "Lato", sans-serif;
+        }
+    </style>
 </head>
 <body vertical layout fullbleed unresolved>
-<cg-app logo="images/dude_logo_dark.png"
-        graphUrl="examples/audigame.json"
-        theme="audigame"
-        layout horizontal flex>
-</cg-app>
+    <core-header-panel layout horizontal flex>
+        <core-toolbar id="mainheader" layout horizontal>
+            <paper-icon-button icon="menu"></paper-icon-button>
+            <span flex>Audigame</span>
+        </core-toolbar>
+        <cg-app logo="images/dude_logo_dark.png"
+                graphUrl="examples/audigame.json"
+                theme="audigame"
+                layout horizontal fit>
+        </cg-app>
+    </core-header-panel>
 </body>
 </html>
