@@ -31,6 +31,13 @@
     color: #ddd;
     background: #222;
     padding: 10px;
+    transition: .2s;
+    width: 200px;
 }
 ::content dude-sidebar.left { border-right: 1px solid rgba(230, 126, 34, 1); }
 ::content dude-sidebar.right { border-left: 1px solid rgba(230, 126, 34, 1); }
+::content dude-sidebar:not(.selected) {
+    width: 0;
+    padding: 0;
+    border: none;
+}

@@ -16,6 +16,9 @@
 }
 ::content dude-sidebar.left { border-right: 1px solid #ccc; }
 ::content dude-sidebar.right { border-left: 1px solid #ccc; }
+::content /deep/ [data-state]:not(.selected) {
+    display: none;
+}
 
 ::content dude-toolbar-input /deep/ input[is="core-input"] {
     color: #ccc;
