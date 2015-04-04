@@ -27,31 +27,21 @@
                 width: 200px;
             }
             core-dropdown-menu {
+                width: 100%;
                 box-sizing: border-box;
-                width: 170px;
                 outline: none;
                 background: transparent;
             }
             core-dropdown {
-                box-sizing: border-box;
-                min-width: 170px;
-                color: white;
-                z-index: 10;
                 border-radius: 3px;
+                box-sizing: border-box;
+                min-width: 200px;
             }
             core-item {
-                z-index: 10;
                 overflow: hidden;
                 white-space: nowrap;
                 color: #444;
                 text-overflow: ellipsis;
-            }
-            core-collapse {
-                border: 1px solid #ccc;
-                padding: 8px;
-            }
-            .constrained-height {
-                height: 150px;
             }
         </style>
         <dude-panel id="panel"
@@ -109,10 +99,10 @@
                 </div>
                 <div data-state="picker">
                     <div>
-                        <core-dropdown-menu label="boolean">
+                        <core-dropdown-menu label="{{_pickerType}}" selected="{{_pickerType}}">
                             <core-dropdown class="dropdown">
                                 <core-menu>
-                                    <template repeat="{{type in _types}}">
+                                    <template repeat="{{type in _pickerTypes}}">
                                         <core-item>{{type}}</core-item>
                                     </template>
                                 </core-menu>
@@ -157,7 +147,6 @@
     </template>
     <script>
         Polymer({
-            _types: ["boolean", "string", "sound"],
             _commands: [
                 {name: "openGraph", label: "open another graph", icon: "open-in-new"},
                 {name: "saveGraph", label: "save the graph", icon: "save"},
@@ -168,6 +157,7 @@
                 {name: "removeSelection", label: "remove all the selected objects", icon: "delete"},
                 {name: "zoomToFit", label: "zoom to best fit all objects", icon: "image:crop-free"}
             ],
+            _pickerTypes: ["boolean", "string", "sound"],
             _pickerList: [],
             _pickerType: "boolean",
             _pickerName: null,
@@ -217,7 +207,7 @@
 //                    pattern: this._actionName
 //                });
                 if (this._actionList.length === 0) {
-                    this.showError(new pandora.Exception("Model {0} doesnt exist", this._actionName));
+                    this.showError(new pandora.Exception("Action {0} doesn't exist", this._actionName));
                 } else {
                     this.$.renderer.createBlock(this._actionList[0].data, new pandora.Vec2(50, 50));
                     this.$.success.text = "Action \"" + this._actionList[0].name + "\" successfully created!";
@@ -230,10 +220,10 @@
 //                    "default": this._pickerValue
 //                }), new pandora.Vec2(50, 50));
                 if (this._pickerList.length === 0) {
-                    this.showError(new pandora.Exception("Model {0} doesnt exist", this._pickerName));
+                    this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerName));
                 } else {
                     this.$.renderer.createBlock(new cg.Getter({
-                        "value-type": "boolean",
+                        "value-type": this._pickerType,
                         "name": this._pickerList[0].name
                     }), new pandora.Vec2(50, 50));
                 }
@@ -295,7 +285,7 @@
                     modelType: 'getter',
                     pattern: this._pickerName,
                     isInput: false,
-                    type: 'boolean'
+                    type: this._pickerType
                 });
             }
         });
