@@ -84,7 +84,14 @@
                                     on-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
-                <div data-state="picker">Add a picker</div>
+                <dude-toolbar-input name="createPicker"
+                                    value="{{pickerPattern}}"
+                                    data-state="picker"
+                                    label="<type>:<value>"
+                                    icon="check"
+                                    on-submit="{{runCommand}}"
+                                    on-close="{{hideSidebar}}">
+                </dude-toolbar-input>
             </dude-toolbar>
             <dude-sidebar id="sidebar" noroot>
                 <div data-state="action">
@@ -92,11 +99,12 @@
                         <div>No results.</div>
                     </template>
                     <template repeat="{{model in _actionModels}}">
-                        <div class="search-result">{{model}}</div>
+                        <div class="search-result">{{model.name}}</div>
                     </template>
                 </div>
                 <div data-state="picker">
-                    <div>Some picker content...</div>
+                    <div>Type: {{_pickerType}}</div>
+                    <div>Value: {{_pickerValue}}</div>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -121,6 +129,8 @@
     </template>
     <script>
         Polymer({
+            _pickerType: "Unknown",
+            _pickerValue: "Undefined",
             runCommand: function (event, detail) {
                 if (this[detail.name] === undefined) {
                     console.warn("Command " + detail.name + " doesn't exist");
@@ -147,13 +157,15 @@
             },
             removeSelection: function () {
                 this.$.renderer.removeSelection();
+                this.$.success.text = "Entities successfully removed!";
+                this.$.success.show();
             },
             zoomToFit: function() {
                 this.$.renderer.zoomToFit();
             },
             createGroup: function (detail) {
                 this.$.renderer.createGroup(detail.value);
-                this.$.success.text = "Group " + detail.value + " successfully created!";
+                this.$.success.text = "Group \"" + detail.value + "\" successfully created!";
                 this.$.success.show();
             },
             createAction: function () {
@@ -165,13 +177,16 @@
                 if (models.length === 0) {
                     this.showError(new pandora.Exception("Model {0} doesnt exist", this.modelPattern));
                 } else {
-                    this.$.renderer.createBlock(models[0], new pandora.Vec2(50, 50));
-                    this.$.success.text = "Action " + models[0] + " successfully created!";
+                    this.$.renderer.createBlock(models[0].data, new pandora.Vec2(50, 50));
+                    this.$.success.text = "Action \"" + models[0].name + "\" successfully created!";
                     this.$.success.show();
                 }
             },
             createPicker: function () {
-                console.log("TODO: add a picker or getter");
+                this.$.renderer.createBlock(new cg.Picker({
+                    "value-type": this._pickerType,
+                    "default": this._pickerValue
+                }), new pandora.Vec2(50, 50));
             },
             showError: function (error) {
                 this.$.error.text = error.message;
@@ -201,12 +216,17 @@
                 }
 
             },
-            modelPatternChanged: function (old) {
+            modelPatternChanged: function () {
                 this._actionModels = this.$.renderer.findModels({
                     limit: 5,
                     modelType: 'action',
                     pattern: this.modelPattern
                 });
+            },
+            pickerPatternChanged: function () {
+                var pair = this.pickerPattern.split(':');
+                this._pickerType = pair[0] || 'Unknown';
+                this._pickerValue = pair[1] || 'Undefined';
             }
         });
     </script>
