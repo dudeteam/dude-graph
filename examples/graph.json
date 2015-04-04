@@ -191,31 +191,31 @@
     {
       "_type": "block",
       "_id": 0,
-      "name": "blur",
+      "_name": "blur",
       "position": [200, 150]
     },
     {
       "_type": "block",
       "_id": 1251,
-      "name": "black_and_white",
+      "_name": "black_and_white",
       "position": [200, 300]
     },
     {
       "_type": "block",
       "_id": 120,
-      "name": "mix",
+      "_name": "mix",
       "position": [500, 200]
     },
     {
       "_type": "block",
       "_id": 10,
-      "name": "shader",
+      "_name": "shader",
       "position": [474, 5]
     },
     {
       "_type": "group",
       "_id": 324,
-      "name": "The best group in the world",
+      "_name": "The best group in the world",
       "position": [0, 0],
       "size": [200, 100],
       "children": []
@@ -223,7 +223,7 @@
     {
       "_type": "group",
       "_id": 123,
-      "name": "My Group",
+      "_name": "My Group",
       "position": [810, 48],
       "size": [400, 300
       ],
@@ -231,7 +231,7 @@
         {
           "_type": "block",
           "_id": 3,
-          "name": "rounded_rect",
+          "_name": "rounded_rect",
           "position": [30, 130]
         }
       ]
@@ -239,45 +239,45 @@
     {
       "_type": "block",
       "_id": 211,
-      "name": "name",
+      "_name": "name",
       "position": [250, 15]
     },
     {
       "_type": "block",
       "_id": 400,
-      "name": "delta_value",
+      "_name": "delta_value",
       "position": [400, 350]
     },
     {
       "_type": "block",
       "_id": 401,
-      "name": "picker-boolean",
+      "_name": "picker-boolean",
       "position": [50, 150]
     },
     {
       "_type": "block",
       "_id": 402,
-      "name": "picker-string",
+      "_name": "picker-string",
       "position": [50, 200]
     },
     {
       "_type": "block",
       "_id": 403,
-      "name": "picker-vec2",
+      "_name": "picker-vec2",
       "position": [50, 250],
       "value": [512, 512]
     },
     {
       "_type": "block",
       "_id": 404,
-      "name": "picker-color",
+      "_name": "picker-color",
       "position": [50, 300],
       "value": "#6BDB41"
     },
     {
       "_type": "block",
       "_id": 405,
-      "name": "picker-number",
+      "_name": "picker-number",
       "position": [50, 350],
       "value": "7.5"
     }

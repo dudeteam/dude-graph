@@ -121,7 +121,7 @@
     {
       "_type": "block",
       "_id": 0,
-      "name": "start",
+      "_name": "start",
       "position": [
         18,
         99
@@ -130,7 +130,7 @@
     {
       "_type": "group",
       "_id": 0,
-      "name": "success or game over",
+      "_name": "success or game over",
       "position": [
         1176.4664306640625,
         52.10542047023773
@@ -143,7 +143,7 @@
         {
           "_type": "block",
           "_id": 4,
-          "name": "end",
+          "_name": "end",
           "position": [
             55.77069091796875,
             39.99999237060547
@@ -152,7 +152,7 @@
         {
           "_type": "block",
           "_id": 7,
-          "name": "end",
+          "_name": "end",
           "position": [
             48.312042236328125,
             205.95015335083008
@@ -161,7 +161,7 @@
         {
           "_type": "block",
           "_id": 14,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             24.93804931640625,
             316.6547622680664
@@ -171,7 +171,7 @@
         {
           "_type": "block",
           "_id": 15,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             19.99993896484375,
             150.17711639404297
@@ -183,7 +183,7 @@
     {
       "_type": "group",
       "_id": 1,
-      "name": "rescue of the hostage from the military camp",
+      "_name": "rescue of the hostage from the military camp",
       "position": [
         234.178466796875,
         50.452181816101074
@@ -196,7 +196,7 @@
         {
           "_type": "block",
           "_id": 1,
-          "name": "step",
+          "_name": "step",
           "position": [
             20,
             109.57755756378174
@@ -205,7 +205,7 @@
         {
           "_type": "block",
           "_id": 2,
-          "name": "step",
+          "_name": "step",
           "position": [
             650.2620239257812,
             40.000000953674316
@@ -214,7 +214,7 @@
         {
           "_type": "block",
           "_id": 3,
-          "name": "step",
+          "_name": "step",
           "position": [
             25.21942138671875,
             324.42142963409424
@@ -223,7 +223,7 @@
         {
           "_type": "block",
           "_id": 5,
-          "name": "condition",
+          "_name": "condition",
           "position": [
             396.8326110839844,
             168.59992694854736
@@ -232,7 +232,7 @@
         {
           "_type": "block",
           "_id": 6,
-          "name": "step",
+          "_name": "step",
           "position": [
             425.11077880859375,
             321.99076557159424
@@ -241,7 +241,7 @@
         {
           "_type": "block",
           "_id": 10,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             21,
             219.57755756378174
@@ -251,7 +251,7 @@
         {
           "_type": "block",
           "_id": 11,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             652.2843627929688,
             152.79549884796143
@@ -261,7 +261,7 @@
         {
           "_type": "block",
           "_id": 12,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             24.208251953125,
             435.19462299346924
@@ -271,7 +271,7 @@
         {
           "_type": "block",
           "_id": 13,
-          "name": "picker-string",
+          "_name": "picker-string",
           "position": [
             428.17852783203125,
             433.9659547805786
@@ -281,7 +281,7 @@
         {
           "_type": "block",
           "_id": 20,
-          "name": "can enter?",
+          "_name": "can enter?",
           "position": [
             395.821533203125,
             259.5478181838989
