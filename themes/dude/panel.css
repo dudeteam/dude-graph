@@ -3,6 +3,7 @@
     font-family: "Varela Round", sans-serif;
     color: #ddd;
     background: #15202f;
+    height: 40px;
 }
 ::content dude-toolbar.top { border-bottom: 1px solid #ccc; }
 ::content dude-toolbar.bottom { border-top: 1px solid #ccc; }
