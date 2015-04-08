@@ -1518,7 +1518,7 @@ cg.Renderer = (function () {
     Renderer.prototype.zoomToFit = function () {
         var svgBoundingRect = new pandora.Box2(this._svg.node().getBoundingClientRect());
         var scaleExtent = this._zoom.scaleExtent();
-        var bbox = this._rootGroup.node().getBBox();
+        var bbox = this._getBBox(this._rootGroup);
         var dx = bbox.width - bbox.x;
         var dy = bbox.height - bbox.y;
         var x = (bbox.x + bbox.width) / 2;
@@ -1542,7 +1542,7 @@ cg.Renderer.prototype._updateRendererCollisions = function () {
     // Update entities positions.
     var entityPoints = [];
     this.getEntities().each(function (entity) {
-        var bbox = this.getBBox();
+        var bbox = renderer._getBBox(this);
         entityPoints.push({
             "box": new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, bbox.width, bbox.height),
             "node": this
@@ -1715,7 +1715,7 @@ cg.Renderer.prototype._getZoomedSVGPosition = function (x, y, ignoreOrigin) {
  * @param e {Event}
  * @private
  */
-cg.Renderer.prototype._getZoomedTouchPosition = function(e) {
+cg.Renderer.prototype._getZoomedTouchPosition = function (e) {
     if (e.clientX && e.clientY) {
         return this._getZoomedSVGPosition(e.clientX, e.clientY);
     } else if (e.touches[0]) {
@@ -1733,6 +1733,27 @@ cg.Renderer.prototype._getSVGViewport = function () {
     var topLeft = this._getZoomedSVGPosition(svgBoundingRect.left, svgBoundingRect.top, true);
     var bottomRight = this._getZoomedSVGPosition(svgBoundingRect.right, svgBoundingRect.bottom, true);
     return new pandora.Box2(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+};
+
+/**
+ * Return the bounding box of the element
+ * @param element {d3.selection|element}
+ * @return {{x: Number, y: Number, width: Number, height: Number}}
+ * @private
+ */
+// TODO: Workaround for Polymer Webcomponents getBBox bug on IE11.
+cg.Renderer.prototype._getBBox = function (element) {
+    var unwrap_wrapper = unwrap || function (el) {
+            return el;
+        };
+    return pandora.polymorphic(element, {
+        "Array": function () {
+            return unwrap_wrapper(element.node()).getBBox();
+        },
+        "Object": function () {
+            return unwrap_wrapper(element).getBBox();
+        }
+    });
 };
 
 /**
@@ -1951,9 +1972,9 @@ cg.Renderer.prototype._updatePoints = function (points) {
         .each(function(point) {
             point.block.data.pointHeight = renderer._config.point.height;
             if (point.isInput) {
-                point.block.data.maxInputWidth = Math.max(point.block.data.maxInputWidth, this.getBBox().width);
+                point.block.data.maxInputWidth = Math.max(point.block.data.maxInputWidth, renderer._getBBox(this).width);
             } else {
-                point.block.data.maxOutputWidth = Math.max(point.block.data.maxOutputWidth, this.getBBox().width);
+                point.block.data.maxOutputWidth = Math.max(point.block.data.maxOutputWidth, renderer._getBBox(this).width);
             }
         });
 };
@@ -2351,7 +2372,7 @@ cg.Renderer.prototype._updateBlockAction = function (model, block, element) {
     element.select(".title").text(block._name);
     block.data.computedWidth = renderer._config.block.padding * 2;
     block.data.computedWidth += Math.max(
-        element.select(".title").node().getBBox().width,
+        this._getBBox(element.select(".title")).width,
         block.data.maxInputWidth + block.data.maxOutputWidth + renderer._config.block.centerSpacing
     );
     block.data.computedHeight = renderer._config.block.heading;
@@ -2372,7 +2393,7 @@ cg.Renderer.prototype._updateBlockGetter = function (model, block, element) {
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(block._name);
     block.data.computedWidth = renderer._config.block.padding * 2;
-    block.data.computedWidth += element.select(".title").node().getBBox().width;
+    block.data.computedWidth += this._getBBox(element.select(".title")).width;
     block.data.computedWidth += renderer._config.block.padding + renderer._config.point['circle-size'];
     block.data.computedHeight = renderer._config.block.heading;
     block.data.computedHeadingOffset = block.data.computedHeight / 2;
@@ -2420,7 +2441,7 @@ cg.Renderer.prototype._updatePickerText = function (block, element, text) {
     element.select(".title")
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(text);
-    block.data.computedWidth += element.select(".title").node().getBBox().width;
+    block.data.computedWidth += this._getBBox(element.select(".title")).width;
 };
 
 cg.Renderer.prototype._createPickerBoolean = function (block, element) {
@@ -2556,11 +2577,11 @@ cg.Renderer.prototype._renderDrag = function () {
             renderer._updateRendererCollisions();
             var selected = renderer.getSelectedEntities();
             selected.each(function (entity) {
-                var dropBox = new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, this.getBBox().width, this.getBBox().height);
+                var dropBox = new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, renderer._getBBox(this).width, renderer._getBBox(this).height);
                 var possible = renderer._getEntitiesInArea(dropBox);
                 possible.each(function (possibleEntity) {
                     //noinspection JSPotentiallyInvalidUsageOfThis
-                    var possibleDropBox = new pandora.Box2(possibleEntity.absolutePosition.x, possibleEntity.absolutePosition.y, this.getBBox().width, this.getBBox().height);
+                    var possibleDropBox = new pandora.Box2(possibleEntity.absolutePosition.x, possibleEntity.absolutePosition.y, renderer._getBBox(this).width, renderer._getBBox(this).height);
                     if (possibleEntity !== entity && possibleDropBox.contain(dropBox)) {
                         renderer._graph.moveEntity(entity, possibleEntity);
                     }
