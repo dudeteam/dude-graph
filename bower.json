@@ -11,6 +11,7 @@
     "core-style": "Polymer/core-style#~0.5.5",
     "core-toolbar": "Polymer/core-toolbar#~0.5.5",
     "core-tooltip": "Polymer/core-tooltip#~0.5.5",
+    "core-drawer-panel": "Polymer/core-drawer-panel#~0.5.5",
     "core-header-panel": "Polymer/core-header-panel#~0.5.5",
     "core-dropdown-menu": "Polymer/core-dropdown-menu#~0.5.5",
     "core-dropdown": "Polymer/core-dropdown#~0.5.5",
@@ -20,9 +21,8 @@
     "paper-dialog": "Polymer/paper-dialog#~0.5.5",
     "paper-input": "Polymer/paper-input#~0.5.5",
     "paper-icon-button": "Polymer/paper-icon-button#~0.5.5",
-    "dude-gui": "~0.1.1",
     "paper-dropdown": "Polymer/paper-dropdown#~0.5.5",
     "paper-dropdown-menu": "Polymer/paper-dropdown-menu#~0.5.5",
-    "core-scaffold": "Polymer/core-scaffold#~0.5.5"
+    "dude-gui": "~0.1.1"
   }
 }
