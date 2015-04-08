@@ -15,11 +15,16 @@
     <link rel="import" href="cg-app.html">
     <style>
         core-toolbar {
+            font-family: "Lato", sans-serif;
             background: rgb(243, 156, 18);
+        }
+        core-toolbar #title {
             color: #222;
         }
-        core-toolbar span {
-            font-family: "Lato", sans-serif;
+        core-toolbar #login {
+            color: #444;
+            font-style: italic;
+            font-size: .8em;
         }
         [drawer] {
             font-family: "Lato", sans-serif;
@@ -39,12 +44,14 @@
         }
     </style>
 </head>
-<body vertical layout fullbleed unresolved>
+<body fullbleed unresolved>
     <core-drawer-panel forceNarrow>
-        <core-header-panel main layout horizontal flex>
-            <core-toolbar id="mainheader" layout horizontal>
+        <core-header-panel main>
+            <core-toolbar>
                 <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
-                <span flex>Audigame</span>
+                <div id="title" flex>Audigame</div>
+                <div id="login">Hi, Mario Bros!</div>
+                <paper-icon-button icon="account-circle"></paper-icon-button>
             </core-toolbar>
             <cg-app logo="images/dude_logo_dark.png"
                     graphUrl="examples/audigame.json"
@@ -53,10 +60,11 @@
             </cg-app>
         </core-header-panel>
         <div drawer>
-            <core-menu selected="1">
-                <core-item label="Home" icon="home"></core-item>
+            <core-menu selected="2">
+                <core-item label="Dashboard" icon="dashboard"></core-item>
+                <core-item label="Store" icon="apps"></core-item>
                 <core-item label="Editor" icon="create"></core-item>
-                <core-item label="Account" icon="account-circle"></core-item>
+                <core-item label="Get the app!" icon="android"></core-item>
                 <core-item label="Contact" icon="send"></core-item>
             </core-menu>
         </div>
