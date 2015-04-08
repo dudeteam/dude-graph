@@ -24,12 +24,23 @@
         [drawer] {
             font-family: "Lato", sans-serif;
             background: #222;
+            color: #aaa;
+        }
+        [drawer] core-item {
+            padding: 10px;
+            cursor: pointer !important;
+        }
+        [drawer] core-item:not(:last-child) {
+            border-bottom: 1px solid #444;
+        }
+        [drawer] core-item.core-selected {
             color: #eee;
+            font-weight: normal;
         }
     </style>
 </head>
 <body vertical layout fullbleed unresolved>
-    <core-drawer-panel>
+    <core-drawer-panel forceNarrow>
         <core-header-panel main layout horizontal flex>
             <core-toolbar id="mainheader" layout horizontal>
                 <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
@@ -42,7 +53,7 @@
             </cg-app>
         </core-header-panel>
         <div drawer>
-            <core-menu>
+            <core-menu selected="1">
                 <core-item label="Home" icon="home"></core-item>
                 <core-item label="Editor" icon="create"></core-item>
                 <core-item label="Account" icon="account-circle"></core-item>
