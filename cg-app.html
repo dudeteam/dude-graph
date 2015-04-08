@@ -50,6 +50,9 @@
                 background: rgb(243, 156, 18);
                 width: 3px;
             }
+            dude-toolbar-command /deep/ paper-icon-button[disabled] {
+                color: rgba(243, 156, 18, 0.5);
+            }
         </style>
         <dude-panel id="panel"
                     name="story-editor"
@@ -58,11 +61,12 @@
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
-                    <template repeat="{{command in _commands}}">
-                        <dude-toolbar-command name="{{command.name}}"
-                                              label="{{command.label}}"
-                                              icon="{{command.icon}}"
-                                              on-trigger="{{runCommand}}">
+                    <template repeat="{{name in keys(_commands)}}">
+                        <dude-toolbar-command name="{{name}}"
+                                              label="{{_commands[name].label}}"
+                                              icon="{{_commands[name].icon}}"
+                                              on-trigger="{{runCommand}}"
+                                              disable="{{_commands[name].disabled}}">
                         </dude-toolbar-command>
                     </template>
                 </div>
@@ -161,22 +165,25 @@
     </template>
     <script>
         Polymer({
-            _commands: [
-                {name: "openGraph", label: "open another graph", icon: "open-in-new"},
-                {name: "saveGraph", label: "save the graph", icon: "save"},
-                {name: "openGroup", label: "add a group", icon: "av:my-library-add"},
-                {name: "openAction", label: "add an action", icon: "add-box"},
-                {name: "openPicker", label: "add a picker", icon: "add-circle"},
-                {name: "editEntity", label: "edit the selected object", icon: "create"},
-                {name: "removeSelection", label: "remove all the selected objects", icon: "delete"},
-                {name: "zoomToFit", label: "zoom to best fit all objects", icon: "image:crop-free"}
-            ],
+            _commands: {
+                "openGraph": {label: "open another graph", icon: "open-in-new", disabled: true},
+                "saveGraph": {label: "save the graph", icon: "save", disabled: true},
+                "openGroup": {label: "add a group", icon: "av:my-library-add"},
+                "openAction": {label: "add an action", icon: "add-box"},
+                "openPicker": {label: "add a picker", icon: "add-circle"},
+                "editEntity": {label: "edit the selected object", icon: "create", disabled: true},
+                "removeSelection": {label: "remove all the selected objects", icon: "delete", disabled: true},
+                "zoomToFit": {label: "zoom to best fit all objects", icon: "image:crop-free"}
+            },
             _pickerTypes: ["boolean", "string", "sound"],
             _pickerList: [],
             _pickerType: "boolean",
             _pickerName: null,
             _actionList: [],
             _actionName: null,
+            keys: function(input) {
+                return Object.keys(input);
+            },
             runCommand: function (event, detail) {
                 if (this[detail.name] === undefined) {
                     console.warn("Command " + detail.name + " doesn't exist");
@@ -215,11 +222,6 @@
                 this.$.success.show();
             },
             createAction: function () {
-//                var models = this.$.renderer.findModels({
-//                    limit: 5,
-//                    modelType: 'action',
-//                    pattern: this._actionName
-//                });
                 if (this._actionList.length === 0) {
                     this.showError(new pandora.Exception("Action {0} doesn't exist", this._actionName));
                 } else {
@@ -229,10 +231,6 @@
                 }
             },
             createPicker: function () {
-//                this.$.renderer.createBlock(new cg.Picker({
-//                    "value-type": this._pickerType,
-//                    "default": this._pickerValue
-//                }), new pandora.Vec2(50, 50));
                 if (this._pickerList.length === 0) {
                     this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerName));
                 } else {
@@ -272,6 +270,10 @@
                 this.$.renderer.addEventListener("ready", function () {
                     this._pickerNameChanged();
                     this._actionNameChanged();
+                }.bind(this));
+                this.$.renderer.addEventListener("click", function () {
+                    this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
+                    this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
                 }.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
                     jwerty.key('cmd+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
