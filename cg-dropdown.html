@@ -1,7 +1,7 @@
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../polymer/polymer.html">
-<polymer-element name="cg-dropdown" attributes="valueattr">
+<polymer-element name="cg-dropdown" attributes="valueattr value">
     <template>
         <div id="selected"></div>
         <core-collapse id="collapse">
@@ -13,8 +13,29 @@
     <script>
         Polymer('cg-dropdown', {
             publish: {
-                valueattr: "name"
+                /**
+                 * Specifies the attribute to be used for "selected" attribute.
+                 * @attribute valueattr
+                 * @type string
+                 * @default "name"
+                 */
+                valueattr: "name",
+
+                /**
+                 * Specifies the selected value of that dropdown.
+                 * @attribute value
+                 * @type {undefined|String}
+                 * @default undefined
+                 */
+                value: undefined
             },
+
+            /**
+             * Selected element.
+             * @private
+             * @type {Element}
+             **/
+            _selected: null,
 
             /**
              * Select the element.
@@ -23,7 +44,13 @@
              * @private
              */
             _select: function (element) {
-                this.$.selected.innerHTML = element.getAttribute(this.valueattr);
+                var oldValue = this.value;
+                var newValue = element.getAttribute(this.valueattr);
+                this.value = newValue;
+                this.$.selected.innerHTML = newValue;
+                if (oldValue !== newValue) {
+                    this.fire("change", {oldValue: oldValue, newValue: newValue});
+                }
             },
 
             /**
@@ -36,7 +63,7 @@
             },
 
             /**
-             *
+             * Triggered when an element is clicked.
              * @param e {Event}
              * @param element {Object}
              * @delegate
@@ -48,6 +75,7 @@
             },
 
             /**
+             * Polymer ready delegate.
              * @delegate
              */
             ready: function () {
