@@ -2,9 +2,9 @@
     It's the most important polymer component of CodeGraph. It creates the SVG from JSON data and provide an API to add,
     remove or select data of this graph.
 -->
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<link rel="import" href="../bower_components/dude-gui/dude-config.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-ajax/core-ajax.html">
+<link rel="import" href="../dude-gui/dude-config.html">
 <polymer-element name="cg-renderer" attributes="graphUrl" extends="dude-config">
     <template>
         <style>
@@ -37,44 +37,12 @@
         </div>
     </template>
     <!-- Vendors -->
-    <script src="../bower_components/d3/d3.js"></script>
-    <script src="../bower_components/jwerty/jwerty.js"></script>
-    <script src="../bower_components/pandora/lib/pandora.js"></script>
+    <script src="../d3/d3.js"></script>
+    <script src="../jwerty/jwerty.js"></script>
+    <script src="../pandora/lib/pandora.js"></script>
     <!-- CodeGraph library -->
-    <script src="../lib/index.js"></script>
-    <!-- CodeGraph graph -->
-    <script src="../lib/graph/utils/graph-error.js"></script>
-    <script src="../lib/graph/entities/entity.js"></script>
-    <script src="../lib/graph/utils/container.js"></script>
-    <script src="../lib/graph/entities/group.js"></script>
-    <script src="../lib/graph/entities/point.js"></script>
-    <script src="../lib/graph/models/model.js"></script>
-    <script src="../lib/graph/models/getter.js"></script>
-    <script src="../lib/graph/models/picker.js"></script>
-    <script src="../lib/graph/models/action.js"></script>
-    <script src="../lib/graph/entities/block.js"></script>
-    <script src="../lib/graph/entities/connection.js"></script>
-    <script src="../lib/graph/entities/graph.js"></script>
-    <!-- CodeGraph renderer -->
-    <script src="../lib/renderer/renderer.js"></script>
-    <script src="../lib/renderer/utils/renderer-d3.js"></script>
-    <script src="../lib/renderer/utils/renderer-error.js"></script>
-    <script src="../lib/renderer/utils/renderer-position.js"></script>
-    <script src="../lib/renderer/utils/renderer-point.js"></script>
-    <script src="../lib/renderer/utils/renderer-collision.js"></script>
-    <script src="../lib/renderer/render/render.js"></script>
-    <script src="../lib/renderer/render/render-selection.js"></script>
-    <script src="../lib/renderer/render/render-zoom.js"></script>
-    <script src="../lib/renderer/render/render-drag.js"></script>
-    <script src="../lib/renderer/render/render-block.js"></script>
-    <script src="../lib/renderer/render/render-picker.js"></script>
-    <script src="../lib/renderer/render/render-group.js"></script>
-    <script src="../lib/renderer/render/render-connection.js"></script>
-    <script src="../lib/renderer/render/render-point.js"></script>
-    <!-- CodeGraph serialization -->
-    <script src="../lib/serialization/json-saver.js"></script>
-    <script src="../lib/serialization/json-loader.js"></script>
-    <!-- CodeGraph misc -->
+   <script src="codegraph.js"></script>
+    <!-- Polymer element -->
     <script>
         Polymer({
             publish: {
