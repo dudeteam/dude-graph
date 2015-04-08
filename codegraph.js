@@ -1518,7 +1518,11 @@ cg.Renderer = (function () {
     Renderer.prototype.zoomToFit = function () {
         var svgBoundingRect = new pandora.Box2(this._svg.node().getBoundingClientRect());
         var scaleExtent = this._zoom.scaleExtent();
+<<<<<<< HEAD
         var bbox = this._getBBox(this._rootGroup);
+=======
+        var bbox = this._rootGroup.node().getBBox();
+>>>>>>> New polymer structure
         var dx = bbox.width - bbox.x;
         var dy = bbox.height - bbox.y;
         var x = (bbox.x + bbox.width) / 2;
@@ -1542,7 +1546,11 @@ cg.Renderer.prototype._updateRendererCollisions = function () {
     // Update entities positions.
     var entityPoints = [];
     this.getEntities().each(function (entity) {
+<<<<<<< HEAD
         var bbox = renderer._getBBox(this);
+=======
+        var bbox = this.getBBox();
+>>>>>>> New polymer structure
         entityPoints.push({
             "box": new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, bbox.width, bbox.height),
             "node": this
@@ -1715,7 +1723,11 @@ cg.Renderer.prototype._getZoomedSVGPosition = function (x, y, ignoreOrigin) {
  * @param e {Event}
  * @private
  */
+<<<<<<< HEAD
 cg.Renderer.prototype._getZoomedTouchPosition = function (e) {
+=======
+cg.Renderer.prototype._getZoomedTouchPosition = function(e) {
+>>>>>>> New polymer structure
     if (e.clientX && e.clientY) {
         return this._getZoomedSVGPosition(e.clientX, e.clientY);
     } else if (e.touches[0]) {
@@ -1736,6 +1748,7 @@ cg.Renderer.prototype._getSVGViewport = function () {
 };
 
 /**
+<<<<<<< HEAD
  * Return the bounding box of the element
  * @param element {d3.selection|element}
  * @return {{x: Number, y: Number, width: Number, height: Number}}
@@ -1757,6 +1770,8 @@ cg.Renderer.prototype._getBBox = function (element) {
 };
 
 /**
+=======
+>>>>>>> New polymer structure
  * Return the bbox of the d3 selection in zoomed SVG coordinates.
  * @param d3selection {d3.selection}
  * @return {pandora.Box2|null}
@@ -1972,9 +1987,15 @@ cg.Renderer.prototype._updatePoints = function (points) {
         .each(function(point) {
             point.block.data.pointHeight = renderer._config.point.height;
             if (point.isInput) {
+<<<<<<< HEAD
                 point.block.data.maxInputWidth = Math.max(point.block.data.maxInputWidth, renderer._getBBox(this).width);
             } else {
                 point.block.data.maxOutputWidth = Math.max(point.block.data.maxOutputWidth, renderer._getBBox(this).width);
+=======
+                point.block.data.maxInputWidth = Math.max(point.block.data.maxInputWidth, this.getBBox().width);
+            } else {
+                point.block.data.maxOutputWidth = Math.max(point.block.data.maxOutputWidth, this.getBBox().width);
+>>>>>>> New polymer structure
             }
         });
 };
@@ -2372,7 +2393,11 @@ cg.Renderer.prototype._updateBlockAction = function (model, block, element) {
     element.select(".title").text(block._name);
     block.data.computedWidth = renderer._config.block.padding * 2;
     block.data.computedWidth += Math.max(
+<<<<<<< HEAD
         this._getBBox(element.select(".title")).width,
+=======
+        element.select(".title").node().getBBox().width,
+>>>>>>> New polymer structure
         block.data.maxInputWidth + block.data.maxOutputWidth + renderer._config.block.centerSpacing
     );
     block.data.computedHeight = renderer._config.block.heading;
@@ -2393,7 +2418,11 @@ cg.Renderer.prototype._updateBlockGetter = function (model, block, element) {
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(block._name);
     block.data.computedWidth = renderer._config.block.padding * 2;
+<<<<<<< HEAD
     block.data.computedWidth += this._getBBox(element.select(".title")).width;
+=======
+    block.data.computedWidth += element.select(".title").node().getBBox().width;
+>>>>>>> New polymer structure
     block.data.computedWidth += renderer._config.block.padding + renderer._config.point['circle-size'];
     block.data.computedHeight = renderer._config.block.heading;
     block.data.computedHeadingOffset = block.data.computedHeight / 2;
@@ -2441,7 +2470,11 @@ cg.Renderer.prototype._updatePickerText = function (block, element, text) {
     element.select(".title")
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(text);
+<<<<<<< HEAD
     block.data.computedWidth += this._getBBox(element.select(".title")).width;
+=======
+    block.data.computedWidth += element.select(".title").node().getBBox().width;
+>>>>>>> New polymer structure
 };
 
 cg.Renderer.prototype._createPickerBoolean = function (block, element) {
@@ -2577,11 +2610,19 @@ cg.Renderer.prototype._renderDrag = function () {
             renderer._updateRendererCollisions();
             var selected = renderer.getSelectedEntities();
             selected.each(function (entity) {
+<<<<<<< HEAD
                 var dropBox = new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, renderer._getBBox(this).width, renderer._getBBox(this).height);
                 var possible = renderer._getEntitiesInArea(dropBox);
                 possible.each(function (possibleEntity) {
                     //noinspection JSPotentiallyInvalidUsageOfThis
                     var possibleDropBox = new pandora.Box2(possibleEntity.absolutePosition.x, possibleEntity.absolutePosition.y, renderer._getBBox(this).width, renderer._getBBox(this).height);
+=======
+                var dropBox = new pandora.Box2(entity.absolutePosition.x, entity.absolutePosition.y, this.getBBox().width, this.getBBox().height);
+                var possible = renderer._getEntitiesInArea(dropBox);
+                possible.each(function (possibleEntity) {
+                    //noinspection JSPotentiallyInvalidUsageOfThis
+                    var possibleDropBox = new pandora.Box2(possibleEntity.absolutePosition.x, possibleEntity.absolutePosition.y, this.getBBox().width, this.getBBox().height);
+>>>>>>> New polymer structure
                     if (possibleEntity !== entity && possibleDropBox.contain(dropBox)) {
                         renderer._graph.moveEntity(entity, possibleEntity);
                     }
