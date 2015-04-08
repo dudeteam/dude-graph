@@ -17,6 +17,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-dropdown/paper-dropdown.html">
 <link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
     <template>
@@ -26,26 +27,31 @@
                 padding: 0 20px;
                 max-width: 800px;
             }
+
             dude-sidebar [data-state] {
                 width: 200px;
             }
+
             paper-dropdown-menu {
                 width: 100%;
                 box-sizing: border-box;
                 outline: none;
                 background: transparent;
             }
+
             paper-dropdown {
                 border-radius: 3px;
                 box-sizing: border-box;
                 min-width: 200px;
             }
+
             paper-item {
                 overflow: hidden;
                 white-space: nowrap;
                 color: #444;
                 text-overflow: ellipsis;
             }
+
             .panel-splitter {
                 background: rgb(243, 156, 18);
                 width: 3px;
@@ -110,30 +116,35 @@
                 </div>
                 <div data-state="picker">
                     <div>
-                        <paper-dropdown-menu label="{{_pickerType}}" core-select="{{_pickerTypeChanged}}">
-                            <paper-dropdown selected="{{_pickerType}}" class="dropdown">
-                                <core-menu class="menu">
-                                    <template repeat="{{type in _pickerTypes}}">
-                                        <paper-item>{{type}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
+                        <cg-dropdown>
+                            <template repeat="{{type in _pickerTypes}}">
+                                <div class="picker-dropdown" name="{{type}}">{{type}}</div>
+                            </template>
+                        </cg-dropdown>
+                        <!--<paper-dropdown-menu label="{{_pickerType}}" core-select="{{_pickerTypeChanged}}">-->
+                        <!--<paper-dropdown selected="{{_pickerType}}" class="dropdown">-->
+                        <!--<core-menu class="menu">-->
+                        <!--<template repeat="{{type in _pickerTypes}}">-->
+                        <!--<paper-item>{{type}}</paper-item>-->
+                        <!--</template>-->
+                        <!--</core-menu>-->
+                        <!--</paper-dropdown>-->
+                        <!--</paper-dropdown-menu>-->
                         <!--<core-dropdown-menu label="{{_pickerType}}" selected="{{_pickerType}}">-->
-                            <!--<core-dropdown class="dropdown">-->
-                                <!--<core-menu>-->
-                                    <!--<template repeat="{{type in _pickerTypes}}">-->
-                                        <!--<core-item>{{type}}</core-item>-->
-                                    <!--</template>-->
-                                <!--</core-menu>-->
-                            <!--</core-dropdown>-->
+                        <!--<core-dropdown class="dropdown">-->
+                        <!--<core-menu>-->
+                        <!--<template repeat="{{type in _pickerTypes}}">-->
+                        <!--<core-item>{{type}}</core-item>-->
+                        <!--</template>-->
+                        <!--</core-menu>-->
+                        <!--</core-dropdown>-->
                         <!--</core-dropdown-menu>-->
                     </div>
                     <!--<div>-->
-                        <!--<input is="core-input"-->
-                               <!--value="{{_pickerValue}}"-->
-                               <!--placeholder="Type your string..."-->
-                               <!--flex>-->
+                    <!--<input is="core-input"-->
+                    <!--value="{{_pickerValue}}"-->
+                    <!--placeholder="Type your string..."-->
+                    <!--flex>-->
                     <!--</div>-->
                     <div>
                         <template if="{{_pickerList.length === 0}}">
@@ -154,11 +165,11 @@
         </dude-panel>
         <!--<core-splitter class="panel-splitter" direction="right"></core-splitter>-->
         <!--<dude-panel name="audio-editor" styleUrl="themes/{{theme}}/panel.css">-->
-            <!--<dude-toolbar root="hello">-->
-                <!--<div data-state="hello">Audio Editor</div>-->
-            <!--</dude-toolbar>-->
-            <!--<dude-sidebar>Here comes the tools.</dude-sidebar>-->
-            <!--<div content flex>Here comes some edition content</div>-->
+        <!--<dude-toolbar root="hello">-->
+        <!--<div data-state="hello">Audio Editor</div>-->
+        <!--</dude-toolbar>-->
+        <!--<dude-sidebar>Here comes the tools.</dude-sidebar>-->
+        <!--<div content flex>Here comes some edition content</div>-->
         <!--</dude-panel>-->
         <paper-toast class="notification" id="error"></paper-toast>
         <paper-toast class="notification" id="success"></paper-toast>
@@ -276,15 +287,39 @@
                     this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
                 }.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
-                    jwerty.key('cmd+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('cmd+A', function (e) {this.openAction(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('cmd+P', function (e) {this.openPicker(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('cmd+X', function (e) {this.removeSelection(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('cmd+G', function (e) {
+                        this.openGroup();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('cmd+A', function (e) {
+                        this.openAction();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('cmd+P', function (e) {
+                        this.openPicker();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('cmd+X', function (e) {
+                        this.removeSelection();
+                        pandora.preventCallback(e);
+                    }.bind(this));
                 } else {
-                    jwerty.key('ctrl+G', function (e) {this.openGroup(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('ctrl+A', function (e) {this.openAction(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('ctrl+P', function (e) {this.openPicker(); pandora.preventCallback(e); }.bind(this));
-                    jwerty.key('ctrl+X', function (e) {this.removeSelection(); pandora.preventCallback(e); }.bind(this));
+                    jwerty.key('ctrl+G', function (e) {
+                        this.openGroup();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('ctrl+A', function (e) {
+                        this.openAction();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('ctrl+P', function (e) {
+                        this.openPicker();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                    jwerty.key('ctrl+X', function (e) {
+                        this.removeSelection();
+                        pandora.preventCallback(e);
+                    }.bind(this));
                 }
 
             },
