@@ -1,5 +1,4 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../core-splitter/core-splitter.html">
 <link rel="import" href="../core-icons/av-icons.html">
 <link rel="import" href="../core-icons/image-icons.html">
@@ -8,15 +7,17 @@
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-dropdown/paper-dropdown.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../dude-gui/dude-panel.html">
 <link rel="import" href="../dude-gui/dude-config.html">
 <link rel="import" href="../dude-gui/dude-sidebar.html">
 <link rel="import" href="../dude-gui/dude-toolbar.html">
 <link rel="import" href="../dude-gui/dude-toolbar-command.html">
 <link rel="import" href="../dude-gui/dude-toolbar-input.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../paper-dropdown/paper-dropdown.html">
-<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
@@ -116,6 +117,7 @@
                 </div>
                 <div data-state="picker">
                     <div>
+                        <paper-toggle-button></paper-toggle-button>
                         <cg-dropdown>
                             <template repeat="{{type in _pickerTypes}}">
                                 <div class="picker-dropdown" name="{{type}}">{{type}}</div>
