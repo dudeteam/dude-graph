@@ -18,6 +18,8 @@
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-action-dialog.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
@@ -28,37 +30,19 @@
                 padding: 0 20px;
                 max-width: 900px;
             }
-
             dude-sidebar [data-state] {
                 width: 200px;
             }
-
             paper-dropdown-menu {
-                width: 100%;
-                box-sizing: border-box;
-                outline: none;
-                background: transparent;
+                width: 150px;
+                margin: 0;
             }
-
-            paper-dropdown {
-                border-radius: 3px;
-                box-sizing: border-box;
-                min-width: 200px;
+            paper-dropdown-menu core-menu {
+                margin: 0;
+                width: 150px;
             }
-
-            paper-item {
-                overflow: hidden;
-                white-space: nowrap;
-                color: #444;
-                text-overflow: ellipsis;
-            }
-
-            .panel-splitter {
-                background: rgb(243, 156, 18);
-                width: 3px;
-            }
-            dude-toolbar-command /deep/ paper-icon-button[disabled] {
-                color: rgba(243, 156, 18, 0.5);
+            paper-dropdown-menu paper-item /deep/ .button-content {
+                padding: 10px 20px;
             }
         </style>
         <dude-panel id="panel"
@@ -174,37 +158,49 @@
             <section>
                 <label>
                     <span>Theme:</span>
-                    <select>
-                        <option>audigame</option>
-                        <option>dude</option>
-                        <option>light</option>
-                        <option>dark</option>
-                        <option>blueprint</option>
-                    </select>
+                    <paper-dropdown-menu>
+                        <paper-dropdown class="dropdown">
+                            <core-menu selected="0" class="menu">
+                                <paper-item>audigame</paper-item>
+                                <paper-item>dude</paper-item>
+                                <paper-item>light</paper-item>
+                                <paper-item>dark</paper-item>
+                                <paper-item>blueprint</paper-item>
+                            </core-menu>
+                        </paper-dropdown>
+                    </paper-dropdown-menu>
                 </label>
             </section>
             <section>
                 <label>
                     <span>Toolbar position:</span>
-                    <select>
-                        <option>top</option>
-                        <option>bottom</option>
-                    </select>
+                    <paper-dropdown-menu>
+                        <paper-dropdown class="dropdown">
+                            <core-menu selected="0" class="menu">
+                                <paper-item>top</paper-item>
+                                <paper-item>bottom</paper-item>
+                            </core-menu>
+                        </paper-dropdown>
+                    </paper-dropdown-menu>
                 </label>
             </section>
             <section>
                 <label>
                     <span>Sidebar position:</span>
-                    <select>
-                        <option>left</option>
-                        <option>right</option>
-                    </select>
+                    <paper-dropdown-menu>
+                        <paper-dropdown class="dropdown">
+                            <core-menu selected="0" class="menu">
+                                <paper-item>left</paper-item>
+                                <paper-item>right</paper-item>
+                            </core-menu>
+                        </paper-dropdown>
+                    </paper-dropdown-menu>
                 </label>
             </section>
             <section>
                 <label>
                     <span>Auto save:</span>
-                    <input type="checkbox">
+                    <paper-toggle-button></paper-toggle-button>
                 </label>
             </section>
             <paper-button affirmative>Cancel</paper-button>

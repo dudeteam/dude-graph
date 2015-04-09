@@ -29,6 +29,11 @@
     /*height: 15px;*/
 }
 
+::content dude-toolbar /deep/ paper-icon-button[disabled] {
+    color: rgba(243, 156, 18, 0.5);
+}
+
+
 /* Sidebar */
 ::content dude-sidebar {
     font-family: "Lato", sans-serif;
