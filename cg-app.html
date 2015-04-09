@@ -7,17 +7,17 @@
 <link rel="import" href="../core-collapse/core-collapse.html">
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="../paper-dropdown/paper-dropdown.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
-<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../dude-gui/dude-panel.html">
 <link rel="import" href="../dude-gui/dude-config.html">
 <link rel="import" href="../dude-gui/dude-sidebar.html">
 <link rel="import" href="../dude-gui/dude-toolbar.html">
 <link rel="import" href="../dude-gui/dude-toolbar-command.html">
 <link rel="import" href="../dude-gui/dude-toolbar-input.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-dropdown/paper-dropdown.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-dialog/paper-action-dialog.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
@@ -26,7 +26,7 @@
             dude-toolbar [data-state="root"] {
                 margin: auto;
                 padding: 0 20px;
-                max-width: 800px;
+                max-width: 900px;
             }
 
             dude-sidebar [data-state] {
@@ -165,6 +165,51 @@
                          content>
             </cg-renderer>
         </dude-panel>
+        <paper-action-dialog
+                layered="false"
+                backdrop
+                id="settings"
+                transition="core-transition-top"
+                heading="Settings">
+            <section>
+                <label>
+                    <span>Theme:</span>
+                    <select>
+                        <option>audigame</option>
+                        <option>dude</option>
+                        <option>light</option>
+                        <option>dark</option>
+                        <option>blueprint</option>
+                    </select>
+                </label>
+            </section>
+            <section>
+                <label>
+                    <span>Toolbar position:</span>
+                    <select>
+                        <option>top</option>
+                        <option>bottom</option>
+                    </select>
+                </label>
+            </section>
+            <section>
+                <label>
+                    <span>Sidebar position:</span>
+                    <select>
+                        <option>left</option>
+                        <option>right</option>
+                    </select>
+                </label>
+            </section>
+            <section>
+                <label>
+                    <span>Auto save:</span>
+                    <input type="checkbox">
+                </label>
+            </section>
+            <paper-button affirmative>Cancel</paper-button>
+            <paper-button affirmative autofocus>Save</paper-button>
+        </paper-action-dialog>
         <!--<core-splitter class="panel-splitter" direction="right"></core-splitter>-->
         <!--<dude-panel name="audio-editor" styleUrl="themes/{{theme}}/panel.css">-->
         <!--<dude-toolbar root="hello">-->
@@ -186,7 +231,8 @@
                 "openPicker": {label: "add a picker", icon: "add-circle"},
                 "editEntity": {label: "edit the selected object", icon: "create", disabled: true},
                 "removeSelection": {label: "remove all the selected objects", icon: "delete", disabled: true},
-                "zoomToFit": {label: "zoom to best fit all objects", icon: "image:crop-free"}
+                "zoomToFit": {label: "zoom to best fit all objects", icon: "image:crop-free"},
+                "openSettings": {"label": "open setting dialog", icon: "settings"}
             },
             _pickerTypes: ["boolean", "string", "sound"],
             _pickerList: [],
@@ -220,6 +266,9 @@
             openPicker: function () {
                 this.$.toolbar.state = "picker";
                 this.$.sidebar.state = "picker";
+            },
+            openSettings: function () {
+                this.$.settings.open();
             },
             removeSelection: function () {
                 this.$.renderer.removeSelection();

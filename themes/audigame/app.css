@@ -1,3 +1,26 @@
+#settings {
+    color: #aaa;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid #000000;
+    font-family: "Lato", sans-serif;
+    border-radius: 3px;
+}
+#settings /deep/ h1 {
+    font-weight: normal;
+    text-align: center;
+    text-transform: uppercase;
+    color: #eee;
+}
+#settings section {
+    padding: 10px;
+}
+#settings label span {
+    display: inline-block;
+    min-width: 200px;
+}
+#settings paper-button[autofocus] {
+    color: rgb(243, 156, 18);
+}
 .notification {
     color: #eee;
     font-family: "Lato", sans-serif;
