@@ -56,7 +56,7 @@
                         <dude-toolbar-command name="{{name}}"
                                               label="{{_commands[name].label}}"
                                               icon="{{_commands[name].icon}}"
-                                              on-trigger="{{runCommand}}"
+                                              on-dude-trigger="{{runCommand}}"
                                               disable="{{_commands[name].disabled}}">
                         </dude-toolbar-command>
                     </template>
@@ -65,20 +65,20 @@
                                     data-state="group"
                                     label="Group title"
                                     icon="check"
-                                    on-submit="{{runCommand}}">
+                                    on-dude-submit="{{runCommand}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="editGroup"
                                     data-state="editGroup"
                                     label="Group title"
                                     icon="check"
-                                    on-submit="{{runCommand}}">
+                                    on-dude-submit="{{runCommand}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="createAction"
                                     value="{{_actionName}}"
                                     data-state="action"
                                     label="Search action..."
                                     icon="check"
-                                    on-submit="{{runCommand}}"
+                                    on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input name="createPicker"
@@ -86,7 +86,7 @@
                                     data-state="picker"
                                     label="Search by name..."
                                     icon="check"
-                                    on-submit="{{runCommand}}"
+                                    on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
             </dude-toolbar>
