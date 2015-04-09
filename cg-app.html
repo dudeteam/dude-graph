@@ -225,6 +225,7 @@
     </template>
     <script>
         Polymer({
+            searchLimit: 10,
             _commands: {
                 "openGraph": {label: "open another graph", icon: "open-in-new", disabled: true},
                 "saveGraph": {label: "save the graph", icon: "save", disabled: true},
@@ -379,14 +380,14 @@
             },
             _actionNameChanged: function () {
                 this._actionList = this.$.renderer.findModels({
-                    limit: 5,
+                    limit: this.searchLimit,
                     modelType: 'action',
                     pattern: this._actionName
                 });
             },
             _pickerNameChanged: function () {
                 this._pickerList = this.$.renderer.findModels({
-                    limit: 5,
+                    limit: this.searchLimit,
                     modelType: 'getter',
                     pattern: this._pickerName//,
 //                    isInput: false,
