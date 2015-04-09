@@ -1,13 +1,11 @@
+@import url(themes/audigame/types.css);
+
 /* General */
 #svg {
     background: #2b2b2b;
 }
 
 /* Types */
-#svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-#svg .type-sound { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
-#svg .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
-#svg .type-boolean { fill: rgb(46, 204, 113); stroke: rgb(46, 204, 113); }
 #svg .empty {
     fill: transparent;
     stroke-width: 1px;

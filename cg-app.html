@@ -96,7 +96,10 @@
                         <div>No results.</div>
                     </template>
                     <template repeat="{{action in _actionList}}">
-                        <div class="search-result">{{action.name}}</div>
+                        <div class="search-result">
+                            <core-icon class="type-stream" icon="check-box-outline-blank"></core-icon>
+                            <span>{{action.name}}</span>
+                        </div>
                     </template>
                 </div>
                 <div data-state="picker">
@@ -137,7 +140,10 @@
                             <div>No results.</div>
                         </template>
                         <template repeat="{{picker in _pickerList}}">
-                            <div class="search-result">{{picker.name}}</div>
+                            <div class="search-result">
+                                <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
+                                <span>{{picker.name}}</span>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -330,6 +336,7 @@
                     this._actionNameChanged();
                 }.bind(this));
                 this.$.renderer.addEventListener("click", function () {
+                    // TODO: check that when entity removed as well
                     this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
                     this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
                 }.bind(this));
@@ -381,9 +388,9 @@
                 this._pickerList = this.$.renderer.findModels({
                     limit: 5,
                     modelType: 'getter',
-                    pattern: this._pickerName,
-                    isInput: false,
-                    type: this._pickerType
+                    pattern: this._pickerName//,
+//                    isInput: false,
+//                    type: this._pickerType
                 });
             },
             _pickerTypeChanged: function (event) {

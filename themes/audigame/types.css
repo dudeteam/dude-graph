@@ -1,0 +1,16 @@
+
+/**
+ * HTML Elements
+ */
+::content dude-sidebar .search-result core-icon.type-stream { color: rgba(220, 220, 220, 1);}
+::content dude-sidebar .search-result core-icon.type-sound { color: rgba(241, 196, 15, 1);}
+::content dude-sidebar .search-result core-icon.type-string { color: rgba(230, 126, 34, 1);}
+::content dude-sidebar .search-result core-icon.type-boolean { color: rgb(46, 204, 113);}
+
+/**
+ * SVG Elements
+ */
+.type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+.type-sound { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+.type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+.type-boolean { fill: rgb(46, 204, 113); stroke: rgb(46, 204, 113); }

@@ -31,13 +31,6 @@
 }
 #error { background: rgba(231, 76, 60, 0.8); }
 #success { background: rgba(46, 204, 113, 0.8); }
-dude-sidebar .search-result {
-    padding: 10px;
-    border-bottom: 1px solid #444;
-}
-dude-sidebar .search-result:last-child {
-    border-bottom: none;
-}
 paper-item {
     color: #444;
 }

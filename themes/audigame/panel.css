@@ -1,3 +1,4 @@
+@import url(themes/audigame/types.css);
 
 :host {
     background: #333;
@@ -49,4 +50,13 @@
     width: 0;
     padding: 0;
     border: none;
+}
+::content dude-sidebar .search-result {
+    padding: 10px;
+}
+::content dude-sidebar .search-result:not(:last-child) {
+    border-bottom: 1px solid #444;
+}
+::content dude-sidebar .search-result core-icon {
+    margin-right: 10px;
 }

@@ -8,6 +8,7 @@
     <link href='http://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Varela' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Cherry+Cream+Soda' rel='stylesheet' type='text/css'>
     <link rel="import" href="../core-drawer-panel/core-drawer-panel.html">
     <link rel="import" href="../core-header-panel/core-header-panel.html">
@@ -42,14 +43,41 @@
             color: #eee;
             font-weight: normal;
         }
+        /*core-toolbar {*/
+            /*font-family: "Varela", sans-serif;*/
+            /*background: rgb(230, 230, 230);*/
+            /*color: #222;*/
+            /*border-bottom: 1px solid #ccc;*/
+        /*}*/
+        /*core-toolbar #login {*/
+            /*color: #888;*/
+            /*font-size: .8em;*/
+        /*}*/
+        /*[drawer] {*/
+            /*font-family: "Varela Round", sans-serif;*/
+            /*background: #222;*/
+            /*color: #aaa;*/
+        /*}*/
+        /*[drawer] core-item {*/
+            /*padding: 10px;*/
+            /*cursor: pointer !important;*/
+        /*}*/
+        /*[drawer] core-item:not(:last-child) {*/
+            /*border-bottom: 1px solid #444;*/
+        /*}*/
+        /*[drawer] core-item.core-selected {*/
+            /*color: #eee;*/
+            /*font-weight: normal;*/
+        /*}*/
     </style>
 </head>
 <body fullbleed unresolved>
     <core-drawer-panel forceNarrow>
-        <core-header-panel main>
+        <core-header-panel main mode="seamed">
             <core-toolbar>
                 <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
                 <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
+                <!--<div id="title" flex>DUDE</div>-->
                 <div id="login">Hi, @rootkernel!</div>
                 <paper-icon-button icon="account-circle"></paper-icon-button>
             </core-toolbar>
