@@ -106,6 +106,22 @@
       "type": "getter",
       "value-type": "string"
     },
+    "shoot": {
+      "type": "getter",
+      "value-type": "sound"
+    },
+    "boom": {
+      "type": "getter",
+      "value-type": "sound"
+    },
+    "music intro": {
+      "type": "getter",
+      "value-type": "sound"
+    },
+    "music game over": {
+      "type": "getter",
+      "value-type": "sound"
+    },
     "picker-string": {
       "type": "picker",
       "value-type": "string",
