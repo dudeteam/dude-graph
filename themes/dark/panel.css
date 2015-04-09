@@ -4,8 +4,8 @@
     color: #ddd;
     background: #222;
 }
-::content dude-toolbar.top { border-bottom: 1px solid #000; }
-::content dude-toolbar.bottom { border-top: 1px solid #000; }
+::content dude-toolbar.top { border-bottom: 1px solid #111; }
+::content dude-toolbar.bottom { border-top: 1px solid #111; }
 
 ::content dude-sidebar {
     font-family: arial, sans-serif;
@@ -13,8 +13,8 @@
     background: #222;
     padding: 10px;
 }
-::content dude-sidebar.left { border-right: 1px solid #000; }
-::content dude-sidebar.right { border-left: 1px solid #000; }
+/*::content dude-sidebar.left { border-right: 1px solid #000; }*/
+/*::content dude-sidebar.right { border-left: 1px solid #000; }*/
 
 ::content dude-toolbar-input /deep/ input[is="core-input"] {
     color: #ccc;
