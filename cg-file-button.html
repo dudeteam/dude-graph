@@ -1,0 +1,19 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-icon/core-icon.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<polymer-element name="cg-file-button">
+    <template>
+        <paper-button id="button" on-click="{{_buttonClicked}}">
+            <core-icon icon="file-upload"></core-icon>
+            <span>Upload</span>
+        </paper-button>
+        <input id="inputFile" type="file" accept=".ogg,.mp3,.wav" hidden>
+    </template>
+    <script>
+        Polymer({
+            _buttonClicked: function () {
+                this.$.inputFile.click();
+            }
+        })
+    </script>
+</polymer-element>

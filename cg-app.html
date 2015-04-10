@@ -22,6 +22,7 @@
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
+<link rel="import" href="cg-file-button.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
     <template>
         <style>
@@ -125,7 +126,7 @@
                             <input placeholder="Type your text here..." is="core-input">
                         </div>
                         <div class="box" data-state="sound">
-                            <div>Sound</div>
+                            <cg-file-button></cg-file-button>
                         </div>
                     </dude-state>
                     <template if="{{_pickerList.length === 0}}">
