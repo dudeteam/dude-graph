@@ -63,11 +63,17 @@
     margin-top: 10px;
 }
 ::content dude-sidebar .box {
+    box-sizing: border-box;
     background: rgba(0, 0, 0, .2);
     border-radius: 3px;
     padding: 20px;
     margin: 15px 0;
 }
+::content dude-sidebar .box input[is="core-input"] {
+    width: 100%;
+    color: #ccc;
+}
+
 ::content dude-sidebar .search-list {
     overflow: auto;
     max-height: 100%;

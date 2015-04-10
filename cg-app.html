@@ -117,6 +117,17 @@
                             </div>
                         </template>
                     </cg-dropdown>
+                    <dude-state noroot state="{{_pickerType}}">
+                        <div class="box" data-state="boolean">
+                            <paper-toggle-button></paper-toggle-button>
+                        </div>
+                        <div class="box" data-state="string">
+                            <input placeholder="Type your text here..." is="core-input">
+                        </div>
+                        <div class="box" data-state="sound">
+                            <div>Sound</div>
+                        </div>
+                    </dude-state>
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>
