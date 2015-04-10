@@ -204,6 +204,7 @@
                 this.$.renderer.removeSelection();
                 this.$.success.text = "Entities successfully removed!";
                 this.$.success.show();
+                this._updateDisabled();
             },
             zoomToFit: function () {
                 this.$.renderer.zoomToFit();
@@ -227,7 +228,7 @@
                     this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerName));
                 } else {
                     this.$.renderer.createBlock(new cg.Getter({
-                        "value-type": this._pickerType,
+                        "value-type": this._pickerList[0].data.valueType,
                         "name": this._pickerList[0].name
                     }), new pandora.Vec2(50, 50));
                 }
@@ -272,11 +273,7 @@
                     this._pickerNameChanged();
                     this._actionNameChanged();
                 }.bind(this));
-                this.$.renderer.addEventListener("click", function () {
-                    // TODO: check that when entity removed as well.
-                    this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
-                    this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
-                }.bind(this));
+                this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
                     jwerty.key('cmd+G', function (e) {
                         this.openGroup();
@@ -313,6 +310,10 @@
                     }.bind(this));
                 }
 
+            },
+            _updateDisabled: function () {
+                this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
+                this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
             },
             _actionNameChanged: function () {
                 this._actionList = this.$.renderer.findModels({
