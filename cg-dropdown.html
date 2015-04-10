@@ -58,6 +58,8 @@
                 var newValue = element.getAttribute(this.valueattr);
                 this.value = newValue;
                 this.$.selected.innerHTML = newValue;
+                //noinspection JSPrimitiveTypeWrapperUsage
+                this.$.menu.selected = newValue;
                 if (oldValue !== newValue) {
                     this.fire("change", {oldValue: oldValue, newValue: newValue});
                 }
