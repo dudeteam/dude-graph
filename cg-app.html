@@ -252,7 +252,7 @@
                     this._actionNameChanged();
                 }.bind(this));
                 this.$.renderer.addEventListener("click", function () {
-                    // TODO: check that when entity removed as well
+                    // TODO: check that when entity removed as well.
                     this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
                     this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
                 }.bind(this));
