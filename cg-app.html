@@ -73,7 +73,9 @@
                                     icon="check"
                                     on-dude-submit="{{runCommand}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input name="createAction"
+                <dude-toolbar-input
+                                    id="createAction"
+                                    name="createAction"
                                     value="{{_actionName}}"
                                     data-state="action"
                                     label="Search action..."
@@ -95,12 +97,14 @@
                     <template if="{{_actionList.length === 0}}">
                         <div>No results.</div>
                     </template>
-                    <template repeat="{{action in _actionList}}">
-                        <div class="search-result">
-                            <core-icon class="type-stream" icon="check-box-outline-blank"></core-icon>
-                            <span>{{action.name}}</span>
-                        </div>
-                    </template>
+                    <core-menu on-core-activate="{{selectAction}}">
+                        <template repeat="{{action in _actionList}}">
+                            <div class="search-result" name="{{action.name}}">
+                                <core-icon class="type-stream" icon="check-box-outline-blank"></core-icon>
+                                <span>{{action.name}}</span>
+                            </div>
+                        </template>
+                    </core-menu>
                 </div>
                 <div data-state="picker">
                     <div class="title">Select type</div>
@@ -226,6 +230,9 @@
             showError: function (error) {
                 this.$.error.text = error.message;
                 this.$.error.show();
+            },
+            selectAction: function (event, detail) {
+                this.$.createAction.value = detail.item.getAttribute("name");
             },
             attached: function () {
                 this.styleUrl = "themes/" + this.theme + "/app.css";
