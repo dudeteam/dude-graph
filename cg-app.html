@@ -109,7 +109,7 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <cg-dropdown value="{{_pickerType}}">
+                    <cg-dropdown value="{{_pickerType}}" on-change="{{resetPicker}}">
                         <template repeat="{{type in _pickerTypes}}">
                             <div class="type-{{type}} row" name="{{type}}">
                                 <core-icon icon="remove"></core-icon>
@@ -245,6 +245,9 @@
             },
             selectPicker: function (event, detail) {
                 this.$.createPicker.value = detail.item.getAttribute("name");
+            },
+            resetPicker: function () {
+                this.$.createPicker.value = "";
             },
             attached: function () {
                 this.styleUrl = "themes/" + this.theme + "/app.css";
