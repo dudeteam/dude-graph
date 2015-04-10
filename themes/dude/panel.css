@@ -1,17 +1,31 @@
+@import url(themes/dude/types.css);
+@import url(themes/base/panel.css);
+
 ::content dude-toolbar {
     padding: 10px;
     font-family: "Varela Round", sans-serif;
-    color: #ddd;
-    background: #15202f;
+    color: rgba(220, 220, 220, 1);
+    background: rgb(38, 50, 56);
     height: 40px;
+}
+::content dude-toolbar-input /deep/ input[is="core-input"] {
+    font-family: "Lato", sans-serif;
+    color: #ccc;
+    padding: 5px;
+}
+::content dude-toolbar /deep/ paper-icon-button[disabled] {
+    color: rgba(220, 220, 220, 0.5);
 }
 ::content dude-toolbar.top { border-bottom: 1px solid #ccc; }
 ::content dude-toolbar.bottom { border-top: 1px solid #ccc; }
-
+::content dude-sidebar .box {
+    background: rgba(0, 0, 0, .2);
+    border-radius: 3px;
+}
 ::content dude-sidebar {
     font-family: "Varela Round", sans-serif;
     color: #eee;
-    background: #15202f;
+    background: rgba(38, 50, 56, 1);
     padding: 10px;
 }
 ::content dude-sidebar.left { border-right: 1px solid #ccc; }
@@ -19,7 +33,6 @@
 ::content /deep/ [data-state]:not(.selected) {
     display: none;
 }
-
-::content dude-toolbar-input /deep/ input[is="core-input"] {
+::content dude-sidebar .box input[is="core-input"] {
     color: #ccc;
 }

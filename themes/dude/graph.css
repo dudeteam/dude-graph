@@ -1,27 +1,16 @@
 /**
  * CodeGraph theme for DudeEngine.
  */
+@import url(themes/dude/types.css);
 
 /* Global*/
 #svg {
-    background: #1d283a;
+    background: rgb(55, 71, 79);
 }
 #group {
     font-family: "Varela Round", sans-serif;
 }
 
-/* Types */
-#svg [class^="type-"] { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-#svg .type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-#svg .type-string { fill: rgba(28, 188, 156, 1); stroke: rgba(28, 188, 156, 1); }
-#svg .type-boolean { fill: rgb(241, 102, 189); stroke: rgb(241, 102, 189); }
-#svg .type-number { fill: rgb(155, 89, 182); stroke: rgb(155, 89, 182); }
-#svg .type-vec3 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-vec2 { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-color { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-list { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-dictionary { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
-#svg .type-resource { fill: rgba(52, 152, 219, 1); stroke: rgba(52, 152, 219, 1); }
 #svg .empty {
     fill: transparent;
     stroke-width: 1px;
@@ -34,7 +23,7 @@
 
 /* Group */
 #svg .group .background {
-    fill: rgba(25, 35, 50, 0.8);
+    fill: rgba(38, 50, 56, 0.80);
     stroke: #ccc;
     stroke-width: 1px;
 }
@@ -49,11 +38,11 @@
 
 /* Block */
 #svg .block .background {
-    fill: rgba(25, 35, 50, 0.8);
+    fill: rgba(38, 50, 56, 0.80);
     stroke-width: 1px;
 }
 #svg .block:hover .background {
-    fill: rgba(15, 30, 40, 0.8);
+    fill: rgba(38, 50, 56, 0.80);
 }
 #svg .block .title {
     font-family: "Varela Round", sans-serif;

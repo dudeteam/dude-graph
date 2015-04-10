@@ -15,45 +15,20 @@
     <link rel="import" href="../core-toolbar/core-toolbar.html">
     <link rel="import" href="cg-app.html">
     <style>
-        core-toolbar {
-            font-family: "Lato", sans-serif;
-            background: rgb(243, 156, 18);
-        }
-        core-toolbar #title {
-            color: #222;
-        }
-        core-toolbar #login {
-            color: #444;
-            font-style: italic;
-            font-size: .8em;
-        }
-        [drawer] {
-            font-family: "Lato", sans-serif;
-            background: #222;
-            color: #aaa;
-        }
-        [drawer] core-item {
-            padding: 10px;
-            cursor: pointer !important;
-        }
-        [drawer] core-item:not(:last-child) {
-            border-bottom: 1px solid #444;
-        }
-        [drawer] core-item.core-selected {
-            color: #eee;
-            font-weight: normal;
-        }
         /*core-toolbar {*/
-            /*font-family: "Varela", sans-serif;*/
-            /*background: rgb(96, 125, 139);*/
+            /*font-family: "Lato", sans-serif;*/
+            /*background: rgb(243, 156, 18);*/
+        /*}*/
+        /*core-toolbar #title {*/
             /*color: #222;*/
-            /*border-bottom: 1px solid #000;*/
         /*}*/
         /*core-toolbar #login {*/
-            /*font-size: .7em;*/
+            /*color: #444;*/
+            /*font-style: italic;*/
+            /*font-size: .8em;*/
         /*}*/
         /*[drawer] {*/
-            /*font-family: "Varela Round", sans-serif;*/
+            /*font-family: "Lato", sans-serif;*/
             /*background: #222;*/
             /*color: #aaa;*/
         /*}*/
@@ -68,6 +43,31 @@
             /*color: #eee;*/
             /*font-weight: normal;*/
         /*}*/
+        core-toolbar {
+            font-family: "Varela", sans-serif;
+            background: rgb(207, 216, 220);
+            color: #222;
+            border-bottom: 1px solid #000;
+        }
+        core-toolbar #login {
+            font-size: .7em;
+        }
+        [drawer] {
+            font-family: "Varela Round", sans-serif;
+            background: #222;
+            color: #aaa;
+        }
+        [drawer] core-item {
+            padding: 10px;
+            cursor: pointer !important;
+        }
+        [drawer] core-item:not(:last-child) {
+            border-bottom: 1px solid #444;
+        }
+        [drawer] core-item.core-selected {
+            color: #eee;
+            font-weight: normal;
+        }
     </style>
 </head>
 <body fullbleed unresolved>
@@ -81,8 +81,8 @@
                 <paper-icon-button icon="account-circle"></paper-icon-button>
             </core-toolbar>
             <cg-app logo="images/dude_logo_dark.png"
-                    graphUrl="examples/audigame.json"
-                    theme="audigame"
+                    graphUrl="examples/graph.json"
+                    theme="dude"
                     layout horizontal fit>
             </cg-app>
         </core-header-panel>

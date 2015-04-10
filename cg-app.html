@@ -25,27 +25,6 @@
 <link rel="import" href="cg-file-button.html">
 <polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
     <template>
-        <style>
-            dude-toolbar [data-state="root"] {
-                margin: auto;
-                padding: 0 20px;
-                max-width: 900px;
-            }
-            dude-sidebar [data-state] {
-                width: 200px;
-            }
-            paper-dropdown-menu {
-                width: 150px;
-                margin: 0;
-            }
-            paper-dropdown-menu core-menu {
-                margin: 0;
-                width: 150px;
-            }
-            paper-dropdown-menu paper-item /deep/ .button-content {
-                padding: 10px 20px;
-            }
-        </style>
         <dude-panel id="panel"
                     name="story-editor"
                     styleUrl="themes/{{theme}}/panel.css"
