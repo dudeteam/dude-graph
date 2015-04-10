@@ -83,7 +83,9 @@
                                     on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input name="createPicker"
+                <dude-toolbar-input
+                                    id="createPicker"
+                                    name="createPicker"
                                     value="{{_pickerName}}"
                                     data-state="picker"
                                     label="Search by name..."
@@ -118,12 +120,14 @@
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>
-                    <template repeat="{{picker in _pickerList}}">
-                        <div class="search-result">
-                            <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
-                            <span>{{picker.name}}</span>
-                        </div>
-                    </template>
+                    <core-menu on-core-activate="{{selectPicker}}">
+                        <template repeat="{{picker in _pickerList}}">
+                            <div class="search-result" name="{{picker.name}}">
+                                <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
+                                <span>{{picker.name}}</span>
+                            </div>
+                        </template>
+                    </core-menu>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -238,6 +242,9 @@
             },
             selectAction: function (event, detail) {
                 this.$.createAction.value = detail.item.getAttribute("name");
+            },
+            selectPicker: function (event, detail) {
+                this.$.createPicker.value = detail.item.getAttribute("name");
             },
             attached: function () {
                 this.styleUrl = "themes/" + this.theme + "/app.css";
