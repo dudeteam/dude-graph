@@ -107,18 +107,23 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <div class="title">Select type</div>
-                    <div>
-                        <template if="{{_pickerList.length === 0}}">
-                            <div class="search-not-found">No results.</div>
-                        </template>
-                        <template repeat="{{picker in _pickerList}}">
-                            <div class="search-result">
-                                <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
-                                <span>{{picker.name}}</span>
+                    <cg-dropdown value="{{_pickerType}}">
+                        <template repeat="{{type in _pickerTypes}}">
+                            <div class="type-{{type}} row" name="{{type}}">
+                                <core-icon icon="remove"></core-icon>
+                                <span>{{type}}</span>
                             </div>
                         </template>
-                    </div>
+                    </cg-dropdown>
+                    <template if="{{_pickerList.length === 0}}">
+                        <div class="search-not-found">No results.</div>
+                    </template>
+                    <template repeat="{{picker in _pickerList}}">
+                        <div class="search-result">
+                            <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
+                            <span>{{picker.name}}</span>
+                        </div>
+                    </template>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -144,7 +149,7 @@
                 "undo": {label: "undo last action", icon: "undo", disabled: true},
                 "redo": {label: "redo last action", icon: "redo", disabled: true}
             },
-            _pickerTypes: ["boolean", "string", "sound"],
+            _pickerTypes: ["all types", "boolean", "string", "sound"],
             _pickerList: [],
             _pickerType: "boolean",
             _pickerName: null,
@@ -299,13 +304,27 @@
                 this._pickerList = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: 'getter',
-                    pattern: this._pickerName//,
-//                    isInput: false,
-//                    type: this._pickerType
+                    pattern: this._pickerName
                 });
             },
             _pickerTypeChanged: function (event) {
-                console.log(this._pickerType, event);
+                if (this.$.renderer.isReady) {
+                    if (this._pickerType === "all types") {
+                        this._pickerList = this.$.renderer.findModels({
+                            limit: this.searchLimit,
+                            modelType: 'getter',
+                            pattern: this._pickerName
+                        });
+                    } else {
+                        this._pickerList = this.$.renderer.findModels({
+                            limit: this.searchLimit,
+                            modelType: 'getter',
+                            pattern: this._pickerName,
+                            isInput: false,
+                            type: this._pickerType
+                        });
+                    }
+                }
             }
         });
     </script>

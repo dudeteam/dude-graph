@@ -1,11 +1,10 @@
-
 /**
  * HTML Elements
  */
-::content dude-sidebar .search-result core-icon.type-stream { color: rgba(220, 220, 220, 1);}
-::content dude-sidebar .search-result core-icon.type-sound { color: rgba(241, 196, 15, 1);}
-::content dude-sidebar .search-result core-icon.type-string { color: rgba(230, 126, 34, 1);}
-::content dude-sidebar .search-result core-icon.type-boolean { color: rgb(46, 204, 113);}
+::content dude-sidebar .search-result core-icon.type-stream, ::content cg-dropdown .row.type-stream { color: rgba(220, 220, 220, 1);}
+::content dude-sidebar .search-result core-icon.type-sound, ::content cg-dropdown .row.type-sound { color: rgba(241, 196, 15, 1);}
+::content dude-sidebar .search-result core-icon.type-string, ::content cg-dropdown .row.type-string { color: rgba(230, 126, 34, 1);}
+::content dude-sidebar .search-result core-icon.type-boolean, ::content cg-dropdown .row.type-boolean { color: rgb(46, 204, 113);}
 
 /**
  * SVG Elements
