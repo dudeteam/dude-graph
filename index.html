@@ -19,13 +19,18 @@
             font-family: "Lato", sans-serif;
             background: rgb(243, 156, 18);
         }
-        core-toolbar #title {
-            color: #222;
+        core-toolbar paper-button {
+            text-transform: none;
+            font-size: .7em;
+            color: #ccc;
         }
-        core-toolbar #login {
-            color: #444;
-            font-style: italic;
-            font-size: .8em;
+        core-toolbar paper-button.dark { background: #2b2b2b; }
+        core-toolbar paper-button.primary {
+            color: #222;
+            background: rgb(243, 156, 18);
+        }
+        core-toolbar paper-button span {
+            padding-left: 5px;
         }
         [drawer] {
             font-family: "Lato", sans-serif;
@@ -76,10 +81,12 @@
             <core-toolbar>
                 <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
                 <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
-                <!--<div id="title" flex>DUDE</div>-->
-                <div id="login">Hi, @rootkernel!</div>
-                <paper-icon-button icon="account-circle"></paper-icon-button>
-            </core-toolbar>
+                <paper-button class="dark" on-click="{{showDialog}}">
+                    <!--<core-icon icon="account-box"></core-icon>-->
+                    <!--<span>Sign in</span>-->
+                    <core-icon icon="exit-to-app"></core-icon>
+                    <span>Disconnect</span>
+                </paper-button>            </core-toolbar>
             <cg-app logo="images/dude_logo_dark.png"
                     graphUrl="examples/audigame.json"
                     theme="audigame"
