@@ -55,6 +55,9 @@
 ::content dude-sidebar .box input[is="core-input"] {
     color: #ccc;
 }
+::content dude-sidebar .box audio {
+    width: 100%;
+}
 ::content dude-sidebar .box cg-file-button /deep/ paper-button {
-    color: rgb(243, 156, 18);
+    text-transform: none;
 }

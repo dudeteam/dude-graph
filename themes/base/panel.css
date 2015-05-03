@@ -8,10 +8,12 @@
     transition: .2s;
     width: 250px;
 }
-::content dude-sidebar:not(.selected) {
+::content dude-sidebar.left:not(.selected),
+::content dude-sidebar.right:not(.selected) {
     width: 0;
     padding: 0;
-    border: none;
+    border-left: none;
+    border-right: none;
 }
 ::content dude-sidebar .box {
     box-sizing: border-box;

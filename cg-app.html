@@ -104,7 +104,13 @@
                         <div class="box" data-state="string">
                             <input placeholder="Type your text here..." is="core-input">
                         </div>
-                        <div class="box" data-state="sound">
+                        <div data-state="sound">
+                            <div class="box">
+                                <audio controls>
+                                    <source src="" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
                             <cg-file-button></cg-file-button>
                         </div>
                     </dude-state>
