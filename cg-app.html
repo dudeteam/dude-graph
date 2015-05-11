@@ -99,10 +99,13 @@
                     </cg-dropdown>
                     <dude-state noroot state="{{_pickerType}}">
                         <div class="box" data-state="boolean">
-                            <paper-toggle-button></paper-toggle-button>
+                            <paper-toggle-button checked="{{ _pickerBooleanValue }}"></paper-toggle-button>
                         </div>
                         <div class="box" data-state="string">
-                            <input placeholder="Type your text here..." is="core-input">
+                            <input value="{{ _pickerStringValue }}" placeholder="Type your text here..." is="core-input">
+                        </div>
+                        <div class="box" data-state="number">
+                            <input value="{{ _pickerNumberValue }}" type="number" is="core-input">
                         </div>
                         <div data-state="sound">
                             <div class="box">
@@ -150,10 +153,13 @@
                 "undo": {label: "undo last action", icon: "undo", disabled: true},
                 "redo": {label: "redo last action", icon: "redo", disabled: true}
             },
-            _pickerTypes: ["all types", "boolean", "string", "sound"],
+            _pickerTypes: ["all types", "boolean", "string", "sound", "number"],
             _pickerList: [],
             _pickerType: "boolean",
-            _pickerPattern: null,
+            _pickerPattern: "",
+            _pickerStringValue: "",
+            _pickerNumberValue: 0,
+            _pickerBooleanValue: false,
             _actionList: [],
             _actionName: null,
             keys: function(input) {
@@ -210,6 +216,8 @@
                 }
             },
             createPicker: function () {
+                this._pickerBooleanValue = false;
+                this._pickerStringValue = "";
                 return this._createValue() || this._createVariable();
             },
             _createVariable: function () {
@@ -228,12 +236,17 @@
                 if (this._pickerPattern === "true" || this._pickerPattern === "false") {
                     this.$.renderer.createBlock(new cg.Picker({
                         "value-type": "boolean",
-                        "value": this._pickerPattern === "true" // FIXME
+                        "default": this._pickerPattern === "true"
                     }), new pandora.Vec2(100, 100));
                 } else if (this._pickerPattern[0] === "\"" && this._pickerPattern[this._pickerPattern.length - 1] === "\"") {
                     this.$.renderer.createBlock(new cg.Picker({
                         "value-type": "string",
-                        "value": "Coucou" // FIXME
+                        "default": this._pickerPattern.substr(1, this._pickerPattern.length - 2)
+                    }), new pandora.Vec2(100, 100));
+                } else if (typeof this._pickerPattern === "number") {
+                    this.$.renderer.createBlock(new cg.Picker({
+                        "value-type": "number",
+                        "default": this._pickerPattern
                     }), new pandora.Vec2(100, 100));
                 } else { // TODO: handle float and sound types
                     return false;
@@ -354,6 +367,15 @@
                         });
                     }
                 }
+            },
+            _pickerStringValueChanged: function () {
+                this._pickerPattern = "\"" + this._pickerStringValue + "\"";
+            },
+            _pickerNumberValueChanged: function () {
+                this._pickerPattern = this._pickerNumberValue;
+            },
+            _pickerBooleanValueChanged: function () {
+                this._pickerPattern = this._pickerBooleanValue === true ? "true" : "false";
             }
         });
     </script>

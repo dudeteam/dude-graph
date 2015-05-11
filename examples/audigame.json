@@ -24,6 +24,10 @@
         {
           "type": "sound",
           "name": "sound"
+        },
+        {
+          "type": "number",
+          "name": "duration"
         }
       ],
       "outputs": [
@@ -122,6 +126,10 @@
       "type": "getter",
       "value-type": "sound"
     },
+    "default time": {
+      "type": "getter",
+      "value-type": "number"
+    },
     "picker-string": {
       "type": "picker",
       "value-type": "string",
@@ -131,6 +139,11 @@
       "type": "picker",
       "value-type": "sound",
       "default": "default.mp4"
+    },
+    "picker-number": {
+      "type": "picker",
+      "value-type": "number",
+      "default": "0"
     }
   },
   "children": [

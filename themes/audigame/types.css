@@ -5,6 +5,7 @@
 ::content dude-sidebar .search-result core-icon.type-sound, ::content cg-dropdown .row.type-sound { color: rgba(241, 196, 15, 1);}
 ::content dude-sidebar .search-result core-icon.type-string, ::content cg-dropdown .row.type-string { color: rgba(230, 126, 34, 1);}
 ::content dude-sidebar .search-result core-icon.type-boolean, ::content cg-dropdown .row.type-boolean { color: rgb(46, 204, 113);}
+::content dude-sidebar .search-result core-icon.type-number, ::content cg-dropdown .row.type-number { color: rgb(33, 150, 243);}
 
 /**
  * SVG Elements
@@ -13,3 +14,4 @@
 .type-sound { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
 .type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
 .type-boolean { fill: rgb(46, 204, 113); stroke: rgb(46, 204, 113); }
+.type-number { fill: rgb(33, 150, 243); stroke: rgb(33, 150, 243); }
