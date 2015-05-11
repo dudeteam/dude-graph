@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <script src="../webcomponentsjs/webcomponents.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Varela' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Cherry+Cream+Soda' rel='stylesheet' type='text/css'>
@@ -17,6 +17,7 @@
     <style>
         core-toolbar {
             font-family: "Lato", sans-serif;
+            font-weight: 300;
             background: rgb(243, 156, 18);
         }
         core-toolbar paper-button {
@@ -34,6 +35,7 @@
         }
         [drawer] {
             font-family: "Lato", sans-serif;
+            font-weight: 300;
             background: #222;
             color: #aaa;
         }
@@ -81,12 +83,8 @@
             <core-toolbar>
                 <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
                 <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
-                <paper-button class="dark" on-click="{{showDialog}}">
-                    <!--<core-icon icon="account-box"></core-icon>-->
-                    <!--<span>Sign in</span>-->
-                    <core-icon icon="exit-to-app"></core-icon>
-                    <span>Disconnect</span>
-                </paper-button>            </core-toolbar>
+                <paper-button class="dark" on-click="{{showDialog}}">Disconnect</paper-button>
+            </core-toolbar>
             <cg-app logo="images/dude_logo_dark.png"
                     graphUrl="examples/audigame.json"
                     theme="audigame"

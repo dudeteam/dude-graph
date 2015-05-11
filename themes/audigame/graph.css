@@ -19,6 +19,7 @@
 /* Block and groups */
 #svg .group .title, #svg .block .title {
     font-family: "Lato", sans-serif;
+    font-weight: 300;
     font-size: .9em;
     stroke: transparent;
 }
@@ -37,6 +38,7 @@
 #svg .block .description {
     fill: #999;
     font-family: "Lato", sans-serif;
+    font-weight: 300;
     stroke: transparent;
     font-size: .7em;
 }

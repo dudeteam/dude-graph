@@ -66,7 +66,7 @@
                 <dude-toolbar-input
                                     id="createPicker"
                                     name="createPicker"
-                                    value="{{_pickerName}}"
+                                    value="{{_pickerPattern}}"
                                     data-state="picker"
                                     label="Search by name..."
                                     icon="check"
@@ -153,7 +153,7 @@
             _pickerTypes: ["all types", "boolean", "string", "sound"],
             _pickerList: [],
             _pickerType: "boolean",
-            _pickerName: null,
+            _pickerPattern: null,
             _actionList: [],
             _actionName: null,
             keys: function(input) {
@@ -210,14 +210,35 @@
                 }
             },
             createPicker: function () {
+                return this._createValue() || this._createVariable();
+            },
+            _createVariable: function () {
                 if (this._pickerList.length === 0) {
-                    this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerName));
+                    this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerPattern));
+                    return false;
                 } else {
                     this.$.renderer.createBlock(new cg.Getter({
                         "value-type": this._pickerList[0].data.valueType,
                         "name": this._pickerList[0].name
-                    }), new pandora.Vec2(50, 50));
+                    }), new pandora.Vec2(100, 100));
                 }
+                return true;
+            },
+            _createValue: function () {
+                if (this._pickerPattern === "true" || this._pickerPattern === "false") {
+                    this.$.renderer.createBlock(new cg.Picker({
+                        "value-type": "boolean",
+                        "value": this._pickerPattern === "true" // FIXME
+                    }), new pandora.Vec2(100, 100));
+                } else if (this._pickerPattern[0] === "\"" && this._pickerPattern[this._pickerPattern.length - 1] === "\"") {
+                    this.$.renderer.createBlock(new cg.Picker({
+                        "value-type": "string",
+                        "value": "Coucou" // FIXME
+                    }), new pandora.Vec2(100, 100));
+                } else { // TODO: handle float and sound types
+                    return false;
+                }
+                return true;
             },
             editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
@@ -256,7 +277,7 @@
                     console.log("edit picker", e.detail.picker);
                 });
                 this.$.renderer.addEventListener("ready", function () {
-                    this._pickerNameChanged();
+                    this._pickerPatternChanged();
                     this._actionNameChanged();
                 }.bind(this));
                 this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
@@ -308,11 +329,11 @@
                     pattern: this._actionName
                 });
             },
-            _pickerNameChanged: function () {
+            _pickerPatternChanged: function () {
                 this._pickerList = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: 'getter',
-                    pattern: this._pickerName
+                    pattern: this._pickerPattern
                 });
             },
             _pickerTypeChanged: function (event) {
@@ -321,13 +342,13 @@
                         this._pickerList = this.$.renderer.findModels({
                             limit: this.searchLimit,
                             modelType: 'getter',
-                            pattern: this._pickerName
+                            pattern: this._pickerPattern
                         });
                     } else {
                         this._pickerList = this.$.renderer.findModels({
                             limit: this.searchLimit,
                             modelType: 'getter',
-                            pattern: this._pickerName,
+                            pattern: this._pickerPattern,
                             isInput: false,
                             type: this._pickerType
                         });
