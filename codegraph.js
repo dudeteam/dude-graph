@@ -2460,6 +2460,14 @@ cg.Renderer.prototype._updatePickerNumber = function (block, element) {
     this._updatePickerText(block, element, block.value);
 };
 
+cg.Renderer.prototype._createPickerSound = function (block, element) {
+    this._createPickerText(block, element);
+};
+
+cg.Renderer.prototype._updatePickerSound = function (block, element) {
+    this._updatePickerText(block, element, block.value);
+};
+
 cg.Renderer.prototype._createPickerString = function (block, element) {
     this._createPickerText(block, element);
 };

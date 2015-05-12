@@ -3,16 +3,22 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <polymer-element name="cg-file-button">
     <template>
-        <paper-button id="button" on-click="{{_buttonClicked}}">
-            <span>None</span>
-            <core-icon icon="file-upload"></core-icon>
-        </paper-button>
-        <input id="inputFile" type="file" accept=".ogg,.mp3,.wav" hidden>
+        <paper-button id="button" on-click="{{_buttonClicked}}">{{ _file.name }}</paper-button>
+        <input id="fileInput" on-change="{{ _fileChanged }}" type="file" accept="{{ accept }}" hidden>
     </template>
     <script>
         Polymer({
+            publish: {
+                accept: ".mp3"
+            },
+            _file: {
+                name: "Upload your file..."
+            },
             _buttonClicked: function () {
-                this.$.inputFile.click();
+                this.$.fileInput.click();
+            },
+            _fileChanged: function (e) {
+                this._file = this.$.fileInput.files[0];
             }
         })
     </script>

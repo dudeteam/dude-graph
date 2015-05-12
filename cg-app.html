@@ -109,12 +109,12 @@
                         </div>
                         <div data-state="sound">
                             <div class="box">
-                                <audio controls>
+<!--                                <audio controls>
                                     <source src="" type="audio/mpeg">
                                     Your browser does not support the audio element.
-                                </audio>
+                                </audio> -->
+                                <cg-file-button></cg-file-button>
                             </div>
-                            <cg-file-button></cg-file-button>
                         </div>
                     </dude-state>
                     <template if="{{_pickerList.length === 0}}">
@@ -243,11 +243,16 @@
                         "value-type": "string",
                         "default": this._pickerPattern.substr(1, this._pickerPattern.length - 2)
                     }), new pandora.Vec2(100, 100));
-                } else if (typeof this._pickerPattern === "number") {
+                } else if (typeof this._pickerPattern === "number" || /^[0-9]+$/.test(this._pickerPattern)) {
                     this.$.renderer.createBlock(new cg.Picker({
                         "value-type": "number",
                         "default": this._pickerPattern
                     }), new pandora.Vec2(100, 100));
+                } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(this._pickerPattern)) {
+                    this.$.renderer.createBlock(new cg.Picker({
+                        "value-type": "sound",
+                        "default": this._pickerPattern
+                    }));
                 } else { // TODO: handle float and sound types
                     return false;
                 }
