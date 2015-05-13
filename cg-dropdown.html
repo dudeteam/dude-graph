@@ -92,7 +92,7 @@
              * Polymer ready delegate.
              * @delegate
              */
-            ready: function () {
+            domReady: function () {
                 this._select(this.$.content.getDistributedNodes()[1]);
                 this.$.selected.addEventListener('click', this._toggleDropdown.bind(this));
             }
