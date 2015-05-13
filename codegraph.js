@@ -158,7 +158,7 @@ cg.Action = (function () {
     });
 
 })();
-cg.Getter = (function () {
+cg.Variable = (function () {
 
     /**
      * Get a global variable of the blueprint.
@@ -166,8 +166,8 @@ cg.Getter = (function () {
      * @extends cg.Model
      * @constructor
      */
-    return pandora.class_("Getter", cg.Model, function (data) {
-        cg.Model.call(this, data.name, [], [{"name": data.name, "type": data["value-type"]}], "getter");
+    return pandora.class_("Variable", cg.Model, function (data) {
+        cg.Model.call(this, data.name, [], [{"name": data.name, "type": data["value-type"]}], "variable");
 
         /**
          * Shortcut to get the valueType of the picker.
@@ -180,7 +180,7 @@ cg.Getter = (function () {
     });
 
 })();
-cg.Picker = (function () {
+cg.Value = (function () {
 
     /**
      * Like getter, this model returns only one value. However, its not link to a variable but just contains the
@@ -189,8 +189,8 @@ cg.Picker = (function () {
      * @extends cg.Model
      * @constructor
      */
-    return pandora.class_("Picker", cg.Model, function (data) {
-        cg.Model.call(this, "picker-" + data["value-type"], [], [{"value": data.value, "type": data["value-type"]}], "picker");
+    return pandora.class_("Value", cg.Model, function (data) {
+        cg.Model.call(this, "value-" + data["value-type"], [], [{"value": data.value, "type": data["value-type"]}], "value");
 
         /**
          * The current value set into this picker.
@@ -896,7 +896,7 @@ cg.Graph = (function () {
 
     /**
      * Add a model of action.
-     * @param model {cg.Model|cg.Getter}
+     * @param model {cg.Model|cg.Variable|cg.Value|cg.Action}
      */
     Graph.prototype.addModel = function (model) {
         this._models[model.name] = model;
@@ -1160,10 +1160,10 @@ cg.Renderer = (function () {
         "action": {
             "borderRadius": 0
         },
-        "picker": {
+        "value": {
             "borderRadius": 0
         },
-        "getter": {
+        "variable": {
             "borderRadius": 0,
             "height": 40
         },
@@ -1947,8 +1947,8 @@ cg.Renderer.prototype._updatePoints = function (points) {
                 var value = this._getPointRelativePosition(point).toArray();
                 pandora.polymorphic(point.block.model, {
                     "Action": pandora.defaultCallback,
-                    "Getter": function () { value[1] = renderer._config.block.heading / 2; },
-                    "Picker": function () { value[1] = renderer._config.block.heading / 2; }
+                    "Variable": function () { value[1] = renderer._config.block.heading / 2; },
+                    "Value": function () { value[1] = renderer._config.block.heading / 2; }
                 });
                 return "translate(" + value + ")";
             }.bind(this)
@@ -2286,13 +2286,13 @@ cg.Renderer.prototype._createBlockAction = function (model, block, element) {
 };
 
 /**
- * Create the getter block.
+ * Create the variable block.
  * @param model {cg.Model}
  * @param block {cg.Block}
  * @param element {d3.selection}
  * @private
  */
-cg.Renderer.prototype._createBlockGetter = function (model, block, element) {
+cg.Renderer.prototype._createBlockVariable = function (model, block, element) {
     element.classed(model.type, true);
     element.classed("type-" + block.model.valueType, true);
     element.append("svg:text").attr({
@@ -2303,20 +2303,20 @@ cg.Renderer.prototype._createBlockGetter = function (model, block, element) {
 };
 
 /**
- * Create the picker block.
+ * Create the value block.
  * @param model {cg.Model}
  * @param block {cg.Block}
  * @param element {d3.selection}
  * @private
  */
-cg.Renderer.prototype._createBlockPicker = function (model, block, element) {
+cg.Renderer.prototype._createBlockValue = function (model, block, element) {
     element.classed(model.type, true);
     element.classed("type-" + block.model.valueType, true);
     var className = pandora.camelcase(block.model.valueType, "-");
-    if (this["_createPicker" + className] === undefined) {
-        this.emit("error", new pandora.MissingOverloadError("createPicker" + className, "Renderer"));
+    if (this["_createValue" + className] === undefined) {
+        this.emit("error", new pandora.MissingOverloadError("createValue" + className, "Renderer"));
     } else {
-        this["_createPicker" + className](block, element);
+        this["_createValue" + className](block, element);
     }
 };
 
@@ -2382,13 +2382,13 @@ cg.Renderer.prototype._updateBlockAction = function (model, block, element) {
 };
 
 /**
- * Update the getter block.
+ * Update the variable block.
  * @param model {cg.Model}
  * @param block {cg.Block}
  * @param element {d3.selection}
  * @private
  */
-cg.Renderer.prototype._updateBlockGetter = function (model, block, element) {
+cg.Renderer.prototype._updateBlockVariable = function (model, block, element) {
     element.select(".title")
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(block._name);
@@ -2400,19 +2400,19 @@ cg.Renderer.prototype._updateBlockGetter = function (model, block, element) {
 };
 
 /**
- * Update the picker block.
+ * Update the value block.
  * @param model {cg.Model}
  * @param block {cg.Block}
  * @param element {d3.selection}
  * @private
  */
-cg.Renderer.prototype._updateBlockPicker = function (model, block, element) {
+cg.Renderer.prototype._updateBlockValue = function (model, block, element) {
     block.data.computedWidth = renderer._config.block.padding * 2;
     var className = pandora.camelcase(block.model.valueType, "-");
-    if (this["_updatePicker" + className] === undefined) {
-        this.emit("error", new pandora.MissingOverloadError("updatePicker" + className, "Renderer"));
+    if (this["_updateValue" + className] === undefined) {
+        this.emit("error", new pandora.MissingOverloadError("updateValue" + className, "Renderer"));
     } else {
-        this["_updatePicker" + className](block, element);
+        this["_updateValue" + className](block, element);
     }
     block.data.computedWidth += renderer._config.block.padding + renderer._config.point['circle-size'];
     block.data.computedHeight = renderer._config.block.heading;
@@ -2429,7 +2429,7 @@ cg.Renderer.prototype._removeBlocks = function (blocks) {
         .exit()
         .remove();
 };
-cg.Renderer.prototype._createPickerText = function (block, element) {
+cg.Renderer.prototype._createValueText = function (block, element) {
     element.append("svg:text").attr({
         "class": "title",
         "text-anchor": "start",
@@ -2437,62 +2437,62 @@ cg.Renderer.prototype._createPickerText = function (block, element) {
     });
 };
 
-cg.Renderer.prototype._updatePickerText = function (block, element, text) {
+cg.Renderer.prototype._updateValueText = function (block, element, text) {
     element.select(".title")
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(text);
     block.data.computedWidth += this._getBBox(element.select(".title")).width;
 };
 
-cg.Renderer.prototype._createPickerBoolean = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueBoolean = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerBoolean = function (block, element) {
-    this._updatePickerText(block, element, block.value ? "true" : "false");
+cg.Renderer.prototype._updateValueBoolean = function (block, element) {
+    this._updateValueText(block, element, block.value ? "true" : "false");
 };
 
-cg.Renderer.prototype._createPickerNumber = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueNumber = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerNumber = function (block, element) {
-    this._updatePickerText(block, element, block.value);
+cg.Renderer.prototype._updateValueNumber = function (block, element) {
+    this._updateValueText(block, element, block.value);
 };
 
-cg.Renderer.prototype._createPickerSound = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueSound = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerSound = function (block, element) {
-    this._updatePickerText(block, element, block.value);
+cg.Renderer.prototype._updateValueSound = function (block, element) {
+    this._updateValueText(block, element, block.value);
 };
 
-cg.Renderer.prototype._createPickerString = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueString = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerString = function (block, element) {
-    this._updatePickerText(block, element, "\"" + block.value + "\"");
+cg.Renderer.prototype._updateValueString = function (block, element) {
+    this._updateValueText(block, element, "\"" + block.value + "\"");
 };
 
-cg.Renderer.prototype._createPickerVec2 = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueVec2 = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerVec2 = function (block, element) {
-    this._updatePickerText(block, element, "Vec2(" + block.value.join(", ") + ")");
+cg.Renderer.prototype._updateValueVec2 = function (block, element) {
+    this._updateValueText(block, element, "Vec2(" + block.value.join(", ") + ")");
 };
 
-cg.Renderer.prototype._createPickerVec3 = function (block, element) {
-    this._createPickerText(block, element);
+cg.Renderer.prototype._createValueVec3 = function (block, element) {
+    this._createValueText(block, element);
 };
 
-cg.Renderer.prototype._updatePickerVec3 = function (block, element) {
-    this._updatePickerText(block, element, "Vec3(" + block.value.join(", ") + ")");
+cg.Renderer.prototype._updateValueVec3 = function (block, element) {
+    this._updateValueText(block, element, "Vec3(" + block.value.join(", ") + ")");
 };
 
-cg.Renderer.prototype._createPickerColor = function (block, element) {
+cg.Renderer.prototype._createValueColor = function (block, element) {
     element.append("svg:rect")
         .attr({
             "class": "color-rect",
@@ -2505,7 +2505,7 @@ cg.Renderer.prototype._createPickerColor = function (block, element) {
         });
 };
 
-cg.Renderer.prototype._updatePickerColor = function (block, element) {
+cg.Renderer.prototype._updateValueColor = function (block, element) {
     var rect = element.select(".color-rect");
     block.data.computedWidth += parseInt(rect.attr("width"));
     element.select(".color-rect").attr({
@@ -2867,11 +2867,11 @@ cg.JSONSaver = (function () {
     };
 
     /**
-     * @param model {cg.Getter}
+     * @param model {cg.Variable}
      * @returns {Object} JSON data
      * @private
      */
-    JSONSaver.prototype._saveGetter = function (model) {
+    JSONSaver.prototype._saveVariable = function (model) {
         return {
             "type": "getter",
             "value-type": model.valueType
@@ -2879,11 +2879,11 @@ cg.JSONSaver = (function () {
     };
 
     /**
-     * @param model {cg.Picker}
+     * @param model {cg.Value}
      * @returns {Object} JSON data
      * @private
      */
-    JSONSaver.prototype._savePicker = function (model) {
+    JSONSaver.prototype._saveValue = function (model) {
         return {
             "type": "picker",
             "value-type": model.valueType,

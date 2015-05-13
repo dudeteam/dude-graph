@@ -83,65 +83,65 @@
       ]
     },
     "can enter?": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "boolean"
     },
     "has key?": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "boolean"
     },
     "can climb?": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "boolean"
     },
     "alarm disabled?": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "boolean"
     },
     "intro": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "string"
     },
     "game over": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "string"
     },
     "mission success": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "string"
     },
     "shoot": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "sound"
     },
     "boom": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "sound"
     },
     "music intro": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "sound"
     },
     "music game over": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "sound"
     },
     "default time": {
-      "type": "getter",
+      "type": "variable",
       "value-type": "number"
     },
-    "picker-string": {
-      "type": "picker",
+    "value-string": {
+      "type": "value",
       "value-type": "string",
       "default": "Your description..."
     },
-    "picker-sound": {
-      "type": "picker",
+    "value-sound": {
+      "type": "value",
       "value-type": "sound",
       "default": "default.mp4"
     },
-    "picker-number": {
-      "type": "picker",
+    "value-number": {
+      "type": "value",
       "value-type": "number",
       "default": "0"
     }
@@ -190,7 +190,7 @@
         {
           "_type": "block",
           "_id": 14,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             24.93804931640625,
             316.6547622680664
@@ -200,7 +200,7 @@
         {
           "_type": "block",
           "_id": 15,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             19.99993896484375,
             150.17711639404297
@@ -270,7 +270,7 @@
         {
           "_type": "block",
           "_id": 10,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             21,
             219.57755756378174
@@ -280,7 +280,7 @@
         {
           "_type": "block",
           "_id": 11,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             652.2843627929688,
             152.79549884796143
@@ -290,7 +290,7 @@
         {
           "_type": "block",
           "_id": 12,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             24.208251953125,
             435.19462299346924
@@ -300,7 +300,7 @@
         {
           "_type": "block",
           "_id": 13,
-          "_name": "picker-string",
+          "_name": "value-string",
           "position": [
             428.17852783203125,
             433.9659547805786

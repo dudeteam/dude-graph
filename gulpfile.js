@@ -14,8 +14,8 @@ var sources = [
     "graph/utils/graph-error.js",
     "graph/models/model.js",
     "graph/models/action.js",
-    "graph/models/getter.js",
-    "graph/models/picker.js",
+    "graph/models/variable.js",
+    "graph/models/value.js",
     "graph/entities/point.js",
     "graph/entities/connection.js",
     "graph/entities/entity.js",
@@ -33,7 +33,7 @@ var sources = [
     "renderer/render/render-connection.js",
     "renderer/render/render-group.js",
     "renderer/render/render-block.js",
-    "renderer/render/render-picker.js",
+    "renderer/render/render-value.js",
     "renderer/render/render-zoom.js",
     "renderer/render/render-drag.js",
     "renderer/render/render-selection.js",
@@ -59,3 +59,4 @@ gulp.task('build', function () {
 });
 
 gulp.task('library', ['build', 'watch']);
+gulp.task('default', ['library']);

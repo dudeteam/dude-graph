@@ -222,10 +222,10 @@
             },
             _createVariable: function () {
                 if (this._pickerList.length === 0) {
-                    this.showError(new pandora.Exception("Getter {0} doesn't exist", this._pickerPattern));
+                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                     return false;
                 } else {
-                    this.$.renderer.createBlock(new cg.Getter({
+                    this.$.renderer.createBlock(new cg.Variable({
                         "value-type": this._pickerList[0].data.valueType,
                         "name": this._pickerList[0].name
                     }), new pandora.Vec2(100, 100));
@@ -233,23 +233,23 @@
                 return true;
             },
             _createValue: function () {
-                if (this._pickerPattern === "true" || this._pickerPattern === "false") {
-                    this.$.renderer.createBlock(new cg.Picker({
+                if (/^(true|false)$/.test(this._pickerPattern)) {
+                    this.$.renderer.createBlock(new cg.Value({
                         "value-type": "boolean",
                         "default": this._pickerPattern === "true"
                     }), new pandora.Vec2(100, 100));
-                } else if (this._pickerPattern[0] === "\"" && this._pickerPattern[this._pickerPattern.length - 1] === "\"") {
-                    this.$.renderer.createBlock(new cg.Picker({
+                } else if (/^".+"$/.test(this._pickerPattern)) {
+                    this.$.renderer.createBlock(new cg.Value({
                         "value-type": "string",
                         "default": this._pickerPattern.substr(1, this._pickerPattern.length - 2)
                     }), new pandora.Vec2(100, 100));
-                } else if (typeof this._pickerPattern === "number" || /^[0-9]+$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Picker({
+                } else if (/^[0-9]+$/.test(this._pickerPattern)) {
+                    this.$.renderer.createBlock(new cg.Value({
                         "value-type": "number",
                         "default": this._pickerPattern
                     }), new pandora.Vec2(100, 100));
                 } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Picker({
+                    this.$.renderer.createBlock(new cg.Value({
                         "value-type": "sound",
                         "default": this._pickerPattern
                     }));
@@ -350,7 +350,7 @@
             _pickerPatternChanged: function () {
                 this._pickerList = this.$.renderer.findModels({
                     limit: this.searchLimit,
-                    modelType: 'getter',
+                    modelType: 'variable',
                     pattern: this._pickerPattern
                 });
             },
@@ -359,13 +359,13 @@
                     if (this._pickerType === "all types") {
                         this._pickerList = this.$.renderer.findModels({
                             limit: this.searchLimit,
-                            modelType: 'getter',
+                            modelType: 'variable',
                             pattern: this._pickerPattern
                         });
                     } else {
                         this._pickerList = this.$.renderer.findModels({
                             limit: this.searchLimit,
-                            modelType: 'getter',
+                            modelType: 'variable',
                             pattern: this._pickerPattern,
                             isInput: false,
                             type: this._pickerType

@@ -1,8 +1,8 @@
 {
   "group": { "borderRadius": 3 },
   "action": { "borderRadius": 3 },
-  "picker": { "borderRadius": 20 },
-  "getter": { "borderRadius": 20 },
+  "value": { "borderRadius": 20 },
+  "variable": { "borderRadius": 20 },
   "background-grid": {
     "line": {
       "stroke": "rgba(0, 0, 0, 0.1)",

@@ -52,7 +52,7 @@
 }
 
 /* Getter */
-#svg .getter .title, #svg .picker .title {
+#svg .variable .title, #svg .value .title {
     font-size: .8em;
     font-style: italic;
 }
