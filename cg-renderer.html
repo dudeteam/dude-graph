@@ -76,8 +76,66 @@
                 renderer.createSmartGroup(_id, name);
             },
 
-            createBlock: function (model, position) {
-                this.graph.addEntity(new cg.Block(this.graph.getNextBlockId(), model, position), this.graph);
+            createAction: function (model, position) {
+                var block = new cg.Block(this.graph.getNextBlockId(), model, position);
+                this.graph.addEntity(block, this.graph);
+                return block;
+            },
+
+            createPicker: function (pattern, searchResult, position, parent) {
+                var model = this._getValueModel(pattern) || this._getVariableModel(searchResult);
+                if (model === null) {
+                    return null;
+                }
+                var block = new cg.Block(this.graph.getNextBlockId(), model, position);
+                this.graph.addEntity(block, parent || this.graph);
+                return block;
+            },
+
+            replacePicker: function (pattern, searchResult, entity) {
+                var block = this.createPicker(pattern, searchResult, entity.position, entity.parent);
+                if (block !== null) {
+                    pandora.forEach(entity.outputs[0].connections, function (connection) {
+                        this.graph.addConnection(new cg.Connection(block.outputs[0], connection.inputPoint));
+                    }.bind(this));
+                    this.graph.removeEntity(entity);
+                }
+                return block;
+            },
+
+            _getValueModel: function (pattern) {
+                if (/^(true|false)$/.test(pattern)) {
+                    return new cg.Value({
+                        "value-type": "boolean",
+                        "default": pattern === "true"
+                    });
+                } else if (/^".+"$/.test(pattern)) {
+                    return new cg.Value({
+                        "value-type": "string",
+                        "default": pattern.substr(1, pattern.length - 2)
+                    });
+                } else if (/^[0-9]+$/.test(pattern)) {
+                    return new cg.Value({
+                        "value-type": "number",
+                        "default": parseInt(pattern)
+                    });
+                } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(pattern)) {
+                    return new cg.Value({
+                        "value-type": "sound",
+                        "default": pattern
+                    });
+                }
+                return null;
+            },
+
+            _getVariableModel: function (searchResult) {
+                if (searchResult.length > 0) {
+                    return new cg.Variable({
+                        "value-type": searchResult[0].data.valueType,
+                        "name": searchResult[0].name
+                    });
+                }
+                return null;
             },
 
             removeSelection: function () {

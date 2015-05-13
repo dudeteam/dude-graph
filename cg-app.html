@@ -63,12 +63,20 @@
                                     on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input
-                                    id="createPicker"
+                <dude-toolbar-input id="createPicker"
                                     name="createPicker"
                                     value="{{_pickerPattern}}"
                                     data-state="picker"
-                                    label="Search by name..."
+                                    label="Type getter's name or value..."
+                                    icon="check"
+                                    on-dude-submit="{{runCommand}}"
+                                    on-close="{{hideSidebar}}">
+                </dude-toolbar-input>
+                <dude-toolbar-input id="editPicker"
+                                    name="editPicker"
+                                    value="{{_pickerPattern}}"
+                                    data-state="editPicker"
+                                    label="Type getter's name or value..."
                                     icon="check"
                                     on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
@@ -89,7 +97,7 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <cg-dropdown value="{{_pickerType}}" on-change="{{resetPicker}}">
+                    <cg-dropdown value="{{_pickerType}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
                         <template repeat="{{type in _pickerTypes}}">
                             <div class="type-{{type}} row" name="{{type}}">
                                 <core-icon icon="remove"></core-icon>
@@ -155,13 +163,14 @@
             },
             _pickerTypes: ["all types", "boolean", "string", "sound", "number"],
             _pickerList: [],
-            _pickerType: "boolean",
+            _pickerType: "all types",
             _pickerPattern: "",
             _pickerStringValue: "",
             _pickerNumberValue: 0,
             _pickerBooleanValue: false,
             _actionList: [],
             _actionName: null,
+            _editMode: false,
             keys: function(input) {
                 return Object.keys(input);
             },
@@ -210,68 +219,52 @@
                 if (this._actionList.length === 0) {
                     this.showError(new pandora.Exception("Action {0} doesn't exist", this._actionName));
                 } else {
-                    this.$.renderer.createBlock(this._actionList[0].data, new pandora.Vec2(50, 50));
+                    this.$.renderer.createAction(this._actionList[0].data, new pandora.Vec2(100, 100));
                     this.$.success.text = "Action \"" + this._actionList[0].name + "\" successfully created!";
                     this.$.success.show();
                 }
             },
             createPicker: function () {
+                if (!this.$.renderer.createPicker(this._pickerPattern, this._pickerList, new pandora.Vec2(100, 100))) {
+                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
+                }
                 this._pickerBooleanValue = false;
                 this._pickerStringValue = "";
-                return this._createValue() || this._createVariable();
-            },
-            _createVariable: function () {
-                if (this._pickerList.length === 0) {
-                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
-                    return false;
-                } else {
-                    this.$.renderer.createBlock(new cg.Variable({
-                        "value-type": this._pickerList[0].data.valueType,
-                        "name": this._pickerList[0].name
-                    }), new pandora.Vec2(100, 100));
-                }
-                return true;
-            },
-            _createValue: function () {
-                if (/^(true|false)$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Value({
-                        "value-type": "boolean",
-                        "default": this._pickerPattern === "true"
-                    }), new pandora.Vec2(100, 100));
-                } else if (/^".+"$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Value({
-                        "value-type": "string",
-                        "default": this._pickerPattern.substr(1, this._pickerPattern.length - 2)
-                    }), new pandora.Vec2(100, 100));
-                } else if (/^[0-9]+$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Value({
-                        "value-type": "number",
-                        "default": this._pickerPattern
-                    }), new pandora.Vec2(100, 100));
-                } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(this._pickerPattern)) {
-                    this.$.renderer.createBlock(new cg.Value({
-                        "value-type": "sound",
-                        "default": this._pickerPattern
-                    }));
-                } else { // TODO: handle float and sound types
-                    return false;
-                }
-                return true;
+                this._pickerNumberValue = 0;
             },
             editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 if (entity instanceof cg.Group) {
                     this.$.toolbar.state = "editGroup";
+                } else if (entity instanceof cg.Block) {
+                    if (entity.model.type === "action") {
+                        this.$.success.text = "Actions are read only.";
+                        this.$.success.show();
+                    } else if (entity.model.type === "value" || entity.model.type === "variable") {
+                        this.$.toolbar.state = "editPicker";
+                        this.$.sidebar.state = "picker";
+                        this._pickerType = entity.model.valueType;
+                        this._editMode = true;
+                    }
                 }
             },
             editGroup: function (event) {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
-                if (entity instanceof cg.Group) {
-                    entity.description = event.value;
-                    entity.emit("update");
+                entity.description = event.value;
+                entity.emit("update");
+            },
+            editPicker: function () {
+                var selection = this.$.renderer.getLastSelectedEntity();
+                var entity = selection ? selection.datum() : null;
+                this._editMode = false;
+                if (!this.$.renderer.replacePicker(this._pickerPattern, this._pickerList, entity)) {
+                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
+                this._pickerBooleanValue = false;
+                this._pickerStringValue = "";
+                this._pickerNumberValue = 0;
             },
             showError: function (error) {
                 this.$.error.text = error.message;
