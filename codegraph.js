@@ -822,6 +822,12 @@ cg.Graph = (function () {
         cg.Group.call(this, null, this.constructor.typename, new pandora.Vec2(0, 0), new pandora.Vec2(0, 0));
 
         /**
+         * Contains all the types allowed in this codegraph.
+         * @type {Array<String>}
+         */
+        this.types = [];
+
+        /**
          * Contains the model of actions that can be created.
          * @type {Object}
          * @private
@@ -2711,6 +2717,13 @@ cg.JSONLoader = (function () {
         }.bind(this));
     };
 
+    JSONLoader.prototype._loadTypes = function (typesData, graph) {
+        graph.types = typesData;
+        for (var i = 0; i < typesData.length; ++i) {
+            graph.addModel(new cg.Value({"value-type": typesData[i]}));
+        }
+    };
+
     /**
      *
      * @param modelsData
@@ -2846,6 +2859,7 @@ cg.JSONSaver = (function () {
             connections.push(this.save(graph.connections[i]));
         }
         return {
+            "types": graph.types,
             "models": models,
             "children": children,
             "connections": connections
@@ -2911,7 +2925,6 @@ cg.JSONSaver = (function () {
      * @private
      */
     JSONSaver.prototype._saveGroup = function (group) {
-        console.log(group._name);
         var data = {
             "_type": pandora.uncamelcase(group._type, "-"),
             "_id": group._id,

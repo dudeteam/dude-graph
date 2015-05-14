@@ -1,4 +1,10 @@
 {
+  "types": [
+    "string",
+    "sound",
+    "number",
+    "boolean"
+  ],
   "models": {
     "start": {
       "type": "action",
@@ -129,21 +135,6 @@
     "default time": {
       "type": "variable",
       "value-type": "number"
-    },
-    "value-string": {
-      "type": "value",
-      "value-type": "string",
-      "default": "Your description..."
-    },
-    "value-sound": {
-      "type": "value",
-      "value-type": "sound",
-      "default": "default.mp4"
-    },
-    "value-number": {
-      "type": "value",
-      "value-type": "number",
-      "default": "0"
     }
   },
   "children": [

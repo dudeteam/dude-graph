@@ -115,15 +115,6 @@
                         <div class="box" data-state="number">
                             <input value="{{ _pickerNumberValue }}" type="number" is="core-input">
                         </div>
-                        <div data-state="sound">
-                            <div class="box">
-                                <!--                                <audio controls>
-                                                                    <source src="" type="audio/mpeg">
-                                                                    Your browser does not support the audio element.
-                                                                </audio> -->
-                                <cg-file-button></cg-file-button>
-                            </div>
-                        </div>
                     </dude-state>
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
@@ -165,7 +156,7 @@
                 //"undo": {label: "undo last action", icon: "undo", disabled: true},
                 //"redo": {label: "redo last action", icon: "redo", disabled: true}
             },
-            _pickerTypes: ["all types", "boolean", "string", "sound", "number"],
+            _pickerTypes: ["all types"],
             _pickerList: [],
             _pickerType: "all types",
             _pickerPattern: "",
@@ -283,6 +274,9 @@
             resetPicker: function () {
                 this.$.createPicker.value = "";
             },
+            toJSON: function () {
+                return this.saver.save(this.graph);
+            },
             attached: function () {
                 this.styleUrl = this.themeUrl + "/app.css";
                 this.$.renderer.addEventListener("error", function (e) {
@@ -350,6 +344,9 @@
                     modelType: 'variable',
                     pattern: this._pickerPattern
                 });
+            },
+            graphDataChanged: function () {
+                this._pickerTypes = ["all types"].concat(this.graphData.types);
             },
             _pickerTypeChanged: function (event) {
                 if (this.$.renderer.isReady) {

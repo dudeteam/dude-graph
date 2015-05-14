@@ -9,10 +9,10 @@
     <script>
         Polymer({
             publish: {
-                accept: ".mp3"
-            },
-            _file: {
-                name: "Upload your file..."
+                accept: ".mp3",
+                file: {
+                    name: "Upload your file..."
+                }
             },
             _buttonClicked: function () {
                 this.$.fileInput.click();
