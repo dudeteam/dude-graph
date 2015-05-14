@@ -5,7 +5,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
 <link rel="import" href="../dude-gui/dude-config.html">
-<polymer-element name="cg-renderer" attributes="graphUrl" extends="dude-config">
+<polymer-element name="cg-renderer" extends="dude-config">
     <template>
         <style>
             #svg {
@@ -29,12 +29,6 @@
                 stroke-linecap: round;
             }
         </style>
-        <core-ajax id="graphData"
-                   url="{{graphUrl}}"
-                   handleAs="json"
-                   on-core-response="{{_loadGraph}}"
-                   auto>
-        </core-ajax>
         <div id="shadow-dom-bug" layout horizontal flex>
             <svg id="svg" flex></svg>
         </div>
@@ -44,7 +38,7 @@
     <script src="../jwerty/jwerty.js"></script>
     <script src="../pandora/lib/pandora.js"></script>
     <!-- CodeGraph library -->
-   <script src="codegraph.js"></script>
+    <script src="codegraph.js"></script>
     <!-- Polymer element -->
     <script>
         Polymer({
@@ -52,15 +46,12 @@
 
                 /**
                  * This is the url of the graph data to load.
-                 * @attribute url
-                 * @type {String}
+                 * @attribute graphData Json data representing the graph to render
+                 * @type {Object}
                  */
-                graphUrl: null
+                graphData: null
 
             },
-            data: null,
-            config: null,
-
             _isReady: false,
             get isReady() { return this._isReady; },
 
@@ -163,6 +154,7 @@
              * @private
              */
             _createGraph: function () {
+                this.$.svg.innerHTML = "";
                 this.graph = new cg.Graph();
                 this.loader = new cg.JSONLoader();
                 this.saver = new cg.JSONSaver();
@@ -175,18 +167,13 @@
                 this.renderer.on("picker.edit", function (picker) {
                     this.fire("picker.edit", {picker: picker});
                 }.bind(this));
-                this.loader.load(this.graph, this._graphData);
+                this.loader.load(this.graph, this.graphData);
                 this.renderer.render();
                 this._isReady = true;
                 this.fire("ready");
             },
 
-            /**
-             * Load the graph data from an external JSON file.
-             * @private
-             */
-            _loadGraph: function () {
-                this._graphData = this.$.graphData.response;
+            graphDataChanged: function () {
                 if (this.config !== null) {
                     this._createGraph();
                 }
@@ -194,7 +181,7 @@
 
             ready: function () {
                 this.addEventListener("dude-config-ready", function () {
-                    if (this._graphData !== undefined) {
+                    if (this.graphData !== null) {
                         this._createGraph();
                     }
                 });

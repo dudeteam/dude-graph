@@ -1,4 +1,12 @@
-@import url(themes/audigame/types.css);
+
+/**
+ * Types
+ */
+.type-stream { fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+.type-sound { fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
+.type-string { fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
+.type-boolean { fill: rgb(46, 204, 113); stroke: rgb(46, 204, 113); }
+.type-number { fill: rgb(33, 150, 243); stroke: rgb(33, 150, 243); }
 
 /* General */
 #svg {

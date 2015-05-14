@@ -23,12 +23,12 @@
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <link rel="import" href="cg-file-button.html">
-<polymer-element name="cg-app" attributes="logo theme graphUrl" extends="dude-config">
+<polymer-element name="cg-app" extends="dude-config">
     <template>
         <dude-panel id="panel"
                     name="story-editor"
-                    styleUrl="themes/{{theme}}/panel.css"
-                    configUrl="themes/{{theme}}/panel.json"
+                    styleUrl="{{themeUrl}}/panel.css"
+                    configUrl="{{themeUrl}}/panel.json"
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
@@ -54,14 +54,14 @@
                                     on-dude-submit="{{runCommand}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input
-                                    id="createAction"
-                                    name="createAction"
-                                    value="{{_actionName}}"
-                                    data-state="action"
-                                    label="Search action..."
-                                    icon="check"
-                                    on-dude-submit="{{runCommand}}"
-                                    on-close="{{hideSidebar}}">
+                        id="createAction"
+                        name="createAction"
+                        value="{{_actionName}}"
+                        data-state="action"
+                        label="Search action..."
+                        icon="check"
+                        on-dude-submit="{{runCommand}}"
+                        on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
                 <dude-toolbar-input id="createPicker"
                                     name="createPicker"
@@ -117,10 +117,10 @@
                         </div>
                         <div data-state="sound">
                             <div class="box">
-<!--                                <audio controls>
-                                    <source src="" type="audio/mpeg">
-                                    Your browser does not support the audio element.
-                                </audio> -->
+                                <!--                                <audio controls>
+                                                                    <source src="" type="audio/mpeg">
+                                                                    Your browser does not support the audio element.
+                                                                </audio> -->
                                 <cg-file-button></cg-file-button>
                             </div>
                         </div>
@@ -139,9 +139,9 @@
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
-                         styleUrl="themes/{{theme}}/graph.css"
-                         configUrl="themes/{{theme}}/config.json"
-                         graphUrl="{{graphUrl}}"
+                         styleUrl="{{themeUrl}}/graph.css"
+                         configUrl="{{themeUrl}}/config.json"
+                         graphData="{{graphData}}"
                          content>
             </cg-renderer>
         </dude-panel>
@@ -150,6 +150,10 @@
     </template>
     <script>
         Polymer({
+            publish: {
+                themeUrl: "",
+                graphData: null
+            },
             searchLimit: 10,
             _commands: {
                 "openGroup": {label: "add a group", icon: "av:my-library-add"},
@@ -280,7 +284,7 @@
                 this.$.createPicker.value = "";
             },
             attached: function () {
-                this.styleUrl = "themes/" + this.theme + "/app.css";
+                this.styleUrl = this.themeUrl + "/app.css";
                 this.$.renderer.addEventListener("error", function (e) {
                     this.showError(e.detail.error);
                 }.bind(this));

@@ -1,5 +1,82 @@
-@import url(themes/audigame/types.css);
-@import url(themes/base/panel.css);
+/**
+ * Types
+ */
+::content dude-sidebar .search-result core-icon.type-stream, ::content cg-dropdown .row.type-stream { color: rgba(220, 220, 220, 1);}
+::content dude-sidebar .search-result core-icon.type-sound, ::content cg-dropdown .row.type-sound { color: rgba(241, 196, 15, 1);}
+::content dude-sidebar .search-result core-icon.type-string, ::content cg-dropdown .row.type-string { color: rgba(230, 126, 34, 1);}
+::content dude-sidebar .search-result core-icon.type-boolean, ::content cg-dropdown .row.type-boolean { color: rgb(46, 204, 113);}
+::content dude-sidebar .search-result core-icon.type-number, ::content cg-dropdown .row.type-number { color: rgb(33, 150, 243);}
+
+/**
+ * Base
+ */
+::content dude-toolbar [data-state="root"] {
+    margin: auto;
+    padding: 0 20px;
+    max-width: 900px;
+}
+::content dude-sidebar {
+    padding: 10px;
+    transition: .2s;
+    width: 250px;
+}
+::content dude-sidebar.left:not(.selected),
+::content dude-sidebar.right:not(.selected) {
+    width: 0;
+    padding: 0;
+    border-left: none;
+    border-right: none;
+}
+::content dude-sidebar .box {
+    box-sizing: border-box;
+    padding: 20px;
+    margin: 15px 0;
+    text-align: center;
+}
+::content dude-sidebar .search-list {
+    overflow: auto;
+    max-height: 100%;
+}
+::content dude-sidebar .search-result, ::content dude-sidebar .search-not-found {
+    color: #aaa;
+    padding: 10px;
+}
+::content dude-sidebar .search-result {
+    cursor: pointer;
+}
+::content dude-sidebar .search-result:hover {
+    color: #eee;
+}
+::content dude-sidebar .search-result.core-selected {
+    color: #eee;
+    padding: 10px;
+}
+::content dude-sidebar .search-result:not(:last-child) {
+    border-bottom: 1px solid #444;
+}
+::content dude-sidebar .search-result core-icon {
+    margin-right: 10px;
+}
+::content dude-sidebar cg-dropdown /deep/ #header {
+    text-transform: uppercase;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    padding: 10px;
+}
+::content dude-sidebar cg-dropdown .row {
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 10px 0;
+}
+::content dude-sidebar cg-dropdown .row:hover {
+    opacity: 1;
+}
+::content dude-sidebar cg-dropdown .row.core-selected {
+    display: none;
+}
+::content dude-sidebar .box input[is="core-input"] {
+    width: 100%;
+}
 
 :host {
     background: #333;
