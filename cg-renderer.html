@@ -62,9 +62,16 @@
                 this.renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
             },
 
+            createVariable: function (type, name) {
+                this.graph.addModel(new cg.Variable({
+                    "name": name,
+                    "value-type": type
+                }));
+            },
+
             createGroup: function (name) {
                 var _id = graph.getNextGroupId();
-                renderer.createSmartGroup(_id, name);
+                this.renderer.createSmartGroup(_id, name);
             },
 
             createAction: function (model, position) {
@@ -135,6 +142,10 @@
 
             hasSelectedEntities: function () {
                 return this.renderer.hasSelectedEntities();
+            },
+
+            hasSelection: function () {
+                return this.renderer.hasSelection();
             },
 
             zoomToFit: function () {

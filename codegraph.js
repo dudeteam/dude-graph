@@ -1435,6 +1435,15 @@ cg.Renderer = (function () {
     };
 
     /**
+     * Return if there are selected entities.
+     * @param rootOnly {Boolean?} return only selected entities with the graph as parent.
+     * @return {Boolean}
+     */
+    Renderer.prototype.hasSelection = function (rootOnly) {
+        return this.hasSelectedEntities(rootOnly) || this.getSelectedConnections()[0].length > 0;
+    };
+
+    /**
      * Remove select connections and entities.
      */
     Renderer.prototype.removeSelection = function () {

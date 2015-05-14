@@ -88,6 +88,14 @@
                 this._arrow = "arrow-drop-down";
             },
 
+            valueChanged: function (oldValue) {
+                this.$.selected.innerHTML = this.value;
+                this.$.menu.selected = this.value;
+                if (oldValue !== this.value) {
+                    this.fire("change", {oldValue: oldValue, newValue: this.value});
+                }
+            },
+
             /**
              * Polymer ready delegate.
              * @delegate

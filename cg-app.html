@@ -223,9 +223,7 @@
                 if (!this.$.renderer.createPicker(this._pickerPattern, this._pickerList, new pandora.Vec2(100, 100))) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
-                this._pickerBooleanValue = false;
-                this._pickerStringValue = "";
-                this._pickerNumberValue = 0;
+                this._reset();
             },
             editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
@@ -257,9 +255,10 @@
                 if (!this.$.renderer.replacePicker(this._pickerPattern, this._pickerList, entity)) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
-                this._pickerBooleanValue = false;
-                this._pickerStringValue = "";
-                this._pickerNumberValue = 0;
+                this._reset();
+            },
+            createVariable: function (type, value) {
+                this.$.renderer.createVariable(type, value);
             },
             showError: function (error) {
                 this.$.error.text = error.message;
@@ -288,6 +287,7 @@
                 this.$.renderer.addEventListener("ready", function () {
                     this._pickerPatternChanged();
                     this._actionNameChanged();
+                    this.fire("ready");
                 }.bind(this));
                 this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
                 if (navigator.platform.indexOf("Mac") !== -1) {
@@ -329,7 +329,7 @@
             },
             _updateDisabled: function () {
                 this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
-                this._commands.removeSelection.disabled = !this.$.renderer.hasSelectedEntities();
+                this._commands.removeSelection.disabled = !this.$.renderer.hasSelection();
             },
             _actionNameChanged: function () {
                 this._actionList = this.$.renderer.findModels({
@@ -375,6 +375,14 @@
             },
             _pickerBooleanValueChanged: function () {
                 this._pickerPattern = this._pickerBooleanValue === true ? "true" : "false";
+            },
+            _reset: function () {
+                this._pickerBooleanValue = false;
+                this._pickerStringValue = "";
+                this._pickerNumberValue = 0;
+                console.log(this._pickerType);
+                this._pickerType = "all types";
+                console.log(this._pickerType);
             }
         });
     </script>

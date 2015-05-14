@@ -113,6 +113,9 @@
         var demo = document.querySelector("#codegraph-demo");
         demo._graphLoaded = function () {
             this.$.codegraph.graphData = this.$.loader.response;
+            this.$.codegraph.addEventListener("ready", function () {
+                this.$.codegraph.createVariable("sound", "toto.mp3");
+            }.bind(this));
         };
     </script>
 </body>
