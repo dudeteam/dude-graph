@@ -582,21 +582,20 @@ cg.Group = (function () {
     /**
      * Represent a group instance into the graph, a group is a container for grouping sub-entities.
      * @param _id {Number|String} the unique id within the graph for this kind of entity.
-     * @param description {String} the description of the group content
+     * @param name {String} the description of the group content
      * @param position {pandora.Vec2} the position on the screen.
      * @param size {pandora.Vec2} the size on the screen.
      * @extends cg.Entity
      * @constructor
      */
-    var Group = pandora.class_("Group", cg.Entity, function (_id, description, position, size) {
-        cg.Entity.call(this, _id, this.constructor.typename, description, position);
+    var Group = pandora.class_("Group", cg.Entity, function (_id, _name, position, size) {
+        cg.Entity.call(this, _id, this.constructor.typename, _name, position);
 
         /**
          * Group can change its description.
          */
-        this._name = description;
         Object.defineProperty(this, "description", {
-            get: function () { return this._name; }.bind(this),
+            get: function () { return this.__name; }.bind(this),
             set: function (description) { this.__name = description; }.bind(this)
         });
 
@@ -2873,7 +2872,7 @@ cg.JSONSaver = (function () {
      */
     JSONSaver.prototype._saveVariable = function (model) {
         return {
-            "type": "getter",
+            "type": "variable",
             "value-type": model.valueType
         };
     };
@@ -2885,7 +2884,7 @@ cg.JSONSaver = (function () {
      */
     JSONSaver.prototype._saveValue = function (model) {
         return {
-            "type": "picker",
+            "type": "value",
             "value-type": model.valueType,
             "default": model.value
         };
@@ -2900,7 +2899,7 @@ cg.JSONSaver = (function () {
         return {
             "_type": pandora.uncamelcase(block._type, "-"),
             "_id": block._id,
-            "_name": block.name,
+            "_name": block.__name,
             "position": block.position.toArray(),
             "value": block.value
         };
@@ -2912,10 +2911,11 @@ cg.JSONSaver = (function () {
      * @private
      */
     JSONSaver.prototype._saveGroup = function (group) {
+        console.log(group._name);
         var data = {
             "_type": pandora.uncamelcase(group._type, "-"),
             "_id": group._id,
-            "_name": group.name,
+            "_name": group._name,
             "position": group.position.toArray(),
             "size": group.size.toArray(),
             "children": []

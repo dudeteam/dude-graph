@@ -13,6 +13,7 @@
     <link rel="import" href="../core-drawer-panel/core-drawer-panel.html">
     <link rel="import" href="../core-header-panel/core-header-panel.html">
     <link rel="import" href="../core-toolbar/core-toolbar.html">
+    <link rel="import" href="../core-ajax/core-ajax.html">
     <link rel="import" href="cg-app.html">
     <style>
         core-toolbar {
@@ -85,11 +86,18 @@
                 <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
                 <paper-button class="dark" on-click="{{showDialog}}">Disconnect</paper-button>
             </core-toolbar>
-            <cg-app logo="images/dude_logo_dark.png"
-                    graphUrl="examples/audigame.json"
-                    theme="audigame"
-                    layout horizontal fit>
-            </cg-app>
+            <template id="codegraph-demo" is="auto-binding">
+                <core-ajax id="loader"
+                           url="examples/audigame.json"
+                           handleAs="json"
+                           on-core-response="{{_graphLoaded}}"
+                           auto>
+                </core-ajax>
+                <cg-app id="codegraph" logo="images/dude_logo_dark.png"
+                        themeUrl="themes/audigame"
+                        layout horizontal fit>
+                </cg-app>
+            </template>
         </core-header-panel>
         <div drawer>
             <core-menu selected="2">
@@ -102,6 +110,10 @@
         </div>
     </core-drawer-panel>
     <script>
+        var demo = document.querySelector("#codegraph-demo");
+        demo._graphLoaded = function () {
+            this.$.codegraph.graphData = this.$.loader.response;
+        };
     </script>
 </body>
 </html>
