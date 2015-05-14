@@ -274,7 +274,7 @@
                 this.$.createPicker.value = "";
             },
             toJSON: function () {
-                return this.saver.save(this.graph);
+                return this.$.renderer.toJSON();
             },
             attached: function () {
                 this.styleUrl = this.themeUrl + "/app.css";

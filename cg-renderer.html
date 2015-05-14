@@ -184,6 +184,10 @@
                 this.fire("ready");
             },
 
+            toJSON: function () {
+                return this.saver.save(this.graph);
+            },
+
             graphDataChanged: function () {
                 if (this.config !== null) {
                     this._createGraph();
