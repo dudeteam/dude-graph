@@ -27,11 +27,17 @@
     border-left: none;
     border-right: none;
 }
+::content dude-sidebar {
+    overflow: auto;
+}
 ::content dude-sidebar .box {
     box-sizing: border-box;
     padding: 20px;
     margin: 15px 0;
     text-align: center;
+}
+::content dude-sidebar core-menu {
+    margin: 10px 0;
 }
 ::content dude-sidebar .search-list {
     overflow: auto;

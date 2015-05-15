@@ -371,18 +371,16 @@
                 this._pickerPattern = "\"" + this._pickerStringValue + "\"";
             },
             _pickerNumberValueChanged: function () {
-                this._pickerPattern = this._pickerNumberValue;
+                this._pickerPattern = this._pickerNumberValue.toString();
             },
             _pickerBooleanValueChanged: function () {
-                this._pickerPattern = this._pickerBooleanValue === true ? "true" : "false";
+                this._pickerPattern = (this._pickerBooleanValue === true).toString();
             },
             _reset: function () {
                 this._pickerBooleanValue = false;
                 this._pickerStringValue = "";
                 this._pickerNumberValue = 0;
-                console.log(this._pickerType);
                 this._pickerType = "all types";
-                console.log(this._pickerType);
             }
         });
     </script>
