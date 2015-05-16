@@ -2738,12 +2738,12 @@ cg.JSONLoader = (function () {
                         "name": "input"
                     },
                     {
-                        "type": "string",
-                        "name": "name"
+                        "type": typesData[i],
+                        "name": "variable"
                     },
                     {
                         "type": typesData[i],
-                        "name": "value"
+                        "name": "other"
                     }
                 ],
                 "outputs": [
