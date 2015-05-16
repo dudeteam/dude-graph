@@ -97,22 +97,22 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <cg-dropdown value="{{_pickerType}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
+                    <cg-dropdown value="{{_pickerLabel}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
                         <template repeat="{{type in _pickerTypes}}">
-                            <div class="type-{{type}} row" name="{{type}}">
+                            <div class="type-{{type.name}} row" name="{{type.label}}">
                                 <core-icon icon="remove"></core-icon>
-                                <span>{{type}}</span>
+                                <span>{{type.label}}</span>
                             </div>
                         </template>
                     </cg-dropdown>
                     <dude-state noroot state="{{_pickerType}}">
-                        <div class="box" data-state="boolean">
+                        <div class="box" data-state="test">
                             <paper-toggle-button checked="{{ _pickerBooleanValue }}"></paper-toggle-button>
                         </div>
-                        <div class="box" data-state="string">
+                        <div class="box" data-state="text">
                             <input value="{{ _pickerStringValue }}" placeholder="Type your text here..." is="core-input">
                         </div>
-                        <div class="box" data-state="number">
+                        <div class="box" data-state="time">
                             <input value="{{ _pickerNumberValue }}" type="number" is="core-input">
                         </div>
                     </dude-state>
@@ -156,9 +156,10 @@
                 //"undo": {label: "undo last action", icon: "undo", disabled: true},
                 //"redo": {label: "redo last action", icon: "redo", disabled: true}
             },
-            _pickerTypes: ["all types"],
+            _pickerTypes: [{"label": "all types", "name": "all types"}],
             _pickerList: [],
             _pickerType: "all types",
+            _pickerLabel: "all types",
             _pickerPattern: "",
             _pickerStringValue: "",
             _pickerNumberValue: 0,
@@ -346,7 +347,7 @@
                 });
             },
             graphDataChanged: function () {
-                this._pickerTypes = ["all types"].concat(this.graphData.types);
+                this._pickerTypes = [{"label": "all types", "name": "all types"}].concat(this.graphData.types);
             },
             _pickerTypeChanged: function (event) {
                 if (this.$.renderer.isReady) {
@@ -364,6 +365,13 @@
                             isInput: false,
                             type: this._pickerType
                         });
+                    }
+                }
+            },
+            _pickerLabelChanged: function () {
+                for (var i = 0; i < this._pickerTypes.length; ++i) {
+                    if (this._pickerTypes[i].label === this._pickerLabel) {
+                        this._pickerType = this._pickerTypes[i].name;
                     }
                 }
             },

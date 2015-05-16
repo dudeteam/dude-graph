@@ -1,9 +1,9 @@
 {
   "types": [
-    "string",
-    "sound",
-    "number",
-    "boolean"
+    {"name": "string", "label": "text"},
+    {"name": "sound", "label": "sound"},
+    {"name": "number", "label": "time"},
+    {"name": "boolean", "label": "test"}
   ],
   "models": {
     "start": {
