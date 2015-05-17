@@ -1,0 +1,49 @@
+<!--
+    A picker that handle all "native" types values. For now, the following types are handled:
+        - boolean
+        - number
+        - string
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../dude-gui/dude-state.html">
+<polymer-element name="cg-picker">
+    <template>
+        <dude-state noroot state="{{type}}">
+            <div class="box" data-state="boolean">
+                <paper-toggle-button checked="{{ _booleanValue }}"></paper-toggle-button>
+            </div>
+            <div class="box" data-state="string">
+                <input value="{{ _stringValue }}" placeholder="Type your text here..." is="core-input">
+            </div>
+            <div class="box" data-state="number">
+                <input value="{{ _numberValue }}" type="number" is="core-input">
+            </div>
+        </dude-state>
+    </template>
+    <script>
+        Polymer({
+            publish: {
+                type: "",
+                pattern: ""
+            },
+            reset: function () {
+                this._booleanValue = false;
+                this._numberValue = 0;
+                this._stringValue = "";
+            },
+            _booleanValue: false,
+            _numberValue: 0,
+            _stringValue: "",
+            _stringValueChanged: function () {
+                this.pattern = "\"" + this._stringValue + "\"";
+            },
+            _numberValueChanged: function () {
+                this.pattern = this._numberValue.toString();
+            },
+            _booleanValueChanged: function () {
+                this.pattern = (this._booleanValue === true).toString();
+            },
+        });
+    </script>
+</polymer-element>

@@ -17,3 +17,14 @@ paper-toggle-button::shadow #toggleContainer[checked] .toggle {
 paper-toggle-button::shadow #toggleContainer[checked] .toggle-ink {
     color: rgba(243, 156, 18, 1);
 }
+paper-button {
+    text-transform: none;
+}
+paper-button.primary {
+    background: rgb(243, 156, 18);
+    color: #222;
+}
+paper-button.full {
+    width: 100%;
+    margin: 0;
+}

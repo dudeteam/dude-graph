@@ -41,10 +41,6 @@
 ::content dude-sidebar core-menu {
     margin: 10px 0;
 }
-::content dude-sidebar .search-list {
-    overflow: auto;
-    max-height: 100%;
-}
 ::content dude-sidebar .search-result, ::content dude-sidebar .search-not-found {
     color: #aaa;
     padding: 10px;

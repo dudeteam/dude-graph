@@ -23,6 +23,7 @@
 <link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
 <link rel="import" href="cg-file-button.html">
+<link rel="import" href="cg-picker.html">
 <polymer-element name="cg-app" extends="dude-config">
     <template>
         <dude-panel id="panel"
@@ -105,21 +106,22 @@
                             </div>
                         </template>
                     </cg-dropdown>
-                    <dude-state noroot state="{{_pickerType}}">
-                        <div class="box" data-state="test">
-                            <paper-toggle-button checked="{{ _pickerBooleanValue }}"></paper-toggle-button>
-                        </div>
-                        <div class="box" data-state="text">
-                            <input value="{{ _pickerStringValue }}" placeholder="Type your text here..." is="core-input">
-                        </div>
-                        <div class="box" data-state="time">
-                            <input value="{{ _pickerNumberValue }}" type="number" is="core-input">
-                        </div>
-                    </dude-state>
+                    <cg-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></cg-picker>
+                    <!--<dude-state noroot state="{{_pickerType}}">-->
+                        <!--<div class="box" data-state="boolean">-->
+                            <!--<paper-toggle-button checked="{{ _pickerBooleanValue }}"></paper-toggle-button>-->
+                        <!--</div>-->
+                        <!--<div class="box" data-state="string">-->
+                            <!--<input value="{{ _pickerStringValue }}" placeholder="Type your text here..." is="core-input">-->
+                        <!--</div>-->
+                        <!--<div class="box" data-state="number">-->
+                            <!--<input value="{{ _pickerNumberValue }}" type="number" is="core-input">-->
+                        <!--</div>-->
+                    <!--</dude-state>-->
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>
-                    <core-menu on-core-activate="{{selectPicker}}">
+                    <core-menu id="searchList" on-core-activate="{{selectPicker}}">
                         <template repeat="{{picker in _pickerList}}">
                             <div class="search-result" name="{{picker.name}}">
                                 <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
@@ -127,6 +129,13 @@
                             </div>
                         </template>
                     </core-menu>
+                    <paper-button class="primary full">Add variable</paper-button>
+                </div>
+                <div data-state="editVariable">
+                    <paper-input-decorator id="nameDecorator" floatingLabel label="name" flex self-center>
+                        <input is="core-input" id="nameInput" type="text" value="{{ _pickerPattern }}">
+                    </paper-input-decorator>
+                    <paper-button class="primary">Delete</paper-button>
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -161,9 +170,9 @@
             _pickerType: "all types",
             _pickerLabel: "all types",
             _pickerPattern: "",
-            _pickerStringValue: "",
-            _pickerNumberValue: 0,
-            _pickerBooleanValue: false,
+//            _pickerStringValue: "",
+//            _pickerNumberValue: 0,
+//            _pickerBooleanValue: false,
             _actionList: [],
             _actionName: null,
             _editMode: false,
@@ -224,7 +233,8 @@
                 if (!this.$.renderer.createPicker(this._pickerPattern, this._pickerList, new pandora.Vec2(100, 100))) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
-                this._reset();
+                this.$.pickerElement.reset();
+//                this._reset();
             },
             editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
@@ -256,7 +266,8 @@
                 if (!this.$.renderer.replacePicker(this._pickerPattern, this._pickerList, entity)) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
-                this._reset();
+                this.$.pickerElement.reset();
+//                this._reset();
             },
             createVariable: function (type, value) {
                 this.$.renderer.createVariable(type, value);
@@ -270,6 +281,7 @@
             },
             selectPicker: function (event, detail) {
                 this.$.createPicker.value = detail.item.getAttribute("name");
+                this.$.sidebar.state = "editVariable";
             },
             resetPicker: function () {
                 this.$.createPicker.value = "";
@@ -375,21 +387,21 @@
                     }
                 }
             },
-            _pickerStringValueChanged: function () {
-                this._pickerPattern = "\"" + this._pickerStringValue + "\"";
-            },
-            _pickerNumberValueChanged: function () {
-                this._pickerPattern = this._pickerNumberValue.toString();
-            },
-            _pickerBooleanValueChanged: function () {
-                this._pickerPattern = (this._pickerBooleanValue === true).toString();
-            },
-            _reset: function () {
-                this._pickerBooleanValue = false;
-                this._pickerStringValue = "";
-                this._pickerNumberValue = 0;
-                this._pickerType = "all types";
-            }
+//            _pickerStringValueChanged: function () {
+//                this._pickerPattern = "\"" + this._pickerStringValue + "\"";
+//            },
+//            _pickerNumberValueChanged: function () {
+//                this._pickerPattern = this._pickerNumberValue.toString();
+//            },
+//            _pickerBooleanValueChanged: function () {
+//                this._pickerPattern = (this._pickerBooleanValue === true).toString();
+//            },
+//            _reset: function () {
+//                this._pickerBooleanValue = false;
+//                this._pickerStringValue = "";
+//                this._pickerNumberValue = 0;
+//                this._pickerType = "all types";
+//            }
         });
     </script>
 </polymer-element>

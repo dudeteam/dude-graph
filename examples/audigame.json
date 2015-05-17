@@ -135,6 +135,10 @@
     "default time": {
       "type": "variable",
       "value-type": "number"
+    },
+    "long time": {
+      "type": "variable",
+      "value-type": "number"
     }
   },
   "children": [
