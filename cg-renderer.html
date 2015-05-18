@@ -4,8 +4,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-ajax/core-ajax.html">
-<link rel="import" href="../dude-gui/dude-config.html">
-<polymer-element name="cg-renderer" extends="dude-config">
+<polymer-element name="cg-renderer">
     <template>
         <style>
             #svg {
@@ -160,11 +159,12 @@
                 return this.renderer.getLastSelectedEntity();
             },
 
-            /**
-             * Create the graph when its config and data are loaded.
-             * @private
-             */
-            _createGraph: function () {
+            toJSON: function () {
+                return this.saver.save(this.graph);
+            },
+
+            graphDataChanged: function () {
+                this.config = {};
                 this.$.svg.innerHTML = "";
                 this.graph = new cg.Graph();
                 this.loader = new cg.JSONLoader();
@@ -182,24 +182,6 @@
                 this.renderer.render();
                 this._isReady = true;
                 this.fire("ready");
-            },
-
-            toJSON: function () {
-                return this.saver.save(this.graph);
-            },
-
-            graphDataChanged: function () {
-                if (this.config !== null) {
-                    this._createGraph();
-                }
-            },
-
-            ready: function () {
-                this.addEventListener("dude-config-ready", function () {
-                    if (this.graphData !== null) {
-                        this._createGraph();
-                    }
-                });
             }
         });
     </script>

@@ -1974,7 +1974,7 @@ cg.Renderer.prototype._updatePoints = function (points) {
             "x": 0,
             "y" : 0
         });
-    circles.classed("empty", function (point) { return !point.connections.length; });
+    circles.classed("type-filter-fill", function (point) { return !point.connections.length; });
     points
         .select(".description")
         .text(function(point) { return point.name; })
@@ -2054,7 +2054,11 @@ cg.Renderer.prototype._createConnections = function (connections) {
         .enter()
         .append("svg:path")
         .attr({
-            "class": function (connection) { return ["connection", "empty", "type-" + connection.outputPoint.type].join(" "); },
+            "class": function (connection) { return [
+                "connection",
+                "type-filter-fill",
+                "type-" + connection.outputPoint.type
+            ].join(" "); },
             "style": "stroke-width: 2px;"
         })
         .on("mousedown", function () {

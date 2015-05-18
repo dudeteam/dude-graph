@@ -91,7 +91,7 @@
                     <core-menu on-core-activate="{{selectAction}}">
                         <template repeat="{{action in _actionList}}">
                             <div class="search-result" name="{{action.name}}">
-                                <core-icon class="type-stream" icon="check-box-outline-blank"></core-icon>
+                                <core-icon class="type-filter-stroke type-stream" icon="check-box-outline-blank"></core-icon>
                                 <span>{{action.name}}</span>
                             </div>
                         </template>
@@ -100,31 +100,22 @@
                 <div data-state="picker">
                     <cg-dropdown value="{{_pickerLabel}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
                         <template repeat="{{type in _pickerTypes}}">
-                            <div class="type-{{type.name}} row" name="{{type.label}}">
+                            <div class="type-filter-stroke type-{{type.name}} row" name="{{type.label}}">
                                 <core-icon icon="remove"></core-icon>
                                 <span>{{type.label}}</span>
                             </div>
                         </template>
                     </cg-dropdown>
                     <cg-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></cg-picker>
-                    <!--<dude-state noroot state="{{_pickerType}}">-->
-                        <!--<div class="box" data-state="boolean">-->
-                            <!--<paper-toggle-button checked="{{ _pickerBooleanValue }}"></paper-toggle-button>-->
-                        <!--</div>-->
-                        <!--<div class="box" data-state="string">-->
-                            <!--<input value="{{ _pickerStringValue }}" placeholder="Type your text here..." is="core-input">-->
-                        <!--</div>-->
-                        <!--<div class="box" data-state="number">-->
-                            <!--<input value="{{ _pickerNumberValue }}" type="number" is="core-input">-->
-                        <!--</div>-->
-                    <!--</dude-state>-->
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>
                     <core-menu id="searchList" on-core-activate="{{selectPicker}}">
                         <template repeat="{{picker in _pickerList}}">
                             <div class="search-result" name="{{picker.name}}">
-                                <core-icon class="type-{{picker.data.valueType}}" icon="radio-button-off"></core-icon>
+                                <core-icon class="type-filter-stroke type-{{picker.data.valueType}}"
+                                           icon="radio-button-off">
+                                </core-icon>
                                 <span>{{picker.name}}</span>
                             </div>
                         </template>
@@ -139,7 +130,6 @@
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
-                         styleUrl="{{themeUrl}}/graph.css"
                          configUrl="{{themeUrl}}/config.json"
                          graphData="{{graphData}}"
                          content>
@@ -170,9 +160,6 @@
             _pickerType: "all types",
             _pickerLabel: "all types",
             _pickerPattern: "",
-//            _pickerStringValue: "",
-//            _pickerNumberValue: 0,
-//            _pickerBooleanValue: false,
             _actionList: [],
             _actionName: null,
             _editMode: false,
@@ -290,13 +277,10 @@
                 return this.$.renderer.toJSON();
             },
             attached: function () {
-                this.styleUrl = this.themeUrl + "/app.css";
+//                this.styleUrl = this.themeUrl + "/app.css";
                 this.$.renderer.addEventListener("error", function (e) {
                     this.showError(e.detail.error);
                 }.bind(this));
-                this.$.renderer.addEventListener("picker.edit", function (e) {
-                    console.log("edit picker", e.detail.picker);
-                });
                 this.$.renderer.addEventListener("ready", function () {
                     this._pickerPatternChanged();
                     this._actionNameChanged();
@@ -386,22 +370,7 @@
                         this._pickerType = this._pickerTypes[i].name;
                     }
                 }
-            },
-//            _pickerStringValueChanged: function () {
-//                this._pickerPattern = "\"" + this._pickerStringValue + "\"";
-//            },
-//            _pickerNumberValueChanged: function () {
-//                this._pickerPattern = this._pickerNumberValue.toString();
-//            },
-//            _pickerBooleanValueChanged: function () {
-//                this._pickerPattern = (this._pickerBooleanValue === true).toString();
-//            },
-//            _reset: function () {
-//                this._pickerBooleanValue = false;
-//                this._pickerStringValue = "";
-//                this._pickerNumberValue = 0;
-//                this._pickerType = "all types";
-//            }
+            }
         });
     </script>
 </polymer-element>
