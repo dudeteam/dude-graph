@@ -8,11 +8,12 @@
 <link rel="import" href="../core-menu/core-menu.html">
 <link rel="import" href="../core-item/core-item.html">
 <link rel="import" href="../dude-gui/dude-panel.html">
-<link rel="import" href="../dude-gui/dude-config.html">
 <link rel="import" href="../dude-gui/dude-sidebar.html">
 <link rel="import" href="../dude-gui/dude-toolbar.html">
 <link rel="import" href="../dude-gui/dude-toolbar-command.html">
 <link rel="import" href="../dude-gui/dude-toolbar-input.html">
+<link rel="import" href="../dude-gui/dude-picker.html">
+<link rel="import" href="../dude-gui/dude-dropdown.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-dropdown/paper-dropdown.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -20,10 +21,7 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="cg-dropdown.html">
 <link rel="import" href="cg-renderer.html">
-<link rel="import" href="cg-file-button.html">
-<link rel="import" href="cg-picker.html">
 <polymer-element name="cg-app">
     <template>
         <dude-panel id="panel"
@@ -97,15 +95,15 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <cg-dropdown value="{{_pickerLabel}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
+                    <dude-dropdown value="{{_pickerLabel}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
                         <template repeat="{{type in _pickerTypes}}">
                             <div class="type-filter-stroke type-{{type.name}} row" name="{{type.label}}">
                                 <core-icon icon="remove"></core-icon>
                                 <span>{{type.label}}</span>
                             </div>
                         </template>
-                    </cg-dropdown>
-                    <cg-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></cg-picker>
+                    </dude-dropdown>
+                    <dude-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></dude-picker>
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>

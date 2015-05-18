@@ -44,23 +44,23 @@ html /deep/ .search-result core-icon {
     margin-right: 10px;
 }
 
-/* Cg Dropdown */
+/* Dude Dropdown */
 
-html /deep/ cg-dropdown /deep/ #header {
+html /deep/ dude-dropdown /deep/ #header {
     text-transform: uppercase;
     border-bottom: 1px solid #444;
     cursor: pointer;
     padding: 10px;
 }
-html /deep/ cg-dropdown .row {
+html /deep/ dude-dropdown .row {
     opacity: 0.6;
     cursor: pointer;
     padding: 10px 0;
 }
-html /deep/ cg-dropdown .row:hover {
+html /deep/ dude-dropdown .row:hover {
     opacity: 1;
 }
-html /deep/ cg-dropdown .row.core-selected {
+html /deep/ dude-dropdown .row.core-selected {
     display: none;
 }
 
