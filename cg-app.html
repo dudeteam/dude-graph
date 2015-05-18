@@ -24,12 +24,11 @@
 <link rel="import" href="cg-renderer.html">
 <link rel="import" href="cg-file-button.html">
 <link rel="import" href="cg-picker.html">
-<polymer-element name="cg-app" extends="dude-config">
+<polymer-element name="cg-app">
     <template>
         <dude-panel id="panel"
                     name="story-editor"
-                    styleUrl="{{themeUrl}}/panel.css"
-                    configUrl="{{themeUrl}}/panel.json"
+                    config="{{config.panel}}"
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
@@ -130,8 +129,8 @@
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
-                         configUrl="{{themeUrl}}/config.json"
-                         graphData="{{graphData}}"
+                         config="{{config.graph}}"
+                         graph="{{graphData}}"
                          content>
             </cg-renderer>
         </dude-panel>
@@ -141,7 +140,28 @@
     <script>
         Polymer({
             publish: {
-                themeUrl: "",
+                config: {
+                    "panel": {
+                        "toolbar": { "position": "top" },
+                        "sidebar": { "position": "left" }
+                    },
+                    "graph": {
+                        "group": { "borderRadius": 3 },
+                        "action": { "borderRadius": 3 },
+                        "value": { "borderRadius": 20 },
+                        "variable": { "borderRadius": 20 },
+                        "background-grid": {
+                            "line": {
+                                "stroke": "rgba(0, 0, 0, 0.1)",
+                                "stroke-width": 1
+                            },
+                            "big-line": {
+                                "stroke": "rgba(0, 0, 0, 0.8)",
+                                "stroke-width": 1
+                            }
+                        }
+                    }
+                },
                 graphData: null
             },
             searchLimit: 10,
@@ -221,7 +241,6 @@
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
                 this.$.pickerElement.reset();
-//                this._reset();
             },
             editEntity: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
@@ -254,7 +273,6 @@
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
                 this.$.pickerElement.reset();
-//                this._reset();
             },
             createVariable: function (type, value) {
                 this.$.renderer.createVariable(type, value);

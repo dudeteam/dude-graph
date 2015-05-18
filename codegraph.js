@@ -2163,6 +2163,7 @@ cg.Renderer.prototype._updateGroupMasks = function() {
  * @private
  */
 cg.Renderer.prototype._createGroups = function (groups) {
+    var renderer = this;
     var createdGroups = groups
         .enter()
         .append("svg:g")
@@ -2388,14 +2389,14 @@ cg.Renderer.prototype._heavyUpdateBlocks = function (blocks) {
  */
 cg.Renderer.prototype._updateBlockAction = function (model, block, element) {
     element.select(".title").text(block._name);
-    block.data.computedWidth = renderer._config.block.padding * 2;
+    block.data.computedWidth = this._config.block.padding * 2;
     block.data.computedWidth += Math.max(
         this._getBBox(element.select(".title")).width,
-        block.data.maxInputWidth + block.data.maxOutputWidth + renderer._config.block.centerSpacing
+        block.data.maxInputWidth + block.data.maxOutputWidth + this._config.block.centerSpacing
     );
-    block.data.computedHeight = renderer._config.block.heading;
+    block.data.computedHeight = this._config.block.heading;
     block.data.computedHeight += block.data.pointHeight * Math.max(block.inputs.length, block.outputs.length);
-    block.data.computedHeadingOffset = renderer._config.block.heading;
+    block.data.computedHeadingOffset = this._config.block.heading;
     element.select(".title").attr({x: block.data.computedWidth / 2, y: this._config.block.padding});
 };
 
@@ -2410,10 +2411,10 @@ cg.Renderer.prototype._updateBlockVariable = function (model, block, element) {
     element.select(".title")
         .attr({x: this._config.block.padding, y: this._config.block.padding})
         .text(block._name);
-    block.data.computedWidth = renderer._config.block.padding * 2;
+    block.data.computedWidth = this._config.block.padding * 2;
     block.data.computedWidth += this._getBBox(element.select(".title")).width;
-    block.data.computedWidth += renderer._config.block.padding + renderer._config.point['circle-size'];
-    block.data.computedHeight = renderer._config.block.heading;
+    block.data.computedWidth += this._config.block.padding + this._config.point['circle-size'];
+    block.data.computedHeight = this._config.block.heading;
     block.data.computedHeadingOffset = block.data.computedHeight / 2;
 };
 
@@ -2425,15 +2426,15 @@ cg.Renderer.prototype._updateBlockVariable = function (model, block, element) {
  * @private
  */
 cg.Renderer.prototype._updateBlockValue = function (model, block, element) {
-    block.data.computedWidth = renderer._config.block.padding * 2;
+    block.data.computedWidth = this._config.block.padding * 2;
     var className = pandora.camelcase(block.model.valueType, "-");
     if (this["_updateValue" + className] === undefined) {
         this.emit("error", new pandora.MissingOverloadError("updateValue" + className, "Renderer"));
     } else {
         this["_updateValue" + className](block, element);
     }
-    block.data.computedWidth += renderer._config.block.padding + renderer._config.point['circle-size'];
-    block.data.computedHeight = renderer._config.block.heading;
+    block.data.computedWidth += this._config.block.padding + this._config.point['circle-size'];
+    block.data.computedHeight = this._config.block.heading;
     block.data.computedHeadingOffset = block.data.computedHeight / 2;
 };
 

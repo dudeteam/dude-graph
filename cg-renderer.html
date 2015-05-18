@@ -44,25 +44,30 @@
             publish: {
 
                 /**
-                 * This is the url of the graph data to load.
-                 * @attribute graphData Json data representing the graph to render
+                 * JSON data to create the graph.
                  * @type {Object}
                  */
-                graphData: null
+                graph: null,
+
+                /**
+                 * Some configuration settings for the graph rendering.
+                 * @type {Object}
+                 */
+                config: {}
 
             },
             _isReady: false,
             get isReady() { return this._isReady; },
 
             handleErrors: function () {
-                this.loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this.saver.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this.graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this.renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+                this._loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+                this._saver.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+                this._graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+                this._renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
             },
 
             createVariable: function (type, name) {
-                this.graph.addModel(new cg.Variable({
+                this._graph.addModel(new cg.Variable({
                     "name": name,
                     "value-type": type
                 }));
@@ -70,12 +75,12 @@
 
             createGroup: function (name) {
                 var _id = graph.getNextGroupId();
-                this.renderer.createSmartGroup(_id, name);
+                this._renderer.createSmartGroup(_id, name);
             },
 
             createAction: function (model, position) {
-                var block = new cg.Block(this.graph.getNextBlockId(), model, position);
-                this.graph.addEntity(block, this.graph);
+                var block = new cg.Block(this._graph.getNextBlockId(), model, position);
+                this._graph.addEntity(block, this._graph);
                 return block;
             },
 
@@ -84,8 +89,8 @@
                 if (model === null) {
                     return null;
                 }
-                var block = new cg.Block(this.graph.getNextBlockId(), model, position);
-                this.graph.addEntity(block, parent || this.graph);
+                var block = new cg.Block(this._graph.getNextBlockId(), model, position);
+                this._graph.addEntity(block, parent || this._graph);
                 return block;
             },
 
@@ -93,9 +98,9 @@
                 var block = this.createPicker(pattern, searchResult, entity.position, entity.parent);
                 if (block !== null) {
                     pandora.forEach(entity.outputs[0].connections, function (connection) {
-                        this.graph.addConnection(new cg.Connection(block.outputs[0], connection.inputPoint));
+                        this._graph.addConnection(new cg.Connection(block.outputs[0], connection.inputPoint));
                     }.bind(this));
-                    this.graph.removeEntity(entity);
+                    this._graph.removeEntity(entity);
                 }
                 return block;
             },
@@ -136,52 +141,55 @@
             },
 
             removeSelection: function () {
-                this.renderer.removeSelection();
+                this._renderer.removeSelection();
             },
 
             hasSelectedEntities: function () {
-                return this.renderer.hasSelectedEntities();
+                return this._renderer.hasSelectedEntities();
             },
 
             hasSelection: function () {
-                return this.renderer.hasSelection();
+                return this._renderer.hasSelection();
             },
 
             zoomToFit: function () {
-                this.renderer.zoomToFit();
+                this._renderer.zoomToFit();
             },
 
             findModels: function (options) {
-                return this.graph.findModels(options);
+                return this._graph.findModels(options);
             },
 
             getLastSelectedEntity: function() {
-                return this.renderer.getLastSelectedEntity();
+                return this._renderer.getLastSelectedEntity();
             },
 
             toJSON: function () {
-                return this.saver.save(this.graph);
+                return this._saver.save(this._graph);
             },
 
-            graphDataChanged: function () {
-                this.config = {};
+            graphChanged: function () {
                 this.$.svg.innerHTML = "";
-                this.graph = new cg.Graph();
-                this.loader = new cg.JSONLoader();
-                this.saver = new cg.JSONSaver();
-                this.renderer = new cg.Renderer(this.graph, this.$.svg, this.config);
-                window.graph = this.graph;
-                window.renderer = this.renderer;
-                window.loader = this.loader;
-                window.saver = this.saver;
+                this._graph = new cg.Graph();
+                this._loader = new cg.JSONLoader();
+                this._saver = new cg.JSONSaver();
+                this._renderer = new cg.Renderer(this._graph, this.$.svg, this.config);
                 this.handleErrors();
-                this.renderer.on("picker.edit", function (picker) {
+                this._renderer.on("picker.edit", function (picker) {
                     this.fire("picker.edit", {picker: picker});
                 }.bind(this));
-                this.loader.load(this.graph, this.graphData);
-                this.renderer.render();
+                this._loader.load(this._graph, this.graph);
+                this._renderer.render();
                 this._isReady = true;
                 this.fire("ready");
+
+                // FOR DEBUG
+
+                window.cgGraph = this._graph;
+                window.cgRenderer = this._renderer;
+                window.cgLoader = this._loader;
+                window.cgSaver = this._saver;
+
             }
         });
     </script>
