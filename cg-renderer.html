@@ -66,10 +66,11 @@
                 this._renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
             },
 
-            createVariable: function (type, name) {
+            createVariable: function (type, name, value) {
                 this._graph.addModel(new cg.Variable({
                     "name": name,
-                    "value-type": type
+                    "value-type": type,
+                    "value": value
                 }));
             },
 

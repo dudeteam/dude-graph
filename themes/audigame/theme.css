@@ -12,22 +12,24 @@ html /deep/ .type-number { color: rgba(33, 150, 243, 1);  fill: rgba(33, 150, 24
  * General
  */
 
+html /deep/ body {
+    font-family: "Lato", sans-serif;
+    font-weight: 300;
+}
+
 html /deep/ .box {
     background: rgba(0, 0, 0, .2);
     border-radius: 3px;
 }
 
-html /deep/ .notification {
+html /deep/ paper-toast {
     color: #eee;
-    font-family: "Lato", sans-serif;
-    font-weight: 300;
     border-radius: 3px;
     font-size: .8em;
-    box-shadow: none;
 }
 
-html /deep/ #error { background: rgba(231, 76, 60, 0.8); }
-html /deep/ #success { background: rgba(46, 204, 113, 0.8); }
+html /deep/ paper-toast.error { background: rgba(231, 76, 60, 0.8); }
+html /deep/ paper-toast.success { background: rgba(46, 204, 113, 0.8); }
 html /deep/ paper-item {
     color: #444;
 }
@@ -54,8 +56,6 @@ html /deep/ paper-button.full {
  */
 
 core-toolbar {
-    font-family: "Lato", sans-serif;
-    font-weight: 300;
     background: rgb(243, 156, 18);
 }
 core-toolbar paper-button {
@@ -72,8 +72,6 @@ core-toolbar paper-button span {
     padding-left: 5px;
 }
 [drawer] {
-    font-family: "Lato", sans-serif;
-    font-weight: 300;
     background: #222;
     color: #aaa;
 }

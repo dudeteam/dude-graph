@@ -120,20 +120,21 @@
                     <paper-button class="primary full">Add variable</paper-button>
                 </div>
                 <div data-state="editVariable">
-                    <paper-input-decorator id="nameDecorator" floatingLabel label="name" flex self-center>
-                        <input is="core-input" id="nameInput" type="text" value="{{ _pickerPattern }}">
-                    </paper-input-decorator>
-                    <paper-button class="primary">Delete</paper-button>
+                    <paper-button class="primary full" on-click="{{resetSearch}}">Back</paper-button>
+                    <!--<paper-input-decorator id="nameDecorator" floatingLabel label="name" flex self-center>-->
+                        <!--<input is="core-input" id="nameInput" type="text" value="{{ _pickerPattern }}">-->
+                    <!--</paper-input-decorator>-->
+                    <!--<paper-button class="primary">Delete</paper-button>-->
                 </div>
             </dude-sidebar>
             <cg-renderer id="renderer"
                          config="{{config.graph}}"
-                         graph="{{graphData}}"
+                         graph="{{graph}}"
                          content>
             </cg-renderer>
         </dude-panel>
-        <paper-toast class="notification" id="error"></paper-toast>
-        <paper-toast class="notification" id="success"></paper-toast>
+        <paper-toast class="error" id="error"></paper-toast>
+        <paper-toast class="success" id="success"></paper-toast>
     </template>
     <script>
         Polymer({
@@ -160,7 +161,7 @@
                         }
                     }
                 },
-                graphData: null
+                graph: null
             },
             searchLimit: 10,
             _commands: {
@@ -272,8 +273,8 @@
                 }
                 this.$.pickerElement.reset();
             },
-            createVariable: function (type, value) {
-                this.$.renderer.createVariable(type, value);
+            createVariable: function (type, name, value) {
+                this.$.renderer.createVariable(type, name, value);
             },
             showError: function (error) {
                 this.$.error.text = error.message;
@@ -289,11 +290,14 @@
             resetPicker: function () {
                 this.$.createPicker.value = "";
             },
+            resetSearch: function () {
+                this.$.sidebar.state = "picker";
+                this._pickerPattern = "";
+            },
             toJSON: function () {
                 return this.$.renderer.toJSON();
             },
             attached: function () {
-//                this.styleUrl = this.themeUrl + "/app.css";
                 this.$.renderer.addEventListener("error", function (e) {
                     this.showError(e.detail.error);
                 }.bind(this));
@@ -358,8 +362,8 @@
                     pattern: this._pickerPattern
                 });
             },
-            graphDataChanged: function () {
-                this._pickerTypes = [{"label": "all types", "name": "all types"}].concat(this.graphData.types);
+            graphChanged: function () {
+                this._pickerTypes = [{"label": "all types", "name": "all types"}].concat(this.graph.types);
             },
             _pickerTypeChanged: function (event) {
                 if (this.$.renderer.isReady) {

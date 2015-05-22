@@ -177,6 +177,15 @@ cg.Variable = (function () {
             get: function () { return this._outputs[0].type; }
         });
 
+        /**
+         * Contains the actual value of this variable. It can be anything that can be represented as a JSON object.
+         * @type {*}
+         */
+        this._value = data["value"];
+        Object.defineProperty(this, "value", {
+            get: function () { return this._value; }.bind(this)
+        });
+
     });
 
 })();
@@ -1846,7 +1855,7 @@ var removeCursorConnection = function (cursorConnection) {
  * @return {d3.selection}
  * @private
  */
-var getCursorPointConnections = function () {
+var getCursorPointConnections = function (renderer) {
     return renderer._cursorConnectionLayer
         .selectAll(".connection")
         .data(cursorConnections, function (cursorConnection) {
@@ -1900,7 +1909,7 @@ cg.Renderer.prototype._createPoints = function (points) {
                 point.data.cursorPoint = new cg.Renderer.Point(point, touchPosition);
                 point.data.cursorConnection = new cg.Connection(point.data.cursorPoint, point);
                 addCursorConnection(point.data.cursorConnection);
-                renderer._renderConnections(getCursorPointConnections());
+                renderer._renderConnections(getCursorPointConnections(renderer));
                 pandora.preventCallback(d3.event.sourceEvent);
             })
             .on("drag", function () {
@@ -1920,7 +1929,7 @@ cg.Renderer.prototype._createPoints = function (points) {
                 } else {
                     renderer._graph.emit("error", new cg.GraphError("No " + (point.data.cursorPoint.isInput ? "input" : "output") + " found around"));
                 }
-                renderer._removeConnections(getCursorPointConnections());
+                renderer._removeConnections(getCursorPointConnections(renderer));
                 delete point.data.cursorPoint;
                 delete point.data.cursorConnection;
             })
@@ -2924,7 +2933,8 @@ cg.JSONSaver = (function () {
     JSONSaver.prototype._saveVariable = function (model) {
         return {
             "type": "variable",
-            "value-type": model.valueType
+            "value-type": model.valueType,
+            "value": model.value
         };
     };
 

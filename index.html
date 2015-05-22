@@ -30,7 +30,7 @@
                 <core-ajax id="loader"
                            url="examples/audigame.json"
                            handleAs="json"
-                           on-core-response="{{_graphLoaded}}"
+                           on-core-response="{{graphLoaded}}"
                            auto>
                 </core-ajax>
                 <cg-app id="codegraph" logo="images/dude_logo_dark.png"
@@ -51,10 +51,12 @@
     </core-drawer-panel>
     <script>
         var demo = document.querySelector("#codegraph-demo");
-        demo._graphLoaded = function () {
-            this.$.codegraph.graphData = this.$.loader.response;
+        demo.isLoading = true;
+        demo.graphLoaded = function () {
+            demo.isLoading = false;
+            this.$.codegraph.graph = this.$.loader.response;
             this.$.codegraph.addEventListener("ready", function () {
-                this.$.codegraph.createVariable("sound", "toto.mp3");
+                this.$.codegraph.createVariable("sound", "toto.mp3", "oijo2ij34o2i3j423uh4i23ueone2u3h2i3h24");
             }.bind(this));
         };
     </script>
