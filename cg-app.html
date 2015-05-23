@@ -270,7 +270,7 @@
                 }
             },
             createPicker: function () {
-                if (!this.$.renderer.createPicker(this._pickerPattern, this._pickerList, new pandora.Vec2(100, 100))) {
+                if (!this.$.renderer.createPicker(this._pickerPattern, this._getBestModel(), new pandora.Vec2(100, 100))) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
                 this.$.pickerElement.reset();
@@ -302,7 +302,7 @@
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 this._editMode = false;
-                if (!this.$.renderer.replacePicker(this._pickerPattern, this._pickerList, entity)) {
+                if (!this.$.renderer.replacePicker(this._pickerPattern, this._getBestModel(), entity)) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
                 }
                 this.$.pickerElement.reset();
@@ -373,12 +373,22 @@
             selectPicker: function (event, detail) {
                 this.$.createPicker.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editVariable";
-                this._currentVariable = this.$.renderer.findModels({
+                this._currentVariable = this._getBestModel();
+            },
+            _getBestModel: function () {
+                var models = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: 'variable',
                     pattern: this._pickerPattern,
                     isInput: false
-                })[0];
+                });
+                var model = models[0];
+                pandora.forEach(models, function (m) {
+                    if (m.name === this._pickerPattern) {
+                        model = m;
+                    }
+                }.bind(this));
+                return model;
             },
             resetPicker: function () {
                 this.$.sidebar.state = "picker";

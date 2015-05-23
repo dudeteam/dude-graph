@@ -163,13 +163,10 @@
             },
 
             _getVariableModel: function (searchResult) {
-                if (searchResult.length > 0) {
-                    return new cg.Variable({
-                        "value-type": searchResult[0].data.valueType,
-                        "name": searchResult[0].name
-                    });
-                }
-                return null;
+                return new cg.Variable({
+                    "value-type": searchResult.data.valueType,
+                    "name": searchResult.name
+                });
             },
 
             removeSelection: function () {
