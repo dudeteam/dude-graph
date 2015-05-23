@@ -379,6 +379,7 @@
             resetPicker: function () {
                 this.$.sidebar.state = "picker";
                 this._pickerPattern = "";
+                this.$.pickerElement.reset();
             },
             toJSON: function () {
                 return this.$.renderer.toJSON();
