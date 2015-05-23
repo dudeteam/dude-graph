@@ -21,7 +21,8 @@
       "inputs": [
         {
           "type": "stream",
-          "name": "input"
+          "name": "input",
+          "max": -1
         },
         {
           "type": "string",
@@ -52,7 +53,8 @@
       "inputs": [
         {
           "type": "stream",
-          "name": "input"
+          "name": "input",
+          "max": -1
         },
         {
           "type": "string",
@@ -70,7 +72,8 @@
       "inputs": [
         {
           "type": "stream",
-          "name": "input"
+          "name": "input",
+          "max": -1
         },
         {
           "type": "boolean",
