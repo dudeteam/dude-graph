@@ -399,32 +399,31 @@
                 });
             },
             _pickerPatternChanged: function () {
-                this._pickerList = this.$.renderer.findModels({
-                    limit: this.searchLimit,
-                    modelType: 'variable',
-                    pattern: this._pickerPattern
-                });
+                this._updatePickerList();
             },
             graphChanged: function () {
                 this._pickerTypes = [{"label": "all types", "name": "all types"}].concat(this.graph.types);
             },
             _pickerTypeChanged: function (event) {
                 if (this.$.renderer.isReady) {
-                    if (this._pickerType === "all types") {
-                        this._pickerList = this.$.renderer.findModels({
-                            limit: this.searchLimit,
-                            modelType: 'variable',
-                            pattern: this._pickerPattern
-                        });
-                    } else {
-                        this._pickerList = this.$.renderer.findModels({
-                            limit: this.searchLimit,
-                            modelType: 'variable',
-                            pattern: this._pickerPattern,
-                            isInput: false,
-                            type: this._pickerType
-                        });
-                    }
+                    this._updatePickerList();
+                }
+            },
+            _updatePickerList: function () {
+                if (this._pickerType === "all types") {
+                    this._pickerList = this.$.renderer.findModels({
+                        limit: this.searchLimit,
+                        modelType: 'variable',
+                        pattern: this._pickerPattern
+                    });
+                } else {
+                    this._pickerList = this.$.renderer.findModels({
+                        limit: this.searchLimit,
+                        modelType: 'variable',
+                        pattern: this._pickerPattern,
+                        isInput: false,
+                        type: this._pickerType
+                    });
                 }
             }
         });
