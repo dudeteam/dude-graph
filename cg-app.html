@@ -100,9 +100,8 @@
                 </div>
                 <div data-state="picker">
                     <cg-type-dropdown type="{{_pickerType}}"
-                                      label="{{_label}}"
                                       types="{{_pickerTypes}}"
-                                      on-change="{{resetPicker}}"
+                                      on-change="{{_resetPickerPattern}}"
                                       hidden?="{{_editMode}}">
                     </cg-type-dropdown>
                     <dude-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></dude-picker>
@@ -123,14 +122,16 @@
                 </div>
                 <cg-variable-inspector data-state="editVariable"
                                        variable="{{_currentVariable}}"
+                                       types="{{graph.types}}"
                                        on-submit="{{_editVariable}}"
                                        on-delete="{{_deleteVariable}}"
                                        editMode>
                 </cg-variable-inspector>
                 <cg-variable-inspector data-state="createVariable"
                                        variable="{{_currentVariable}}"
+                                       types="{{graph.types}}"
                                        on-submit="{{_createVariable}}"
-                                       on-delete="{{_cancelVariable}}">
+                                       on-cancel="{{_cancelVariable}}">
                 </cg-variable-inspector>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -292,6 +293,7 @@
                 this.$.renderer.deleteVariable(name);
             },
             _showCreateVariable: function () {
+                this._currentVariable = null;
                 this.$.sidebar.state = "createVariable";
             },
             _createVariable: function () {
@@ -312,16 +314,14 @@
                             this._currentVariable.name,
                             this._currentVariable.data.value
                     );
+                    this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully updated!");
+                    this.resetPicker();
                 }
-                this.$.sidebar.state = "picker";
-                this._pickerPattern = "";
-                this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully updated!");
             },
             _deleteVariable: function () {
                 this.$.renderer.deleteVariable(this._currentVariable.name);
-                this.$.sidebar.state = "picker";
-                this._pickerPattern = "";
                 this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully deleted!");
+                this.resetPicker();
             },
             showSuccess: function (message) {
                 this.$.success.text = message;
@@ -345,7 +345,8 @@
                 })[0];
             },
             resetPicker: function () {
-                this.$.createPicker.value = "";
+                this.$.sidebar.state = "picker";
+                this._pickerPattern = "";
             },
             toJSON: function () {
                 return this.$.renderer.toJSON();
@@ -367,6 +368,9 @@
                         pandora.preventCallback(e);
                     }.bind(this));
                 }.bind(this));
+            },
+            _resetPickerPattern: function () {
+                this._pickerPattern = "";
             },
             _updateDisabled: function () {
                 this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();

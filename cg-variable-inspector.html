@@ -6,13 +6,15 @@
     <template>
         <div>
             <h1>{{_label}}</h1>
+            <cg-type-dropdown type="{{_type}}"
+                              types="{{types}}"
+                              on-change="{{_resetVariable}}"
+                              hidden?="{{editMode}}">
+            </cg-type-dropdown>
             <paper-input-decorator label="name">
                 <input is="core-input" type="text" value="{{_name}}">
             </paper-input-decorator>
-            <dude-picker type="{{variable.data.valueType}}"
-                         value="{{variable.data.value}}"
-                         on-change="{{_valueChanged}}">
-            </dude-picker>
+            <dude-picker type="{{_type}}" value="{{_value}}"></dude-picker>
             <div layout horizontal class="row" style="margin-bottom: 10px">
                 <paper-button on-click="{{_submit}}" flex class="primary">
                     <core-icon icon="check"></core-icon>
@@ -33,10 +35,17 @@
         Polymer({
             publish: {
                 editMode: false,
-                variable: {type: null, value: null}
+                variable: null,
+                types: []
             },
+            _name: "",
+            _type: "",
+            _value: null,
             ready: function () {
                 this.editModeChanged();
+            },
+            typesChanged: function () {
+                this._type = this.types[0].name;
             },
             editModeChanged: function () {
                 if (this.editMode) {
@@ -45,18 +54,38 @@
                     this._label = "Create";
                 }
             },
-            _name: "",
             variableChanged: function () {
-                this._name = this.variable.name;
-            },
-            _valueChanged: function () {
-                if (this.variable.data.valueType === "sound") {
-                    this._name = this.variable.data.value.name;
+                if (this.variable !== null) {
+                    this._name = this.variable.name;
+                    this._type = this.variable.data.valueType;
+                    this._value = this.variable.data.value;
+                } else {
+                    this._type = this.types[0].name;
+                    this._name = "";
+                    this._value = null;
                 }
             },
+            _valueChanged: function () {
+                if (this._type === "sound") {
+                    this._name = this._value.name;
+                }
+            },
+            _resetVariable: function () {
+                this._name = "";
+            },
             _submit: function () {
-                this.variable.previousName = this.variable.name;
-                this.variable.name = this._name;
+                var previousName = this.variable !== null ? this.variable.name : null;
+                this.variable = {
+                    name: this._name,
+                    data: new cg.Variable({
+                        "name": this._name,
+                        "value-type": this._type,
+                        "value": this._value
+                    })
+                };
+                if (previousName !== null) {
+                    this.variable.previousName = previousName;
+                }
                 this.fire("submit");
             },
             _close: function () {

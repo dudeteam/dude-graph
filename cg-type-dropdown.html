@@ -25,6 +25,13 @@
                     }
                 }
             },
+            typeChanged: function () {
+                for (var i = 0; i < this.types.length; ++i) {
+                    if (this.types[i].name === this.type) {
+                        this.label = this.types[i].label;
+                    }
+                }
+            },
             _change: function () {
                 this.fire("change");
             }

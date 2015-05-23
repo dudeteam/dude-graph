@@ -65,6 +65,8 @@
                         e.detail.variable.name,
                         e.detail.variable.data.value
                 );
+                this.showSuccess("Variable \"" + e.detail.variable.name + "\" successfully updated!");
+                this.resetPicker();
             });
         };
     </script>
