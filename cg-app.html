@@ -308,10 +308,14 @@
                 this.$.pickerElement.reset();
             },
             createVariable: function (type, name, value) {
-                return this.$.renderer.createVariable(type, name, value);
+                var result = this.$.renderer.createVariable(type, name, value);
+                this._updatePickerList();
+                return result;
             },
             editVariable: function (previous, type, name, value) {
-                return this.$.renderer.editVariable(previous, type, name, value);
+                var result = this.$.renderer.editVariable(previous, type, name, value);
+                this._updatePickerList();
+                return result;
             },
             deleteVariable: function (name) {
                 this.$.renderer.deleteVariable(name);
