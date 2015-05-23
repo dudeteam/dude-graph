@@ -207,7 +207,7 @@
                     this._pickerPatternChanged();
                     this._actionNameChanged();
                 }.bind(this));
-                this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
+                this.$.renderer.addEventListener("mouseup", this._updateDisabled.bind(this));
                 var keyModifier = navigator.platform.indexOf("Mac") !== -1 ? "cmd" : "ctrl";
                 pandora.forEach(this.config.shortcuts, function (functionName, shortcut) {
                     jwerty.key(keyModifier + "+" + shortcut, function (e) {
@@ -425,6 +425,9 @@
                         type: this._pickerType
                     });
                 }
+            },
+            ready: function() {
+                window.renderer = this.$.renderer;
             }
         });
     </script>
