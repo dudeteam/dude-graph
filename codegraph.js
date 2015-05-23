@@ -2672,10 +2672,11 @@ cg.Renderer.prototype._renderDrag = function () {
 cg.Renderer.prototype._renderSelection = function () {
     var renderer = this;
     var origin = null;
-    this._svg.on('mousedown', function() {
-        renderer.getSelectedEntities().each(function () {
+    this._svg.on('mousedown', function () {
+        if (!d3.event.shiftKey) {
             renderer._clearSelection();
-        });
+            renderer._selectionBox.assign({x: 0, y: 0, width: 0, height: 0});
+        }
     });
     this._svg.call(d3.behavior.drag()
             .on('dragstart', function () {
@@ -2720,9 +2721,9 @@ cg.Renderer.prototype._renderSelection = function () {
                     renderer._selectionRectangle.remove();
                     renderer._selectionRectangle = null;
                 }
-                if (d3.event.sourceEvent.shiftKey) {
+                if (renderer._selectionBox.width !== 0 && renderer._selectionBox.height !== 0) {
                     var selectedEntities = renderer._getEntitiesInArea(renderer._selectionBox);
-                    renderer._addEntitiesToSelection(selectedEntities);
+                    renderer._addEntitiesToSelection(selectedEntities, !d3.event.sourceEvent.shiftKey);
                 }
             })
     );
@@ -2732,7 +2733,7 @@ cg.Renderer.prototype._renderSelection = function () {
  * Clear the selection.
  * @private
  */
-cg.Renderer.prototype._clearSelection = function() {
+cg.Renderer.prototype._clearSelection = function () {
     this._lastSelectedEntity = null;
     this.getSelectedEntities().classed("selected", false);
 };
@@ -2742,7 +2743,7 @@ cg.Renderer.prototype._clearSelection = function() {
  * @param entitiesSelection {d3.selection}
  * @param clearSelection {Boolean?} clear the previous selection
  */
-cg.Renderer.prototype._addEntitiesToSelection = function(entitiesSelection, clearSelection) {
+cg.Renderer.prototype._addEntitiesToSelection = function (entitiesSelection, clearSelection) {
     if (clearSelection) {
         this._clearSelection();
     }
