@@ -104,7 +104,11 @@
                                       on-change="{{_resetPickerPattern}}"
                                       hidden?="{{_editMode}}">
                     </cg-type-dropdown>
-                    <dude-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></dude-picker>
+                    <dude-picker id="pickerElement"
+                                 type="{{_pickerType}}"
+                                 pattern="{{_pickerPattern}}"
+                                 noVariable>
+                    </dude-picker>
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>

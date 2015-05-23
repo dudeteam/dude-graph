@@ -38,7 +38,7 @@
     "core-splitter": "Polymer/core-splitter#~0.5.5",
     "d3": "~3.5.5",
     "core-tooltip": "Polymer/core-tooltip#~0.5.5",
-    "dude-gui": "~0.1.6",
+    "dude-gui": "~0.1.7",
     "paper-dialog": "Polymer/paper-dialog#~0.5.5",
     "paper-dropdown-menu": "Polymer/paper-dropdown-menu#~0.5.5",
     "paper-input": "Polymer/paper-input#~0.5.5",
