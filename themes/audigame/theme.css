@@ -16,6 +16,11 @@ html /deep/ body {
     font-family: "Lato", sans-serif;
     font-weight: 300;
 }
+html /deep/ h1 {
+    font-weight: 300;
+    text-align: center;
+    margin: 0 0 20px 0;
+}
 html /deep/ .box {
     background: rgba(0, 0, 0, .2);
     border-radius: 3px;
@@ -166,9 +171,7 @@ html /deep/ dude-sidebar .subtitle {
 html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
     color: #ccc;
 }
-html /deep/ h1 {
-    font-weight: 300;
-    text-align: center;
+html /deep/ dude-sidebar /deep/ h1 {
     margin: 0;
     padding-bottom: 10px;
     border-bottom: 1px solid #444;

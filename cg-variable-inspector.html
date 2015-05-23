@@ -1,10 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-input/paper-input-decorator.html">
+<link rel="import" href="../paper-dialog/paper-action-dialog.html">
 <link rel="import" href="../dude-gui/dude-picker.html">
 <polymer-element name="cg-variable-inspector">
     <template>
         <div>
-            <h1>{{label}}</h1>
+            <h1>{{_label}}</h1>
             <paper-input-decorator label="name">
                 <input is="core-input" type="text" value="{{_name}}">
             </paper-input-decorator>
@@ -16,17 +17,33 @@
                 <paper-button on-click="{{_submit}}" flex class="primary">
                     <core-icon icon="check"></core-icon>
                 </paper-button>
-                <paper-button on-click="{{_delete}}" flex class="primary">
-                    <core-icon icon="delete"></core-icon>
+                <paper-button on-click="{{_close}}" flex class="primary">
+                    <core-icon icon="close"></core-icon>
                 </paper-button>
             </div>
         </div>
+        <paper-action-dialog id="confirm"
+                             heading="Are you sure that you want to delete this variable?"
+                             transition="core-transition-center" backdrop>
+            <paper-button affirmative>No</paper-button>
+            <paper-button class="primary" on-click="{{_confirmDelete}}" affirmative autofocus>Yes</paper-button>
+        </paper-action-dialog>
     </template>
     <script>
         Polymer({
             publish: {
-                label: "Edit",
+                editMode: false,
                 variable: {type: null, value: null}
+            },
+            ready: function () {
+                this.editModeChanged();
+            },
+            editModeChanged: function () {
+                if (this.editMode) {
+                    this._label = "Edit";
+                } else {
+                    this._label = "Create";
+                }
             },
             _name: "",
             variableChanged: function () {
@@ -42,7 +59,14 @@
                 this.variable.name = this._name;
                 this.fire("submit");
             },
-            _delete: function () {
+            _close: function () {
+                if (this.editMode) {
+                    this.$.confirm.open();
+                } else {
+                    this.fire("cancel");
+                }
+            },
+            _confirmDelete: function () {
                 this.fire("delete");
             }
         })

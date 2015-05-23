@@ -1,0 +1,33 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../dude-gui/dude-dropdown.html">
+<polymer-element name="cg-type-dropdown">
+    <template>
+        <dude-dropdown value="{{label}}" on-change="{{_change}}">
+            <template repeat="{{currentType in types}}">
+                <div class="type-filter-stroke type-{{currentType.name}} row" name="{{currentType.label}}">
+                    <core-icon icon="remove"></core-icon>
+                    <span>{{currentType.label}}</span>
+                </div>
+            </template>
+        </dude-dropdown>
+    </template>
+    <script>
+        Polymer({
+            publish: {
+                label: "",
+                type: "",
+                types: []
+            },
+            labelChanged: function () {
+                for (var i = 0; i < this.types.length; ++i) {
+                    if (this.types[i].label === this.label) {
+                        this.type = this.types[i].name;
+                    }
+                }
+            },
+            _change: function () {
+                this.fire("change");
+            }
+        });
+    </script>
+</polymer-element>

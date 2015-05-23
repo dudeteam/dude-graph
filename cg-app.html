@@ -25,6 +25,7 @@
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="cg-renderer.html">
 <link rel="import" href="cg-variable-inspector.html">
+<link rel="import" href="cg-type-dropdown.html">
 <polymer-element name="cg-app">
     <template>
         <dude-panel id="panel"
@@ -98,14 +99,12 @@
                     </core-menu>
                 </div>
                 <div data-state="picker">
-                    <dude-dropdown value="{{_pickerLabel}}" on-change="{{resetPicker}}" hidden?="{{_editMode}}">
-                        <template repeat="{{type in _pickerTypes}}">
-                            <div class="type-filter-stroke type-{{type.name}} row" name="{{type.label}}">
-                                <core-icon icon="remove"></core-icon>
-                                <span>{{type.label}}</span>
-                            </div>
-                        </template>
-                    </dude-dropdown>
+                    <cg-type-dropdown type="{{_pickerType}}"
+                                      label="{{_label}}"
+                                      types="{{_pickerTypes}}"
+                                      on-change="{{resetPicker}}"
+                                      hidden?="{{_editMode}}">
+                    </cg-type-dropdown>
                     <dude-picker id="pickerElement" type="{{_pickerType}}" pattern="{{_pickerPattern}}"></dude-picker>
                     <template if="{{_pickerList.length === 0}}">
                         <div class="search-not-found">No results.</div>
@@ -120,13 +119,18 @@
                             </div>
                         </template>
                     </core-menu>
-                    <paper-button class="primary full">Add variable</paper-button>
+                    <paper-button on-click="{{_showCreateVariable}}" class="primary full">Add variable</paper-button>
                 </div>
                 <cg-variable-inspector data-state="editVariable"
-                                       label="Edit"
                                        variable="{{_currentVariable}}"
                                        on-submit="{{_editVariable}}"
-                                       on-delete="{{_deleteVariable}}">
+                                       on-delete="{{_deleteVariable}}"
+                                       editMode>
+                </cg-variable-inspector>
+                <cg-variable-inspector data-state="createVariable"
+                                       variable="{{_currentVariable}}"
+                                       on-submit="{{_createVariable}}"
+                                       on-delete="{{_cancelVariable}}">
                 </cg-variable-inspector>
             </dude-sidebar>
             <cg-renderer id="renderer"
@@ -161,6 +165,12 @@
                                 "stroke-width": 1
                             }
                         }
+                    },
+                    "shortcuts": {
+                        "G": "openGroup",
+                        "A": "openAction",
+                        "P": "openPicker",
+                        "X": "removeSelection"
                     }
                 },
                 graph: null
@@ -281,6 +291,16 @@
             deleteVariable: function (name) {
                 this.$.renderer.deleteVariable(name);
             },
+            _showCreateVariable: function () {
+                this.$.sidebar.state = "createVariable";
+            },
+            _createVariable: function () {
+                console.log("Create variable", this._currentVariable);
+            },
+            _cancelVariable: function () {
+                this.$.sidebar.state = "picker";
+                this._pickerPattern = "";
+            },
             _editVariable: function () {
                 // Note: if it's a sound the variable is created outside of cg (upload...)
                 if (this._currentVariable.data.valueType === "sound") {
@@ -295,11 +315,17 @@
                 }
                 this.$.sidebar.state = "picker";
                 this._pickerPattern = "";
+                this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully updated!");
             },
             _deleteVariable: function () {
                 this.$.renderer.deleteVariable(this._currentVariable.name);
                 this.$.sidebar.state = "picker";
                 this._pickerPattern = "";
+                this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully deleted!");
+            },
+            showSuccess: function (message) {
+                this.$.success.text = message;
+                this.$.success.show();
             },
             showError: function (error) {
                 this.$.error.text = error.message;
@@ -334,42 +360,13 @@
                     this.fire("ready");
                 }.bind(this));
                 this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
-                if (navigator.platform.indexOf("Mac") !== -1) {
-                    jwerty.key('cmd+G', function (e) {
-                        this.openGroup();
+                var keyModifier = navigator.platform.indexOf("Mac") !== -1 ? "cmd" : "ctrl";
+                pandora.forEach(this.config.shortcuts, function (functionName, shortcut) {
+                    jwerty.key(keyModifier + "+" + shortcut, function (e) {
+                        this[functionName]();
                         pandora.preventCallback(e);
                     }.bind(this));
-                    jwerty.key('cmd+A', function (e) {
-                        this.openAction();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                    jwerty.key('cmd+P', function (e) {
-                        this.openPicker();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                    jwerty.key('cmd+X', function (e) {
-                        this.removeSelection();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                } else {
-                    jwerty.key('ctrl+G', function (e) {
-                        this.openGroup();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                    jwerty.key('ctrl+A', function (e) {
-                        this.openAction();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                    jwerty.key('ctrl+P', function (e) {
-                        this.openPicker();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                    jwerty.key('ctrl+X', function (e) {
-                        this.removeSelection();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                }
-
+                }.bind(this));
             },
             _updateDisabled: function () {
                 this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
@@ -408,13 +405,6 @@
                             isInput: false,
                             type: this._pickerType
                         });
-                    }
-                }
-            },
-            _pickerLabelChanged: function () {
-                for (var i = 0; i < this._pickerTypes.length; ++i) {
-                    if (this._pickerTypes[i].label === this._pickerLabel) {
-                        this._pickerType = this._pickerTypes[i].name;
                     }
                 }
             }
