@@ -12,7 +12,7 @@
       "outputs": [
         {
           "type": "stream",
-          "name": "choice"
+          "name": "output"
         }
       ]
     },
@@ -321,7 +321,7 @@
     {
       "from": {
         "block": 0,
-        "point": "choice"
+        "point": "output"
       },
       "to": {
         "block": 1,
