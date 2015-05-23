@@ -336,7 +336,7 @@ cg.Point = (function () {
      * Add a connection for this point, this is called by graph.addConnection(connection) and dispatched here if the connection has this point.
      * Never call this directly
      * @param {cg.Connection} connection
-     * @return {cg.Connection|null} the connection if the add was successful, null otherwise
+     * @returns {cg.Connection|null} the connection if the add was successful, null otherwise
      */
     Point.prototype.addConnection = function (connection) {
         if (this._connections.indexOf(connection) !== -1) {
@@ -943,9 +943,10 @@ cg.Graph = (function () {
     /**
      * Get a model from its name.
      * @param name {String}
+     * @returns {cg.Model}
      */
     Graph.prototype.getModel = function (name) {
-        var result = undefined;
+        var result = null;
         pandora.forEach(this._models, function (model) {
             if (model.name === name) {
                 result = model;
@@ -980,6 +981,7 @@ cg.Graph = (function () {
      * @option options.isInput {Boolean?} whether the type to search is an input or an output
      * @option options.limit {Number?} the maximal number of result
      * @option options.pattern {String} a pattern to match the model name
+     * @returns {Array<cg.Model>}
      */
     Graph.prototype.findModels = function (options) {
         var models = [];
@@ -1010,7 +1012,7 @@ cg.Graph = (function () {
      * Add the entity to the parent in this graph.
      * @param entity {cg.Entity}
      * @param parent {cg.Group}
-     * @return {cg.Entity|null} return the entity if successfully added, or null otherwise
+     * @returns {cg.Entity|null} return the entity if successfully added, or null otherwise
      */
     Graph.prototype.addEntity = function (entity, parent) {
         if (parent.graph !== this) {
@@ -1046,7 +1048,7 @@ cg.Graph = (function () {
      * Change the entity position in the graph by adding it to the given parent.
      * @param entity {cg.Entity}
      * @param newParent {cg.Group}
-     * @return {cg.Entity|null} return the entity if successfully added, or null otherwise
+     * @returns {cg.Entity|null} return the entity if successfully added, or null otherwise
      */
     Graph.prototype.moveEntity = function (entity, newParent) {
         if (newParent.graph !== this) {
@@ -1079,8 +1081,8 @@ cg.Graph = (function () {
     };
 
     /**
-     *
-     * @return {Array<cg.Group>}
+     * Return all groups in graph.
+     * @returns {Array<cg.Group>}
      */
     Graph.prototype.groups = function () {
         var groups = [];
@@ -1093,8 +1095,8 @@ cg.Graph = (function () {
     };
 
     /**
-     *
-     * @return {Array<cg.Block>}
+     * Return all blocks in graph.
+     * @returns {Array<cg.Block>}
      */
     Graph.prototype.blocks = function () {
         var blocks = [];
@@ -1109,7 +1111,7 @@ cg.Graph = (function () {
     /**
      * Return the group by id.
      * @param id
-     * @return {cg.Group|null}
+     * @returns {cg.Group|null}
      */
     Graph.prototype.groupById = function (id) {
         return this._registeredGroupIds[id] || null;
@@ -1118,7 +1120,7 @@ cg.Graph = (function () {
     /**
      * Return the block by id.
      * @param id
-     * @return {cg.Block|null}
+     * @returns {cg.Block|null}
      */
     Graph.prototype.blockById = function (id) {
         return this._registeredBlockIds[id] || null;
@@ -1127,7 +1129,7 @@ cg.Graph = (function () {
     /**
      * Add the connection object into the graph.
      * @param connection {cg.Connection}
-     * @return {cg.Connection|null} the connection if the add was successful, null otherwise
+     * @returns {cg.Connection|null} the connection if the add was successful, null otherwise
      */
     Graph.prototype.addConnection = function (connection) {
         var error = false;
@@ -1406,7 +1408,7 @@ cg.Renderer = (function () {
 
     /**
      * Return d3 selection for all entities.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getEntities = function () {
         return this._rootGroup
@@ -1415,7 +1417,7 @@ cg.Renderer = (function () {
 
     /**
      * Return d3 selection for all groups.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getGroups = function () {
         return this._groupLayer
@@ -1427,7 +1429,7 @@ cg.Renderer = (function () {
 
     /**
      * Return d3 selection for all blocks.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getBlocks = function () {
         return this._blockLayer
@@ -1439,7 +1441,7 @@ cg.Renderer = (function () {
 
     /**
      * Return d3 selection for all points.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getPoints = function () {
         return this._blockLayer
@@ -1447,7 +1449,7 @@ cg.Renderer = (function () {
     };
     /**
      * Return d3 selection for all connections.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getConnections = function () {
         var pointId = function (point) {
@@ -1464,7 +1466,7 @@ cg.Renderer = (function () {
     /**
      * Return if there are selected entities.
      * @param rootOnly {Boolean?} return only selected entities with the graph as parent.
-     * @return {Boolean}
+     * @returns {Boolean}
      */
     Renderer.prototype.hasSelectedEntities = function (rootOnly) {
         return this.getSelectedEntities(rootOnly)[0].length > 0;
@@ -1472,7 +1474,7 @@ cg.Renderer = (function () {
 
     /**
      * Return the last selected entity.
-     * @return {d3.selection|null}
+     * @returns {d3.selection|null}
      */
     Renderer.prototype.getLastSelectedEntity = function () {
         return this.hasSelectedEntities() ? this._lastSelectedEntity : null;
@@ -1481,7 +1483,7 @@ cg.Renderer = (function () {
     /**
      * Return all selected entities.
      * @param rootOnly {Boolean?} return only selected entities with the graph as parent.
-     * @return {d3.selection}
+     * @returns {d3.selection}
      */
     Renderer.prototype.getSelectedEntities = function (rootOnly) {
         return this._rootGroup
@@ -1502,7 +1504,7 @@ cg.Renderer = (function () {
     /**
      * Return if there are selected entities.
      * @param rootOnly {Boolean?} return only selected entities with the graph as parent.
-     * @return {Boolean}
+     * @returns {Boolean}
      */
     Renderer.prototype.hasSelection = function (rootOnly) {
         return this.hasSelectedEntities(rootOnly) || this.getSelectedConnections()[0].length > 0;
@@ -1658,7 +1660,7 @@ cg.Renderer.prototype._updateRendererCollisions = function () {
 /**
  * Return all entities contained in the box.
  * @param selectionBox {pandora.Box2}
- * @return {d3.selection}
+ * @returns {d3.selection}
  * @private
  */
 cg.Renderer.prototype._getEntitiesInArea = function (selectionBox) {
@@ -1760,7 +1762,7 @@ cg.Renderer.Point = (function () {
 })();
 /**
  * Return SVG offset origin.
- * @return {pandora.Vec2}
+ * @returns {pandora.Vec2}
  * @private
  */
 cg.Renderer.prototype._getSVGOrigin = function () {
@@ -1773,7 +1775,7 @@ cg.Renderer.prototype._getSVGOrigin = function () {
  * @param x {Number}
  * @param y {Number}
  * @param ignoreOrigin {Boolean?} Ignore the SVG offset
- * @return {pandora.Vec2}
+ * @returns {pandora.Vec2}
  * @private
  */
 cg.Renderer.prototype._getZoomedSVGPosition = function (x, y, ignoreOrigin) {
@@ -1804,7 +1806,7 @@ cg.Renderer.prototype._getZoomedTouchPosition = function (e) {
 
 /**
  * Return the zoomed viewport.
- * @return {pandora.Box2}
+ * @returns {pandora.Box2}
  * @private
  */
 cg.Renderer.prototype._getSVGViewport = function () {
@@ -1817,7 +1819,7 @@ cg.Renderer.prototype._getSVGViewport = function () {
 /**
  * Return the bounding box of the element
  * @param element {d3.selection|element}
- * @return {{x: Number, y: Number, width: Number, height: Number}}
+ * @returns {{x: Number, y: Number, width: Number, height: Number}}
  * @private
  */
 // TODO: Workaround for Polymer Webcomponents getBBox bug on IE11.
@@ -1838,7 +1840,7 @@ cg.Renderer.prototype._getBBox = function (element) {
 /**
  * Return the bbox of the d3 selection in zoomed SVG coordinates.
  * @param d3selection {d3.selection}
- * @return {pandora.Box2|null}
+ * @returns {pandora.Box2|null}
  * @private
  */
 //TODO: Fix this method, it's broken.
@@ -1889,7 +1891,7 @@ var nextCursorConnectionId = 0;
 /**
  * Add the cursor connection to the list of cursor connections drawn on the screen.
  * @param cursorConnection {cg.Connection}
- * @return {cg.Connection}
+ * @returns {cg.Connection}
  */
 var addCursorConnection = function (cursorConnection) {
     cursorConnection.data.cursorConnectionId = nextCursorConnectionId++;
@@ -1908,7 +1910,7 @@ var removeCursorConnection = function (cursorConnection) {
 
 /**
  * Return the list of cursor connections drawn on the screen.
- * @return {d3.selection}
+ * @returns {d3.selection}
  * @private
  */
 var getCursorPointConnections = function (renderer) {
