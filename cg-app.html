@@ -297,7 +297,18 @@
                 this.$.sidebar.state = "createVariable";
             },
             _createVariable: function () {
-                console.log("Create variable", this._currentVariable);
+                // Note: if it's a sound the variable is created outside of cg (upload...)
+                if (this._currentVariable.data.valueType === "sound") {
+                    this.fire("variable.create", {"variable": this._currentVariable});
+                } else {
+                    this.createVariable(
+                            this._currentVariable.data.valueType,
+                            this._currentVariable.name,
+                            this._currentVariable.data.value
+                    );
+                    this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully created!");
+                    this.resetPicker();
+                }
             },
             _cancelVariable: function () {
                 this.$.sidebar.state = "picker";
