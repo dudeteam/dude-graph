@@ -291,7 +291,10 @@
                 this.$.pickerElement.reset();
             },
             createVariable: function (type, name, value) {
-                this.$.renderer.createVariable(type, name, value);
+                return this.$.renderer.createVariable(type, name, value);
+            },
+            editVariable: function (previous, type, name, value) {
+                return this.$.renderer.editVariable(previous, type, name, value);
             },
             deleteVariable: function (name) {
                 this.$.renderer.deleteVariable(name);
@@ -304,12 +307,11 @@
                 // Note: if it's a sound the variable is created outside of cg (upload...)
                 if (this._currentVariable.data.valueType === "sound") {
                     this.fire("variable.create", {"variable": this._currentVariable});
-                } else {
-                    this.createVariable(
-                            this._currentVariable.data.valueType,
-                            this._currentVariable.name,
-                            this._currentVariable.data.value
-                    );
+                } else if (this.createVariable(
+                                this._currentVariable.data.valueType,
+                                this._currentVariable.name,
+                                this._currentVariable.data.value
+                        )) {
                     this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully created!");
                     this.resetPicker();
                 }
@@ -322,13 +324,11 @@
                 // Note: if it's a sound the variable is created outside of cg (upload...)
                 if (this._currentVariable.data.valueType === "sound") {
                     this.fire("variable.edit", {"variable": this._currentVariable});
-                } else {
-                    this.deleteVariable(this._currentVariable.previousName);
-                    this.createVariable(
-                            this._currentVariable.data.valueType,
-                            this._currentVariable.name,
-                            this._currentVariable.data.value
-                    );
+                } else if (this.editVariable(
+                                this._currentVariable.previousName,
+                                this._currentVariable.data.valueType,
+                                this._currentVariable.name,
+                                this._currentVariable.data.value)) {
                     this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully updated!");
                     this.resetPicker();
                 }
