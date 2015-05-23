@@ -199,6 +199,23 @@
             _actionList: [],
             _actionName: null,
             _editMode: false,
+            attached: function () {
+                this.$.renderer.addEventListener("error", function (e) {
+                    this.showError(e.detail.error);
+                }.bind(this));
+                this.$.renderer.addEventListener("ready", function () {
+                    this._pickerPatternChanged();
+                    this._actionNameChanged();
+                }.bind(this));
+                this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
+                var keyModifier = navigator.platform.indexOf("Mac") !== -1 ? "cmd" : "ctrl";
+                pandora.forEach(this.config.shortcuts, function (functionName, shortcut) {
+                    jwerty.key(keyModifier + "+" + shortcut, function (e) {
+                        this[functionName]();
+                        pandora.preventCallback(e);
+                    }.bind(this));
+                }.bind(this));
+            },
             keys: function(input) {
                 return Object.keys(input);
             },
@@ -365,24 +382,6 @@
             },
             toJSON: function () {
                 return this.$.renderer.toJSON();
-            },
-            attached: function () {
-                this.$.renderer.addEventListener("error", function (e) {
-                    this.showError(e.detail.error);
-                }.bind(this));
-                this.$.renderer.addEventListener("ready", function () {
-                    this._pickerPatternChanged();
-                    this._actionNameChanged();
-                    this.fire("ready");
-                }.bind(this));
-                this.$.renderer.addEventListener("click", this._updateDisabled.bind(this));
-                var keyModifier = navigator.platform.indexOf("Mac") !== -1 ? "cmd" : "ctrl";
-                pandora.forEach(this.config.shortcuts, function (functionName, shortcut) {
-                    jwerty.key(keyModifier + "+" + shortcut, function (e) {
-                        this[functionName]();
-                        pandora.preventCallback(e);
-                    }.bind(this));
-                }.bind(this));
             },
             _resetPickerPattern: function () {
                 this._pickerPattern = "";
