@@ -67,7 +67,7 @@
             },
 
             createVariable: function (type, name, value) {
-                if (name === "") {
+                if (!name) {
                     this.fire("error", {error: new pandora.Exception("A name should provided to create a variable")});
                     return false;
                 }

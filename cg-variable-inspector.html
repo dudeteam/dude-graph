@@ -2,13 +2,13 @@
 <link rel="import" href="../paper-input/paper-input-decorator.html">
 <link rel="import" href="../paper-dialog/paper-action-dialog.html">
 <link rel="import" href="../dude-gui/dude-picker.html">
+<link rel="import" href="cg-type-dropdown.html">
 <polymer-element name="cg-variable-inspector">
     <template>
         <div>
             <h1>{{_label}}</h1>
             <cg-type-dropdown type="{{_type}}"
                               types="{{types}}"
-                              on-change="{{_resetVariable}}"
                               hidden?="{{editMode}}">
             </cg-type-dropdown>
             <paper-input-decorator label="name">
@@ -46,6 +46,7 @@
             },
             typesChanged: function () {
                 this._type = this.types[0].name;
+                this._name = "";
             },
             editModeChanged: function () {
                 if (this.editMode) {
@@ -69,9 +70,6 @@
                 if (this._type === "sound" && this._value !== null) {
                     this._name = this._value.name;
                 }
-            },
-            _resetVariable: function () {
-                this._name = "";
             },
             _submit: function () {
                 var previousName = this.variable !== null ? this.variable.name : null;
