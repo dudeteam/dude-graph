@@ -58,6 +58,14 @@
             this.$.codegraph.addEventListener("ready", function () {
                 this.$.codegraph.createVariable("sound", "toto.mp3", "oijo2ij34o2i3j423uh4i23ueone2u3h2i3h24");
             }.bind(this));
+            this.$.codegraph.addEventListener("variable.edit", function (e) {
+                this.deleteVariable(e.detail.variable.previousName);
+                this.createVariable(
+                        e.detail.variable.data.valueType,
+                        e.detail.variable.name,
+                        e.detail.variable.data.value
+                );
+            });
         };
     </script>
 </body>

@@ -21,6 +21,11 @@ html /deep/ .box {
     text-align: center;
 }
 
+/* Paper */
+html /deep/ paper-button {
+    margin: 0;
+}
+
 /* Search */
 
 html /deep/ .search-result, html /deep/ .search-not-found {
@@ -101,4 +106,10 @@ html /deep/ dude-sidebar core-menu {
 }
 html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
     width: 100%;
+}
+html /deep/ dude-sidebar /deep/ .row > *:not(:last-child) {
+    margin-right: 5px;
+}
+html /deep/ dude-sidebar /deep/ .row > *:not(:first-child) {
+    margin-left: 5px;
 }

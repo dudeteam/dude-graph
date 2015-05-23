@@ -74,6 +74,10 @@
                 }));
             },
 
+            deleteVariable: function (name) {
+                this._graph.deleteModel(name);
+            },
+
             createGroup: function (name) {
                 var _id = graph.getNextGroupId();
                 this._renderer.createSmartGroup(_id, name);

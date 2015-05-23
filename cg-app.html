@@ -21,7 +21,10 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-input/paper-input-decorator.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="cg-renderer.html">
+<link rel="import" href="cg-variable-inspector.html">
 <polymer-element name="cg-app">
     <template>
         <dude-panel id="panel"
@@ -119,13 +122,12 @@
                     </core-menu>
                     <paper-button class="primary full">Add variable</paper-button>
                 </div>
-                <div data-state="editVariable">
-                    <paper-button class="primary full" on-click="{{resetSearch}}">Back</paper-button>
-                    <!--<paper-input-decorator id="nameDecorator" floatingLabel label="name" flex self-center>-->
-                        <!--<input is="core-input" id="nameInput" type="text" value="{{ _pickerPattern }}">-->
-                    <!--</paper-input-decorator>-->
-                    <!--<paper-button class="primary">Delete</paper-button>-->
-                </div>
+                <cg-variable-inspector data-state="editVariable"
+                                       label="Edit"
+                                       variable="{{_currentVariable}}"
+                                       on-submit="{{_editVariable}}"
+                                       on-delete="{{_deleteVariable}}">
+                </cg-variable-inspector>
             </dude-sidebar>
             <cg-renderer id="renderer"
                          config="{{config.graph}}"
@@ -276,6 +278,29 @@
             createVariable: function (type, name, value) {
                 this.$.renderer.createVariable(type, name, value);
             },
+            deleteVariable: function (name) {
+                this.$.renderer.deleteVariable(name);
+            },
+            _editVariable: function () {
+                // Note: if it's a sound the variable is created outside of cg (upload...)
+                if (this._currentVariable.data.valueType === "sound") {
+                    this.fire("variable.edit", {"variable": this._currentVariable});
+                } else {
+                    this.deleteVariable(this._currentVariable.previousName);
+                    this.createVariable(
+                            this._currentVariable.data.valueType,
+                            this._currentVariable.name,
+                            this._currentVariable.data.value
+                    );
+                }
+                this.$.sidebar.state = "picker";
+                this._pickerPattern = "";
+            },
+            _deleteVariable: function () {
+                this.$.renderer.deleteVariable(this._currentVariable.name);
+                this.$.sidebar.state = "picker";
+                this._pickerPattern = "";
+            },
             showError: function (error) {
                 this.$.error.text = error.message;
                 this.$.error.show();
@@ -286,13 +311,15 @@
             selectPicker: function (event, detail) {
                 this.$.createPicker.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editVariable";
+                this._currentVariable = this.$.renderer.findModels({
+                    limit: this.searchLimit,
+                    modelType: 'variable',
+                    pattern: this._pickerPattern,
+                    isInput: false
+                })[0];
             },
             resetPicker: function () {
                 this.$.createPicker.value = "";
-            },
-            resetSearch: function () {
-                this.$.sidebar.state = "picker";
-                this._pickerPattern = "";
             },
             toJSON: function () {
                 return this.$.renderer.toJSON();

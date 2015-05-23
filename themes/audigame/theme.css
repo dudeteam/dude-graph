@@ -16,23 +16,30 @@ html /deep/ body {
     font-family: "Lato", sans-serif;
     font-weight: 300;
 }
-
 html /deep/ .box {
     background: rgba(0, 0, 0, .2);
     border-radius: 3px;
 }
 
-html /deep/ paper-toast {
-    color: #eee;
-    border-radius: 3px;
-    font-size: .8em;
+/**
+ * Paper elements.
+ */
+
+/* Inputs */
+html /deep/ paper-input-decorator {
+    padding: 5px 0;
+}
+html /deep/ paper-input-decorator /deep/ .focused-underline {
+    background: rgb(243, 156, 18);
+}
+html /deep/ paper-input-decorator[focused] /deep/ .floated-label .label-text {
+    color: rgb(243, 156, 18);
+}
+html /deep/ input[is="core-input"]::-webkit-input-placeholder {
+    color: #666;
 }
 
-html /deep/ paper-toast.error { background: rgba(231, 76, 60, 0.8); }
-html /deep/ paper-toast.success { background: rgba(46, 204, 113, 0.8); }
-html /deep/ paper-item {
-    color: #444;
-}
+/* Buttons */
 html /deep/ paper-toggle-button::shadow #toggleContainer[checked] .toggle {
     background: rgb(243, 156, 18);
 }
@@ -46,9 +53,27 @@ html /deep/ paper-button.primary {
     background: rgb(243, 156, 18);
     color: #222;
 }
+html /deep/ paper-button.dark {
+    color: #ccc;
+    background: #2b2b2b;
+}
 html /deep/ paper-button.full {
     width: 100%;
     margin: 0;
+}
+
+/* Toast */
+html /deep/ paper-toast {
+    color: #eee;
+    border-radius: 3px;
+    font-size: .8em;
+}
+html /deep/ paper-toast.error { background: rgba(231, 76, 60, 0.8); }
+html /deep/ paper-toast.success { background: rgba(46, 204, 113, 0.8); }
+
+/* Dropdown */
+html /deep/ paper-item {
+    color: #444;
 }
 
 /**
@@ -140,6 +165,15 @@ html /deep/ dude-sidebar .subtitle {
 }
 html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
     color: #ccc;
+}
+html /deep/ h1 {
+    font-weight: 300;
+    text-align: center;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+    font-size: 1em;
+    text-transform: uppercase;
 }
 
 /**

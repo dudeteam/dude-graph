@@ -1,0 +1,50 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input-decorator.html">
+<link rel="import" href="../dude-gui/dude-picker.html">
+<polymer-element name="cg-variable-inspector">
+    <template>
+        <div>
+            <h1>{{label}}</h1>
+            <paper-input-decorator label="name">
+                <input is="core-input" type="text" value="{{_name}}">
+            </paper-input-decorator>
+            <dude-picker type="{{variable.data.valueType}}"
+                         value="{{variable.data.value}}"
+                         on-change="{{_valueChanged}}">
+            </dude-picker>
+            <div layout horizontal class="row" style="margin-bottom: 10px">
+                <paper-button on-click="{{_submit}}" flex class="primary">
+                    <core-icon icon="check"></core-icon>
+                </paper-button>
+                <paper-button on-click="{{_delete}}" flex class="primary">
+                    <core-icon icon="delete"></core-icon>
+                </paper-button>
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            publish: {
+                label: "Edit",
+                variable: {type: null, value: null}
+            },
+            _name: "",
+            variableChanged: function () {
+                this._name = this.variable.name;
+            },
+            _valueChanged: function () {
+                if (this.variable.data.valueType === "sound") {
+                    this._name = this.variable.data.value.name;
+                }
+            },
+            _submit: function () {
+                this.variable.previousName = this.variable.name;
+                this.variable.name = this._name;
+                this.fire("submit");
+            },
+            _delete: function () {
+                this.fire("delete");
+            }
+        })
+    </script>
+</polymer-element>

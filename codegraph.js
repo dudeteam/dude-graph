@@ -181,9 +181,10 @@ cg.Variable = (function () {
          * Contains the actual value of this variable. It can be anything that can be represented as a JSON object.
          * @type {*}
          */
-        this._value = data["value"];
+        this._value = data.value;
         Object.defineProperty(this, "value", {
-            get: function () { return this._value; }.bind(this)
+            get: function () { return this._value; }.bind(this),
+            set: function (value) { this._value = value; }.bind(this)
         });
 
     });
@@ -922,6 +923,14 @@ cg.Graph = (function () {
      */
     Graph.prototype.getModel = function (name) {
         return this._models[name];
+    };
+
+    /**
+     * Remove a model from its name.
+     * @param name
+     */
+    Graph.prototype.deleteModel = function (name) {
+        delete this._models[name];
     };
 
     /**
