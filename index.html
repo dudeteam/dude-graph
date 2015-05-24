@@ -55,13 +55,13 @@
         var buildSaver = new BuildSaver();
         demo.isLoading = true;
         demo.save = function () {
-            console.log(this.$.codegraph.save(buildSaver));
+            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;
             this.$.codegraph.graph = this.$.loader.response;
             this.$.codegraph.addEventListener("ready", function () {
-                this.$.codegraph.createVariable("sound", "toto.mp3", "oijo2ij34o2i3j423uh4i23ueone2u3h2i3h24");
+                console.log("Code graph is ready! :)");
             }.bind(this));
             this.$.codegraph.addEventListener("variable.create", function (e) {
                 if (this.createVariable(

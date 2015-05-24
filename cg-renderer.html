@@ -128,10 +128,11 @@
             replacePicker: function (pattern, searchResult, entity) {
                 var block = this.createPicker(pattern, searchResult, entity.position, entity.parent);
                 if (block !== null) {
-                    pandora.forEach(entity.outputs[0].connections, function (connection) {
-                        this._graph.addConnection(new cg.Connection(block.outputs[0], connection.inputPoint));
-                    }.bind(this));
+                    var connection = entity.outputs[0].connections[0] || null;
                     this._graph.removeEntity(entity);
+                    if (connection !== null) {
+                        this._graph.addConnection(new cg.Connection(block.outputs[0], connection.inputPoint));
+                    }
                 }
                 return block;
             },

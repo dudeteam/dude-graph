@@ -1,0 +1,57 @@
+{
+  "variables": {
+    "SARA_A slave.mp3": {
+      "type": "sound",
+      "value": {}
+    },
+    "long time": {
+      "type": "number",
+      "value": 42
+    },
+    "default time": {
+      "type": "number",
+      "value": 5
+    },
+    "alarm disabled?": {
+      "type": "boolean",
+      "value": false
+    }
+  },
+  "story": {
+    "name": "step",
+    "description": {
+      "type": "string",
+      "value": "Step's description..."
+    },
+    "sound": {
+      "type": "sound",
+      "name": "SARA_A slave.mp3"
+    },
+    "duration": {
+      "type": "number",
+      "value": 5
+    },
+    "firstChoice": {
+      "name": "end",
+      "description": {
+        "type": "string",
+        "value": "OK"
+      },
+      "sound": {
+        "type": "sound",
+        "name": "SARA_A slave.mp3"
+      }
+    },
+    "secondChoice": {
+      "name": "end",
+      "description": {
+        "type": "string",
+        "value": "KO"
+      },
+      "sound": {
+        "type": "sound",
+        "name": "SARA_A slave.mp3"
+      }
+    }
+  }
+}
