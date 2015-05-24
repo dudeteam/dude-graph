@@ -19,39 +19,43 @@
     <link rel="stylesheet" href="themes/audigame/theme.css" shim-shadowdom>
 </head>
 <body fullbleed unresolved>
-    <core-drawer-panel forceNarrow>
-        <core-header-panel main>
-            <core-toolbar>
-                <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
-                <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
-                <paper-button class="dark" on-click="{{showDialog}}">Disconnect</paper-button>
-            </core-toolbar>
-            <template id="codegraph-demo" is="auto-binding">
-                <core-ajax id="loader"
-                           url="examples/audigame.json"
-                           handleAs="json"
-                           on-core-response="{{graphLoaded}}"
-                           auto>
-                </core-ajax>
-                <cg-app id="codegraph" logo="images/dude_logo_dark.png"
-                        themeUrl="themes/audigame"
-                        layout horizontal fit>
-                </cg-app>
-            </template>
-        </core-header-panel>
-        <div drawer>
-            <core-menu selected="2">
-                <core-item label="Dashboard" icon="dashboard"></core-item>
-                <core-item label="Shop" icon="shopping-cart"></core-item>
-                <core-item label="Editor" icon="create"></core-item>
-                <core-item label="Get the app!" icon="android"></core-item>
-                <core-item label="Contact" icon="send"></core-item>
-            </core-menu>
-        </div>
-    </core-drawer-panel>
-    <script>
+    <template id="codegraph-demo" is="auto-binding">
+        <core-drawer-panel forceNarrow>
+            <core-header-panel main>
+                <core-toolbar>
+                    <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
+                    <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
+                    <paper-button class="dark" on-click="{{save}}">Save</paper-button>
+                </core-toolbar>
+                    <core-ajax id="loader"
+                               url="examples/audigame.json"
+                               handleAs="json"
+                               on-core-response="{{graphLoaded}}"
+                               auto>
+                    </core-ajax>
+                    <cg-app id="codegraph" logo="images/dude_logo_dark.png"
+                            themeUrl="themes/audigame"
+                            layout horizontal fit>
+                    </cg-app>
+            </core-header-panel>
+            <div drawer>
+                <core-menu selected="2">
+                    <core-item label="Dashboard" icon="dashboard"></core-item>
+                    <core-item label="Shop" icon="shopping-cart"></core-item>
+                    <core-item label="Editor" icon="create"></core-item>
+                    <core-item label="Get the app!" icon="android"></core-item>
+                    <core-item label="Contact" icon="send"></core-item>
+                </core-menu>
+            </div>
+        </core-drawer-panel>
+    </template>
+<script>
         var demo = document.querySelector("#codegraph-demo");
+        var jsonSaver = new cg.JSONSaver();
         demo.isLoading = true;
+        demo.save = function () {
+            console.log(this.$.codegraph.save(jsonSaver));
+        };
         demo.graphLoaded = function () {
             demo.isLoading = false;
             this.$.codegraph.graph = this.$.loader.response;

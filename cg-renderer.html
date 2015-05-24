@@ -61,7 +61,6 @@
 
             handleErrors: function () {
                 this._loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this._saver.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
                 this._graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
                 this._renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
             },
@@ -106,7 +105,7 @@
             },
 
             createGroup: function (name) {
-                var _id = graph.getNextGroupId();
+                var _id = this._graph.getNextGroupId();
                 this._renderer.createSmartGroup(_id, name);
             },
 
@@ -193,15 +192,14 @@
                 return this._renderer.getLastSelectedEntity();
             },
 
-            toJSON: function () {
-                return this._saver.save(this._graph);
+            save: function (saver) {
+                return saver.save(this._graph);
             },
 
             graphChanged: function () {
                 this.$.svg.innerHTML = "";
                 this._graph = new cg.Graph();
                 this._loader = new cg.JSONLoader();
-                this._saver = new cg.JSONSaver();
                 this._renderer = new cg.Renderer(this._graph, this.$.svg, this.config);
                 this.handleErrors();
                 this._renderer.on("picker.edit", function (picker) {
@@ -211,13 +209,6 @@
                 this._renderer.render();
                 this._isReady = true;
                 this.fire("ready");
-
-                // FOR DEBUG
-
-                window.cgGraph = this._graph;
-                window.cgRenderer = this._renderer;
-                window.cgLoader = this._loader;
-                window.cgSaver = this._saver;
 
             }
         });

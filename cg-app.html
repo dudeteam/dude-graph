@@ -395,8 +395,8 @@
                 this._pickerPattern = "";
                 this.$.pickerElement.reset();
             },
-            toJSON: function () {
-                return this.$.renderer.toJSON();
+            save: function (saver) {
+                return this.$.renderer.save(saver);
             },
             _resetPickerPattern: function () {
                 this._pickerPattern = "";
