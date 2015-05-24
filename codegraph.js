@@ -155,6 +155,15 @@ cg.Action = (function () {
      */
     return pandora.class_("Action", cg.Model, function (data) {
         cg.Model.call(this, data.name, data.inputs, data.outputs, "action");
+
+        /**
+         * Description of how this action works.
+         * @type {String}
+         */
+        this._description = data.description;
+        Object.defineProperty(this, "description", {
+            get: function () { return this._description; }.bind(this)
+        });
     });
 
 })();
@@ -935,9 +944,14 @@ cg.Graph = (function () {
     /**
      * Add a model of action.
      * @param model {cg.Model|cg.Variable|cg.Value|cg.Action}
+     * @param append {Boolean} defines whether the model should be added at the end or the begin.
      */
-    Graph.prototype.addModel = function (model) {
-        this._models.unshift(model);
+    Graph.prototype.addModel = function (model, append) {
+        if (append) {
+            this._models.push(model);
+        } else {
+            this._models.unshift(model);
+        }
     };
 
     /**
@@ -2802,9 +2816,10 @@ cg.JSONLoader = (function () {
     JSONLoader.prototype._loadTypes = function (typesData, graph) {
         graph.types = typesData;
         for (var i = 0; i < typesData.length; ++i) {
-            graph.addModel(new cg.Value({"value-type": typesData[i].name}));
+            graph.addModel(new cg.Value({"value-type": typesData[i].name}), true);
             graph.addModel(new cg.Action({
                 "name": "set " + typesData[i].label,
+                "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
                 "inputs": [
                     {
                         "type": "stream",
@@ -2825,7 +2840,7 @@ cg.JSONLoader = (function () {
                         "name": "output"
                     }
                 ]
-            }));
+            }), true);
         }
     };
 
@@ -2838,7 +2853,7 @@ cg.JSONLoader = (function () {
     JSONLoader.prototype._loadModels = function (modelsData, graph) {
         pandora.forEach(modelsData, function (model, name) {
             model.name = name;
-            graph.addModel(new cg[pandora.camelcase(model.type, "-")](model));
+            graph.addModel(new cg[pandora.camelcase(model.type, "-")](model), true);
         });
     };
 
@@ -2955,7 +2970,9 @@ cg.JSONSaver = (function () {
         var children = [];
         var connections = [];
         pandora.forEach(graph.models, function (model, name) {
-            models[model.name] = this.save(model);
+            if (name.indexOf("set ") !== -1) { // do not save setters, they are automatically generated.
+                models[model.name] = this.save(model);
+            }
         }.bind(this));
         graph.children.forEach(function (child) {
             children.push(this.save(child));
@@ -2979,6 +2996,7 @@ cg.JSONSaver = (function () {
     JSONSaver.prototype._saveAction = function (model) {
         return {
             "type": "action",
+            "description": model.description,
             "inputs": model.inputs,
             "outputs": model.outputs
         };

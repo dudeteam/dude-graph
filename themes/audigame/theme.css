@@ -171,6 +171,11 @@ html /deep/ dude-sidebar .subtitle {
 html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
     color: #ccc;
 }
+html /deep/ dude-sidebar /deep/ p {
+    margin: 20px;
+    color: #888;
+    font-style: italic;
+}
 
 /**
  * Graph

@@ -77,6 +77,7 @@
     },
     "condition": {
       "type": "action",
+      "description": "Choose the steam yes or no according whether the <test> is true or false.",
       "inputs": [
         {
           "type": "stream",
@@ -101,6 +102,7 @@
     },
     "end": {
       "type": "action",
+      "description": "It works like step but finishes a story, you can have several possible ends.",
       "inputs": [
         {
           "type": "stream",
@@ -120,6 +122,7 @@
     },
     "step": {
       "type": "action",
+      "description": "This block represents a step of the story. You define the <description>, <sound> and <duration> of this step. Then, you connect this step to the 2 potential next choices.",
       "inputs": [
         {
           "type": "stream",
@@ -152,6 +155,7 @@
     },
     "start": {
       "type": "action",
+      "description": "This block is the entry point of your story, the first step should be attached to it. Be careful, you should have only one start by story!",
       "inputs": [],
       "outputs": [
         {
@@ -159,114 +163,6 @@
           "name": "output"
         }
       ]
-    },
-    "set test": {
-      "type": "action",
-      "inputs": [
-        {
-          "type": "stream",
-          "name": "input"
-        },
-        {
-          "type": "boolean",
-          "name": "variable"
-        },
-        {
-          "type": "boolean",
-          "name": "other"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "stream",
-          "name": "output"
-        }
-      ]
-    },
-    "value-boolean": {
-      "type": "value",
-      "value-type": "boolean"
-    },
-    "set time": {
-      "type": "action",
-      "inputs": [
-        {
-          "type": "stream",
-          "name": "input"
-        },
-        {
-          "type": "number",
-          "name": "variable"
-        },
-        {
-          "type": "number",
-          "name": "other"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "stream",
-          "name": "output"
-        }
-      ]
-    },
-    "value-number": {
-      "type": "value",
-      "value-type": "number"
-    },
-    "set sound": {
-      "type": "action",
-      "inputs": [
-        {
-          "type": "stream",
-          "name": "input"
-        },
-        {
-          "type": "sound",
-          "name": "variable"
-        },
-        {
-          "type": "sound",
-          "name": "other"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "stream",
-          "name": "output"
-        }
-      ]
-    },
-    "value-sound": {
-      "type": "value",
-      "value-type": "sound"
-    },
-    "set text": {
-      "type": "action",
-      "inputs": [
-        {
-          "type": "stream",
-          "name": "input"
-        },
-        {
-          "type": "string",
-          "name": "variable"
-        },
-        {
-          "type": "string",
-          "name": "other"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "stream",
-          "name": "output"
-        }
-      ]
-    },
-    "value-string": {
-      "type": "value",
-      "value-type": "string"
     }
   },
   "children": [

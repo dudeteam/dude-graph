@@ -124,6 +124,11 @@
                     </core-menu>
                     <paper-button on-click="{{_showCreateVariable}}" class="primary full">Add variable</paper-button>
                 </div>
+                <div data-state="editAction">
+                    <h1>{{_currentAction.name}}</h1>
+                    <p>{{_currentAction.data.description}}</p>
+                    <paper-button class="primary full" on-click="{{_cancelAction}}">Back</paper-button>
+                </div>
                 <cg-variable-inspector data-state="editVariable"
                                        variable="{{_currentVariable}}"
                                        types="{{graph.types}}"
@@ -359,6 +364,10 @@
                 this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully deleted!");
                 this.resetPicker();
             },
+            _cancelAction: function () {
+                this.$.sidebar.state = "action";
+                this.$.createAction.value = "";
+            },
             showSuccess: function (message) {
                 this.$.success.text = message;
                 this.$.success.show();
@@ -369,17 +378,19 @@
             },
             selectAction: function (event, detail) {
                 this.$.createAction.value = detail.item.getAttribute("name");
+                this.$.sidebar.state = "editAction";
+                this._currentAction = this._getBestModel(true, this.$.createAction.value);
             },
             selectPicker: function (event, detail) {
                 this.$.createPicker.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editVariable";
                 this._currentVariable = this._getBestModel();
             },
-            _getBestModel: function () {
+            _getBestModel: function (isAction, pattern) {
                 var models = this.$.renderer.findModels({
                     limit: this.searchLimit,
-                    modelType: 'variable',
-                    pattern: this._pickerPattern,
+                    modelType: isAction ? 'action' : 'variable',
+                    pattern: pattern || this._pickerPattern,
                     isInput: false
                 });
                 var model = models[0];
