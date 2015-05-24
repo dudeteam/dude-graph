@@ -140,22 +140,22 @@
                 if (/^(true|false)$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "boolean",
-                        "default": pattern === "true"
+                        "value": pattern === "true"
                     });
                 } else if (/^".+"$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "string",
-                        "default": pattern.substr(1, pattern.length - 2)
+                        "value": pattern.substr(1, pattern.length - 2)
                     });
                 } else if (/^[0-9]+$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "number",
-                        "default": parseInt(pattern)
+                        "value": parseInt(pattern)
                     });
                 } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "sound",
-                        "default": pattern
+                        "value": pattern
                     });
                 }
                 return null;
@@ -193,6 +193,7 @@
             },
 
             save: function (saver) {
+                saver.on("error", function (error) { this.fire("error", {error: error})}.bind(this));
                 return saver.save(this._graph);
             },
 

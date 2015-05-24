@@ -25,55 +25,68 @@
     },
     "long time": {
       "type": "variable",
-      "value-type": "number"
+      "value-type": "number",
+      "value": 42
     },
     "default time": {
       "type": "variable",
-      "value-type": "number"
+      "value-type": "number",
+      "value": 5
     },
     "music game over": {
       "type": "variable",
-      "value-type": "sound"
+      "value-type": "sound",
+      "value": "24o34o2k3mo2k3joi32j4o234o23ij4o23i4j23"
     },
     "music intro": {
       "type": "variable",
-      "value-type": "sound"
+      "value-type": "sound",
+      "value": "oiwjn4piwsodfm3k4m2lksfmdfvxwef93h98hd0"
     },
     "boom": {
       "type": "variable",
-      "value-type": "sound"
+      "value-type": "sound",
+      "value": "o24ij3okroi3290898h9udsf9s9nsdf9js8f9sf"
     },
     "shoot": {
       "type": "variable",
-      "value-type": "sound"
+      "value-type": "sound",
+      "value": "09j0dm0w93jijwieufiuvds98dnsdnjnkdjbs332"
     },
     "mission success": {
       "type": "variable",
-      "value-type": "string"
+      "value-type": "string",
+      "value": "You are the winner!!!"
     },
     "game over": {
       "type": "variable",
-      "value-type": "string"
+      "value-type": "string",
+      "value": "You are a looser :/"
     },
     "intro": {
       "type": "variable",
-      "value-type": "string"
+      "value-type": "string",
+      "value": "Once upon a time..."
     },
     "alarm disabled?": {
       "type": "variable",
-      "value-type": "boolean"
+      "value-type": "boolean",
+      "value": false
     },
     "can climb?": {
       "type": "variable",
-      "value-type": "boolean"
+      "value-type": "boolean",
+      "value": true
     },
     "has key?": {
       "type": "variable",
-      "value-type": "boolean"
+      "value-type": "boolean",
+      "value": false
     },
     "can enter?": {
       "type": "variable",
-      "value-type": "boolean"
+      "value-type": "boolean",
+      "value": false
     },
     "condition": {
       "type": "action",

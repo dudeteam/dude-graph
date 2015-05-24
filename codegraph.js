@@ -216,7 +216,7 @@ cg.Value = (function () {
          * @type {*}
          * @private
          */
-        this._value = data["default"];
+        this._value = data.value;
         Object.defineProperty(this, "value", {
             get: function () { return this._value; }.bind(this)
         });
@@ -1120,6 +1120,17 @@ cg.Graph = (function () {
             }
         }
         return blocks;
+    };
+
+    Graph.prototype.findBlock = function (fn) {
+        var result = null;
+        pandora.forEach(this._registeredBlockIds, function (block) {
+            if (fn(block)) {
+                result = block;
+                return true;
+            }
+        });
+        return result;
     };
 
     /**
@@ -2971,7 +2982,7 @@ cg.JSONSaver = (function () {
         var connections = [];
         pandora.forEach(graph.models, function (model) {
             // do not save setters or values, they are automatically generated.
-            if (model.name.indexOf("set ") !== 0 && model.name.indexOf("value-") !== 0) {
+            if (model.name.indexOf("set ") !== 0 && model._type !== "value") {
                 models[model.name] = this.save(model);
             }
         }.bind(this));
@@ -3013,19 +3024,6 @@ cg.JSONSaver = (function () {
             "type": "variable",
             "value-type": model.valueType,
             "value": model.value
-        };
-    };
-
-    /**
-     * @param model {cg.Value}
-     * @returns {Object} JSON data
-     * @private
-     */
-    JSONSaver.prototype._saveValue = function (model) {
-        return {
-            "type": "value",
-            "value-type": model.valueType,
-            "default": model.value
         };
     };
 

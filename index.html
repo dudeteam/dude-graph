@@ -28,7 +28,7 @@
                     <paper-button class="dark" on-click="{{save}}">Save</paper-button>
                 </core-toolbar>
                     <core-ajax id="loader"
-                               url="examples/audigame.json"
+                               url="examples/hello_world.json"
                                handleAs="json"
                                on-core-response="{{graphLoaded}}"
                                auto>
@@ -48,12 +48,14 @@
             </div>
         </core-drawer-panel>
     </template>
-<script>
+    <script src="build-saver.js"></script>
+    <script>
         var demo = document.querySelector("#codegraph-demo");
         var jsonSaver = new cg.JSONSaver();
+        var buildSaver = new BuildSaver();
         demo.isLoading = true;
         demo.save = function () {
-            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
+            console.log(this.$.codegraph.save(buildSaver));
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;
