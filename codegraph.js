@@ -2969,8 +2969,9 @@ cg.JSONSaver = (function () {
         var models = {};
         var children = [];
         var connections = [];
-        pandora.forEach(graph.models, function (model, name) {
-            if (name.indexOf("set ") !== -1) { // do not save setters, they are automatically generated.
+        pandora.forEach(graph.models, function (model) {
+            // do not save setters or values, they are automatically generated.
+            if (model.name.indexOf("set ") !== 0 && model.name.indexOf("value-") !== 0) {
                 models[model.name] = this.save(model);
             }
         }.bind(this));
