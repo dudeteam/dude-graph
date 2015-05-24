@@ -21,6 +21,9 @@ html /deep/ h1 {
     text-align: center;
     margin: 0 0 20px 0;
 }
+html /deep/ p {
+    color: #888;
+}
 html /deep/ .box {
     background: rgba(0, 0, 0, .2);
     border-radius: 3px;
@@ -173,7 +176,6 @@ html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
 }
 html /deep/ dude-sidebar /deep/ p {
     margin: 20px;
-    color: #888;
     font-style: italic;
 }
 

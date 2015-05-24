@@ -101,6 +101,12 @@
             },
 
             deleteVariable: function (name) {
+                var blocks = this._graph.findBlocks(function (block) {
+                    return block._name === name;
+                });
+                pandora.forEach(blocks, function (block) {
+                    this._graph.removeEntity(block);
+                }.bind(this));
                 this._graph.deleteModel(name);
             },
 

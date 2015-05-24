@@ -1133,6 +1133,16 @@ cg.Graph = (function () {
         return result;
     };
 
+    Graph.prototype.findBlocks = function (fn) {
+        var result = [];
+        pandora.forEach(this._registeredBlockIds, function (block) {
+            if (fn(block)) {
+                result.push(block);
+            }
+        });
+        return result;
+    };
+
     /**
      * Return the group by id.
      * @param id

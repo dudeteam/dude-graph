@@ -27,6 +27,7 @@
         <paper-action-dialog id="confirm"
                              heading="Are you sure that you want to delete this variable?"
                              transition="core-transition-center" backdrop>
+            <p>Be careful! If you remove it, all its instances will also be removed from the story.</p>
             <paper-button affirmative>No</paper-button>
             <paper-button class="primary" on-click="{{_confirmDelete}}" affirmative autofocus>Yes</paper-button>
         </paper-action-dialog>
