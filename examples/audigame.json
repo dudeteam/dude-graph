@@ -1,20 +1,122 @@
 {
   "types": [
-    {"name": "string", "label": "text"},
-    {"name": "sound", "label": "sound"},
-    {"name": "number", "label": "time"},
-    {"name": "boolean", "label": "test"}
+    {
+      "name": "string",
+      "label": "text"
+    },
+    {
+      "name": "sound",
+      "label": "sound"
+    },
+    {
+      "name": "number",
+      "label": "time"
+    },
+    {
+      "name": "boolean",
+      "label": "test"
+    }
   ],
   "models": {
-    "start": {
+    "toto.mp3": {
+      "type": "variable",
+      "value-type": "sound",
+      "value": "oijo2ij34o2i3j423uh4i23ueone2u3h2i3h24"
+    },
+    "long time": {
+      "type": "variable",
+      "value-type": "number"
+    },
+    "default time": {
+      "type": "variable",
+      "value-type": "number"
+    },
+    "music game over": {
+      "type": "variable",
+      "value-type": "sound"
+    },
+    "music intro": {
+      "type": "variable",
+      "value-type": "sound"
+    },
+    "boom": {
+      "type": "variable",
+      "value-type": "sound"
+    },
+    "shoot": {
+      "type": "variable",
+      "value-type": "sound"
+    },
+    "mission success": {
+      "type": "variable",
+      "value-type": "string"
+    },
+    "game over": {
+      "type": "variable",
+      "value-type": "string"
+    },
+    "intro": {
+      "type": "variable",
+      "value-type": "string"
+    },
+    "alarm disabled?": {
+      "type": "variable",
+      "value-type": "boolean"
+    },
+    "can climb?": {
+      "type": "variable",
+      "value-type": "boolean"
+    },
+    "has key?": {
+      "type": "variable",
+      "value-type": "boolean"
+    },
+    "can enter?": {
+      "type": "variable",
+      "value-type": "boolean"
+    },
+    "condition": {
       "type": "action",
-      "inputs": [],
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": -1
+        },
+        {
+          "type": "boolean",
+          "name": "test"
+        }
+      ],
       "outputs": [
         {
           "type": "stream",
-          "name": "output"
+          "name": "yes"
+        },
+        {
+          "type": "stream",
+          "name": "no"
         }
       ]
+    },
+    "end": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": -1
+        },
+        {
+          "type": "string",
+          "name": "description"
+        },
+        {
+          "type": "sound",
+          "name": "sound"
+        }
+      ],
+      "outputs": []
     },
     "step": {
       "type": "action",
@@ -48,100 +150,123 @@
         }
       ]
     },
-    "end": {
+    "start": {
       "type": "action",
-      "inputs": [
+      "inputs": [],
+      "outputs": [
         {
           "type": "stream",
-          "name": "input",
-          "max": -1
-        },
-        {
-          "type": "string",
-          "name": "description"
-        },
-        {
-          "type": "sound",
-          "name": "sound"
+          "name": "output"
         }
-      ],
-      "outputs": []
+      ]
     },
-    "condition": {
+    "set test": {
       "type": "action",
       "inputs": [
         {
           "type": "stream",
-          "name": "input",
-          "max": -1
+          "name": "input"
         },
         {
           "type": "boolean",
-          "name": "test"
+          "name": "variable"
+        },
+        {
+          "type": "boolean",
+          "name": "other"
         }
       ],
       "outputs": [
         {
           "type": "stream",
-          "name": "yes"
-        },
-        {
-          "type": "stream",
-          "name": "no"
+          "name": "output"
         }
       ]
     },
-    "can enter?": {
-      "type": "variable",
+    "value-boolean": {
+      "type": "value",
       "value-type": "boolean"
     },
-    "has key?": {
-      "type": "variable",
-      "value-type": "boolean"
+    "set time": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "number",
+          "name": "variable"
+        },
+        {
+          "type": "number",
+          "name": "other"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output"
+        }
+      ]
     },
-    "can climb?": {
-      "type": "variable",
-      "value-type": "boolean"
-    },
-    "alarm disabled?": {
-      "type": "variable",
-      "value-type": "boolean"
-    },
-    "intro": {
-      "type": "variable",
-      "value-type": "string"
-    },
-    "game over": {
-      "type": "variable",
-      "value-type": "string"
-    },
-    "mission success": {
-      "type": "variable",
-      "value-type": "string"
-    },
-    "shoot": {
-      "type": "variable",
-      "value-type": "sound"
-    },
-    "boom": {
-      "type": "variable",
-      "value-type": "sound"
-    },
-    "music intro": {
-      "type": "variable",
-      "value-type": "sound"
-    },
-    "music game over": {
-      "type": "variable",
-      "value-type": "sound"
-    },
-    "default time": {
-      "type": "variable",
+    "value-number": {
+      "type": "value",
       "value-type": "number"
     },
-    "long time": {
-      "type": "variable",
-      "value-type": "number"
+    "set sound": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "sound",
+          "name": "variable"
+        },
+        {
+          "type": "sound",
+          "name": "other"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output"
+        }
+      ]
+    },
+    "value-sound": {
+      "type": "value",
+      "value-type": "sound"
+    },
+    "set text": {
+      "type": "action",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input"
+        },
+        {
+          "type": "string",
+          "name": "variable"
+        },
+        {
+          "type": "string",
+          "name": "other"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output"
+        }
+      ]
+    },
+    "value-string": {
+      "type": "value",
+      "value-type": "string"
     }
   },
   "children": [

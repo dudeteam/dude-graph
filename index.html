@@ -34,7 +34,6 @@
                                auto>
                     </core-ajax>
                     <cg-app id="codegraph" logo="images/dude_logo_dark.png"
-                            themeUrl="themes/audigame"
                             layout horizontal fit>
                     </cg-app>
             </core-header-panel>
@@ -54,7 +53,7 @@
         var jsonSaver = new cg.JSONSaver();
         demo.isLoading = true;
         demo.save = function () {
-            console.log(this.$.codegraph.save(jsonSaver));
+            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;
