@@ -943,7 +943,7 @@ cg.Graph = (function () {
     /**
      * Get a model from its name.
      * @param name {String}
-     * @returns {cg.Model|null}
+     * @returns {cg.Model}
      */
     Graph.prototype.getModel = function (name) {
         var result = null;
