@@ -55,7 +55,9 @@
         var buildSaver = new BuildSaver();
         demo.isLoading = true;
         demo.save = function () {
-            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
+            console.log(this.$.codegraph.save(buildSaver));
+//            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
+//            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;

@@ -2839,26 +2839,53 @@ cg.JSONLoader = (function () {
         for (var i = 0; i < typesData.length; ++i) {
             graph.addModel(new cg.Value({"value-type": typesData[i].name}), true);
             graph.addModel(new cg.Action({
-                "name": "set " + typesData[i].label,
+                "name": typesData[i].label + " equal",
+                "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+                "inputs": [
+                    {
+                        "type": typesData[i].name,
+                        "name": "first",
+                        "max": 1
+                    },
+                    {
+                        "type": typesData[i].name,
+                        "name": "second",
+                        "max": 1
+                    }
+                ],
+                "outputs": [
+                    {
+                        "type": "boolean",
+                        "name": "result",
+                        "max": -1
+                    }
+                ]
+            }));
+            graph.addModel(new cg.Action({
+                "name": typesData[i].label + " assign",
                 "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
                 "inputs": [
                     {
                         "type": "stream",
-                        "name": "input"
+                        "name": "input",
+                        "max": 1
                     },
                     {
                         "type": typesData[i].name,
-                        "name": "variable"
+                        "name": "variable",
+                        "max": 1
                     },
                     {
                         "type": typesData[i].name,
-                        "name": "other"
+                        "name": "other",
+                        "max": 1
                     }
                 ],
                 "outputs": [
                     {
                         "type": "stream",
-                        "name": "output"
+                        "name": "output",
+                        "max": 1
                     }
                 ]
             }), true);
@@ -2874,7 +2901,7 @@ cg.JSONLoader = (function () {
     JSONLoader.prototype._loadModels = function (modelsData, graph) {
         pandora.forEach(modelsData, function (model, name) {
             model.name = name;
-            graph.addModel(new cg[pandora.camelcase(model.type, "-")](model), true);
+            graph.addModel(new cg[pandora.camelcase(model.type, "-")](model));
         });
     };
 
@@ -2992,7 +3019,7 @@ cg.JSONSaver = (function () {
         var connections = [];
         pandora.forEach(graph.models, function (model) {
             // do not save setters or values, they are automatically generated.
-            if (model.name.indexOf("set ") !== 0 && model._type !== "value") {
+            if (/^[a-z]+ (assign|equal)$/.test(model.name) === false && model._type !== "value") {
                 models[model.name] = this.save(model);
             }
         }.bind(this));

@@ -12,20 +12,28 @@ var BuildSaver = (function () {
         return pandora.polymorphicMethod(this, "save", entity);
     };
 
-    BuildSaver.prototype.saveFromName = function (entity) {
-        if (this["_save" + pandora.camelcase(entity._name)] !== undefined) {
-            return this["_save" + pandora.camelcase(entity._name)](entity);
+    BuildSaver.prototype._saveFromName = function (entity) {
+        var m = /^[a-z]+ (assign|equal)$/.exec(entity._name); // check operators
+        if (m !== null && this["_save" + pandora.camelcase(m[1], " ")] !== undefined) {
+            return this["_save" + pandora.camelcase(m[1], " ")](entity);
+        } else if (this["_save" + pandora.camelcase(entity._name, " ")] !== undefined) {
+            return this["_save" + pandora.camelcase(entity._name, " ")](entity);
         } else {
-            this.emit("error", new pandora.MissingOverloadError("save" + pandora.camelcase(entity._name, "-"), "BuildSaver"));
+            this.emit("error", new pandora.MissingOverloadError("save" + pandora.camelcase(entity._name, " "), "BuildSaver"));
+            return null;
         }
     };
 
-    BuildSaver.prototype.saveFromModel = function (entity, prefix) {
-        if (this["_save" + prefix + pandora.camelcase(entity.model._type)] !== undefined) {
-            return this["_save" + prefix + pandora.camelcase(entity.model._type)](entity);
+    BuildSaver.prototype._save = function (entity) {
+        var result = null;
+        if (entity.model._type === "action") {
+            result = this._saveFromName(entity);
+        } else if (this["_savePicker" + pandora.camelcase(entity.model._type)] !== undefined) {
+            result = this["_savePicker" + pandora.camelcase(entity.model._type)](entity);
         } else {
-            this.emit("error", new pandora.MissingOverloadError("save" + prefix + pandora.camelcase(entity.model._type, "-"), "BuildSaver"));
+            this.emit("error", new pandora.MissingOverloadError("savePicker" + pandora.camelcase(entity.model._type, "-"), "BuildSaver"));
         }
+        return result;
     };
 
     /**
@@ -96,7 +104,7 @@ var BuildSaver = (function () {
         if (start === null) {
             this.emit("error", new cg.GraphError("A start block should be provided to create a story"));
         }
-        return this.saveFromName(this._getOutputBlock(start, 0));
+        return this._save(this._getOutputBlock(start, 0));
     };
 
     BuildSaver.prototype._saveStep = function (step) {
@@ -110,11 +118,11 @@ var BuildSaver = (function () {
         }
         return {
             "name": "step",
-            "description": this.saveFromModel(description, "Picker"),
-            "sound": this.saveFromModel(sound, "Picker"),
-            "duration": this.saveFromModel(duration, "Picker"),
-            "firstChoice": this.saveFromName(firstChoice),
-            "secondChoice": this.saveFromName(secondChoice)
+            "description": this._save(description),
+            "sound": this._save(sound),
+            "duration": this._save(duration),
+            "firstChoice": this._save(firstChoice),
+            "secondChoice": this._save(secondChoice)
         };
     };
 
@@ -126,9 +134,48 @@ var BuildSaver = (function () {
         }
         return {
             "name": "end",
-            "description": this.saveFromModel(description, "Picker"),
-            "sound": this.saveFromModel(sound, "Picker")
+            "description": this._save(description),
+            "sound": this._save(sound)
         };
+    };
+
+    BuildSaver.prototype._saveAssign = function (assign) {
+        var variable = this._getInputBlock(assign, 1);
+        var other = this._getInputBlock(assign, 2);
+        var output = this._getOutputBlock(assign, 0);
+        if (variable === null || other === null || output === null) {
+            return null;
+        }
+        return {
+            "name": assign._name,
+            "variable": this._save(variable),
+            "other": this._save(other),
+            "output": this._save(output)
+        };
+    };
+
+    BuildSaver.prototype._saveEqual = function (equal) {
+        var first = this._getInputBlock(equal, 0);
+        var second = this._getInputBlock(equal, 1);
+        return {
+            "name": equal._name,
+            "first": this._save(first),
+            "second": this._save(second)
+        };
+    };
+
+    BuildSaver.prototype._saveCondition = function (condition) {
+        var test = this._getInputBlock(condition, 1);
+        var yes = this._getOutputBlock(condition, 0);
+        var no = this._getOutputBlock(condition, 1);
+        if (test === null || yes === null || no === null) {
+            return null;
+        }
+        return {
+            "test": this._save(test),
+            "yes": this._save(yes),
+            "no": this._save(no)
+        }
     };
 
     BuildSaver.prototype._getInputBlock = function (block, index) {
