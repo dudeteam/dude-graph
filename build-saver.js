@@ -104,7 +104,20 @@ var BuildSaver = (function () {
         if (start === null) {
             this.emit("error", new cg.GraphError("A start block should be provided to create a story"));
         }
-        return this._save(this._getOutputBlock(start, 0));
+        var sound = this._getInputBlock(start, 0);
+        var duration = this._getInputBlock(start, 1);
+        var firstChoice = this._getOutputBlock(start, 0);
+        var secondChoice = this._getOutputBlock(start, 1);
+        if (sound === null || duration === null || firstChoice === null || secondChoice === null) {
+            return null;
+        }
+        return {
+            "name": "step",
+            "sound": this._save(sound),
+            "duration": this._save(duration),
+            "firstChoice": this._save(firstChoice),
+            "secondChoice": this._save(secondChoice)
+        };
     };
 
     BuildSaver.prototype._saveStep = function (step) {
@@ -172,6 +185,7 @@ var BuildSaver = (function () {
             return null;
         }
         return {
+            "name": "condition",
             "test": this._save(test),
             "yes": this._save(yes),
             "no": this._save(no)
