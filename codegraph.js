@@ -93,11 +93,11 @@ cg.GraphError = (function () {
 cg.Model = (function () {
 
     /**
-     * Represent an action model, aka how an Action entity will be created
-     * @param name {String} the action's name
+     * Represent a block model, aka how an Block entity will be created
+     * @param name {String} the block's name
      * @param inputs {Array<Object<String, String>>} the parameters
      * @param outputs {Array<Object<String, String>>} the returned values
-     * @param type {String?} to specify a type of action (getters for instance)
+     * @param type {String?} to specify a type of block (getters for instance)
      * @constructor
      */
     return pandora.class_("Model", function (name, inputs, outputs, type) {
@@ -122,7 +122,7 @@ cg.Model = (function () {
         });
 
         /**
-         *
+         * Model default inputs.
          * @type {Array<cg.Point>}
          * @private
          */
@@ -132,7 +132,7 @@ cg.Model = (function () {
         });
 
         /**
-         *
+         * Model default outputs.
          * @type {Array<cg.Point>}
          * @private
          */
@@ -171,7 +171,7 @@ cg.Variable = (function () {
 
     /**
      * Get a global variable of the blueprint.
-     * @param data {Object} some JSON data to represent the model
+     * @param data {{name: {String}, value-type: {String}, value: {Object}}} some JSON data to represent the model.
      * @extends cg.Model
      * @constructor
      */
@@ -202,9 +202,8 @@ cg.Variable = (function () {
 cg.Value = (function () {
 
     /**
-     * Like getter, this model returns only one value. However, its not link to a variable but just contains the
-     * actual value.
-     * @param data {Object} some JSON data to represent the model
+     * Like getter, this model returns only one value. However, its not linked to a variable but just contains the actual value.
+     * @param data {{value-type: {String}, value: {Object}}} some JSON data to represent the model
      * @extends cg.Model
      * @constructor
      */
