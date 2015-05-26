@@ -287,8 +287,8 @@
                     this.$.toolbar.state = "editGroup";
                 } else if (entity instanceof cg.Block) {
                     if (entity.model.type === "action") {
-                        this.$.success.text = "Actions are read only.";
-                        this.$.success.show();
+                        this.$.error.text = "Actions are read only.";
+                        this.$.error.show();
                     } else if (entity.model.type === "value" || entity.model.type === "variable") {
                         this.$.toolbar.state = "editPicker";
                         this.$.sidebar.state = "picker";

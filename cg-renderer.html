@@ -102,9 +102,13 @@
                 });
                 pandora.forEach(blocks, function (block) {
                     var newBlock = new cg.Block(block._id, newModel, block.position, block.value);
-                    // TODO: This is broken, no add
-                    this._graph.addEntity(newBlock, this._graph);
+                    console.log(block, block.inputs, block.outputs);
+                    var connection = block.outputs[0].connections[0] || null;
                     this._graph.removeEntity(block);
+                    this._graph.addEntity(newBlock, this._graph);
+                    if (connection !== null) {
+                        this._graph.addConnection(new cg.Connection(newBlock.outputs[0], connection.inputPoint));
+                    }
                 }.bind(this));
                 return true;
             },
