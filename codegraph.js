@@ -740,7 +740,7 @@ cg.Block = (function () {
      * @param _id {Number|String} the unique id within the graph for this kind of entity.
      * @param model {cg.Model} the action model.
      * @param position {pandora.Vec2} the position on the screen.
-     * @param value {*}
+     * @param value {*} An optional value for this block.
      * @extends cg.Entity
      * @constructor
      */
@@ -788,7 +788,7 @@ cg.Block = (function () {
         });
 
         /**
-         * An optional value for this action.
+         * An optional value for this block.
          * @type {*}
          * @private
          */
@@ -945,6 +945,7 @@ cg.Graph = (function () {
      * Add a model of action.
      * @param model {cg.Model|cg.Variable|cg.Value|cg.Action}
      * @param append {Boolean} defines whether the model should be added at the end or the begin.
+     * @return {cg.Model}
      */
     Graph.prototype.addModel = function (model, append) {
         if (append) {
@@ -952,12 +953,13 @@ cg.Graph = (function () {
         } else {
             this._models.unshift(model);
         }
+        return model;
     };
 
     /**
      * Get a model from its name.
      * @param name {String}
-     * @returns {cg.Model}
+     * @returns {cg.Model|null}
      */
     Graph.prototype.getModel = function (name) {
         var result = null;
@@ -973,18 +975,20 @@ cg.Graph = (function () {
     /**
      * Remove a model from its name.
      * @param name
+     * @returns {cg.Model|null}
      */
-    Graph.prototype.deleteModel = function (name) {
-        var index = -1;
-        pandora.forEach(this._models, function (model, i) {
+    Graph.prototype.removeModel = function (name) {
+        var foundModel = null;
+        pandora.forEach(this._models, function (model) {
             if (model.name === name) {
-                index = i;
+                foundModel = model;
                 return true;
             }
         });
-        if (index !== -1) {
-            this._models.splice(index, 1);
+        if (foundModel) {
+            this._models.splice(this._models.indexOf(foundModel), 1);
         }
+        return foundModel;
     };
 
     /**
@@ -1122,6 +1126,11 @@ cg.Graph = (function () {
         return blocks;
     };
 
+    /**
+     * Find a block by condition.
+     * @param fn
+     * @return {cg.Block}
+     */
     Graph.prototype.findBlock = function (fn) {
         var result = null;
         pandora.forEach(this._registeredBlockIds, function (block) {
@@ -1133,6 +1142,11 @@ cg.Graph = (function () {
         return result;
     };
 
+    /**
+     * Find blocks by conditions
+     * @param fn
+     * @return {Array<cg.Block>}
+     */
     Graph.prototype.findBlocks = function (fn) {
         var result = [];
         pandora.forEach(this._registeredBlockIds, function (block) {
