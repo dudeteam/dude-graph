@@ -68,7 +68,7 @@
                 }
             },
             _valueChanged: function () {
-                if (this._type === "sound" && this._value) {
+                if (this._type === "sound" && this._value && this._value.name) {
                     this._name = this._value.name;
                 }
             },
