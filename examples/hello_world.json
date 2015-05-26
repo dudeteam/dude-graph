@@ -17,8 +17,9 @@
       "label": "test"
     }
   ],
-  "models": {
-    "start": {
+  "models": [
+    {
+      "name": "start",
       "type": "action",
       "description": "This block is the entry point of your story, the first step should be attached to it. Be careful, you should have only one start by story!",
       "inputs": [],
@@ -29,7 +30,8 @@
         }
       ]
     },
-    "step": {
+    {
+      "name": "step",
       "type": "action",
       "description": "This block represents a step of the story. You define the <description>, <sound> and <duration> of this step. Then, you connect this step to the 2 potential next choices.",
       "inputs": [
@@ -62,7 +64,8 @@
         }
       ]
     },
-    "end": {
+    {
+      "name": "end",
       "type": "action",
       "description": "It works like step but finishes a story, you can have several possible ends.",
       "inputs": [
@@ -82,7 +85,8 @@
       ],
       "outputs": []
     },
-    "condition": {
+    {
+      "name": "condition",
       "type": "action",
       "description": "Choose the steam yes or no according whether the <test> is true or false.",
       "inputs": [
@@ -108,7 +112,8 @@
         }
       ]
     },
-    "regex": {
+    {
+      "name": "regex",
       "type": "action",
       "description": "Check whether the <input> string matches the <regex> and return true, return false otherwise.",
       "inputs": [
@@ -131,22 +136,73 @@
         }
       ]
     },
-    "default time": {
+    {
+      "name": "greater than",
+      "type": "action",
+      "description": "Check whether the <first> time is greater than the <second> one.",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "number",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "output",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "less than",
+      "type": "action",
+      "description": "Check whether the <first> time is less than the <second> one.",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "number",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "output",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "default time",
       "type": "variable",
       "value-type": "number",
       "value": 5
     },
-    "SARA_A slave.mp3": {
+    {
+      "name": "SARA_A slave.mp3",
       "type": "variable",
       "value-type": "sound",
       "value": {}
     },
-    "is a looser?": {
+    {
+      "name": "is a looser?",
       "type": "variable",
       "value-type": "boolean",
       "value": false
     }
-  },
+  ],
   "children": [
     {
       "_type": "block",

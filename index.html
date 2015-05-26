@@ -48,6 +48,9 @@
             </div>
         </core-drawer-panel>
     </template>
+    <script src="../d3/d3.js"></script>
+    <script src="../pandora/lib/pandora.js"></script>
+    <script src="codegraph.js"></script>
     <script src="build-saver.js"></script>
     <script>
         var demo = document.querySelector("#codegraph-demo");
@@ -57,7 +60,7 @@
         demo.save = function () {
             console.log(this.$.codegraph.save(buildSaver));
 //            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
-//            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
+            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;

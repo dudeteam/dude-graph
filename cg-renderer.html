@@ -180,11 +180,11 @@
             },
 
             hasSelectedEntities: function () {
-                return this._renderer.hasSelectedEntities();
+                return this._isReady && this._renderer.hasSelectedEntities();
             },
 
             hasSelection: function () {
-                return this._renderer.hasSelection();
+                return this._isReady && this._renderer.hasSelection();
             },
 
             zoomToFit: function () {

@@ -2899,10 +2899,9 @@ cg.JSONLoader = (function () {
      * @private
      */
     JSONLoader.prototype._loadModels = function (modelsData, graph) {
-        pandora.forEach(modelsData, function (model, name) {
-            model.name = name;
-            graph.addModel(new cg[pandora.camelcase(model.type, "-")](model));
-        });
+        for (var i = modelsData.length - 1; i >= 0; --i) {
+            graph.addModel(new cg[pandora.camelcase(modelsData[i].type, "-")](modelsData[i]));
+        }
     };
 
     /**
@@ -3014,13 +3013,13 @@ cg.JSONSaver = (function () {
      * @private
      */
     JSONSaver.prototype._saveGraph = function (graph) {
-        var models = {};
+        var models = [];
         var children = [];
         var connections = [];
         pandora.forEach(graph.models, function (model) {
             // do not save setters or values, they are automatically generated.
             if (/^[a-z]+ (assign|equal)$/.test(model.name) === false && model._type !== "value") {
-                models[model.name] = this.save(model);
+                models.push(this.save(model));
             }
         }.bind(this));
         graph.children.forEach(function (child) {
@@ -3044,6 +3043,7 @@ cg.JSONSaver = (function () {
      */
     JSONSaver.prototype._saveAction = function (model) {
         return {
+            "name": model.name,
             "type": "action",
             "description": model.description,
             "inputs": model.inputs,
@@ -3058,6 +3058,7 @@ cg.JSONSaver = (function () {
      */
     JSONSaver.prototype._saveVariable = function (model) {
         return {
+            "name": model.name,
             "type": "variable",
             "value-type": model.valueType,
             "value": model.value
