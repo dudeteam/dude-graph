@@ -67,10 +67,10 @@
 
             createVariable: function (type, name, value) {
                 if (!name) {
-                    this.fire("error", {error: new pandora.Exception("A name should provided to create a variable")});
+                    this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
                 }
-                if (this._graph.getModel(name) !== null) {
+                if (this._graph.getModel(name)) {
                     this.fire("error", {error: new pandora.Exception("Variable {0} already exists", name)});
                     return false;
                 }
@@ -83,33 +83,28 @@
             },
 
             editVariable: function (previous, type, name, value) {
-                if (name === "") {
-                    this.fire("error", {error: new pandora.Exception("A name should provided to create a variable")});
+                if (!name) {
+                    this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
                 }
-                if (name !== previous && this._graph.getModel(name) !== null) {
+                if (this._graph.getModel(name)) {
                     this.fire("error", {error: new pandora.Exception("Variable {0} already exists", name)});
                     return false;
                 }
-                var previousModel = this._graph.removeModel(previous);
-                var newModel = this._graph.addModel(new cg.Variable({
-                    "name": name,
-                    "value-type": type,
-                    "value": value
-                }));
+                var model = this._graph.getModel(previous);
+                if (!model) {
+                    this.fire("error", {error: new pandora.Exception("Variable {0} does not exist", previous)});
+                    return false;
+                }
                 var blocks = this._graph.findBlocks(function (block) {
-                    return block._model === previousModel;
+                    return block._name === previous;
                 });
+                model._name = name;
                 pandora.forEach(blocks, function (block) {
-                    var newBlock = new cg.Block(block._id, newModel, block.position, block.value);
-                    console.log(block, block.inputs, block.outputs);
-                    var connection = block.outputs[0].connections[0] || null;
-                    this._graph.removeEntity(block);
-                    this._graph.addEntity(newBlock, this._graph);
-                    if (connection !== null) {
-                        this._graph.addConnection(new cg.Connection(newBlock.outputs[0], connection.inputPoint));
-                    }
-                }.bind(this));
+                    block.__name = name;
+                    block.emit("update");
+                    block.emit("move");
+                });
                 return true;
             },
 
