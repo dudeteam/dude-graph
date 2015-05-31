@@ -14,9 +14,20 @@
     <link rel="import" href="../core-header-panel/core-header-panel.html">
     <link rel="import" href="../core-toolbar/core-toolbar.html">
     <link rel="import" href="../core-ajax/core-ajax.html">
+    <link rel="import" href="../paper-dialog/paper-dialog.html">
+    <link rel="import" href="audigame-preview.html">
     <link rel="import" href="cg-app.html">
     <link rel="stylesheet" href="themes/base.css" shim-shadowdom>
     <link rel="stylesheet" href="themes/audigame/theme.css" shim-shadowdom>
+    <style>
+        html /deep/ #previewDialog {
+            background: #222222;
+            border-radius: 10px;
+        }
+        html /deep/ #homeButton {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body fullbleed unresolved>
     <template id="codegraph-demo" is="auto-binding">
@@ -28,7 +39,7 @@
                     <paper-button class="dark" on-click="{{save}}">Save</paper-button>
                 </core-toolbar>
                     <core-ajax id="loader"
-                               url="examples/hello_world.json"
+                               url="examples/audigame_tutorial.json"
                                handleAs="json"
                                on-core-response="{{graphLoaded}}"
                                auto>
@@ -36,6 +47,13 @@
                     <cg-app id="codegraph" logo="images/dude_logo_dark.png"
                             layout horizontal fit>
                     </cg-app>
+                    <paper-dialog id="previewDialog"
+                                  backdrop
+                                  transition="core-transition-top"
+                                  autoCloseDisabled>
+                        <audigame-preview id="preview"></audigame-preview>
+                        <paper-button id="homeButton" class="primary full" on-click="{{quitPreview}}">Back to editor</paper-button>
+                    </paper-dialog>
             </core-header-panel>
             <div drawer>
                 <core-menu selected="2">
@@ -58,9 +76,75 @@
         var buildSaver = new BuildSaver();
         demo.isLoading = true;
         demo.save = function () {
-            console.log(this.$.codegraph.save(buildSaver));
 //            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
-            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
+//            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
+//            console.log(this.$.codegraph.save(buildSaver));
+            this.$.previewDialog.open();
+//            this.$.preview.game = this.$.codegraph.save(buildSaver);
+            this.$.preview.game = {
+                "variables": {
+                    "gameover.mp3": {
+                        "type": "sound",
+                        "value": {
+                            "file_name": "audigame_assets/gameover.mp3"
+                        }
+                    },
+                    "success.mp3": {
+                        "type": "sound",
+                        "value": {
+                            "file_name": "audigame_assets/success.mp3"
+                        }
+                    },
+                    "intro.mp3": {
+                        "type": "sound",
+                        "value": {
+                            "file_name": "audigame_assets/intro.mp3"
+                        }
+                    },
+                    "default time": {
+                        "type": "number",
+                        "value": 5
+                    }
+                },
+                "story": {
+                    "name": "step",
+                    "sound": {
+                        "type": "sound",
+                        "name": "intro.mp3"
+                    },
+                    "duration": {
+                        "type": "number",
+                        "name": "default time"
+                    },
+                    "firstChoice": {
+                        "name": "end",
+                        "description": {
+                            "type": "string",
+                            "value": "I'm ready to write awesome stories!"
+                        },
+                        "sound": {
+                            "type": "sound",
+                            "name": "success.mp3"
+                        }
+                    },
+                    "secondChoice": {
+                        "name": "end",
+                        "description": {
+                            "type": "string",
+                            "value": "I'm not ready at all, I'll gonna read the tutorial..."
+                        },
+                        "sound": {
+                            "type": "sound",
+                            "name": "gameover.mp3"
+                        }
+                    }
+                }
+            };
+            this.$.preview.play();
+        };
+        demo.quitPreview = function () {
+            this.$.preview.reset();
+            this.$.previewDialog.opened = false;
         };
         demo.graphLoaded = function () {
             demo.isLoading = false;

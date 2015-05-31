@@ -1,0 +1,162 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../core-icons/av-icons.html">
+<link rel="import" href="../dude-gui/dude-state.html">
+<polymer-element name="audigame-preview">
+    <template>
+        <style>
+            :host {
+                width: 350px;
+                display: block;
+                background: #2b2b2b;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            paper-button {
+                color: rgb(243, 156, 18);
+            }
+            paper-progress, img {
+                width: 100%;
+            }
+            #toolbar {
+                border-radius: 5px;
+                padding: 5px;
+                background: rgba(0, 0, 0, 0.2);
+            }
+            #toolbar div {
+                text-align: center;
+            }
+            #toolbar paper-icon-button {
+                color: rgba(243, 156, 18, 1);
+            }
+            #toolbar paper-icon-button[disabled] {
+                color: rgba(243, 156, 18, .5);
+            }
+            p {
+                text-align: center;
+            }
+        </style>
+        <div>
+            <img src="audigame_assets/cover.png" style="width: 100%">
+        </div>
+        <paper-progress value="{{_progress}}"></paper-progress>
+        <dude-state root="None" state="{{_state}}">
+            <div id="choices" layout horizontal data-state="Choice">
+                <paper-button on-click="{{_firstChoice}}" flex self-center>{{_firstChoiceMessage}}</paper-button>
+                <paper-button on-click="{{_secondChoice}}" flex self-center>{{_secondChoiceMessage}}</paper-button>
+            </div>
+            <p data-state="Sound">
+                Playing sound...
+            </p>
+            <p data-state="None">No game data.</p>
+            <p data-state="End">The game is finished, try again?</p>
+        </dude-state>
+        <div id="toolbar" layout horizontal>
+            <div flex><paper-icon-button on-click="{{_togglePlay}}" icon="av:{{_playIcon}}" disabled?="{{_disablePlay}}"></paper-icon-button></div>
+            <div flex><paper-icon-button on-click="{{_restart}}" icon="av:replay"></paper-icon-button></div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            publish: {
+                game: null
+            },
+            _isPlaying: true,
+            _playIcon: "pause",
+            _disablePlay: false,
+            _src: "",
+            _progress: 0,
+            _audio: new Audio(),
+            _state: "None",
+            _currentStep: null,
+            play: function() {
+                this.reset();
+                this._startSound();
+                var gameLoop = function () {
+                    if (this["_update" + this._state] !== undefined) {
+                        this["_update" + this._state]();
+                    }
+                    requestAnimationFrame(gameLoop);
+                }.bind(this);
+                gameLoop();
+            },
+            reset: function () {
+                this._progress = 0;
+                this._currentStep = this.game.story;
+                this._isPlaying = true;
+                this._playIcon = "pause";
+                if (this._state === "Sound") {
+                    this._audio.pause();
+                }
+            },
+            _restart: function () {
+                this.reset();
+                this._startSound();
+            },
+            _togglePlay: function () {
+                if (this["_togglePlay" + this._state] !== undefined) {
+                    this["_togglePlay" + this._state]();
+                }
+                if (this._isPlaying) {
+                    this._isPlaying = false;
+                    this._playIcon = "play-arrow";
+                } else {
+                    this._isPlaying = true;
+                    this._playIcon = "pause";
+                }
+            },
+            _startSound: function () {
+                this._state = "Sound";
+                this._disablePlay = false;
+                this._audio.setAttribute("src", this._getValue(this._currentStep.sound).file_name);
+                this._audio.load();
+                this._audio.play();
+            },
+            _updateSound: function () {
+                this._progress = 100 * this._audio.currentTime / this._audio.duration;
+                if (this._audio.ended) {
+                    if (this._currentStep.name === "end") {
+                        this._state = "End";
+                    } else {
+                        this._startChoice();
+                    }
+                }
+            },
+            _togglePlaySound: function () {
+                if (this._isPlaying) {
+                    this._audio.pause();
+                } else {
+                    this._audio.play();
+                }
+            },
+            _startChoice: function () {
+                this._isPlaying = true;
+                this._state = "Choice";
+                this._disablePlay = true;
+                this._startTime = Date.now();
+                this._duration = this._getValue(this._currentStep.duration);
+                this._firstChoiceMessage = this._getValue(this._currentStep.firstChoice.description);
+                this._secondChoiceMessage = this._getValue(this._currentStep.secondChoice.description);
+            },
+            _updateChoice: function () {
+                this._progress = 0.1 * (Date.now() - this._startTime) / this._duration;
+                if (this._progress > 100) {
+                    this._firstChoice();
+                }
+            },
+            _getValue: function (data) {
+                return data.name !== undefined ? this.game.variables[data.name].value : data.value;
+            },
+            _firstChoice: function () {
+                this._currentStep = this._currentStep.firstChoice;
+                this._startSound();
+            },
+            _secondChoice: function () {
+                this._currentStep = this._currentStep.secondChoice;
+                this._startSound();
+            }
+        });
+    </script>
+</polymer-element>

@@ -19,6 +19,30 @@
   ],
   "models": [
     {
+      "name": "gameover.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "success.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "intro.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "default time",
+      "type": "variable",
+      "value-type": "number",
+      "value": 5
+    },
+    {
       "name": "start",
       "type": "action",
       "description": "This block is the entry point of your story, the first step should be attached to it. Be careful, you should have only one start by story!",
@@ -196,24 +220,6 @@
           "max": -1
         }
       ]
-    },
-    {
-      "name": "default time",
-      "type": "variable",
-      "value-type": "number",
-      "value": 5
-    },
-    {
-      "name": "SARA_A slave.mp3",
-      "type": "variable",
-      "value-type": "sound",
-      "value": {}
-    },
-    {
-      "name": "is a looser?",
-      "type": "variable",
-      "value-type": "boolean",
-      "value": false
     }
   ],
   "children": [
@@ -222,249 +228,94 @@
       "_id": 0,
       "_name": "start",
       "position": [
-        49,
-        141
-      ]
-    },
-    {
-      "_type": "block",
-      "_id": 1,
-      "_name": "step",
-      "position": [
-        518,
-        52
-      ]
-    },
-    {
-      "_type": "block",
-      "_id": 2,
-      "_name": "end",
-      "position": [
-        1102,
-        33
-      ]
-    },
-    {
-      "_type": "block",
-      "_id": 3,
-      "_name": "end",
-      "position": [
-        1249,
-        261
+        426,
+        140
       ]
     },
     {
       "_type": "block",
       "_id": 4,
-      "_name": "value-string",
+      "_name": "default time",
       "position": [
-        517,
-        192
-      ],
-      "value": "Step's description..."
+        452,
+        274
+      ]
     },
     {
       "_type": "block",
       "_id": 5,
-      "_name": "value-string",
+      "_name": "end",
       "position": [
-        1111,
-        190
-      ],
-      "value": "OK"
+        771,
+        21
+      ]
     },
     {
       "_type": "block",
       "_id": 6,
-      "_name": "value-string",
+      "_name": "end",
       "position": [
-        1269,
-        168
-      ],
-      "value": "KO"
+        776,
+        243
+      ]
     },
     {
       "_type": "block",
       "_id": 7,
-      "_name": "SARA_A slave.mp3",
+      "_name": "value-string",
       "position": [
-        523,
-        244
+        714,
+        132
       ],
-      "value": {}
+      "value": "I'm ready to write awesome stories!"
     },
     {
       "_type": "block",
       "_id": 8,
-      "_name": "SARA_A slave.mp3",
+      "_name": "value-string",
       "position": [
-        1078,
-        143
+        681,
+        351
       ],
-      "value": {}
+      "value": "I'm not ready at all, I'll gonna read the tutorial..."
     },
     {
       "_type": "block",
       "_id": 9,
-      "_name": "SARA_A slave.mp3",
+      "_name": "value-sound",
       "position": [
-        1234,
-        214
+        768,
+        400
       ],
-      "value": {}
+      "value": "gameover.mp3"
     },
     {
       "_type": "block",
       "_id": 10,
-      "_name": "value-number",
+      "_name": "success.mp3",
       "position": [
-        553,
-        292
-      ],
-      "value": 5
+        767,
+        179
+      ]
     },
     {
       "_type": "block",
       "_id": 11,
-      "_name": "test assign",
+      "_name": "intro.mp3",
       "position": [
-        198,
-        18
+        457,
+        228
       ]
-    },
-    {
-      "_type": "block",
-      "_id": 12,
-      "_name": "is a looser?",
-      "position": [
-        203,
-        128
-      ],
-      "value": false
-    },
-    {
-      "_type": "block",
-      "_id": 14,
-      "_name": "value-boolean",
-      "position": [
-        207,
-        176
-      ],
-      "value": true
-    },
-    {
-      "_type": "block",
-      "_id": 15,
-      "_name": "condition",
-      "position": [
-        823,
-        33
-      ]
-    },
-    {
-      "_type": "block",
-      "_id": 13,
-      "_name": "text equal",
-      "position": [
-        807,
-        127
-      ]
-    },
-    {
-      "_type": "block",
-      "_id": 16,
-      "_name": "value-string",
-      "position": [
-        829,
-        215
-      ],
-      "value": "Hello"
-    },
-    {
-      "_type": "block",
-      "_id": 17,
-      "_name": "value-string",
-      "position": [
-        823,
-        262
-      ],
-      "value": "Good bye"
     }
   ],
   "connections": [
     {
       "from": {
-        "block": 6
+        "block": 4,
+        "point": "default time"
       },
       "to": {
-        "block": 3,
-        "point": "description"
-      }
-    },
-    {
-      "from": {
-        "block": 5
-      },
-      "to": {
-        "block": 2,
-        "point": "description"
-      }
-    },
-    {
-      "from": {
-        "block": 1,
-        "point": "second choice"
-      },
-      "to": {
-        "block": 3,
-        "point": "input"
-      }
-    },
-    {
-      "from": {
-        "block": 8,
-        "point": "SARA_A slave.mp3"
-      },
-      "to": {
-        "block": 2,
-        "point": "sound"
-      }
-    },
-    {
-      "from": {
-        "block": 9,
-        "point": "SARA_A slave.mp3"
-      },
-      "to": {
-        "block": 3,
-        "point": "sound"
-      }
-    },
-    {
-      "from": {
-        "block": 4
-      },
-      "to": {
-        "block": 1,
-        "point": "description"
-      }
-    },
-    {
-      "from": {
-        "block": 7,
-        "point": "SARA_A slave.mp3"
-      },
-      "to": {
-        "block": 1,
-        "point": "sound"
-      }
-    },
-    {
-      "from": {
-        "block": 10
-      },
-      "to": {
-        "block": 1,
+        "block": 0,
         "point": "duration"
       }
     },
@@ -474,95 +325,65 @@
         "point": "first choice"
       },
       "to": {
+        "block": 5,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 7
+      },
+      "to": {
+        "block": 5,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
+        "block": 0,
+        "point": "second choice"
+      },
+      "to": {
+        "block": 6,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 8
+      },
+      "to": {
+        "block": 6,
+        "point": "description"
+      }
+    },
+    {
+      "from": {
         "block": 11,
-        "point": "input"
+        "point": "intro.mp3"
+      },
+      "to": {
+        "block": 0,
+        "point": "sound"
       }
     },
     {
       "from": {
-        "block": 11,
-        "point": "output"
+        "block": 10,
+        "point": "success.mp3"
       },
       "to": {
-        "block": 1,
-        "point": "input"
+        "block": 5,
+        "point": "sound"
       }
     },
     {
       "from": {
-        "block": 12,
-        "point": "is a looser?"
+        "block": 9
       },
       "to": {
-        "block": 11,
-        "point": "variable"
-      }
-    },
-    {
-      "from": {
-        "block": 14
-      },
-      "to": {
-        "block": 11,
-        "point": "other"
-      }
-    },
-    {
-      "from": {
-        "block": 1,
-        "point": "first choice"
-      },
-      "to": {
-        "block": 15,
-        "point": "input"
-      }
-    },
-    {
-      "from": {
-        "block": 15,
-        "point": "yes"
-      },
-      "to": {
-        "block": 3,
-        "point": "input"
-      }
-    },
-    {
-      "from": {
-        "block": 15,
-        "point": "no"
-      },
-      "to": {
-        "block": 2,
-        "point": "input"
-      }
-    },
-    {
-      "from": {
-        "block": 13,
-        "point": "result"
-      },
-      "to": {
-        "block": 15,
-        "point": "test"
-      }
-    },
-    {
-      "from": {
-        "block": 16
-      },
-      "to": {
-        "block": 13,
-        "point": "first"
-      }
-    },
-    {
-      "from": {
-        "block": 17
-      },
-      "to": {
-        "block": 13,
-        "point": "second"
+        "block": 6,
+        "point": "sound"
       }
     }
   ]
