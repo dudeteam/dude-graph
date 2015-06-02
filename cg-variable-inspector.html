@@ -5,7 +5,21 @@
 <link rel="import" href="cg-type-dropdown.html">
 <polymer-element name="cg-variable-inspector">
     <template>
-        <div>
+        <style>
+            #panel {
+                position: relative;
+            }
+            #back {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            h1 {
+                padding-top: 20px;
+            }
+        </style>
+        <div id="panel">
+            <paper-icon-button on-click="{{_back}}" id="back" icon="close"></paper-icon-button>
             <h1>{{_label}}</h1>
             <cg-type-dropdown type="{{_type}}"
                               types="{{types}}"
@@ -87,6 +101,9 @@
                     this.variable.previousName = previousName;
                 }
                 this.fire("submit");
+            },
+            _back: function () {
+                this.fire("cancel");
             },
             _close: function () {
                 if (this.editMode) {

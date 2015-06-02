@@ -125,16 +125,20 @@
                     </core-menu>
                     <paper-button on-click="{{_showCreateVariable}}" class="primary full">Add variable</paper-button>
                 </div>
-                <div data-state="editAction">
-                    <h1>{{_currentAction.name}}</h1>
+                <div data-state="editAction" style="position: relative">
+                    <paper-icon-button on-click="{{_cancelAction}}"
+                                       icon="close"
+                                       style="position: absolute; left: 0">
+                    </paper-icon-button>
+                    <h1 style="padding-top: 20px">{{_currentAction.name}}</h1>
                     <p>{{_currentAction.data.description}}</p>
-                    <paper-button class="primary full" on-click="{{_cancelAction}}">Back</paper-button>
                 </div>
                 <cg-variable-inspector data-state="editVariable"
                                        variable="{{_currentVariable}}"
                                        types="{{graph.types}}"
                                        on-submit="{{_editVariable}}"
                                        on-delete="{{_deleteVariable}}"
+                                       on-cancel="{{_cancelVariable}}"
                                        editMode>
                 </cg-variable-inspector>
                 <cg-variable-inspector data-state="createVariable"
