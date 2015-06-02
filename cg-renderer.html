@@ -125,12 +125,22 @@
             },
 
             createAction: function (model, position) {
+                position.assign([
+                    position.x - this._graph.zoom.translate[0],
+                    position.y - this._graph.zoom.translate[1]
+                ]);
                 var block = new cg.Block(this._graph.getNextBlockId(), model, position);
                 this._graph.addEntity(block, this._graph);
                 return block;
             },
 
             createPicker: function (pattern, searchResult, position, parent) {
+                console.log(position);
+                position.assign([
+                    position.x - this._graph.zoom.translate[0],
+                    position.y - this._graph.zoom.translate[1]
+                ]);
+                console.log(position);
                 var model = this._getValueModel(pattern) || this._getVariableModel(searchResult);
                 if (model === null) {
                     return null;
