@@ -31,7 +31,7 @@
         <dude-panel id="panel"
                     name="story-editor"
                     config="{{config.panel}}"
-                    on-dude-reset="{{_resetPicker}}"
+                    on-dude-reset="{{_reset}}"
                     flex>
             <dude-toolbar id="toolbar">
                 <div data-state="root" layout horizontal justified>
@@ -403,7 +403,8 @@
                 }.bind(this));
                 return model;
             },
-            _resetPicker: function() {
+            _reset: function() {
+                this._currentVariable = null;
                 this._pickerPattern = "";
                 this.$.pickerElement.reset();
             },
