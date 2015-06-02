@@ -17,6 +17,10 @@
       "label": "test"
     }
   ],
+  "zoom": {
+    "translate": [-200, 0],
+    "scale": 1
+  },
   "models": [
     {
       "name": "gameover.mp3",

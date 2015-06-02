@@ -90,6 +90,7 @@
                 if (this._state === "Sound") {
                     this._audio.pause();
                 }
+                this._state = "None";
             },
             _restart: function () {
                 this.reset();

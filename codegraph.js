@@ -869,6 +869,21 @@ cg.Graph = (function () {
         this.types = [];
 
         /**
+         * Default zoom value of the graph.
+         */
+        this._zoom = {
+            translate: [0, 0],
+            scale: 1
+        };
+        Object.defineProperty(this, "zoom", {
+            get: function () { return this._zoom; }.bind(this),
+            set: function (value) {
+                this._zoom = value;
+                this.emit("zoom");
+            }.bind(this)
+        });
+
+        /**
          * Contains the model of actions that can be created.
          * @type {Array}
          * @private
@@ -2659,7 +2674,15 @@ cg.Renderer.prototype._renderZoom = function() {
                 pandora.preventCallback(d3.event.sourceEvent);
             }
             this._rootGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            this._graph.zoom.translate = this._zoom.translate();
+            this._graph.zoom.scale = this._zoom.scale();
         }.bind(this));
+    this._graph.on("zoom", function () {
+        this._zoom.translate(this._graph.zoom.translate);
+        this._zoom.scale(this._graph.zoom.scale);
+        this._svg.call(this._zoom.event);
+    }.bind(this));
+    this._graph.emit("zoom"); // apply the zoom at least once
     this._svg.call(this._zoom);
 };
 /**
@@ -2845,6 +2868,10 @@ cg.JSONLoader = (function () {
                 this.emit("error", new pandora.MissingOverloadError("load" + pandora.camelcase(name, "-"), "JSONLoader"));
             }
         }.bind(this));
+    };
+
+    JSONLoader.prototype._loadZoom = function (zoomData, graph) {
+        graph.zoom = zoomData;
     };
 
     JSONLoader.prototype._loadTypes = function (typesData, graph) {
@@ -3043,6 +3070,7 @@ cg.JSONSaver = (function () {
         }
         return {
             "types": graph.types,
+            "zoom": graph.zoom,
             "models": models,
             "children": children,
             "connections": connections
