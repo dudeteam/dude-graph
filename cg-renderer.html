@@ -166,7 +166,7 @@
                         "value-type": "boolean",
                         "value": pattern === "true"
                     });
-                } else if (/^".+"$/.test(pattern)) {
+                } else if (/^".*"$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "string",
                         "value": pattern.substr(1, pattern.length - 2)
