@@ -176,11 +176,6 @@
                         "value-type": "number",
                         "value": parseInt(pattern)
                     });
-                } else if (/^[a-zA-Z0-9\/]+\.mp3$/.test(pattern)) {
-                    return new cg.Value({
-                        "value-type": "sound",
-                        "value": pattern
-                    });
                 }
                 return null;
             },
