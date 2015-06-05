@@ -144,8 +144,8 @@
 
             createPicker: function (pattern, searchResult, position, parent) {
                 position.assign([
-                    position.x - this._graph.zoom.translate[0],
-                    position.y - this._graph.zoom.translate[1]
+                    position.x - this._graph.zoom.translate[0] / this._graph.zoom.scale,
+                    position.y - this._graph.zoom.translate[1] / this._graph.zoom.scale
                 ]);
                 var model = this._getValueModel(pattern) || this._getVariableModel(searchResult);
                 if (model === null) {
