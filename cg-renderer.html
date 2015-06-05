@@ -70,8 +70,8 @@
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
                 }
-                if (/^[a-zA-Z][a-zA-Z0-9-_ ]*$/.test(name) === false) {
-                    this.fire("error", {error: new pandora.Exception("A variable name should be a valid identifier")});
+                if (/^[_a-zA-Z][a-zA-Z0-9-_ ]*$/.test(name) === false) {
+                    this.fire("error", {error: new pandora.Exception("A variable name begins with a letter followed by alphanumeric characters, '_',  '-' or spaces")});
                     return false;
                 }
                 if (this._graph.getModel(name)) {
@@ -89,6 +89,10 @@
             editVariable: function (previous, type, name, value) {
                 if (!name) {
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
+                    return false;
+                }
+                if (/^[_a-zA-Z][a-zA-Z0-9-_ ]*$/.test(name) === false) {
+                    this.fire("error", {error: new pandora.Exception("A variable name begins with a letter followed by alphanumeric characters, '_',  '-' or spaces")});
                     return false;
                 }
                 if (previous !== name && this._graph.getModel(name)) {
