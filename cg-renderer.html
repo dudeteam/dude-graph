@@ -70,7 +70,7 @@
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
                 }
-                if (/^[_a-zA-Z][a-zA-Z0-9-_ ]*$/.test(name) === false) {
+                if (/^[_a-zA-Z][a-zA-Z0-9-_'\. ]*$/.test(name) === false) {
                     this.fire("error", {error: new pandora.Exception("A variable name begins with a letter followed by alphanumeric characters, '_',  '-' or spaces")});
                     return false;
                 }
@@ -91,7 +91,7 @@
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
                 }
-                if (/^[_a-zA-Z][a-zA-Z0-9-_ ]*$/.test(name) === false) {
+                if (/^[_a-zA-Z][a-zA-Z0-9-_'\. ]*$/.test(name) === false) {
                     this.fire("error", {error: new pandora.Exception("A variable name begins with a letter followed by alphanumeric characters, '_',  '-' or spaces")});
                     return false;
                 }
