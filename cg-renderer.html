@@ -142,7 +142,7 @@
                 return block;
             },
 
-            createPicker: function (pattern, searchResult, position, parent) {
+            createProperty: function (pattern, searchResult, position, parent) {
                 position.assign([
                     (position.x - this._graph.zoom.translate[0]) / this._graph.zoom.scale,
                     (position.y - this._graph.zoom.translate[1]) / this._graph.zoom.scale
@@ -156,8 +156,8 @@
                 return block;
             },
 
-            replacePicker: function (pattern, searchResult, entity) {
-                var block = this.createPicker(pattern, searchResult, entity.position, entity.parent);
+            replaceProperty: function (pattern, searchResult, entity) {
+                var block = this.createProperty(pattern, searchResult, entity.position, entity.parent);
                 if (block !== null) {
                     var connection = entity.outputs[0].connections[0] || null;
                     this._graph.removeEntity(entity);
@@ -230,8 +230,8 @@
                 this._loader = new cg.JSONLoader();
                 this._renderer = new cg.Renderer(this._graph, this.$.svg, this.config);
                 this.handleErrors();
-                this._renderer.on("picker.edit", function (picker) {
-                    this.fire("picker.edit", {picker: picker});
+                this._renderer.on("property.edit", function (property) {
+                    this.fire("property.edit", {property: property});
                 }.bind(this));
                 this._loader.load(this._graph, this.graph);
                 this._renderer.render();

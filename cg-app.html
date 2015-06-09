@@ -66,19 +66,19 @@
                         on-dude-submit="{{runCommand}}"
                         on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input id="createPicker"
-                                    name="createPicker"
-                                    value="{{_pickerPattern}}"
-                                    data-state="picker"
+                <dude-toolbar-input id="createProperty"
+                                    name="createProperty"
+                                    value="{{_propertyPattern}}"
+                                    data-state="property"
                                     label="Type getter's name or value..."
                                     icon="check"
                                     on-dude-submit="{{runCommand}}"
                                     on-close="{{hideSidebar}}">
                 </dude-toolbar-input>
-                <dude-toolbar-input id="editPicker"
-                                    name="editPicker"
-                                    value="{{_pickerPattern}}"
-                                    data-state="editPicker"
+                <dude-toolbar-input id="editProperty"
+                                    name="editProperty"
+                                    value="{{_propertyPattern}}"
+                                    data-state="editProperty"
                                     label="Type getter's name or value..."
                                     icon="check"
                                     on-dude-submit="{{runCommand}}"
@@ -99,27 +99,27 @@
                         </template>
                     </core-menu>
                 </div>
-                <div data-state="picker">
-                    <cg-type-dropdown type="{{_pickerType}}"
-                                      types="{{_pickerTypes}}"
-                                      on-change="{{_resetPickerPattern}}"
+                <div data-state="property">
+                    <cg-type-dropdown type="{{_propertyType}}"
+                                      types="{{_propertyTypes}}"
+                                      on-change="{{_resetPropertyPattern}}"
                                       hidden?="{{_editMode}}">
                     </cg-type-dropdown>
                     <dude-picker id="pickerElement"
-                                 type="{{_pickerType}}"
-                                 pattern="{{_pickerPattern}}"
+                                 type="{{_propertyType}}"
+                                 pattern="{{_propertyPattern}}"
                                  noVariable>
                     </dude-picker>
-                    <template if="{{_pickerList.length === 0}}">
+                    <template if="{{_propertyList.length === 0}}">
                         <div class="search-not-found">No results.</div>
                     </template>
-                    <core-menu id="searchList" on-core-activate="{{selectPicker}}">
-                        <template repeat="{{picker in _pickerList}}">
-                            <div class="search-result" name="{{picker.name}}">
-                                <core-icon class="type-filter-stroke type-{{picker.data.valueType}}"
+                    <core-menu id="searchList" on-core-activate="{{selectProperty}}">
+                        <template repeat="{{prop in _propertyList}}">
+                            <div class="search-result" name="{{prop.name}}">
+                                <core-icon class="type-filter-stroke type-{{prop.data.valueType}}"
                                            icon="radio-button-off">
                                 </core-icon>
-                                <span>{{picker.name}}</span>
+                                <span>{{prop.name}}</span>
                             </div>
                         </template>
                     </core-menu>
@@ -184,7 +184,7 @@
                     "shortcuts": {
                         "G": "openGroup",
                         "A": "openAction",
-                        "P": "openPicker",
+                        "P": "openProperty",
                         "X": "removeSelection",
                         "E": "editEntity"
                     }
@@ -193,20 +193,21 @@
             },
             searchLimit: 10,
             _commands: {
+                "openSave": {label: "save the graph", "icon": "save"},
                 "openGroup": {label: "add a group", icon: "av:my-library-add"},
                 "openAction": {label: "add an action", icon: "add-box"},
-                "openPicker": {label: "add a picker", icon: "add-circle"},
-                "editEntity": {label: "edit the selected object", icon: "create", disabled: true},
-                "removeSelection": {label: "remove all the selected objects", icon: "delete", disabled: true}//,
+                "openProperty": {label: "add a property", icon: "add-circle"},
+                "editEntity": {label: "edit the selection", icon: "create", disabled: true},
+                "removeSelection": {label: "remove the selection", icon: "delete", disabled: true}//,
 //                "zoomToFit": {label: "zoom to best fit all objects", icon: "image:crop-free"}//,
                 //"undo": {label: "undo last action", icon: "undo", disabled: true},
                 //"redo": {label: "redo last action", icon: "redo", disabled: true}
             },
-            _pickerTypes: [{"label": "all types", "name": "all types"}],
-            _pickerList: [],
-            _pickerType: "all types",
-            _pickerLabel: "all types",
-            _pickerPattern: "",
+            _propertyTypes: [{"label": "all types", "name": "all types"}],
+            _propertyList: [],
+            _propertyType: "all types",
+            _propertyLabel: "all types",
+            _propertyPattern: "",
             _actionList: [],
             _actionName: null,
             _editMode: false,
@@ -215,7 +216,7 @@
                     this.showError(e.detail.error);
                 }.bind(this));
                 this.$.renderer.addEventListener("ready", function () {
-                    this._pickerPatternChanged();
+                    this._propertyPatternChanged();
                     this._actionNameChanged();
                 }.bind(this));
                 this.$.renderer.addEventListener("mouseup", this._updateDisabled.bind(this));
@@ -243,6 +244,9 @@
             hideSidebar: function () {
                 this.$.sidebar.reset();
             },
+            openSave: function () {
+                this.fire("save");
+            },
             openGroup: function () {
                 this.$.toolbar.state = "group";
             },
@@ -250,9 +254,9 @@
                 this.$.toolbar.state = "action";
                 this.$.sidebar.state = "action";
             },
-            openPicker: function () {
-                this.$.toolbar.state = "picker";
-                this.$.sidebar.state = "picker";
+            openProperty: function () {
+                this.$.toolbar.state = "property";
+                this.$.sidebar.state = "property";
             },
             openSettings: function () {
                 this.$.settings.open();
@@ -280,9 +284,9 @@
                     this.$.success.show();
                 }
             },
-            createPicker: function () {
-                if (!this.$.renderer.createPicker(this._pickerPattern, this._getBestModel(), new pandora.Vec2(100, 100))) {
-                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
+            createProperty: function () {
+                if (!this.$.renderer.createProperty(this._propertyPattern, this._getBestModel(), new pandora.Vec2(100, 100))) {
+                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._propertyPattern));
                 }
                 this.$.pickerElement.reset();
             },
@@ -296,9 +300,9 @@
                         this.$.error.text = "Actions are read only.";
                         this.$.error.show();
                     } else if (entity.model.type === "value" || entity.model.type === "variable") {
-                        this.$.toolbar.state = "editPicker";
-                        this.$.sidebar.state = "picker";
-                        this._pickerType = entity.model.valueType;
+                        this.$.toolbar.state = "editProperty";
+                        this.$.sidebar.state = "property";
+                        this._propertyType = entity.model.valueType;
                         this._editMode = true;
                     }
                 }
@@ -309,23 +313,23 @@
                 entity.description = event.value;
                 entity.emit("update");
             },
-            editPicker: function () {
+            editProperty: function () {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 this._editMode = false;
-                if (!this.$.renderer.replacePicker(this._pickerPattern, this._getBestModel(), entity)) {
-                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._pickerPattern));
+                if (!this.$.renderer.replaceProperty(this._propertyPattern, this._getBestModel(), entity)) {
+                    this.showError(new pandora.Exception("Variable {0} doesn't exist", this._propertyPattern));
                 }
                 this.$.pickerElement.reset();
             },
             createVariable: function (type, name, value) {
                 var result = this.$.renderer.createVariable(type, name, value);
-                this._updatePickerList();
+                this._updatePropertyList();
                 return result;
             },
             editVariable: function (previous, type, name, value) {
                 var result = this.$.renderer.editVariable(previous, type, name, value);
-                this._updatePickerList();
+                this._updatePropertyList();
                 return result;
             },
             deleteVariable: function (name) {
@@ -349,8 +353,8 @@
                 }
             },
             _cancelVariable: function () {
-                this.$.sidebar.state = "picker";
-                this._pickerPattern = "";
+                this.$.sidebar.state = "property";
+                this._propertyPattern = "";
             },
             _editVariable: function () {
                 // Note: if it's a sound the variable is created outside of cg (upload...)
@@ -387,8 +391,8 @@
                 this.$.sidebar.state = "editAction";
                 this._currentAction = this._getBestModel(true, this.$.createAction.value);
             },
-            selectPicker: function (event, detail) {
-                this.$.createPicker.value = detail.item.getAttribute("name");
+            selectProperty: function (event, detail) {
+                this.$.createProperty.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editVariable";
                 this._currentVariable = this._getBestModel();
             },
@@ -396,12 +400,12 @@
                 var models = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: isAction ? 'action' : 'variable',
-                    pattern: pattern || this._pickerPattern,
+                    pattern: pattern || this._propertyPattern,
                     isInput: false
                 });
                 var model = models[0];
                 pandora.forEach(models, function (m) {
-                    if (m.name === this._pickerPattern) {
+                    if (m.name === this._propertyPattern) {
                         model = m;
                     }
                 }.bind(this));
@@ -409,19 +413,19 @@
             },
             _reset: function() {
                 this._currentVariable = null;
-                this._pickerPattern = "";
+                this._propertyPattern = "";
                 this.$.pickerElement.reset();
             },
             resetPicker: function () {
-                this.$.sidebar.state = "picker";
-                this._pickerPattern = "";
+                this.$.sidebar.state = "property";
+                this._propertyPattern = "";
                 this.$.pickerElement.reset();
             },
             save: function (saver) {
                 return this.$.renderer.save(saver);
             },
-            _resetPickerPattern: function () {
-                this._pickerPattern = "";
+            _resetPropertyPattern: function () {
+                this._propertyPattern = "";
             },
             _updateDisabled: function () {
                 this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
@@ -434,31 +438,31 @@
                     pattern: this._actionName
                 });
             },
-            _pickerPatternChanged: function () {
-                this._updatePickerList();
+            _propertyPatternChanged: function () {
+                this._updatePropertyList();
             },
             graphChanged: function () {
-                this._pickerTypes = [{"label": "all types", "name": "all types"}].concat(this.graph.types);
+                this._propertyTypes = [{"label": "all types", "name": "all types"}].concat(this.graph.types);
             },
-            _pickerTypeChanged: function (event) {
+            _propertyTypeChanged: function (event) {
                 if (this.$.renderer.isReady) {
-                    this._updatePickerList();
+                    this._updatePropertyList();
                 }
             },
-            _updatePickerList: function () {
-                if (this._pickerType === "all types") {
-                    this._pickerList = this.$.renderer.findModels({
+            _updatePropertyList: function () {
+                if (this._propertyType === "all types") {
+                    this._propertyList = this.$.renderer.findModels({
                         limit: this.searchLimit,
                         modelType: 'variable',
-                        pattern: this._pickerPattern
+                        pattern: this._propertyPattern
                     });
                 } else {
-                    this._pickerList = this.$.renderer.findModels({
+                    this._propertyList = this.$.renderer.findModels({
                         limit: this.searchLimit,
                         modelType: 'variable',
-                        pattern: this._pickerPattern,
+                        pattern: this._propertyPattern,
                         isInput: false,
-                        type: this._pickerType
+                        type: this._propertyType
                     });
                 }
             }
