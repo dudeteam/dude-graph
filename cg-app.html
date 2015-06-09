@@ -28,6 +28,11 @@
 <link rel="import" href="cg-type-dropdown.html">
 <polymer-element name="cg-app">
     <template>
+        <style>
+            #add-variable-btn {
+                margin-bottom: 10px;
+            }
+        </style>
         <dude-panel id="panel"
                     name="story-editor"
                     config="{{config.panel}}"
@@ -99,12 +104,17 @@
                         </template>
                     </core-menu>
                 </div>
-                <div data-state="property">
-                    <cg-type-dropdown type="{{_propertyType}}"
-                                      types="{{_propertyTypes}}"
-                                      on-change="{{_resetPropertyPattern}}"
-                                      hidden?="{{_editMode}}">
-                    </cg-type-dropdown>
+                <div data-state="property" id="property-panel">
+                    <div id="property-header">
+                        <paper-button on-click="{{_showCreateVariable}}"
+                                      class="primary full"
+                                      id="add-variable-btn">Add variable</paper-button>
+                        <cg-type-dropdown type="{{_propertyType}}"
+                                          types="{{_propertyTypes}}"
+                                          on-change="{{_resetPropertyPattern}}"
+                                          hidden?="{{_editMode}}">
+                        </cg-type-dropdown>
+                    </div>
                     <dude-picker id="pickerElement"
                                  type="{{_propertyType}}"
                                  pattern="{{_propertyPattern}}"
@@ -123,7 +133,6 @@
                             </div>
                         </template>
                     </core-menu>
-                    <paper-button on-click="{{_showCreateVariable}}" class="primary full">Add variable</paper-button>
                 </div>
                 <div data-state="editAction" style="position: relative">
                     <paper-icon-button on-click="{{_cancelAction}}"
@@ -182,6 +191,7 @@
                         }
                     },
                     "shortcuts": {
+                        "S": "openSave",
                         "G": "openGroup",
                         "A": "openAction",
                         "P": "openProperty",
@@ -191,7 +201,7 @@
                 },
                 graph: null
             },
-            searchLimit: 10,
+            searchLimit: 200,
             _commands: {
                 "openSave": {label: "save the graph", "icon": "save"},
                 "openGroup": {label: "add a group", icon: "av:my-library-add"},
