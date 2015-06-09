@@ -1,7 +1,7 @@
 {
   "name": "codegraph",
   "main": "codegraph.js",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "homepage": "https://github.com/dudeteam/CodeGraph",
   "authors": [
     "Jeremie Taboada <taboada.jeremie@gmail.com>",
