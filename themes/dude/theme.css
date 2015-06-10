@@ -3,7 +3,7 @@
  */
 
 html /deep/ .type-stream { color: rgba(220, 220, 220, 1);  fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-html /deep/ .type-sound { color: #67cdcc;  fill: #67cdcc; stroke: #67cdcc; }
+html /deep/ .type-sound { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-string { color: #f08d49;  fill: #f08d49; stroke: #f08d49; }
 html /deep/ .type-boolean { color: #cc99cd;  fill: #cc99cd; stroke: #cc99cd; }
 html /deep/ .type-number { color: #f8c555;  fill: #f8c555; stroke: #f8c555; }
@@ -38,10 +38,10 @@ html /deep/ paper-input-decorator {
     padding: 5px 0;
 }
 html /deep/ paper-input-decorator /deep/ .focused-underline {
-    background: rgb(243, 156, 18);
+    background: #ddb272;
 }
 html /deep/ paper-input-decorator[focused] /deep/ .floated-label .label-text {
-    color: rgb(243, 156, 18);
+    color: #ddb272;
 }
 html /deep/ input[is="core-input"]::-webkit-input-placeholder {
     color: #666;
@@ -49,16 +49,16 @@ html /deep/ input[is="core-input"]::-webkit-input-placeholder {
 
 /* Buttons */
 html /deep/ paper-toggle-button::shadow #toggleContainer[checked] .toggle {
-    background: rgb(243, 156, 18);
+    background: #ddb272;
 }
 html /deep/ paper-toggle-button::shadow #toggleContainer[checked] .toggle-ink {
-    color: rgba(243, 156, 18, 1);
+    color: #ddb272;
 }
 html /deep/ paper-button {
     text-transform: none;
 }
 html /deep/ paper-button.primary {
-    background: #00ACC1;
+    background: #ddb272;
     color: #222;
 }
 html /deep/ paper-button.dark {
@@ -72,7 +72,7 @@ html /deep/ paper-button.full {
 
 /* Progress */
 html /deep/ paper-progress::shadow #activeProgress {
-    background-color: rgb(243, 156, 18);
+    background-color: #ddb272;
 }
 
 /* Toast */
@@ -94,7 +94,7 @@ html /deep/ paper-item {
  */
 
 core-toolbar {
-    background: rgb(243, 156, 18);
+    background: #ddb272;
 }
 core-toolbar paper-button {
     text-transform: none;
@@ -104,7 +104,7 @@ core-toolbar paper-button {
 core-toolbar paper-button.dark { background: #2b2b2b; }
 core-toolbar paper-button.primary {
     color: #222;
-    background: rgb(243, 156, 18);
+    background: #ddb272;
 }
 core-toolbar paper-button span {
     padding-left: 5px;
@@ -130,10 +130,9 @@ core-toolbar paper-button span {
  */
 
 html /deep/ dude-toolbar {
-    padding: 5px;
     font-family: "Varela Round", sans-serif;
     font-weight: 300;
-    color: #cccccc;
+    color: #aaaaaa;
     background: #1a1a1a;
     height: 40px;
 }
@@ -149,6 +148,14 @@ html /deep/ dude-toolbar-input /deep/ input[is="core-input"] {
 }
 
 /* Toolbar command */
+html /deep/ dude-toolbar /deep/ paper-icon-button {
+    transform: scale(0.8);
+    transition: .2s;
+}
+html /deep/ dude-toolbar /deep/ paper-icon-button:hover {
+    color: #eeeeee;
+    transform: scale(1);
+}
 html /deep/ dude-toolbar /deep/ paper-icon-button[disabled] {
     color: #666666;
 }
@@ -195,10 +202,14 @@ html /deep/ #svg {
     background: #2b2b2b;
 }
 
+html /deep/ #svg #selection {
+    fill: rgba(255, 255, 255, 0.2);
+}
+
 /* Connection */
 
 html /deep/ #svg .connection.selected {
-    stroke-dasharray: 10, 5;
+    stroke-width: 4px !important;
 }
 
 /* Block and groups */

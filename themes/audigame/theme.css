@@ -194,6 +194,12 @@ html /deep/ #svg {
     background: #2b2b2b;
 }
 
+html /deep/ #svg #selection {
+    fill: rgba(255, 255, 255, 0.2);
+    stroke: rgba(255, 255, 255, 0.5);
+    stroke-width: 1px;
+}
+
 /* Connection */
 
 html /deep/ #svg .connection.selected {
