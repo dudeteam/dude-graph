@@ -183,6 +183,9 @@ html /deep/ dude-sidebar /deep/ p {
     margin: 20px;
     font-style: italic;
 }
+html /deep/ .search-result:not(:last-child) {
+    border-bottom: 1px solid #444;
+}
 
 /**
  * Graph

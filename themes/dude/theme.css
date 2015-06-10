@@ -192,6 +192,14 @@ html /deep/ dude-sidebar /deep/ p {
     font-style: italic;
 }
 
+html /deep/ .search-result {
+    background: #1a1a1a;
+    border-radius: 5px;
+}
+html /deep/ .search-result:not(:last-child) {
+    margin-bottom: 5px;
+}
+
 /**
  * Graph
  */
@@ -225,7 +233,6 @@ html /deep/ #svg .group .background, html /deep/ #svg .block .background {
     transition: .2s;
 }
 html /deep/ #svg .group:hover .background, html /deep/ #svg .block:hover .background {
-    opacity: 1;
     stroke-width: 5px;
 }
 html /deep/ #svg .group.selected .background, html /deep/ #svg .block.selected .background {

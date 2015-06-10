@@ -45,9 +45,6 @@ html /deep/ .search-result.core-selected {
     color: #eee;
     padding: 10px;
 }
-html /deep/ .search-result:not(:last-child) {
-    border-bottom: 1px solid #444;
-}
 html /deep/ .search-result core-icon {
     margin-right: 10px;
 }
