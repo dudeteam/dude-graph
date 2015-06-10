@@ -180,6 +180,7 @@ html /deep/ dude-sidebar /deep/ .box input[is="core-input"] {
     color: #ccc;
 }
 html /deep/ dude-sidebar /deep/ p {
+    font-family: "Lato", sans-serif;
     margin: 20px;
     font-style: italic;
 }
