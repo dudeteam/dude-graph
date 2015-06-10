@@ -3,10 +3,10 @@
  */
 
 html /deep/ .type-stream { color: rgba(220, 220, 220, 1);  fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-html /deep/ .type-sound { color: rgba(241, 196, 15, 1);  fill: rgba(241, 196, 15, 1); stroke: rgba(241, 196, 15, 1); }
-html /deep/ .type-string { color: rgba(230, 126, 34, 1);  fill: rgba(230, 126, 34, 1); stroke: rgba(230, 126, 34, 1); }
-html /deep/ .type-boolean { color: rgba(46, 204, 113, 1);  fill: rgba(46, 204, 113, 1); stroke: rgba(46, 204, 113, 1); }
-html /deep/ .type-number { color: rgba(33, 150, 243, 1);  fill: rgba(33, 150, 243, 1); stroke: rgba(33, 150, 243, 1); }
+html /deep/ .type-sound { color: #67cdcc;  fill: #67cdcc; stroke: #67cdcc; }
+html /deep/ .type-string { color: #f08d49;  fill: #f08d49; stroke: #f08d49; }
+html /deep/ .type-boolean { color: #cc99cd;  fill: #cc99cd; stroke: #cc99cd; }
+html /deep/ .type-number { color: #f8c555;  fill: #f8c555; stroke: #f8c555; }
 
 /**
  * General
@@ -209,13 +209,15 @@ html /deep/ #svg .group .title, html /deep/ #svg .block .title {
     stroke: transparent;
 }
 html /deep/ #svg .group .background, html /deep/ #svg .block .background {
-    /*fill: rgba(30, 30, 30, 0.8);*/
+    opacity: 0.9;
+    transition: .2s;
 }
 html /deep/ #svg .group:hover .background, html /deep/ #svg .block:hover .background {
-    /*fill: rgba(20, 20, 20, .8);*/
+    opacity: 1;
+    stroke-width: 5px;
 }
 html /deep/ #svg .group.selected .background, html /deep/ #svg .block.selected .background {
-    /*fill: rgba(20, 20, 20, .8);*/
+    opacity: 1;
     stroke-width: 5px;
 }
 
@@ -244,7 +246,7 @@ html /deep/ #svg .group .title, html /deep/ #svg .action .title {
     fill: #c4c4c4;
 }
 
-/* Getter */
+/* Property */
 
 html /deep/ #svg .variable .title, html /deep/ #svg .value .title {
     font-size: .8em;

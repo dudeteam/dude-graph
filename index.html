@@ -27,6 +27,13 @@
         html /deep/ #homeButton {
             margin-top: 10px;
         }
+        body {
+            background: #222222;
+        }
+        .dude-panel {
+            margin: 5px;
+            background: #2b2b2b;
+        }
     </style>
 </head>
 <body fullbleed unresolved>
@@ -44,9 +51,14 @@
                                on-core-response="{{graphLoaded}}"
                                auto>
                     </core-ajax>
-                    <cg-app id="codegraph" logo="images/dude_logo_dark.png"
-                            layout horizontal fit>
-                    </cg-app>
+                    <div layout horizontal fit style="margin: 5px">
+                        <cg-app class="dude-panel" flex id="codegraph" logo="images/dude_logo_dark.png"
+                                layout horizontal>
+                        </cg-app>
+                        <div class="dude-panel" flex>
+                            PREVIEW
+                        </div>
+                    </div>
                     <paper-dialog id="previewDialog"
                                   backdrop
                                   transition="core-transition-top"
