@@ -18,7 +18,7 @@
     <link rel="import" href="audigame-preview.html">
     <link rel="import" href="cg-app.html">
     <link rel="stylesheet" href="themes/base.css" shim-shadowdom>
-    <link rel="stylesheet" href="themes/audigame/theme.css" shim-shadowdom>
+    <link rel="stylesheet" href="themes/dude/theme.css" shim-shadowdom>
     <style>
         html /deep/ #previewDialog {
             background: #222222;
@@ -33,11 +33,11 @@
     <template id="codegraph-demo" is="auto-binding">
         <core-drawer-panel forceNarrow>
             <core-header-panel main>
-                <core-toolbar>
-                    <paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>
-                    <div id="title" flex><img height="20" src="images/audigame_logo.png"></div>
-                    <paper-button class="dark" on-click="{{save}}">Save</paper-button>
-                </core-toolbar>
+                <!--<core-toolbar>-->
+                    <!--<paper-icon-button id="menu-btn" icon="menu" core-drawer-toggle></paper-icon-button>-->
+                    <!--<div id="title" flex><img height="20" src="images/audigame_logo.png"></div>-->
+                    <!--<paper-button class="dark" on-click="{{save}}">Save</paper-button>-->
+                <!--</core-toolbar>-->
                     <core-ajax id="loader"
                                url="examples/audigame_tutorial.json"
                                handleAs="json"

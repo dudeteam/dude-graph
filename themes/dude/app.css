@@ -1,9 +1,0 @@
-.notification {
-    color: #eee;
-    font-family: "Varela Round", sans-serif;
-    border-radius: 5px;
-    font-size: .8em;
-    box-shadow: none;
-}
-#error { background: rgba(244, 67, 54, 0.80); }
-#success { background: rgba(76, 175, 80, 0.80); }
