@@ -5,26 +5,52 @@
       "label": "string"
     },
     {
-      "name": "entity-model",
-      "label": "entity model"
-    },
-    {
       "name": "number",
       "label": "number"
     },
     {
       "name": "boolean",
-      "label": "test"
+      "label": "boolean"
+    },
+    {
+      "name": "vec3",
+      "label": "vec3"
+    },
+    {
+      "name": "vec2",
+      "label": "vec2"
+    },
+    {
+      "name": "entity-model",
+      "label": "entity model"
     }
   ],
   "zoom": {
     "translate": [
-      -300,
-      2
+      -186.71337820783924,
+      -61.480637342869954
     ],
-    "scale": 1
+    "scale": 0.8432311102501158
   },
   "models": [
+    {
+      "name": "timer_fps",
+      "type": "variable",
+      "value-type": "number",
+      "value": null
+    },
+    {
+      "name": "timer_elapsed_time",
+      "type": "variable",
+      "value-type": "number",
+      "value": null
+    },
+    {
+      "name": "timer_delta_time",
+      "type": "variable",
+      "value-type": "number",
+      "value": null
+    },
     {
       "name": "shoot_key",
       "type": "variable",
@@ -35,12 +61,6 @@
       "name": "bullet",
       "type": "variable",
       "value-type": "entity-model",
-      "value": null
-    },
-    {
-      "name": "bullet_model",
-      "type": "variable",
-      "value-type": "string",
       "value": null
     },
     {
@@ -56,33 +76,37 @@
       "value": true
     },
     {
-      "name": "gameover.mp3",
-      "type": "variable",
-      "value-type": "sound",
-      "value": {}
-    },
-    {
-      "name": "success.mp3",
-      "type": "variable",
-      "value-type": "sound",
-      "value": {}
-    },
-    {
-      "name": "intro.mp3",
-      "type": "variable",
-      "value-type": "sound",
-      "value": {}
-    },
-    {
-      "name": "default time",
-      "type": "variable",
-      "value-type": "number",
-      "value": 5
-    },
-    {
       "name": "on_start",
       "type": "action",
       "description": "This delegate is called when the game starts",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "out"
+        }
+      ]
+    },
+    {
+      "name": "to_string",
+      "type": "action",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "value"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "string",
+          "name": "result"
+        }
+      ]
+    },
+    {
+      "name": "on_update",
+      "type": "action",
+      "description": "This delegate is called for each frame",
       "inputs": [],
       "outputs": [
         {
@@ -99,6 +123,26 @@
         {
           "type": "string",
           "name": "name"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "out"
+        }
+      ]
+    },
+    {
+      "name": "info",
+      "type": "action",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "in"
+        },
+        {
+          "type": "string",
+          "name": "message"
         }
       ],
       "outputs": [
@@ -333,6 +377,218 @@
           "max": 1
         }
       ]
+    },
+    {
+      "name": "entity model equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "entity-model",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "entity model assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "entity model equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "entity-model",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec2 equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "vec2",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec3 equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "vec3",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec3 assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "vec2 assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "entity model assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
     }
   ],
   "children": [
@@ -465,7 +721,8 @@
           "position": [
             241,
             209
-          ]
+          ],
+          "value": 5
         },
         {
           "_type": "block",
@@ -476,6 +733,58 @@
             263
           ],
           "value": 50
+        }
+      ]
+    },
+    {
+      "_type": "group",
+      "_id": 2,
+      "_name": "Shows FPS",
+      "position": [
+        441.26202392578125,
+        436.3728942871094
+      ],
+      "size": [
+        419.8082275390625,
+        276.29327392578125
+      ],
+      "children": [
+        {
+          "_type": "block",
+          "_id": 13,
+          "_name": "info",
+          "position": [
+            246.7457275390625,
+            40
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 14,
+          "_name": "to_string",
+          "position": [
+            245.7457275390625,
+            133
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 15,
+          "_name": "on_update",
+          "position": [
+            20.000005716844896,
+            76.19028387367888
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 12,
+          "_name": "timer_fps",
+          "position": [
+            258.81207275390625,
+            216.29327392578125
+          ],
+          "value": null
         }
       ]
     }
@@ -577,6 +886,36 @@
       "to": {
         "block": 9,
         "point": "other"
+      }
+    },
+    {
+      "from": {
+        "block": 14,
+        "point": "result"
+      },
+      "to": {
+        "block": 13,
+        "point": "message"
+      }
+    },
+    {
+      "from": {
+        "block": 12,
+        "point": "timer_fps"
+      },
+      "to": {
+        "block": 14,
+        "point": "value"
+      }
+    },
+    {
+      "from": {
+        "block": 15,
+        "point": "out"
+      },
+      "to": {
+        "block": 13,
+        "point": "in"
       }
     }
   ]

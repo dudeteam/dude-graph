@@ -4,6 +4,8 @@
 
 html /deep/ .type-stream { color: rgba(220, 220, 220, 1);  fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
 html /deep/ .type-entity-model { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
+html /deep/ .type-vec3 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
+html /deep/ .type-vec2 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-string { color: #f08d49;  fill: #f08d49; stroke: #f08d49; }
 html /deep/ .type-boolean { color: #cc99cd;  fill: #cc99cd; stroke: #cc99cd; }
 html /deep/ .type-number { color: #f8c555;  fill: #f8c555; stroke: #f8c555; }
