@@ -1,0 +1,583 @@
+{
+  "types": [
+    {
+      "name": "string",
+      "label": "string"
+    },
+    {
+      "name": "entity-model",
+      "label": "entity model"
+    },
+    {
+      "name": "number",
+      "label": "number"
+    },
+    {
+      "name": "boolean",
+      "label": "test"
+    }
+  ],
+  "zoom": {
+    "translate": [
+      -300,
+      2
+    ],
+    "scale": 1
+  },
+  "models": [
+    {
+      "name": "shoot_key",
+      "type": "variable",
+      "value-type": "string",
+      "value": null
+    },
+    {
+      "name": "bullet",
+      "type": "variable",
+      "value-type": "entity-model",
+      "value": null
+    },
+    {
+      "name": "bullet_model",
+      "type": "variable",
+      "value-type": "string",
+      "value": null
+    },
+    {
+      "name": "nb_bullets",
+      "type": "variable",
+      "value-type": "number",
+      "value": 5
+    },
+    {
+      "name": "has_bullets",
+      "type": "variable",
+      "value-type": "boolean",
+      "value": true
+    },
+    {
+      "name": "gameover.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "success.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "intro.mp3",
+      "type": "variable",
+      "value-type": "sound",
+      "value": {}
+    },
+    {
+      "name": "default time",
+      "type": "variable",
+      "value-type": "number",
+      "value": 5
+    },
+    {
+      "name": "on_start",
+      "type": "action",
+      "description": "This delegate is called when the game starts",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "out"
+        }
+      ]
+    },
+    {
+      "name": "on_input",
+      "type": "action",
+      "description": "This delegate is called when an input is triggered",
+      "inputs": [
+        {
+          "type": "string",
+          "name": "name"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "out"
+        }
+      ]
+    },
+    {
+      "name": "add_entity",
+      "type": "action",
+      "description": "Add an entity to the screen",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "in"
+        },
+        {
+          "type": "entity-model",
+          "name": "model"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "out"
+        }
+      ]
+    },
+    {
+      "name": "condition",
+      "type": "action",
+      "description": "Choose the steam yes or no according whether the <test> is true or false.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": -1
+        },
+        {
+          "type": "boolean",
+          "name": "test",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "yes"
+        },
+        {
+          "type": "stream",
+          "name": "no"
+        }
+      ]
+    },
+    {
+      "name": "regex",
+      "type": "action",
+      "description": "Check whether the <input> string matches the <regex> and return true, return false otherwise.",
+      "inputs": [
+        {
+          "type": "string",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "string",
+          "name": "regex",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "output",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "greater than",
+      "type": "action",
+      "description": "Check whether the <first> time is greater than the <second> one.",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "number",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "output",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "less than",
+      "type": "action",
+      "description": "Check whether the <first> time is less than the <second> one.",
+      "inputs": [
+        {
+          "type": "number",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "number",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "output",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "entity model equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "entity-model",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "entity model assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "entity model equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "entity-model",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "entity model assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    }
+  ],
+  "children": [
+    {
+      "_type": "group",
+      "_id": 0,
+      "_name": "Shoots if enough bullets",
+      "position": [
+        891,
+        94
+      ],
+      "size": [
+        694.484375,
+        393
+      ],
+      "children": [
+        {
+          "_type": "block",
+          "_id": 0,
+          "_name": "add_entity",
+          "position": [
+            535,
+            86
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 1,
+          "_name": "on_input",
+          "position": [
+            20,
+            95
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 2,
+          "_name": "condition",
+          "position": [
+            284,
+            40
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 3,
+          "_name": "greater than",
+          "position": [
+            270,
+            190
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 4,
+          "_name": "nb_bullets",
+          "position": [
+            280,
+            285
+          ],
+          "value": 5
+        },
+        {
+          "_type": "block",
+          "_id": 5,
+          "_name": "value-number",
+          "position": [
+            309,
+            333
+          ],
+          "value": 5
+        },
+        {
+          "_type": "block",
+          "_id": 6,
+          "_name": "bullet",
+          "position": [
+            558,
+            179
+          ],
+          "value": null
+        },
+        {
+          "_type": "block",
+          "_id": 7,
+          "_name": "shoot_key",
+          "position": [
+            28,
+            173
+          ],
+          "value": null
+        }
+      ]
+    },
+    {
+      "_type": "group",
+      "_id": 1,
+      "_name": "Setups the number of bullets",
+      "position": [
+        442,
+        95
+      ],
+      "size": [
+        412.15625,
+        323
+      ],
+      "children": [
+        {
+          "_type": "block",
+          "_id": 8,
+          "_name": "on_start",
+          "position": [
+            20,
+            40
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 9,
+          "_name": "number assign",
+          "position": [
+            226,
+            95
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 10,
+          "_name": "nb_bullets",
+          "position": [
+            241,
+            209
+          ]
+        },
+        {
+          "_type": "block",
+          "_id": 11,
+          "_name": "value-number",
+          "position": [
+            267,
+            263
+          ],
+          "value": 50
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": {
+        "block": 4,
+        "point": "nb_bullets"
+      },
+      "to": {
+        "block": 3,
+        "point": "first"
+      }
+    },
+    {
+      "from": {
+        "block": 5
+      },
+      "to": {
+        "block": 3,
+        "point": "second"
+      }
+    },
+    {
+      "from": {
+        "block": 1,
+        "point": "out"
+      },
+      "to": {
+        "block": 2,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 2,
+        "point": "yes"
+      },
+      "to": {
+        "block": 0,
+        "point": "in"
+      }
+    },
+    {
+      "from": {
+        "block": 6,
+        "point": "bullet"
+      },
+      "to": {
+        "block": 0,
+        "point": "model"
+      }
+    },
+    {
+      "from": {
+        "block": 7,
+        "point": "shoot_key"
+      },
+      "to": {
+        "block": 1,
+        "point": "name"
+      }
+    },
+    {
+      "from": {
+        "block": 3,
+        "point": "output"
+      },
+      "to": {
+        "block": 2,
+        "point": "test"
+      }
+    },
+    {
+      "from": {
+        "block": 8,
+        "point": "out"
+      },
+      "to": {
+        "block": 9,
+        "point": "input"
+      }
+    },
+    {
+      "from": {
+        "block": 10,
+        "point": "nb_bullets"
+      },
+      "to": {
+        "block": 9,
+        "point": "variable"
+      }
+    },
+    {
+      "from": {
+        "block": 11
+      },
+      "to": {
+        "block": 9,
+        "point": "other"
+      }
+    }
+  ]
+}

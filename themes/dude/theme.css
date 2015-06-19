@@ -3,7 +3,7 @@
  */
 
 html /deep/ .type-stream { color: rgba(220, 220, 220, 1);  fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
-html /deep/ .type-sound { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
+html /deep/ .type-entity-model { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-string { color: #f08d49;  fill: #f08d49; stroke: #f08d49; }
 html /deep/ .type-boolean { color: #cc99cd;  fill: #cc99cd; stroke: #cc99cd; }
 html /deep/ .type-number { color: #f8c555;  fill: #f8c555; stroke: #f8c555; }
@@ -232,12 +232,19 @@ html /deep/ #svg .group .background, html /deep/ #svg .block .background {
     opacity: 0.9;
     transition: .2s;
 }
-html /deep/ #svg .group:hover .background, html /deep/ #svg .block:hover .background {
+html /deep/ #svg .block:hover .background {
     stroke-width: 5px;
 }
-html /deep/ #svg .group.selected .background, html /deep/ #svg .block.selected .background {
+html /deep/ #svg .block.selected .background {
     opacity: 1;
     stroke-width: 5px;
+}
+
+html /deep/ #svg .group:hover .background {
+    fill: rgba(255, 255, 255, .15);
+}
+html /deep/ #svg .group.selected .background {
+    fill: rgba(255, 255, 255, .15);
 }
 
 /* Blocks */
@@ -253,8 +260,8 @@ html /deep/ #svg .block .description {
 /* Group and Action */
 
 html /deep/ #svg .group .background {
-    stroke: #1a1a1a;
-    fill: #1a1a1a;
+    stroke: transparent;
+    fill: rgba(255, 255, 255, .1);
 }
 
 html /deep/ #svg .action .background {

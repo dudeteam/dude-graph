@@ -46,18 +46,19 @@
                     <!--<paper-button class="dark" on-click="{{save}}">Save</paper-button>-->
                 <!--</core-toolbar>-->
                     <core-ajax id="loader"
-                               url="examples/audigame_tutorial.json"
+                               url="examples/dude_behavior.json"
                                handleAs="json"
                                on-core-response="{{graphLoaded}}"
                                auto>
                     </core-ajax>
                     <div layout horizontal fit style="margin: 5px">
                         <cg-app class="dude-panel" flex id="codegraph" logo="images/dude_logo_dark.png"
+                                on-save="{{save}}"
                                 layout horizontal>
                         </cg-app>
-                        <div class="dude-panel" flex>
-                            PREVIEW
-                        </div>
+                        <!--<div class="dude-panel" flex>-->
+                            <!--PREVIEW-->
+                        <!--</div>-->
                     </div>
                     <paper-dialog id="previewDialog"
                                   backdrop
@@ -89,9 +90,9 @@
         demo.isLoading = true;
         demo.save = function () {
 //            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
-//            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
+            console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
 //            console.log(this.$.codegraph.save(buildSaver));
-            this.$.previewDialog.open();
+//            this.$.previewDialog.open();
 //            this.$.preview.game = this.$.codegraph.save(buildSaver);
             this.$.preview.game = {
                 "variables": {
