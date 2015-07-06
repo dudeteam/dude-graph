@@ -220,7 +220,7 @@ html /deep/ #svg #selection {
 /* Connection */
 
 html /deep/ #svg .connection.selected {
-    stroke-width: 4px !important;
+    stroke-width: 3px !important;
 }
 
 /* Block and groups */
@@ -262,6 +262,9 @@ html /deep/ #svg .block .description {
 
 html /deep/ #svg .block.active .background {
     stroke: rgba(255, 255, 255, 1);
+    stroke-width: 2px;
+}
+html /deep/ #svg .block.active.selected .background {
     stroke-width: 3px;
 }
 
