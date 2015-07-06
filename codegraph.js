@@ -2980,8 +2980,12 @@ cg.JSONLoader = (function () {
             if (!secondPoint) {
                 this.emit("error", new pandora.Exception('Connection "to block point" not found'), connectionData, connectionData.to.block, connectionData.to.point);
             }
-            var connection = new cg.Connection(firstPoint, secondPoint);
-            graph.addConnection(connection);
+            if (firstPoint && secondPoint) {
+                var connection = new cg.Connection(firstPoint, secondPoint);
+                graph.addConnection(connection);
+            } else {
+                console.log("An error occurred while connecting points", firstPoint, secondPoint);
+            }
         }.bind(this));
     };
 
@@ -3032,6 +3036,7 @@ cg.JSONLoader = (function () {
     return JSONLoader;
 
 })();
+
 cg.JSONSaver = (function () {
 
     /**

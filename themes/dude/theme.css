@@ -2,7 +2,8 @@
  * Types
  */
 
-html /deep/ .type-stream { color: rgba(220, 220, 220, 1);  fill: rgba(220, 220, 220, 1); stroke: rgba(220, 220, 220, 1); }
+html /deep/ .type-stream { color: rgba(150, 150, 150, 1);  fill: rgba(150, 150, 150, 1); stroke: rgba(150, 150, 150, 1); }
+html /deep/ .type-stream.active { stroke: rgba(255, 255, 255, 1); }
 html /deep/ .type-entity-model { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-vec3 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-vec2 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
@@ -257,6 +258,16 @@ html /deep/ #svg .block .description {
     font-weight: 300;
     stroke: transparent;
     font-size: .7em;
+}
+
+html /deep/ #svg .block.active .background {
+    stroke: rgba(255, 255, 255, 1);
+    stroke-width: 3px;
+}
+
+html /deep/ #svg .block.error .background {
+    stroke: rgba(231, 76, 60, 1);
+    stroke-width: 2px;
 }
 
 /* Group and Action */
