@@ -455,7 +455,7 @@ cg.Connection = (function () {
      */
     Connection.prototype.replacePoint = function (source, target) {
         if (target.isInput !== source.isInput) {
-            renderer._graph.emit("error", new cg.GraphError("Cannot link " + (source.isInput ? "inputs" : "outputs") + " together"));
+            this._graph.emit("error", new cg.GraphError("Cannot link " + (source.isInput ? "inputs" : "outputs") + " together"));
             return false;
         }
         if (this._inputPoint === source) {
@@ -2056,11 +2056,20 @@ cg.Renderer.prototype._createPoints = function (points) {
             })
         )
         .each(function(point) {
-            d3.select(this)
-                .append("svg:circle")
-                .attr({
-                    "class": "circle"
-                });
+            if (point.type === "stream") {
+                d3.select(this)
+                    .append("svg:path")
+                    .attr({
+                        "class": "circle",
+                        "d": "M -2 -5 L -2 5 L 3 0 Z"
+                    });
+            } else {
+                d3.select(this)
+                    .append("svg:circle")
+                    .attr({
+                        "class": "circle"
+                    });
+            }
             pandora.polymorphic(point.block.model, {
                 "Action": function () {
                     d3.select(this)
