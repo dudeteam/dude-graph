@@ -74,7 +74,7 @@
             play: function() {
                 this.reset();
                 this._startSound();
-                var gameLoop = function () {
+                var gameLoop = function() {
                     if (this["_update" + this._state] !== undefined) {
                         this["_update" + this._state]();
                     }
@@ -82,7 +82,7 @@
                 }.bind(this);
                 gameLoop();
             },
-            reset: function () {
+            reset: function() {
                 this._progress = 0;
                 this._currentStep = this.game.story;
                 this._isPlaying = true;
@@ -92,11 +92,11 @@
                 }
                 this._state = "None";
             },
-            _restart: function () {
+            _restart: function() {
                 this.reset();
                 this._startSound();
             },
-            _togglePlay: function () {
+            _togglePlay: function() {
                 if (this["_togglePlay" + this._state] !== undefined) {
                     this["_togglePlay" + this._state]();
                 }
@@ -108,14 +108,14 @@
                     this._playIcon = "pause";
                 }
             },
-            _startSound: function () {
+            _startSound: function() {
                 this._state = "Sound";
                 this._disablePlay = false;
                 this._audio.setAttribute("src", this._getValue(this._currentStep.sound).file_name);
                 this._audio.load();
                 this._audio.play();
             },
-            _updateSound: function () {
+            _updateSound: function() {
                 this._progress = 100 * this._audio.currentTime / this._audio.duration;
                 if (this._audio.ended) {
                     if (this._currentStep.name === "end") {
@@ -125,14 +125,14 @@
                     }
                 }
             },
-            _togglePlaySound: function () {
+            _togglePlaySound: function() {
                 if (this._isPlaying) {
                     this._audio.pause();
                 } else {
                     this._audio.play();
                 }
             },
-            _startChoice: function () {
+            _startChoice: function() {
                 this._isPlaying = true;
                 this._state = "Choice";
                 this._disablePlay = true;
@@ -141,20 +141,20 @@
                 this._firstChoiceMessage = this._getValue(this._currentStep.firstChoice.description);
                 this._secondChoiceMessage = this._getValue(this._currentStep.secondChoice.description);
             },
-            _updateChoice: function () {
+            _updateChoice: function() {
                 this._progress = 0.1 * (Date.now() - this._startTime) / this._duration;
                 if (this._progress > 100) {
                     this._firstChoice();
                 }
             },
-            _getValue: function (data) {
+            _getValue: function(data) {
                 return data.name !== undefined ? this.game.variables[data.name].value : data.value;
             },
-            _firstChoice: function () {
+            _firstChoice: function() {
                 this._currentStep = this._currentStep.firstChoice;
                 this._startSound();
             },
-            _secondChoice: function () {
+            _secondChoice: function() {
                 this._currentStep = this._currentStep.secondChoice;
                 this._startSound();
             }

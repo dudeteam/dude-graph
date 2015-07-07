@@ -221,18 +221,18 @@
             _actionList: [],
             _actionName: null,
             _editMode: false,
-            attached: function () {
-                this.$.renderer.addEventListener("error", function (e) {
+            attached: function() {
+                this.$.renderer.addEventListener("error", function(e) {
                     this.showError(e.detail.error);
                 }.bind(this));
-                this.$.renderer.addEventListener("ready", function () {
+                this.$.renderer.addEventListener("ready", function() {
                     this._propertyPatternChanged();
                     this._actionNameChanged();
                 }.bind(this));
                 this.$.renderer.addEventListener("mouseup", this._updateDisabled.bind(this));
                 var keyModifier = navigator.platform.indexOf("Mac") !== -1 ? "cmd" : "ctrl";
-                pandora.forEach(this.config.shortcuts, function (functionName, shortcut) {
-                    jwerty.key(keyModifier + "+" + shortcut, function (e) {
+                pandora.forEach(this.config.shortcuts, function(functionName, shortcut) {
+                    jwerty.key(keyModifier + "+" + shortcut, function(e) {
                         this[functionName]();
                         pandora.preventCallback(e);
                     }.bind(this));
@@ -241,51 +241,51 @@
             keys: function(input) {
                 return Object.keys(input);
             },
-            runCommand: function (event, detail) {
+            runCommand: function(event, detail) {
                 if (this[detail.name] === undefined) {
                     console.warn("Command " + detail.name + " doesn't exist");
                     return;
                 }
                 this[detail.name](detail);
             },
-            root: function () {
+            root: function() {
                 this.$.toolbar.reset();
             },
-            hideSidebar: function () {
+            hideSidebar: function() {
                 this.$.sidebar.reset();
             },
-            openSave: function () {
+            openSave: function() {
                 this.fire("save");
             },
-            openGroup: function () {
+            openGroup: function() {
                 this.$.toolbar.state = "group";
             },
-            openAction: function () {
+            openAction: function() {
                 this.$.toolbar.state = "action";
                 this.$.sidebar.state = "action";
             },
-            openProperty: function () {
+            openProperty: function() {
                 this.$.toolbar.state = "property";
                 this.$.sidebar.state = "property";
             },
-            openSettings: function () {
+            openSettings: function() {
                 this.$.settings.open();
             },
-            removeSelection: function () {
+            removeSelection: function() {
                 this.$.renderer.removeSelection();
                 this.$.success.text = "Entities successfully removed!";
                 this.$.success.show();
                 this._updateDisabled();
             },
-            zoomToFit: function () {
+            zoomToFit: function() {
                 this.$.renderer.zoomToFit();
             },
-            createGroup: function (detail) {
+            createGroup: function(detail) {
                 this.$.renderer.createGroup(detail.value);
                 this.$.success.text = "Group \"" + detail.value + "\" successfully created!";
                 this.$.success.show();
             },
-            createAction: function () {
+            createAction: function() {
                 if (this._actionList.length === 0) {
                     this.showError(new pandora.Exception("Action {0} doesn't exist", this._actionName));
                 } else {
@@ -294,13 +294,13 @@
                     this.$.success.show();
                 }
             },
-            createProperty: function () {
+            createProperty: function() {
                 if (!this.$.renderer.createProperty(this._propertyPattern, this._getBestModel(), new pandora.Vec2(100, 100))) {
                     this.showError(new pandora.Exception("Variable {0} doesn't exist", this._propertyPattern));
                 }
                 this.$.pickerElement.reset();
             },
-            editEntity: function () {
+            editEntity: function() {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 if (entity instanceof cg.Group) {
@@ -317,13 +317,13 @@
                     }
                 }
             },
-            editGroup: function (event) {
+            editGroup: function(event) {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 entity.description = event.value;
                 entity.emit("update");
             },
-            editProperty: function () {
+            editProperty: function() {
                 var selection = this.$.renderer.getLastSelectedEntity();
                 var entity = selection ? selection.datum() : null;
                 this._editMode = false;
@@ -332,24 +332,24 @@
                 }
                 this.$.pickerElement.reset();
             },
-            createVariable: function (type, name, value) {
+            createVariable: function(type, name, value) {
                 var result = this.$.renderer.createVariable(type, name, value);
                 this._updatePropertyList();
                 return result;
             },
-            editVariable: function (previous, type, name, value) {
+            editVariable: function(previous, type, name, value) {
                 var result = this.$.renderer.editVariable(previous, type, name, value);
                 this._updatePropertyList();
                 return result;
             },
-            deleteVariable: function (name) {
+            deleteVariable: function(name) {
                 this.$.renderer.deleteVariable(name);
             },
-            _showCreateVariable: function () {
+            _showCreateVariable: function() {
                 this._currentVariable = null;
                 this.$.sidebar.state = "createVariable";
             },
-            _createVariable: function () {
+            _createVariable: function() {
                 // Note: if it's a sound the variable is created outside of cg (upload...)
                 if (this._currentVariable.data.valueType === "sound") {
                     this.fire("variable.create", {"variable": this._currentVariable});
@@ -362,11 +362,11 @@
                     this.resetPicker();
                 }
             },
-            _cancelVariable: function () {
+            _cancelVariable: function() {
                 this.$.sidebar.state = "property";
                 this._propertyPattern = "";
             },
-            _editVariable: function () {
+            _editVariable: function() {
                 // Note: if it's a sound the variable is created outside of cg (upload...)
                 if (this._currentVariable.data.valueType === "sound") {
                     this.fire("variable.edit", {"variable": this._currentVariable});
@@ -379,34 +379,34 @@
                     this.resetPicker();
                 }
             },
-            _deleteVariable: function () {
+            _deleteVariable: function() {
                 this.$.renderer.deleteVariable(this._currentVariable.name);
                 this.showSuccess("Variable \"" + this._currentVariable.name + "\" successfully deleted!");
                 this.resetPicker();
             },
-            _cancelAction: function () {
+            _cancelAction: function() {
                 this.$.sidebar.state = "action";
                 this.$.createAction.value = "";
             },
-            showSuccess: function (message) {
+            showSuccess: function(message) {
                 this.$.success.text = message;
                 this.$.success.show();
             },
-            showError: function (error) {
+            showError: function(error) {
                 this.$.error.text = error.message;
                 this.$.error.show();
             },
-            selectAction: function (event, detail) {
+            selectAction: function(event, detail) {
                 this.$.createAction.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editAction";
                 this._currentAction = this._getBestModel(true, this.$.createAction.value);
             },
-            selectProperty: function (event, detail) {
+            selectProperty: function(event, detail) {
                 this.$.createProperty.value = detail.item.getAttribute("name");
                 this.$.sidebar.state = "editVariable";
                 this._currentVariable = this._getBestModel();
             },
-            _getBestModel: function (isAction, pattern) {
+            _getBestModel: function(isAction, pattern) {
                 var models = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: isAction ? 'action' : 'variable',
@@ -414,7 +414,7 @@
                     isInput: false
                 });
                 var model = models[0];
-                pandora.forEach(models, function (m) {
+                pandora.forEach(models, function(m) {
                     if (m.name === this._propertyPattern) {
                         model = m;
                     }
@@ -426,40 +426,40 @@
                 this._propertyPattern = "";
                 this.$.pickerElement.reset();
             },
-            resetPicker: function () {
+            resetPicker: function() {
                 this.$.sidebar.state = "property";
                 this._propertyPattern = "";
                 this.$.pickerElement.reset();
             },
-            save: function (saver) {
+            save: function(saver) {
                 return this.$.renderer.save(saver);
             },
-            _resetPropertyPattern: function () {
+            _resetPropertyPattern: function() {
                 this._propertyPattern = "";
             },
-            _updateDisabled: function () {
+            _updateDisabled: function() {
                 this._commands.editEntity.disabled = !this.$.renderer.hasSelectedEntities();
                 this._commands.removeSelection.disabled = !this.$.renderer.hasSelection();
             },
-            _actionNameChanged: function () {
+            _actionNameChanged: function() {
                 this._actionList = this.$.renderer.findModels({
                     limit: this.searchLimit,
                     modelType: 'action',
                     pattern: this._actionName
                 });
             },
-            _propertyPatternChanged: function () {
+            _propertyPatternChanged: function() {
                 this._updatePropertyList();
             },
-            graphChanged: function () {
+            graphChanged: function() {
                 this._propertyTypes = [{"label": "all types", "name": "all types"}].concat(this.graph.types);
             },
-            _propertyTypeChanged: function (event) {
+            _propertyTypeChanged: function(event) {
                 if (this.$.renderer.isReady) {
                     this._updatePropertyList();
                 }
             },
-            _updatePropertyList: function () {
+            _updatePropertyList: function() {
                 if (this._propertyType === "all types") {
                     this._propertyList = this.$.renderer.findModels({
                         limit: this.searchLimit,

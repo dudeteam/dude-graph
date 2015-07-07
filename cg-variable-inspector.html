@@ -56,21 +56,21 @@
             _name: "",
             _type: "",
             _value: null,
-            ready: function () {
+            ready: function() {
                 this.editModeChanged();
             },
-            typesChanged: function () {
+            typesChanged: function() {
                 this._type = this.types[0].name;
                 this._name = "";
             },
-            editModeChanged: function () {
+            editModeChanged: function() {
                 if (this.editMode) {
                     this._label = "Edit";
                 } else {
                     this._label = "Create";
                 }
             },
-            variableChanged: function () {
+            variableChanged: function() {
                 if (this.variable !== null) {
                     this._name = this.variable.name;
                     this._type = this.variable.data.valueType;
@@ -82,12 +82,12 @@
                     this.$.picker.valueChanged();
                 }
             },
-            _valueChanged: function () {
+            _valueChanged: function() {
                 if (this._type === "sound" && this._value && this._value.name) {
                     this._name = this._value.name;
                 }
             },
-            _submit: function () {
+            _submit: function() {
                 var previousName = this.variable !== null ? this.variable.name : null;
                 this.variable = {
                     name: this._name,
@@ -102,17 +102,17 @@
                 }
                 this.fire("submit");
             },
-            _back: function () {
+            _back: function() {
                 this.fire("cancel");
             },
-            _close: function () {
+            _close: function() {
                 if (this.editMode) {
                     this.$.confirm.open();
                 } else {
                     this.fire("cancel");
                 }
             },
-            _confirmDelete: function () {
+            _confirmDelete: function() {
                 this.fire("delete");
             }
         })

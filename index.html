@@ -88,7 +88,7 @@
         var jsonSaver = new cg.JSONSaver();
         var buildSaver = new BuildSaver();
         demo.isLoading = true;
-        demo.save = function () {
+        demo.save = function() {
 //            console.log(JSON.stringify(this.$.codegraph.save(buildSaver), null, 2));
             console.log(JSON.stringify(this.$.codegraph.save(jsonSaver), null, 2));
 //            console.log(this.$.codegraph.save(buildSaver));
@@ -155,17 +155,17 @@
             };
             this.$.preview.play();
         };
-        demo.quitPreview = function () {
+        demo.quitPreview = function() {
             this.$.preview.reset();
             this.$.previewDialog.opened = false;
         };
-        demo.graphLoaded = function () {
+        demo.graphLoaded = function() {
             demo.isLoading = false;
             this.$.codegraph.graph = this.$.loader.response;
-            this.$.codegraph.addEventListener("ready", function () {
+            this.$.codegraph.addEventListener("ready", function() {
                 console.log("Code graph is ready! :)");
             }.bind(this));
-            this.$.codegraph.addEventListener("variable.create", function (e) {
+            this.$.codegraph.addEventListener("variable.create", function(e) {
                 if (this.createVariable(
                         e.detail.variable.data.valueType,
                         e.detail.variable.name,
@@ -175,7 +175,7 @@
                     this.resetPicker();
                 }
             });
-            this.$.codegraph.addEventListener("variable.edit", function (e) {
+            this.$.codegraph.addEventListener("variable.edit", function(e) {
                 if (this.editVariable(
                         e.detail.variable.previousName,
                         e.detail.variable.data.valueType,

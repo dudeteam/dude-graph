@@ -1,18 +1,18 @@
-var BuildSaver = (function () {
+var BuildSaver = (function() {
 
     /**
      * Save a graph an audigame.
      * @constructor
      */
-    var BuildSaver = pandora.class_("BuildSaver", pandora.EventEmitter, function () {
+    var BuildSaver = pandora.class_("BuildSaver", pandora.EventEmitter, function() {
         pandora.EventEmitter.call(this);
     });
 
-    BuildSaver.prototype.save = function (entity) {
+    BuildSaver.prototype.save = function(entity) {
         return pandora.polymorphicMethod(this, "save", entity);
     };
 
-    BuildSaver.prototype._saveFromName = function (entity) {
+    BuildSaver.prototype._saveFromName = function(entity) {
         var m = /^[a-z]+ (assign|equal)$/.exec(entity._name); // check operators
         if (m !== null && this["_save" + pandora.camelcase(m[1], " ")] !== undefined) {
             return this["_save" + pandora.camelcase(m[1], " ")](entity);
@@ -24,7 +24,7 @@ var BuildSaver = (function () {
         }
     };
 
-    BuildSaver.prototype._save = function (entity) {
+    BuildSaver.prototype._save = function(entity) {
         var result = null;
         if (entity.model._type === "action") {
             result = this._saveFromName(entity);
@@ -42,9 +42,9 @@ var BuildSaver = (function () {
      * @returns {{models: Object, children: Array, connections: Array}}
      * @private
      */
-    BuildSaver.prototype._saveGraph = function (graph) {
+    BuildSaver.prototype._saveGraph = function(graph) {
         var variables = {};
-        pandora.forEach(graph.models, function (model) {
+        pandora.forEach(graph.models, function(model) {
             // only variables need to be saved
             if (model._type === "variable") {
                 variables[model.name] = this.save(model);
@@ -61,7 +61,7 @@ var BuildSaver = (function () {
      * @returns {Object} JSON data
      * @private
      */
-    BuildSaver.prototype._saveVariable = function (model) {
+    BuildSaver.prototype._saveVariable = function(model) {
         return {
             "type": model.valueType,
             "value": model.value
@@ -73,7 +73,7 @@ var BuildSaver = (function () {
      * @returns {Object} JSON data
      * @private
      */
-    BuildSaver.prototype._savePickerVariable = function (picker) {
+    BuildSaver.prototype._savePickerVariable = function(picker) {
         return {
             "type": picker.model.valueType,
             "name": picker.model.name
@@ -85,7 +85,7 @@ var BuildSaver = (function () {
      * @returns {Object} JSON data
      * @private
      */
-    BuildSaver.prototype._savePickerValue = function (picker) {
+    BuildSaver.prototype._savePickerValue = function(picker) {
         return {
             "type": picker.model.valueType,
             "value": picker.value
@@ -97,8 +97,8 @@ var BuildSaver = (function () {
      * @returns {Object} JSON data
      * @private
      */
-    BuildSaver.prototype._saveStart = function (graph) {
-        var start = graph.findBlock(function (block) {
+    BuildSaver.prototype._saveStart = function(graph) {
+        var start = graph.findBlock(function(block) {
             return block._name === "start";
         });
         if (start === null) {
@@ -120,7 +120,7 @@ var BuildSaver = (function () {
         };
     };
 
-    BuildSaver.prototype._saveStep = function (step) {
+    BuildSaver.prototype._saveStep = function(step) {
         var description = this._getInputBlock(step, 1);
         var sound = this._getInputBlock(step, 2);
         var duration = this._getInputBlock(step, 3);
@@ -139,7 +139,7 @@ var BuildSaver = (function () {
         };
     };
 
-    BuildSaver.prototype._saveEnd = function (end) {
+    BuildSaver.prototype._saveEnd = function(end) {
         var description = this._getInputBlock(end, 1);
         var sound = this._getInputBlock(end, 2);
         if (description === null || sound === null) {
@@ -152,7 +152,7 @@ var BuildSaver = (function () {
         };
     };
 
-    BuildSaver.prototype._saveAssign = function (assign) {
+    BuildSaver.prototype._saveAssign = function(assign) {
         var variable = this._getInputBlock(assign, 1);
         var other = this._getInputBlock(assign, 2);
         var output = this._getOutputBlock(assign, 0);
@@ -167,7 +167,7 @@ var BuildSaver = (function () {
         };
     };
 
-    BuildSaver.prototype._saveEqual = function (equal) {
+    BuildSaver.prototype._saveEqual = function(equal) {
         var first = this._getInputBlock(equal, 0);
         var second = this._getInputBlock(equal, 1);
         return {
@@ -177,7 +177,7 @@ var BuildSaver = (function () {
         };
     };
 
-    BuildSaver.prototype._saveCondition = function (condition) {
+    BuildSaver.prototype._saveCondition = function(condition) {
         var test = this._getInputBlock(condition, 1);
         var yes = this._getOutputBlock(condition, 0);
         var no = this._getOutputBlock(condition, 1);
@@ -192,7 +192,7 @@ var BuildSaver = (function () {
         }
     };
 
-    BuildSaver.prototype._getInputBlock = function (block, index) {
+    BuildSaver.prototype._getInputBlock = function(block, index) {
         if (block.inputs[index].connections.length !== 1) {
             this.emit("error", new cg.GraphError("Missing input " + block.inputs[index].name + " in " + block.model.name));
             return null;
@@ -200,7 +200,7 @@ var BuildSaver = (function () {
         return block.inputs[index].connections[0].outputPoint.block;
     };
 
-    BuildSaver.prototype._getOutputBlock = function (block, index) {
+    BuildSaver.prototype._getOutputBlock = function(block, index) {
         if (block.outputs[index].connections.length !== 1) {
             this.emit("error", new cg.GraphError("Missing output " + block.outputs[index].name + " in " + block.model.name));
             return null;

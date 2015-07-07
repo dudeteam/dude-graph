@@ -54,13 +54,13 @@
             _isReady: false,
             get isReady() { return this._isReady; },
 
-            handleErrors: function () {
-                this._loader.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this._graph.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
-                this._renderer.on("error", function (error) { this.fire("error", {error: error}); }.bind(this));
+            handleErrors: function() {
+                this._loader.on("error", function(error) { this.fire("error", {error: error}); }.bind(this));
+                this._graph.on("error", function(error) { this.fire("error", {error: error}); }.bind(this));
+                this._renderer.on("error", function(error) { this.fire("error", {error: error}); }.bind(this));
             },
 
-            createVariable: function (type, name, value) {
+            createVariable: function(type, name, value) {
                 if (!name) {
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
@@ -81,7 +81,7 @@
                 return true;
             },
 
-            editVariable: function (previous, type, name, value) {
+            editVariable: function(previous, type, name, value) {
                 if (!name) {
                     this.fire("error", {error: new pandora.Exception("A name should be provided to create a variable")});
                     return false;
@@ -99,12 +99,12 @@
                     this.fire("error", {error: new pandora.Exception("Variable {0} does not exist", previous)});
                     return false;
                 }
-                var blocks = this._graph.findBlocks(function (block) {
+                var blocks = this._graph.findBlocks(function(block) {
                     return block._name === previous;
                 });
                 model._name = name;
                 model.value = value;
-                pandora.forEach(blocks, function (block) {
+                pandora.forEach(blocks, function(block) {
                     block.__name = name;
                     block.emit("update");
                     block.emit("move");
@@ -112,22 +112,22 @@
                 return true;
             },
 
-            deleteVariable: function (name) {
-                var blocks = this._graph.findBlocks(function (block) {
+            deleteVariable: function(name) {
+                var blocks = this._graph.findBlocks(function(block) {
                     return block._name === name;
                 });
-                pandora.forEach(blocks, function (block) {
+                pandora.forEach(blocks, function(block) {
                     this._graph.removeEntity(block);
                 }.bind(this));
                 this._graph.removeModel(name);
             },
 
-            createGroup: function (name) {
+            createGroup: function(name) {
                 var _id = this._graph.getNextGroupId();
                 this._renderer.createSmartGroup(_id, name);
             },
 
-            createAction: function (model, position) {
+            createAction: function(model, position) {
                 position.assign([
                     (position.x - this._graph.zoom.translate[0]) / this._graph.zoom.scale,
                     (position.y - this._graph.zoom.translate[1]) / this._graph.zoom.scale
@@ -137,7 +137,7 @@
                 return block;
             },
 
-            createProperty: function (pattern, searchResult, position, parent) {
+            createProperty: function(pattern, searchResult, position, parent) {
                 position.assign([
                     (position.x - this._graph.zoom.translate[0]) / this._graph.zoom.scale,
                     (position.y - this._graph.zoom.translate[1]) / this._graph.zoom.scale
@@ -151,7 +151,7 @@
                 return block;
             },
 
-            replaceProperty: function (pattern, searchResult, entity) {
+            replaceProperty: function(pattern, searchResult, entity) {
                 var block = this.createProperty(pattern, searchResult, entity.position, entity.parent);
                 if (block !== null) {
                     var connection = entity.outputs[0].connections[0] || null;
@@ -163,7 +163,7 @@
                 return block;
             },
 
-            _getValueModel: function (pattern) {
+            _getValueModel: function(pattern) {
                 if (/^(true|false)$/.test(pattern)) {
                     return new cg.Value({
                         "value-type": "boolean",
@@ -183,30 +183,30 @@
                 return null;
             },
 
-            _getVariableModel: function (searchResult) {
+            _getVariableModel: function(searchResult) {
                 return new cg.Variable({
                     "value-type": searchResult.data.valueType,
                     "name": searchResult.name
                 });
             },
 
-            removeSelection: function () {
+            removeSelection: function() {
                 this._renderer.removeSelection();
             },
 
-            hasSelectedEntities: function () {
+            hasSelectedEntities: function() {
                 return this._isReady && this._renderer.hasSelectedEntities();
             },
 
-            hasSelection: function () {
+            hasSelection: function() {
                 return this._isReady && this._renderer.hasSelection();
             },
 
-            zoomToFit: function () {
+            zoomToFit: function() {
                 this._renderer.zoomToFit();
             },
 
-            findModels: function (options) {
+            findModels: function(options) {
                 return this._graph.findModels(options);
             },
 
@@ -214,18 +214,18 @@
                 return this._renderer.getLastSelectedEntity();
             },
 
-            save: function (saver) {
-                saver.on("error", function (error) { this.fire("error", {error: error})}.bind(this));
+            save: function(saver) {
+                saver.on("error", function(error) { this.fire("error", {error: error})}.bind(this));
                 return saver.save(this._graph);
             },
 
-            graphChanged: function () {
+            graphChanged: function() {
                 this.$.svg.innerHTML = "";
                 this._graph = new cg.Graph();
                 this._loader = new cg.JSONLoader();
                 this._renderer = new cg.Renderer(this._graph, this.$.svg, this.config);
                 this.handleErrors();
-                this._renderer.on("property.edit", function (property) {
+                this._renderer.on("property.edit", function(property) {
                     this.fire("property.edit", {property: property});
                 }.bind(this));
                 this._loader.load(this._graph, this.graph);

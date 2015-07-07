@@ -41,14 +41,14 @@ var sources = [
     "serialization/json-saver.js"
 ];
 
-gulp.task('watch', function () {
-    gulp.watch(sources.map(function (e) {
+gulp.task('watch', function() {
+    gulp.watch(sources.map(function(e) {
         return paths.lib + e;
     }), ['build']);
 });
 
-gulp.task('build', function () {
-    return gulp.src(sources.map(function (e) {
+gulp.task('build', function() {
+    return gulp.src(sources.map(function(e) {
         return paths.lib + e;
     }))
         .pipe(jshint())

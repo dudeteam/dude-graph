@@ -18,21 +18,21 @@
                 type: "",
                 types: []
             },
-            labelChanged: function () {
+            labelChanged: function() {
                 for (var i = 0; i < this.types.length; ++i) {
                     if (this.types[i].label === this.label) {
                         this.type = this.types[i].name;
                     }
                 }
             },
-            typeChanged: function () {
+            typeChanged: function() {
                 for (var i = 0; i < this.types.length; ++i) {
                     if (this.types[i].name === this.type) {
                         this.label = this.types[i].label;
                     }
                 }
             },
-            _change: function () {
+            _change: function() {
                 this.fire("change");
             }
         });
