@@ -4,6 +4,7 @@
 
 html /deep/ .type-stream { color: rgba(150, 150, 150, 1);  fill: rgba(150, 150, 150, 1); stroke: rgba(150, 150, 150, 1); }
 html /deep/ .type-stream.active { stroke: rgba(255, 255, 255, 1); }
+html /deep/ .type-property { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-entity-model { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-vec3 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
 html /deep/ .type-vec2 { color: #5990c7;  fill: #5990c7; stroke: #5990c7; }
