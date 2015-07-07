@@ -769,6 +769,165 @@
           "max": 1
         }
       ]
+    },
+    {
+      "name": "entity model equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "entity-model",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec2 equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "vec2",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec3 equal",
+      "type": "action",
+      "description": "Check if the <first> value is equal to the <second> one and return true or false accordingly.",
+      "inputs": [
+        {
+          "type": "vec3",
+          "name": "first",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "second",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "boolean",
+          "name": "result",
+          "max": -1
+        }
+      ]
+    },
+    {
+      "name": "vec3 assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "vec3",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "vec2 assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "vec2",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "entity model assign",
+      "type": "action",
+      "description": "Assign the value of <other> (can be a variable or a value) to <variable>.",
+      "inputs": [
+        {
+          "type": "stream",
+          "name": "input",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "variable",
+          "max": 1
+        },
+        {
+          "type": "entity-model",
+          "name": "other",
+          "max": 1
+        }
+      ],
+      "outputs": [
+        {
+          "type": "stream",
+          "name": "output",
+          "max": 1
+        }
+      ]
     }
   ],
   "children": [
@@ -872,8 +1031,8 @@
         95
       ],
       "size": [
-        412.15625,
-        323
+        420.2454528808594,
+        331.0892028808594
       ],
       "children": [
         {

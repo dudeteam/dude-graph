@@ -2256,7 +2256,7 @@ cg.Renderer.prototype._removeConnections = function(connections) {
  * Some default sizes
  * @type {number}
  */
-var HANDLE_SIZE = 10;
+var HANDLE_SIZE = 20;
 var GROUP_MIN_SIZE = {x: 300, y: 200};
 
 /**
@@ -2326,28 +2326,14 @@ cg.Renderer.prototype._createGroups = function(groups) {
     createdGroups
         .append("svg:rect")
         .attr({
-            "fill": "lightblue",
-            "fill-opacity": 0.5,
-            "class": "group-handle bottom",
-            "cursor": "ns-resize",
-            "x": function() { return 5; },
+            "fill": "transparent",
+            "class": "group-handle",
+            "cursor": "nwse-resize",
+            "x": function(group) { return group.size.x - HANDLE_SIZE / 2; },
             "y": function(group) { return group.size.y - HANDLE_SIZE / 2; },
-            "width": function(group) { return group.size.x - HANDLE_SIZE; },
-            "height": function() { return HANDLE_SIZE; }
+            "width": HANDLE_SIZE,
+            "height": HANDLE_SIZE
         });
-    createdGroups
-        .append("svg:rect")
-        .attr({
-            "fill": "lightblue",
-            "fill-opacity": 0.5,
-            "class": "group-handle top",
-            "cursor": "ns-resize",
-            "x": function() { return 5; },
-            "y": function() { return -HANDLE_SIZE / 2; },
-            "width": function(group) { return group.size.x - HANDLE_SIZE; },
-            "height": function() { return HANDLE_SIZE; }
-        });
-
 
     // create text
     createdGroups
@@ -2399,22 +2385,22 @@ cg.Renderer.prototype._heavyUpdateGroups = function(groups) {
         .select(".group-handle")
         .call(d3.behavior.drag()
             .on("dragstart", function() {
-                console.log("drag start");
                 pandora.preventCallback(d3.event.sourceEvent);
             })
             .on("drag", function(group) {
                 var rect = d3.select(this.parentNode).select(".group-rect");
                 var handle = d3.select(this);
-                if (handle.classed("bottom")) {
-                    var h = parseFloat(rect.attr("height"));
-                    if (h + d3.event.dy > GROUP_MIN_SIZE.y) {
-                        handle.attr("y", parseFloat(handle.attr("y")) + d3.event.dy);
-                        rect.attr("height", h + d3.event.dy);
-                        group.size.y = h;
-                    }
-                } else if (handle.classed("top")) {
-                    console.log("in");
+                var h = parseFloat(rect.attr("height"));
+                if (h + d3.event.dy > GROUP_MIN_SIZE.y) {
                     handle.attr("y", parseFloat(handle.attr("y")) + d3.event.dy);
+                    rect.attr("height", h + d3.event.dy);
+                    group.size.y = h;
+                }
+                var w = parseFloat(rect.attr("width"));
+                if (w + d3.event.dx > GROUP_MIN_SIZE.x) {
+                    handle.attr("x", parseFloat(handle.attr("x")) + d3.event.dx);
+                    rect.attr("width", w + d3.event.dx);
+                    group.size.x = w;
                 }
             }));
     groups
