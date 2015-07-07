@@ -455,7 +455,7 @@ cg.Connection = (function() {
      */
     Connection.prototype.replacePoint = function(source, target) {
         if (target.isInput !== source.isInput) {
-            this._graph.emit("error", new cg.GraphError("Cannot link " + (source.isInput ? "inputs" : "outputs") + " together"));
+            this.emit("error", new cg.GraphError("Cannot link " + (source.isInput ? "inputs" : "outputs") + " together"));
             return false;
         }
         if (this._inputPoint === source) {
