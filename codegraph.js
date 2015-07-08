@@ -2378,8 +2378,17 @@ cg.Renderer.prototype._heavyUpdateGroups = function(groups) {
             ry: this._config.group.borderRadius,
             x: 0,
             y: 0,
-            width: function(group) { return group.size.x; },
+            width: function(group) {
+                return group.size.x;
+            },
             height: function(group) { return group.size.y; }
+        });
+    groups
+        .select(".group-text")
+        .text(function(group) { return group.description; })
+        .attr({
+            x: function(group) { return group.size.x / 2; },
+            y: this._config.group.heading
         });
     groups
         .select(".group-handle")
@@ -2389,6 +2398,7 @@ cg.Renderer.prototype._heavyUpdateGroups = function(groups) {
             })
             .on("drag", function(group) {
                 var rect = d3.select(this.parentNode).select(".group-rect");
+                var text = d3.select(this.parentNode).select(".group-text");
                 var handle = d3.select(this);
                 var h = parseFloat(rect.attr("height"));
                 if (h + d3.event.dy > GROUP_MIN_SIZE.y) {
@@ -2401,15 +2411,10 @@ cg.Renderer.prototype._heavyUpdateGroups = function(groups) {
                     handle.attr("x", parseFloat(handle.attr("x")) + d3.event.dx);
                     rect.attr("width", w + d3.event.dx);
                     group.size.x = w;
+                    text.attr("x", group.size.x / 2);
                 }
+                //group.emit("update");
             }));
-    groups
-        .select(".group-text")
-        .text(function(group) { return group.description; })
-        .attr({
-            x: function(group) { return group.size.x / 2; },
-            y: this._config.group.heading
-        });
 };
 
 /**
