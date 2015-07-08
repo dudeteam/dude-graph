@@ -1,29 +1,29 @@
 {
-  "name": "CodeGraph",
-  "version": "1.0.0",
-  "description": "CodeGraph is a graphic tool to draw graphs which represent some logical behaviors. You can create actions, connect them together and order them into groups.",
-  "main": "lib/index.js",
+  "name": "codegraph",
+  "version": "0.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeremt/CodeGraph.git"
+    "url": "https://github.com/dudeteam/codegraph.git"
   },
-  "keywords": [
-    "graph",
-    "blueprint"
-  ],
-  "author": "DudeTeam",
+  "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jeremt/CodeGraph/issues"
+    "url": "https://github.com/dudeteam/codegraph/issues"
   },
-  "homepage": "https://github.com/jeremt/CodeGraph",
-  "dependencies": {
-    "gulp": "^3.8.11",
-    "gulp-concat": "^2.5.2",
-    "gulp-uglify": "^1.1.0",
-    "gulp-jshint": "^1.9.2"
+  "devDependencies": {
+    "bower": "^1.4.1",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-mocha": "^2.1.2",
+    "gulp-uglify": "^1.2.0"
   }
 }

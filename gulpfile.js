@@ -1,62 +1,33 @@
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var jshint = require('gulp-jshint');
+var gulp = require("gulp");
+var concat = require("gulp-concat");
+var uglify = require("gulp-uglify");
+var jshint = require("gulp-jshint");
+var mocha = require('gulp-mocha');
 
-var paths = {
-    "lib": "./lib/",
-    "dist": "."
-};
-
-var sources = [
-    "index.js",
-    "graph/utils/container.js",
-    "graph/utils/graph-error.js",
-    "graph/models/model.js",
-    "graph/models/action.js",
-    "graph/models/variable.js",
-    "graph/models/value.js",
-    "graph/entities/point.js",
-    "graph/entities/connection.js",
-    "graph/entities/entity.js",
-    "graph/entities/group.js",
-    "graph/entities/block.js",
-    "graph/entities/graph.js",
-    "renderer/renderer.js",
-    "renderer/utils/renderer-collision.js",
-    "renderer/utils/renderer-d3.js",
-    "renderer/utils/renderer-error.js",
-    "renderer/utils/renderer-point.js",
-    "renderer/utils/renderer-position.js",
-    "renderer/render/render.js",
-    "renderer/render/render-point.js",
-    "renderer/render/render-connection.js",
-    "renderer/render/render-group.js",
-    "renderer/render/render-block.js",
-    "renderer/render/render-value.js",
-    "renderer/render/render-zoom.js",
-    "renderer/render/render-drag.js",
-    "renderer/render/render-selection.js",
-    "serialization/json-loader.js",
-    "serialization/json-saver.js"
+var CG_SOURCES = [
+    "lib/index.js",
+    "lib/graph/utils/*.js",
+    "lib/graph/nodes/graph.js",
+    "lib/graph/nodes/block.js",
+    "lib/graph/blocks/*.js"
 ];
 
-gulp.task('watch', function() {
-    gulp.watch(sources.map(function(e) {
-        return paths.lib + e;
-    }), ['build']);
-});
-
-gulp.task('build', function() {
-    return gulp.src(sources.map(function(e) {
-        return paths.lib + e;
-    }))
+gulp.task("jshint", function () {
+    return gulp.src(CG_SOURCES)
         .pipe(jshint())
-        .pipe(jshint.reporter('default'))
-        .pipe(concat("codegraph.js"))
-        //.pipe(uglify({mangle: false}))
-        .pipe(gulp.dest(paths.dist));
+        .pipe(jshint.reporter());
 });
 
-gulp.task('library', ['build', 'watch']);
-gulp.task('default', ['library']);
+gulp.task("build", function () {
+    return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(CG_SOURCES))
+        .pipe(concat("codegraph.js"))
+        //.pipe(uglify())
+        .pipe(gulp.dest("."));
+});
+
+gulp.task("test", function () {
+    return gulp.src(['test/*.js', 'tests/**/*.js'], {read: false})
+        .pipe(mocha({reporter: 'progress'}));
+});
+
+gulp.task("default", ["jshint", "build", "test"]);
