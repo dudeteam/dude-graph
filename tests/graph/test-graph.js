@@ -11,7 +11,7 @@ var blocks = [
             {"stuff": "the_string"}
         ],
         "cgOutputs": [
-            {"out": null}
+            {"out": true}
         ]
     },
     {
@@ -31,12 +31,18 @@ describe("Graph", function () {
                     in_created = true;
                 });
                 node.addInputs(block.cgInputs);
+                node.addOutputs(block.cgOutputs);
                 assert.ok(in_created);
                 assert.equal(pandora.typename(node.in), "Number");
                 assert.equal(pandora.typename(node.stuff), "String");
                 assert.equal(node.in, 32);
                 try {
                     node.in = "Stuff";
+                } catch (ex) {
+                    console.log(ex);
+                }
+                try {
+                    node.addOutputs(block.cgInputs);
                 } catch (ex) {
                     console.log(ex);
                 }

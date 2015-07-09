@@ -25,9 +25,13 @@ gulp.task("build", function () {
         .pipe(gulp.dest("."));
 });
 
+gulp.task("watch", function () {
+    gulp.watch(CG_SOURCES, ["jshint", "build"]);
+});
+
 gulp.task("test", function () {
     return gulp.src(['test/*.js', 'tests/**/*.js'], {read: false})
         .pipe(mocha({reporter: 'progress'}));
 });
 
-gulp.task("default", ["jshint", "build", "test"]);
+gulp.task("default", ["watch"]);
