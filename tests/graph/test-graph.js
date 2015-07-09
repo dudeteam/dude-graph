@@ -27,7 +27,7 @@ describe("Graph", function () {
             graph.addBlock(node);
             if (block.cgInputs) {
                 var in_created = false;
-                node.on('in-created', function() {
+                node.on('input-in-created', function() {
                     in_created = true;
                 });
                 node.addInputs(block.cgInputs);
