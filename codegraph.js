@@ -698,21 +698,28 @@ cg.Graph = (function () {
 
         /**
          * Next block id
-         * @type {number}
+         * @type {Number}
          * @private
          */
         this._nextBlockId = 0;
 
         /**
          * Collection of blocks in the graph
-         * @type {Array}
+         * @type {Array<cg.Block>}
          * @private
          */
         this._blocks = [];
 
         /**
+         * Connections between blocks transputs
+         * @type {Array<cg.Connection>}
+         * @private
+         */
+        this._connections = [];
+
+        /**
          * Map to access a block by its id
-         * @type {Object}
+         * @type {Object} {"42": {cg.Block}}
          * @private
          */
         this._blocksIds = {};
@@ -720,15 +727,18 @@ cg.Graph = (function () {
 
     /**
      * Adds a block to the graph
-     * @param {cg.Block} block
+     * @param {cg.Block} block to add to the graph
      */
     Graph.prototype.addBlock = function (block) {
         var blockId = block.cgId;
+        if (block.cgGraph !== this) {
+            throw new cg.GraphError("Graph::addBlock() This block does not belong to this graph");
+        }
         if (blockId === null || blockId === undefined) {
-            throw new cg.GraphError("Graph::addBlock() block id is null");
+            throw new cg.GraphError("Graph::addBlock() Block id is null");
         }
         if (this._blocksIds[blockId]) {
-            throw new cg.GraphError("Graph::addBlock() block with id {0} already exists", blockId);
+            throw new cg.GraphError("Graph::addBlock() Block with id {0} already exists", blockId);
         }
         this._blocks.push(block);
         this._blocksIds[blockId] = block;
@@ -854,6 +864,7 @@ cg.Block = (function() {
                     var oldValue = self["_" + transputName];
                     if (typeof(oldValue) != typeof(newValue)) {
                         // TODO: Silently ignore if the type is convertible
+                        // TODO: Handle connections
                         throw new cg.GraphError("The {0} `{1}` was expecting a value of type {2}, but {3} was found instead", transputType, transputName, pandora.typename(oldValue), pandora.typename(newValue));
                     }
                     self["_" + transputName] = newValue;

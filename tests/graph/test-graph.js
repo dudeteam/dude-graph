@@ -7,15 +7,35 @@ var blocks = [
         "cgType": "Function",
         "cgId": 0,
         "cgInputs": [
-            {"in": 32},
-            {"stuff": "the_string"}
+            {
+                "in": 32
+            },
+            {
+                "stuff": "the_string"
+            }
         ],
         "cgOutputs": [
-            {"out": true}
+            {
+                "out": {
+                    "type": "Connection",
+                    "cgId": 1,
+                    "input": "in"
+                }
+            }
         ]
     },
     {
-        "cgType": "Function"
+        "cgType": "Function",
+        "cgId": 1,
+        "cgInputs": [
+            {
+                "in": {
+                    "type": "Connection",
+                    "cgId": 0,
+                    "output": "out"
+                }
+            }
+        ]
     }
 ];
 
@@ -27,7 +47,7 @@ describe("Graph", function () {
             graph.addBlock(node);
             if (block.cgInputs) {
                 var in_created = false;
-                node.on('input-in-created', function() {
+                node.on('input-in-created', function () {
                     in_created = true;
                 });
                 node.addInputs(block.cgInputs);
