@@ -653,6 +653,77 @@ var cg = (function() {
     }
     return namespace;
 })();
+cg.JSONLoader = (function () {
+
+    /**
+     *
+     * @extends {pandora.EventEmitter}
+     * @constructor
+     */
+    var JSONLoader = pandora.class_("JSONLoader", pandora.EventEmitter, function () {
+        pandora.EventEmitter.call(this);
+    });
+
+    /**
+     *
+     * @param graph {cg.Graph}
+     * @param blocksData {Array<{cgType: "Function", cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     */
+    JSONLoader.prototype.load = function (graph, blocksData) {
+        this._loadBlocks(graph, blocksData);
+        this._loadPoints(graph, blocksData);
+    };
+
+    /**
+     *
+     * @param graph {cg.Graph}
+     * @param blocksData {Array<{cgType: "Function", cgId: "32"}>}
+     * @private
+     */
+    JSONLoader.prototype._loadBlocks = function (graph, blocksData) {
+        pandora.forEach(blocksData, function (blockData) {
+            if (!blockData.hasOwnProperty("cgType")) {
+                throw new cg.GraphError("JSONLoader::_loadBlocks() Block definition lacks property `cgType`");
+            }
+            if (!blockData.hasOwnProperty("cgId")) {
+                throw new cg.GraphError("JSONLoader::_loadBlocks() Block definition lacks property `cgId`");
+            }
+            var cgBlockCreator = cg[blockData.cgType];
+            if (!cgBlockCreator) {
+                throw new cg.GraphError("JSONLoader::_loadBlocks() Cannot create a block of type `{0}`", blockData.cgType);
+            }
+            var block = new cg[blockData.cgType](graph, blockData.cgId);
+            graph.addBlock(block);
+        });
+    };
+
+    /**
+     *
+     * @param graph {cg.Graph}
+     * @param blocksData {Array<{cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @private
+     */
+    JSONLoader.prototype._loadPoints = function (graph, blocksData) {
+        pandora.forEach(blocksData, function (blockData) {
+            var block = graph.blockById(blockData.cgId);
+            if (blockData.cgInputs) {
+                pandora.forEach(blockData.cgInputs, function (input) {
+                    var inputDecomposed = pandora.decomposeObject(input);
+                    console.log("Create input", inputDecomposed.name, "with value", inputDecomposed.value);
+                });
+            }
+            if (blockData.cgOutputs) {
+                pandora.forEach(blockData.cgOutputs, function (output) {
+                    var outputDecomposed = pandora.decomposeObject(output);
+                    console.log("Create output", outputDecomposed.name, "with value", outputDecomposed.value);
+                });
+            }
+        });
+    };
+
+    return JSONLoader;
+
+})();
 cg.GraphError = (function () {
 
     /**
@@ -709,13 +780,9 @@ cg.Graph = (function () {
          * @private
          */
         this._blocks = [];
-
-        /**
-         * Connections between blocks transputs
-         * @type {Array<cg.Connection>}
-         * @private
-         */
-        this._connections = [];
+        Object.defineProperty(this, "blocks", {
+            get: function() { return this._blocks; }.bind(this)
+        });
 
         /**
          * Map to access a block by its id
@@ -723,6 +790,13 @@ cg.Graph = (function () {
          * @private
          */
         this._blocksIds = {};
+
+        /**
+         * Connections between blocks points
+         * @type {Array<cg.Connection>}
+         * @private
+         */
+        this._connections = [];
     });
 
     /**
@@ -745,6 +819,19 @@ cg.Graph = (function () {
     };
 
     /**
+     * Returns a block by it's unique id
+     * @param {String} blockId
+     * @return {cg.Block}
+     */
+    Graph.prototype.blockById = function (blockId) {
+        var block = this._blocksIds[blockId];
+        if (!block) {
+            throw new cg.GraphError("Graph::blockById() Block not found for id ``{0}`", blockId);
+        }
+        return block;
+    };
+
+    /**
      * Returns the next unique block id
      * @returns {number}
      */
@@ -762,6 +849,7 @@ cg.Graph = (function () {
             case "Number":
             case "String":
             case "Boolean":
+            case "Object":
                 return true;
             default:
                 return false;
@@ -832,44 +920,43 @@ cg.Block = (function() {
     });
 
     /**
-     * Transput is the hypernym of input/output
      * This method is used as a helper to add whether inputs or outputs
-     * @param transputs {Array<Object>} [{"x": 0}, {"y": 0}]
-     * @param isInput {Boolean} True if we add the transputs to the inputs, False to the outputs
+     * @param points {Array<Object>} [{"x": 0}, {"y": 0}]
+     * @param isInput {Boolean} True if we add the points to the inputs, False to the outputs
      */
-    Block.prototype._addTransputs = function (transputs, isInput) {
+    Block.prototype._addPoints = function (points, isInput) {
         var self = this;
-        var transputType = isInput ? "input" : "output";
-        var transputContainer = isInput ? this._cgInputs : this._cgOutputs;
-        pandora.forEach(transputs, function (transput) {
-            var decomposedTransput = pandora.decomposeObject(transput);
-            var transputName = decomposedTransput.name;
-            var transputValue = decomposedTransput.value;
-            if (!self._cgGraph.isTypeAllowed(transputValue)) {
-                // TODO: Rethink the concept of types, and allowed types for transputs
-                throw new cg.GraphError("The {0} `{1}` was created with an unknown type: {2}", transputType, transputName, pandora.typename(transputValue));
+        var pointType = isInput ? "input" : "output";
+        var pointContainer = isInput ? this._cgInputs : this._cgOutputs;
+        pandora.forEach(points, function (point) {
+            var decomposedPoint = pandora.decomposeObject(point);
+            var pointName = decomposedPoint.name;
+            var pointValue = decomposedPoint.value;
+            if (!self._cgGraph.isTypeAllowed(pointValue)) {
+                // TODO: Rethink the concept of types, and allowed types for points
+                throw new cg.GraphError("The {0} `{1}` was created with an unknown type: {2}", pointType, pointName, pandora.typename(pointValue));
             }
-            if (self.hasInput(transputName) || self.hasOutput(transputName)) {
-                // TODO: Silently ignore if the transput type and the transput value type is the same, or convertible
-                throw new cg.GraphError("Trying to add an {0} but `{1}` already exists as an {2}", transputType, transputName, self.hasInput(transputName) ? "input" : "output");
+            if (self.hasInput(pointName) || self.hasOutput(pointName)) {
+                // TODO: Silently ignore if the point type and the point value type is the same, or convertible
+                throw new cg.GraphError("Trying to add an {0} but `{1}` already exists as an {2}", pointType, pointName, self.hasInput(pointName) ? "input" : "output");
             }
-            transputContainer.push(transputName);
-            self["_" + transputName] = transputValue;
-            self.emit(pandora.formatString("{0}-{1}-created", transputType, transputName));
-            Object.defineProperty(self, transputName, {
+            pointContainer.push(pointName);
+            self["_" + pointName] = pointValue;
+            self.emit(pandora.formatString("{0}-{1}-created", pointType, pointName));
+            Object.defineProperty(self, pointName, {
                 get: function () {
-                    return self["_" + transputName];
+                    return self["_" + pointName];
                 },
                 set: function (newValue) {
-                    var oldValue = self["_" + transputName];
+                    var oldValue = self["_" + pointName];
                     if (typeof(oldValue) != typeof(newValue)) {
                         // TODO: Silently ignore if the type is convertible
                         // TODO: Handle connections
-                        throw new cg.GraphError("The {0} `{1}` was expecting a value of type {2}, but {3} was found instead", transputType, transputName, pandora.typename(oldValue), pandora.typename(newValue));
+                        throw new cg.GraphError("The {0} `{1}` was expecting a value of type {2}, but {3} was found instead", pointType, pointName, pandora.typename(oldValue), pandora.typename(newValue));
                     }
-                    self["_" + transputName] = newValue;
-                    self._cgGraph.emit(pandora.formatString("entity-{0}-{0}-updated", self._cgId, transputName), oldValue, newValue);
-                    self.emit(pandora.formatString("{0}-{1}-updated", transputType, transputName), oldValue, newValue);
+                    self["_" + pointName] = newValue;
+                    self._cgGraph.emit(pandora.formatString("entity-{0}-{0}-updated", self._cgId, pointName), oldValue, newValue);
+                    self.emit(pandora.formatString("{0}-{1}-updated", pointType, pointName), oldValue, newValue);
                 }
             });
         });
@@ -881,7 +968,7 @@ cg.Block = (function() {
      * @protected
      */
     Block.prototype.addInputs = function (inputs) {
-        this._addTransputs(inputs, true);
+        this._addPoints(inputs, true);
     };
 
     /**
@@ -890,7 +977,7 @@ cg.Block = (function() {
      * @protected
      */
     Block.prototype.addOutputs = function (outputs) {
-        this._addTransputs(outputs, false);
+        this._addPoints(outputs, false);
     };
 
     /**
