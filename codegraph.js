@@ -660,66 +660,6 @@ var cg = (function() {
     }
     return namespace;
 })();
-cg.GraphError = (function () {
-
-    /**
-     * Handle graph related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-cg.GraphSerializationError = (function () {
-
-    /**
-     * Handle graph serialization related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphSerializationError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-/**
- * This file gathers some stub that could be moved to pandora
- */
-
-/**
- *
- * @param object
- * @returns {{name: {String}, value: {Object}}}
- */
-pandora.decomposeObject = function (object) {
-    var objectName = null;
-    var objectValue = null;
-    pandora.forEach(object, function (_objectValue, _objectName) {
-        objectName = _objectName;
-        objectValue = _objectValue;
-        return true;
-    });
-    return {
-        "name": objectName,
-        "value": objectValue
-    };
-};
-
-/**
- *
- * @param container {Array<Object>}
- * @param fn {Function<Object>}
- */
-pandora.findIf = function(container, fn) {
-    var found = null;
-    pandora.forEach(container, function (item) {
-        if (fn(item) === true) {
-            found = item;
-            return true;
-        }
-    });
-    return found;
-};
 cg.JSONLoader = (function () {
 
     /**
@@ -862,11 +802,11 @@ cg.JSONLoader = (function () {
             if (!cgInputBlock) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input block not found for id `{0}`", cgInputBlockId);
             }
-            var cgOutputPoint = cgOutputBlock.output(cgOutputName);
+            var cgOutputPoint = cgOutputBlock.outputByName(cgOutputName);
             if (!cgOutputPoint) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output point `{0}` not found in block `{1}`", cgOutputName, cgOutputBlockId);
             }
-            var cgInputPoint = cgInputBlock.input(cgInputName);
+            var cgInputPoint = cgInputBlock.inputByName(cgInputName);
             if (!cgInputPoint) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input point `{0}` not found in block `{1}`", cgInputName, cgInputBlockId);
             }
@@ -877,6 +817,47 @@ cg.JSONLoader = (function () {
     return JSONLoader;
 
 })();
+cg.GraphError = (function () {
+
+    /**
+     * Handle graph related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+cg.GraphSerializationError = (function () {
+
+    /**
+     * Handle graph serialization related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphSerializationError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+/**
+ * This file gathers some stub that could be moved to pandora
+ */
+
+/**
+ * Finds a specific item in a collection
+ * @param container {Array<Object>}
+ * @param fn {Function<Object>}
+ */
+pandora.findIf = function(container, fn) {
+    var found = null;
+    pandora.forEach(container, function (item) {
+        if (fn(item) === true) {
+            found = item;
+            return true;
+        }
+    });
+    return found;
+};
 cg.Graph = (function () {
 
     /**
@@ -944,6 +925,7 @@ cg.Graph = (function () {
         this._cgBlocks.push(cgBlock);
         this._cgBlocksIds[cgBlockId] = cgBlock;
         this._cgNextBlockId = Math.max(this._cgNextBlockId, cgBlockId);
+        this.emit("cg-block-created", cgBlock);
     };
 
     /**
@@ -954,7 +936,7 @@ cg.Graph = (function () {
     Graph.prototype.blockById = function (cgBlockId) {
         var cgBlock = this._cgBlocksIds[cgBlockId];
         if (!cgBlock) {
-            throw new cg.GraphError("Graph::blockById() Block not found for id ``{0}`", cgBlockId);
+            throw new cg.GraphError("Graph::blockById() Block not found for id `{0}`", cgBlockId);
         }
         return cgBlock;
     };
@@ -981,6 +963,7 @@ cg.Graph = (function () {
         this._cgConnections.push(cgConnection);
         cgOutputPoint._cgConnections.push(cgConnection);
         cgInputPoint._cgConnections.push(cgConnection);
+        this.emit("cg-connection-created", cgConnection);
         return cgConnection;
     };
 
@@ -1002,8 +985,13 @@ cg.Graph = (function () {
      * @returns {Array<cg.Connection>}
      */
     Graph.prototype.connectionsByPoint = function (cgPoint) {
-        // TODO
-        throw new cg.GraphError("Graph::connectionByPoints() Not yet implemented");
+        var cgConnections = [];
+        pandora.forEach(this._cgConnections, function (cgConnection) {
+            if (cgConnection.cgOutputPoint === cgPoint || cgConnection.cgInputPoint === cgPoint) {
+                cgConnections.push(cgConnection);
+            }
+        });
+        return cgConnections;
     };
 
     return Graph;
@@ -1015,14 +1003,11 @@ cg.Block = (function () {
      * Block is the base class for all codegraph nodes
      * A Block has a list of inputs and outputs
      * Inputs and outputs are simple fields in the Block object with get and set properties
-     * @extends {pandora.EventEmitter}
      * @param cgGraph {cg.Graph}
      * @param cgBlockId {String}
      * @constructor
      */
-    var Block = pandora.class_("Block", pandora.EventEmitter, function (cgGraph, cgBlockId) {
-        pandora.EventEmitter.call(this);
-
+    var Block = pandora.class_("Block", function (cgGraph, cgBlockId) {
         if (!cgGraph) {
             throw new cg.GraphError("Block() Cannot create a Block without a graph");
         }
@@ -1080,19 +1065,21 @@ cg.Block = (function () {
     /**
      * Adds an input or an output point
      * @param cgPoint {cg.Point}
+     * @return {cg.Point}
      */
     Block.prototype.addPoint = function (cgPoint) {
         if (cgPoint.cgBlock !== this) {
             throw new cg.GraphError("Block::addPoint() Point is not bound to this block: `{0}`", cgPoint.cgName);
         }
-        if (cgPoint.isOutput && this.output(cgPoint.cgName) || !cgPoint.isOutput && this.input(cgPoint.cgName)) {
-            throw new cg.GraphError("Block::addPoint() Block has already an {0} called `{1}`", (cgPoint.isOutput ? "output" : "input"), cgPoint.cgName);
+        if (cgPoint.isOutput && this.outputByName(cgPoint.cgName) || !cgPoint.isOutput && this.inputByName(cgPoint.cgName)) {
+            throw new cg.GraphError("Block::addPoint() Block has already an {0}: `{1}`", (cgPoint.isOutput ? "output" : "input"), cgPoint.cgName);
         }
         if (cgPoint.isOutput) {
             this._cgOutputs.push(cgPoint);
         } else {
             this._cgInputs.push(cgPoint);
         }
+        return cgPoint;
     };
 
     /**
@@ -1100,7 +1087,7 @@ cg.Block = (function () {
      * @param {String} cgOutputName
      * @return {cg.Point|null}
      */
-    Block.prototype.output = function (cgOutputName) {
+    Block.prototype.outputByName = function (cgOutputName) {
         return pandora.findIf(this._cgOutputs, function(cgOutput) {
             return cgOutput.cgName === cgOutputName;
         });
@@ -1111,7 +1098,7 @@ cg.Block = (function () {
      * @param {String} cgInputName
      * @return {cg.Point|null}
      */
-    Block.prototype.input = function (cgInputName) {
+    Block.prototype.inputByName = function (cgInputName) {
         return pandora.findIf(this._cgInputs, function(cgInput) {
             return cgInput.cgName === cgInputName;
         });
@@ -1145,12 +1132,9 @@ cg.Point = (function () {
      * @param cgBlock {cg.Block} The block this point refers to
      * @param cgPointName {String} The block point name for the input or output
      * @param isOutput {Boolean} True if this point is an output, False for an input
-     * @extends {pandora.EventEmitter}
      * @constructor
      */
-    var Point = pandora.class_("Point", pandora.EventEmitter, function (cgBlock, cgPointName, isOutput) {
-        pandora.EventEmitter.call(this);
-
+    var Point = pandora.class_("Point", function (cgBlock, cgPointName, isOutput) {
         /**
          * The graph of the block
          * @type {cg.Graph}
@@ -1226,8 +1210,7 @@ cg.Point = (function () {
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
                 }
                 this._cgValueType = cgValueType;
-                // TODO: Graph emit
-                this.emit('value-type-changed', oldCgValueType, cgValueType);
+                this._cgGraph.emit("cg-point-value-type-changed", this, oldCgValueType, cgValueType);
             }.bind(this)
         });
 
@@ -1245,8 +1228,7 @@ cg.Point = (function () {
                 this.cgValueType = pandora.typename(cgValue);
                 var oldCgValue = this._cgValue;
                 this._cgValue = cgValue;
-                // TODO: Graph emit
-                this.emit('value-changed', oldCgValue, cgValue);
+                this._cgGraph.emit("cg-point-value-changed", this, oldCgValue, cgValue);
             }.bind(this)
         });
 
@@ -1266,7 +1248,11 @@ cg.Point = (function () {
      */
     Point.prototype.connect = function(cgPoint) {
         if (this._isOutput === cgPoint.isOutput) {
-            throw new cg.GraphError("Point::addConnection() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", this._cgName, cgPoint.cgName);
+            throw new cg.GraphError("Point::connect() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", this._cgName, cgPoint.cgName);
+        }
+        if (cgPoint.cgValueType !== this._cgValueType) {
+            // TODO: Handle conversion
+            throw new cg.GraphError("Point::connect() Cannot connect two points of different value types");
         }
         if (this._isOutput) {
             this._cgGraph.connectPoints(this, cgPoint);
@@ -1282,12 +1268,9 @@ cg.Connection = (function () {
 
     /**
      *
-     * @extends {pandora.EventEmitter}
      * @constructor
      */
-    var Connection = pandora.class_("Connection", pandora.EventEmitter, function (cgInputPoint, cgOutputPoint) {
-        pandora.EventEmitter.call(this);
-
+    var Connection = pandora.class_("Connection", function (cgInputPoint, cgOutputPoint) {
         /**
          *
          * @type {cg.Point}

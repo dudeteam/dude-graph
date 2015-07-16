@@ -37,10 +37,12 @@ describe("Graph", function () {
         loader.load(graph, blocks, connections);
         assert.equal(graph.cgBlocks.length, 2);
         assert.equal(graph.cgConnections.length, 1);
-        assert.equal(graph.blockById("0").input("in").cgValueType, "Number");
-        assert.equal(graph.blockById("1").output("out").cgValue, 64);
-        graph.blockById("1").output("out").cgValue = 128;
-        assert.equal(graph.blockById("1").output("out").cgValue, 128);
+        assert.equal(graph.blockById("1").outputByName("out").cgValue, 64);
+        assert.equal(graph.blockById("0").inputByName("in").cgValueType, "Number");
+        assert.equal(
+            graph.connectionsByPoint(graph.blockById("1").outputByName("out"))[0],
+            graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]
+        );
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
