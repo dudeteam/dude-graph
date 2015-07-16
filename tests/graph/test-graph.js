@@ -33,9 +33,18 @@ describe("Graph", function () {
     it("should deserialize a graph with some blocks and a connection", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
-
+        var blockCreateEmit = 0;
+        var pointCreateEmit = 0;
+        graph.on("cg-block-create", function () {
+            ++blockCreateEmit;
+        });
+        graph.on("cg-point-create", function () {
+            ++pointCreateEmit;
+        });
         loader.load(graph, blocks, connections);
         assert.equal(graph.cgBlocks.length, 2);
+        assert.equal(graph.cgBlocks.length, blockCreateEmit);
+        assert.equal(pointCreateEmit, 2);
         assert.equal(graph.cgConnections.length, 1);
         assert.equal(graph.blockById("1").outputByName("out").cgValue, 64);
         assert.equal(graph.blockById("0").inputByName("in").cgValueType, "Number");
