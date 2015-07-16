@@ -653,6 +653,66 @@ var cg = (function() {
     }
     return namespace;
 })();
+cg.GraphError = (function () {
+
+    /**
+     * Handle graph related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+cg.GraphSerializationError = (function () {
+
+    /**
+     * Handle graph serialization related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphSerializationError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+/**
+ * This file gathers some stub that could be moved to pandora
+ */
+
+/**
+ *
+ * @param object
+ * @returns {{name: {String}, value: {Object}}}
+ */
+pandora.decomposeObject = function (object) {
+    var objectName = null;
+    var objectValue = null;
+    pandora.forEach(object, function (_objectValue, _objectName) {
+        objectName = _objectName;
+        objectValue = _objectValue;
+        return true;
+    });
+    return {
+        "name": objectName,
+        "value": objectValue
+    };
+};
+
+/**
+ *
+ * @param container {Array<Object>}
+ * @param fn {Function<Object>}
+ */
+pandora.findIf = function(container, fn) {
+    var found = null;
+    pandora.forEach(container, function (item) {
+        if (fn(item) === true) {
+            found = item;
+            return true;
+        }
+    });
+    return found;
+};
 cg.JSONLoader = (function () {
 
     /**
@@ -810,66 +870,6 @@ cg.JSONLoader = (function () {
     return JSONLoader;
 
 })();
-cg.GraphError = (function () {
-
-    /**
-     * Handle graph related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-cg.GraphSerializationError = (function () {
-
-    /**
-     * Handle graph serialization related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphSerializationError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-/**
- * This file gathers some stub that could be moved to pandora
- */
-
-/**
- *
- * @param object
- * @returns {{name: {String}, value: {Object}}}
- */
-pandora.decomposeObject = function (object) {
-    var objectName = null;
-    var objectValue = null;
-    pandora.forEach(object, function (_objectValue, _objectName) {
-        objectName = _objectName;
-        objectValue = _objectValue;
-        return true;
-    });
-    return {
-        "name": objectName,
-        "value": objectValue
-    };
-};
-
-/**
- *
- * @param container {Array<Object>}
- * @param fn {Function<Object>}
- */
-pandora.findIf = function(container, fn) {
-    var found = null;
-    pandora.forEach(container, function (item) {
-        if (fn(item) === true) {
-            found = item;
-            return true;
-        }
-    });
-    return found;
-};
 cg.Graph = (function () {
 
     /**
@@ -1213,12 +1213,11 @@ cg.Point = (function () {
                 if (this._cgValueTypesAllowed.indexOf(cgValueType) === -1) {
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
                 }
-                if (this._cgConnections.length > 0) {
-                    // TODO: Check connections if valueType really changes
+                var oldCgValueType = this._cgValueType;
+                if (this._cgConnections.length > 0 && oldCgValueType !== cgValueType) {
                     // TODO: Handle type conversion
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
                 }
-                var oldCgValueType = this._cgValueType;
                 this._cgValueType = cgValueType;
                 // TODO: Graph emit
                 this.emit('value-type-changed', oldCgValueType, cgValueType);

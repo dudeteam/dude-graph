@@ -39,6 +39,8 @@ describe("Graph", function () {
         assert.equal(graph.cgConnections.length, 1);
         assert.equal(graph.blockById("0").input("in").cgValueType, "Number");
         assert.equal(graph.blockById("1").output("out").cgValue, 64);
+        graph.blockById("1").output("out").cgValue = 128;
+        assert.equal(graph.blockById("1").output("out").cgValue, 128);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
