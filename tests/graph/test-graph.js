@@ -39,6 +39,8 @@ describe("Graph", function () {
         assert.equal(graph.cgConnections.length, 1);
         assert.equal(graph.blockById("1").outputByName("out").cgValue, 64);
         assert.equal(graph.blockById("0").inputByName("in").cgValueType, "Number");
+        graph.blockById("1").outputByName("out").cgValue = 128;
+        assert.equal(graph.blockById("1").outputByName("out").cgValue, 128);
         assert.equal(
             graph.connectionsByPoint(graph.blockById("1").outputByName("out"))[0],
             graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]

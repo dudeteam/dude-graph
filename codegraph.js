@@ -193,13 +193,7 @@ pandora.EventEmitter = (function () {
      * @param name
      */
     EventEmitter.prototype.emit = function (name) {
-        var args = [name];
-        pandora.forEach(Array.prototype.slice.call(arguments, 1), function (arg) {
-            if (arg && arg.constructor) {
-                args.push(pandora.typename(arg) + "(" + arg + ")");
-            }
-        });
-        console.log.apply(this, args);
+        console.log(name);
         if (this._listeners[name] === undefined) {
             return;
         }
@@ -660,6 +654,47 @@ var cg = (function() {
     }
     return namespace;
 })();
+cg.GraphError = (function () {
+
+    /**
+     * Handle graph related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+cg.GraphSerializationError = (function () {
+
+    /**
+     * Handle graph serialization related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphSerializationError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+/**
+ * This file gathers some stub that could be moved to pandora
+ */
+
+/**
+ * Finds a specific item in a collection
+ * @param container {Array<Object>}
+ * @param fn {Function<Object>}
+ */
+pandora.findIf = function(container, fn) {
+    var found = null;
+    pandora.forEach(container, function (item) {
+        if (fn(item) === true) {
+            found = item;
+            return true;
+        }
+    });
+    return found;
+};
 cg.JSONLoader = (function () {
 
     /**
@@ -817,47 +852,6 @@ cg.JSONLoader = (function () {
     return JSONLoader;
 
 })();
-cg.GraphError = (function () {
-
-    /**
-     * Handle graph related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-cg.GraphSerializationError = (function () {
-
-    /**
-     * Handle graph serialization related errors.
-     * @constructor
-     */
-    return pandora.class_("GraphSerializationError", function () {
-        return pandora.Exception.apply(this, arguments);
-    });
-
-})();
-/**
- * This file gathers some stub that could be moved to pandora
- */
-
-/**
- * Finds a specific item in a collection
- * @param container {Array<Object>}
- * @param fn {Function<Object>}
- */
-pandora.findIf = function(container, fn) {
-    var found = null;
-    pandora.forEach(container, function (item) {
-        if (fn(item) === true) {
-            found = item;
-            return true;
-        }
-    });
-    return found;
-};
 cg.Graph = (function () {
 
     /**
@@ -910,6 +904,8 @@ cg.Graph = (function () {
     /**
      * Adds a block to the graph
      * @param {cg.Block} cgBlock to add to the graph
+     * @emit "cg-block-create" {cg.Block}
+     * @return {cg.Block}
      */
     Graph.prototype.addBlock = function (cgBlock) {
         var cgBlockId = cgBlock.cgId;
@@ -925,7 +921,8 @@ cg.Graph = (function () {
         this._cgBlocks.push(cgBlock);
         this._cgBlocksIds[cgBlockId] = cgBlock;
         this._cgNextBlockId = Math.max(this._cgNextBlockId, cgBlockId);
-        this.emit("cg-block-created", cgBlock);
+        this.emit("cg-block-create", cgBlock);
+        return cgBlock;
     };
 
     /**
@@ -953,6 +950,7 @@ cg.Graph = (function () {
      * Returns a connection between two points
      * @param {cg.Point} cgOutputPoint
      * @param {cg.Point} cgInputPoint
+     * @emit "cg-connection-create" {cg.Connection}
      * @returns {cg.Connection|null}
      */
     Graph.prototype.connectPoints = function(cgOutputPoint, cgInputPoint) {
@@ -963,7 +961,7 @@ cg.Graph = (function () {
         this._cgConnections.push(cgConnection);
         cgOutputPoint._cgConnections.push(cgConnection);
         cgInputPoint._cgConnections.push(cgConnection);
-        this.emit("cg-connection-created", cgConnection);
+        this.emit("cg-connection-create", cgConnection);
         return cgConnection;
     };
 
@@ -1065,6 +1063,7 @@ cg.Block = (function () {
     /**
      * Adds an input or an output point
      * @param cgPoint {cg.Point}
+     * @emit "cg-point-add" {cg.Block} {cg.Point}
      * @return {cg.Point}
      */
     Block.prototype.addPoint = function (cgPoint) {
@@ -1079,6 +1078,7 @@ cg.Block = (function () {
         } else {
             this._cgInputs.push(cgPoint);
         }
+        this._cgGraph.emit("cg-point-add", this, cgPoint);
         return cgPoint;
     };
 
@@ -1193,6 +1193,7 @@ cg.Point = (function () {
          * The point current value type
          * Example: Number (Yellow color)
          * @type {String}
+         * @emit "cg-point-value-type-change" {cg.Point} {Object} {Object}
          * @private
          */
         this._cgValueType = undefined;
@@ -1210,13 +1211,14 @@ cg.Point = (function () {
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
                 }
                 this._cgValueType = cgValueType;
-                this._cgGraph.emit("cg-point-value-type-changed", this, oldCgValueType, cgValueType);
+                this._cgGraph.emit("cg-point-value-type-change", this, oldCgValueType, cgValueType);
             }.bind(this)
         });
 
         /**
          * The point current value
          * @type {Object|null}
+         * @emit "cg-point-value-change" {cg.Point} {Object} {Object}
          * @private
          */
         this._cgValue = null;
@@ -1228,7 +1230,7 @@ cg.Point = (function () {
                 this.cgValueType = pandora.typename(cgValue);
                 var oldCgValue = this._cgValue;
                 this._cgValue = cgValue;
-                this._cgGraph.emit("cg-point-value-changed", this, oldCgValue, cgValue);
+                this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
             }.bind(this)
         });
 
