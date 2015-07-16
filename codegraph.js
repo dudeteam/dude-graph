@@ -666,58 +666,147 @@ cg.JSONLoader = (function () {
 
     /**
      *
-     * @param graph {cg.Graph}
-     * @param blocksData {Array<{cgType: "Function", cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
      */
-    JSONLoader.prototype.load = function (graph, blocksData) {
-        this._loadBlocks(graph, blocksData);
-        this._loadPoints(graph, blocksData);
+    JSONLoader.prototype.load = function (cgGraph, cgBlocksData, cgConnectionsData) {
+        this._loadBlocks(cgGraph, cgBlocksData);
+        this._loadPoints(cgGraph, cgBlocksData);
+        if (cgConnectionsData) {
+            this._loadConnections(cgGraph, cgConnectionsData);
+        }
+        console.dir(cgGraph);
     };
 
     /**
      *
-     * @param graph {cg.Graph}
-     * @param blocksData {Array<{cgType: "Function", cgId: "32"}>}
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32"}>}
      * @private
      */
-    JSONLoader.prototype._loadBlocks = function (graph, blocksData) {
-        pandora.forEach(blocksData, function (blockData) {
-            if (!blockData.hasOwnProperty("cgType")) {
-                throw new cg.GraphError("JSONLoader::_loadBlocks() Block definition lacks property `cgType`");
+    JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
+        var self = this;
+        pandora.forEach(cgBlocksData, function (cgBlockData) {
+            if (!cgBlockData.hasOwnProperty("cgType")) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block definition lacks property `cgType`");
             }
-            if (!blockData.hasOwnProperty("cgId")) {
-                throw new cg.GraphError("JSONLoader::_loadBlocks() Block definition lacks property `cgId`");
+            if (!cgBlockData.hasOwnProperty("cgId")) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block definition lacks property `cgId`");
             }
-            var cgBlockCreator = cg[blockData.cgType];
-            if (!cgBlockCreator) {
-                throw new cg.GraphError("JSONLoader::_loadBlocks() Cannot create a block of type `{0}`", blockData.cgType);
+            var cgBlockDeserializer = self[pandora.camelcase("_loadBlock" + cgBlockData.cgType)];
+            if (!cgBlockDeserializer) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Cannot deserialize block of type `{0}`", cgBlockData.cgType);
             }
-            var block = new cg[blockData.cgType](graph, blockData.cgId);
-            graph.addBlock(block);
+            cgBlockDeserializer(cgGraph, cgBlockData);
         });
     };
 
     /**
      *
-     * @param graph {cg.Graph}
-     * @param blocksData {Array<{cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @param cgGraph {cg.Graph}
+     * @param cgBlockData {{cgId: "32", cgType: "Function"}}
+     * @returns {cg.Function}
      * @private
      */
-    JSONLoader.prototype._loadPoints = function (graph, blocksData) {
-        pandora.forEach(blocksData, function (blockData) {
-            var block = graph.blockById(blockData.cgId);
-            if (blockData.cgInputs) {
-                pandora.forEach(blockData.cgInputs, function (input) {
-                    var inputDecomposed = pandora.decomposeObject(input);
-                    console.log("Create input", inputDecomposed.name, "with value", inputDecomposed.value);
+    JSONLoader.prototype._loadBlockFunction = function(cgGraph, cgBlockData) {
+        var cgBlockFunction = new cg.Function(cgGraph, cgBlockData.cgId);
+        cgGraph.addBlock(cgBlockFunction);
+        return cgBlockFunction;
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @private
+     */
+    JSONLoader.prototype._loadPoints = function (cgGraph, cgBlocksData) {
+        var self = this;
+        var loadPoint = function(cgBlock, cgPointData, isOutput) {
+            if (!cgPointData.cgName) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Point definition lacks property `cgName`");
+            }
+            var cgPointType = cgPointData.cgType || "Point";
+            var cgPointDeserializer = self[pandora.camelcase("_loadPoint" + cgPointType)];
+            if (!cgPointDeserializer) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Cannot deserialize point of type `{0}`", cgPointType);
+            }
+            cgPointDeserializer(cgBlock, cgPointData, isOutput);
+        };
+        pandora.forEach(cgBlocksData, function (cgBlockData) {
+            var cgBlock = cgGraph.blockById(cgBlockData.cgId);
+            if (cgBlockData.cgOutputs) {
+                pandora.forEach(cgBlockData.cgOutputs, function (output) {
+                    loadPoint(cgBlock, output, true);
                 });
             }
-            if (blockData.cgOutputs) {
-                pandora.forEach(blockData.cgOutputs, function (output) {
-                    var outputDecomposed = pandora.decomposeObject(output);
-                    console.log("Create output", outputDecomposed.name, "with value", outputDecomposed.value);
+            if (cgBlockData.cgInputs) {
+                pandora.forEach(cgBlockData.cgInputs, function (input) {
+                    loadPoint(cgBlock, input, false);
                 });
             }
+        });
+    };
+
+    /**
+     *
+     * @param cgBlock {cg.Block}
+     * @param cgPointData {Object}
+     * @param isOutput {Boolean}
+     * @returns {cg.Point}
+     * @private
+     */
+    JSONLoader.prototype._loadPointPoint = function(cgBlock, cgPointData, isOutput) {
+        var cgName = cgPointData.cgName;
+        var cgValue = cgPointData.cgValue;
+        var cgValueType = cgPointData.cgValueType || pandora.typename(cgValue);
+        var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
+
+        if (cgValue) {
+            cgPoint.cgValue = cgValue;
+        } else {
+            if (!cgValueType) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() cgValueType is required and cannot be deduced from cgValue");
+            }
+            cgPoint.cgValueType = cgValueType;
+        }
+        cgBlock.addPoint(cgPoint);
+        return cgPoint;
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
+     * @private
+     */
+    JSONLoader.prototype._loadConnections = function(cgGraph, cgConnectionsData) {
+        pandora.forEach(cgConnectionsData, function (cgConnectionData) {
+            var cgOutputBlockId = cgConnectionData.cgOutputBlockId;
+            var cgOutputName = cgConnectionData.cgOutputName;
+            var cgInputBlockId = cgConnectionData.cgInputBlockId;
+            var cgInputName = cgConnectionData.cgInputName;
+            if (!cgOutputBlockId || !cgOutputName || !cgInputBlockId || !cgInputName) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Data missing", cgConnectionData);
+            }
+            var cgOutputBlock = cgGraph.blockById(cgOutputBlockId);
+            if (!cgOutputBlock) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output block not found for id `{0}`", cgOutputBlockId);
+            }
+            var cgInputBlock = cgGraph.blockById(cgInputBlockId);
+            if (!cgInputBlock) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input block not found for id `{0}`", cgInputBlockId);
+            }
+            var cgOutputPoint = cgOutputBlock.output(cgOutputName);
+            if (!cgOutputPoint) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output point `{0}` not found in block `{1}`", cgOutputName, cgOutputBlockId);
+            }
+            var cgInputPoint = cgInputBlock.input(cgInputName);
+            if (!cgInputPoint) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input point `{0}` not found in block `{1}`", cgInputName, cgInputBlockId);
+            }
+            cgOutputPoint.connect(cgInputPoint);
         });
     };
 
@@ -731,6 +820,17 @@ cg.GraphError = (function () {
      * @constructor
      */
     return pandora.class_("GraphError", function () {
+        return pandora.Exception.apply(this, arguments);
+    });
+
+})();
+cg.GraphSerializationError = (function () {
+
+    /**
+     * Handle graph serialization related errors.
+     * @constructor
+     */
+    return pandora.class_("GraphSerializationError", function () {
         return pandora.Exception.apply(this, arguments);
     });
 
@@ -757,6 +857,22 @@ pandora.decomposeObject = function (object) {
         "value": objectValue
     };
 };
+
+/**
+ *
+ * @param container {Array<Object>}
+ * @param fn {Function<Object>}
+ */
+pandora.findIf = function(container, fn) {
+    var found = null;
+    pandora.forEach(container, function (item) {
+        if (fn(item) === true) {
+            found = item;
+            return true;
+        }
+    });
+    return found;
+};
 cg.Graph = (function () {
 
     /**
@@ -772,16 +888,18 @@ cg.Graph = (function () {
          * @type {Number}
          * @private
          */
-        this._nextBlockId = 0;
+        this._cgNextBlockId = 0;
 
         /**
          * Collection of blocks in the graph
          * @type {Array<cg.Block>}
          * @private
          */
-        this._blocks = [];
-        Object.defineProperty(this, "blocks", {
-            get: function() { return this._blocks; }.bind(this)
+        this._cgBlocks = [];
+        Object.defineProperty(this, "cgBlocks", {
+            get: function () {
+                return this._cgBlocks;
+            }.bind(this)
         });
 
         /**
@@ -789,216 +907,404 @@ cg.Graph = (function () {
          * @type {Object} {"42": {cg.Block}}
          * @private
          */
-        this._blocksIds = {};
+        this._cgBlocksIds = {};
 
         /**
          * Connections between blocks points
          * @type {Array<cg.Connection>}
          * @private
          */
-        this._connections = [];
+        this._cgConnections = [];
     });
 
     /**
      * Adds a block to the graph
-     * @param {cg.Block} block to add to the graph
+     * @param {cg.Block} cgBlock to add to the graph
      */
-    Graph.prototype.addBlock = function (block) {
-        var blockId = block.cgId;
-        if (block.cgGraph !== this) {
+    Graph.prototype.addBlock = function (cgBlock) {
+        var cgBlockId = cgBlock.cgId;
+        if (cgBlock.cgGraph !== this) {
             throw new cg.GraphError("Graph::addBlock() This block does not belong to this graph");
         }
-        if (blockId === null || blockId === undefined) {
+        if (cgBlockId === null || cgBlockId === undefined) {
             throw new cg.GraphError("Graph::addBlock() Block id is null");
         }
-        if (this._blocksIds[blockId]) {
-            throw new cg.GraphError("Graph::addBlock() Block with id {0} already exists", blockId);
+        if (this._cgBlocksIds[cgBlockId]) {
+            throw new cg.GraphError("Graph::addBlock() Block with id {0} already exists", cgBlockId);
         }
-        this._blocks.push(block);
-        this._blocksIds[blockId] = block;
+        this._cgBlocks.push(cgBlock);
+        this._cgBlocksIds[cgBlockId] = cgBlock;
+        this._cgNextBlockId = Math.max(this._cgNextBlockId, cgBlockId);
     };
 
     /**
      * Returns a block by it's unique id
-     * @param {String} blockId
+     * @param {String} cgBlockId
      * @return {cg.Block}
      */
-    Graph.prototype.blockById = function (blockId) {
-        var block = this._blocksIds[blockId];
-        if (!block) {
-            throw new cg.GraphError("Graph::blockById() Block not found for id ``{0}`", blockId);
+    Graph.prototype.blockById = function (cgBlockId) {
+        var cgBlock = this._cgBlocksIds[cgBlockId];
+        if (!cgBlock) {
+            throw new cg.GraphError("Graph::blockById() Block not found for id ``{0}`", cgBlockId);
         }
-        return block;
+        return cgBlock;
     };
 
     /**
      * Returns the next unique block id
-     * @returns {number}
+     * @returns {Number}
      */
     Graph.prototype.nextBlockId = function () {
-        return ++this._nextBlockId;
+        return ++this._cgNextBlockId;
     };
 
     /**
-     * Returns whether this type is allowed as an input or an output
-     * @param type
-     * @returns {boolean}
+     * Returns a connection between two points
+     * @param {cg.Point} cgOutputPoint
+     * @param {cg.Point} cgInputPoint
+     * @returns {cg.Connection|null}
      */
-    Graph.prototype.isTypeAllowed = function (type) {
-        switch (pandora.typename(type)) {
-            case "Number":
-            case "String":
-            case "Boolean":
-            case "Object":
-                return true;
-            default:
-                return false;
+    Graph.prototype.connectPoints = function(cgOutputPoint, cgInputPoint) {
+        if (this.connectionByPoints(cgOutputPoint, cgInputPoint) !== null) {
+            throw new cg.GraphError("Graph::connectPoints() Connection already exists between these two points: `{0}` and `{1}`", cgInputPoint.cgName, cgOutputPoint.cgName);
         }
+        var cgConnection = new cg.Connection(cgOutputPoint, cgInputPoint);
+        this._cgConnections.push(cgConnection);
+        cgOutputPoint._cgConnections.push(cgConnection);
+        cgInputPoint._cgConnections.push(cgConnection);
+    };
+
+    /**
+     * Returns a connection between two points
+     * @param {cg.Point} cgOutputPoint
+     * @param {cg.Point} cgInputPoint
+     * @returns {cg.Connection|null}
+     */
+    Graph.prototype.connectionByPoints = function(cgOutputPoint, cgInputPoint) {
+        return pandora.findIf(this._cgConnections, function (cgConnection) {
+            return cgConnection.cgOutputPoint === cgOutputPoint && cgConnection.cgInputPoint === cgInputPoint;
+        });
+    };
+
+    /**
+     * Returns the list of connections for a given point
+     * @param {cg.Point} cgPoint
+     * @returns {Array<cg.Connection>}
+     */
+    Graph.prototype.connectionsByPoint = function (cgPoint) {
+        // TODO
+        throw new cg.GraphError("Graph::connectionByPoints() Not yet implemented");
     };
 
     return Graph;
 
 })();
-cg.Block = (function() {
+cg.Block = (function () {
 
     /**
      * Block is the base class for all codegraph nodes
      * A Block has a list of inputs and outputs
      * Inputs and outputs are simple fields in the Block object with get and set properties
      * @extends {pandora.EventEmitter}
-     * @param graph {cg.Graph}
-     * @param id {number}
+     * @param cgGraph {cg.Graph}
+     * @param cgBlockId {String}
      * @constructor
      */
-    var Block = pandora.class_("Block", pandora.EventEmitter, function(graph, id) {
+    var Block = pandora.class_("Block", pandora.EventEmitter, function (cgGraph, cgBlockId) {
         pandora.EventEmitter.call(this);
 
-        if (!graph) {
+        if (!cgGraph) {
             throw new cg.GraphError("Block() Cannot create a Block without a graph");
         }
 
         /**
          * Reference to the graph
-         * @type {cg.Graph|null}
+         * @type {cg.Graph}
          * @private
          */
-        this._cgGraph = graph;
+        this._cgGraph = cgGraph;
         Object.defineProperty(this, "cgGraph", {
-            get: function() { return this._cgGraph;}.bind(this)
+            get: function () {
+                return this._cgGraph;
+            }.bind(this)
         });
 
         /**
          * Unique id of this block
-         * @type {cg.Graph|null}
+         * @type {String}
          * @private
          */
-        this._cgId = id || graph.nextBlockId();
+        this._cgId = cgBlockId || cgGraph.nextBlockId();
         Object.defineProperty(this, "cgId", {
-            get: function() { return this._cgId; }.bind(this)
+            get: function () {
+                return this._cgId;
+            }.bind(this)
         });
 
         /**
-         * Inputs fields names
-         * @type {Array<String>}
+         * Input points
+         * @type {Array<cg.Point>}
          * @private
          */
         this._cgInputs = [];
         Object.defineProperty(this, "cgInputs", {
-            get: function () { return this._cgInputs; }.bind(this)
+            get: function () {
+                return this._cgInputs;
+            }.bind(this)
         });
 
         /**
-         * Outputs fields names
-         * @type {Array<String>}
+         * Output points
+         * @type {Array<cg.Point>}
          * @private
          */
         this._cgOutputs = [];
         Object.defineProperty(this, "cgOutputs", {
-            get: function () { return this._cgOutputs; }.bind(this)
+            get: function () {
+                return this._cgOutputs;
+            }.bind(this)
         });
 
     });
 
     /**
-     * This method is used as a helper to add whether inputs or outputs
-     * @param points {Array<Object>} [{"x": 0}, {"y": 0}]
-     * @param isInput {Boolean} True if we add the points to the inputs, False to the outputs
+     * Adds an input or an output point
+     * @param cgPoint {cg.Point}
      */
-    Block.prototype._addPoints = function (points, isInput) {
-        var self = this;
-        var pointType = isInput ? "input" : "output";
-        var pointContainer = isInput ? this._cgInputs : this._cgOutputs;
-        pandora.forEach(points, function (point) {
-            var decomposedPoint = pandora.decomposeObject(point);
-            var pointName = decomposedPoint.name;
-            var pointValue = decomposedPoint.value;
-            if (!self._cgGraph.isTypeAllowed(pointValue)) {
-                // TODO: Rethink the concept of types, and allowed types for points
-                throw new cg.GraphError("The {0} `{1}` was created with an unknown type: {2}", pointType, pointName, pandora.typename(pointValue));
-            }
-            if (self.hasInput(pointName) || self.hasOutput(pointName)) {
-                // TODO: Silently ignore if the point type and the point value type is the same, or convertible
-                throw new cg.GraphError("Trying to add an {0} but `{1}` already exists as an {2}", pointType, pointName, self.hasInput(pointName) ? "input" : "output");
-            }
-            pointContainer.push(pointName);
-            self["_" + pointName] = pointValue;
-            self.emit(pandora.formatString("{0}-{1}-created", pointType, pointName));
-            Object.defineProperty(self, pointName, {
-                get: function () {
-                    return self["_" + pointName];
-                },
-                set: function (newValue) {
-                    var oldValue = self["_" + pointName];
-                    if (typeof(oldValue) != typeof(newValue)) {
-                        // TODO: Silently ignore if the type is convertible
-                        // TODO: Handle connections
-                        throw new cg.GraphError("The {0} `{1}` was expecting a value of type {2}, but {3} was found instead", pointType, pointName, pandora.typename(oldValue), pandora.typename(newValue));
-                    }
-                    self["_" + pointName] = newValue;
-                    self._cgGraph.emit(pandora.formatString("entity-{0}-{0}-updated", self._cgId, pointName), oldValue, newValue);
-                    self.emit(pandora.formatString("{0}-{1}-updated", pointType, pointName), oldValue, newValue);
-                }
-            });
+    Block.prototype.addPoint = function (cgPoint) {
+        if (cgPoint.cgBlock !== this) {
+            throw new cg.GraphError("Block::addPoint() Point is not bound to this block: `{0}`", cgPoint.cgName);
+        }
+        if (cgPoint.isOutput && this.output(cgPoint.cgName) || !cgPoint.isOutput && this.input(cgPoint.cgName)) {
+            throw new cg.GraphError("Block::addPoint() Block has already an {0} called `{1}`", (cgPoint.isOutput ? "output" : "input"), cgPoint.cgName);
+        }
+        if (cgPoint.isOutput) {
+            this._cgOutputs.push(cgPoint);
+        } else {
+            this._cgInputs.push(cgPoint);
+        }
+    };
+
+    /**
+     * Returns whether this block contains the specified output
+     * @param {String} cgOutputName
+     * @return {cg.Point|null}
+     */
+    Block.prototype.output = function (cgOutputName) {
+        return pandora.findIf(this._cgOutputs, function(cgOutput) {
+            return cgOutput.cgName === cgOutputName;
         });
     };
 
     /**
-     * Add inputs to this block
-     * @param inputs {Object} [{"x": 0}, {"y": 0}]
-     * @protected
-     */
-    Block.prototype.addInputs = function (inputs) {
-        this._addPoints(inputs, true);
-    };
-
-    /**
-     * Add outputs to this block
-     * @param outputs {Object} [{"x": 0}, {"y": 0}]
-     * @protected
-     */
-    Block.prototype.addOutputs = function (outputs) {
-        this._addPoints(outputs, false);
-    };
-
-    /**
      * Returns whether this block contains the specified input
-     * @param {String} inputName
-     * @return {boolean}
+     * @param {String} cgInputName
+     * @return {cg.Point|null}
      */
-    Block.prototype.hasInput = function(inputName) {
-        return this._cgInputs.indexOf(inputName) !== -1;
-    };
-
-    /**
-     * Returns whether this block contains the specified input
-     * @param {String} outputName
-     * @return {boolean}
-     */
-    Block.prototype.hasOutput  = function(outputName) {
-        return this._cgOutputs.indexOf(outputName) !== -1;
+    Block.prototype.input = function (cgInputName) {
+        return pandora.findIf(this._cgInputs, function(cgInput) {
+            return cgInput.cgName === cgInputName;
+        });
     };
 
     return Block;
+
+})();
+cg.Point = (function () {
+
+    /**
+     * A point represents either an input or an output in a block, it has a name and a value type
+     * A point can also have one or many references to other points:
+     *    - The outbound point must be an output
+     *    - The outbound point value type must be accepted by the inbound point
+     *    - The outbound point must have a back reference to this point
+     * Example for an input point:
+     * {
+     *      "cgBlock": "1", // The unique identifier to the block, required
+     *      "cgName": "sum a", // The block input name, required
+     *      "cgValueType": "Number", // The point value type, required
+     *      "cgValue": 32 // The point value for an input, not required
+     * }
+     * Example for an output point:
+     * {
+     *      "cgBlock": "1", // The unique identifier to the block, required
+     *      "cgName": "result", // The block output name, required
+     *      "cgValueType": "Number", // The point value type, required
+     *      // For an output, "cgValue" should be generated by the block and read only
+     * }
+     * @param cgBlock {cg.Block} The block this point refers to
+     * @param cgPointName {String} The block point name for the input or output
+     * @param isOutput {Boolean} True if this point is an output, False for an input
+     * @extends {pandora.EventEmitter}
+     * @constructor
+     */
+    var Point = pandora.class_("Point", pandora.EventEmitter, function (cgBlock, cgPointName, isOutput) {
+        pandora.EventEmitter.call(this);
+
+        /**
+         * The graph of the block
+         * @type {cg.Graph}
+         * @private
+         */
+        this._cgGraph = cgBlock.cgGraph;
+
+        /**
+         * The block it belongs to
+         * @type {cg.Block}
+         * @private
+         */
+        this._cgBlock = cgBlock;
+        Object.defineProperty(this, "cgBlock", {
+            get: function () {
+                return this._cgBlock;
+            }.bind(this)
+        });
+
+        /**
+         * Point type, True if this point is an output, False for an input
+         * @type {Boolean}
+         * @private
+         */
+        this._isOutput = isOutput;
+        Object.defineProperty(this, "isOutput", {
+           get: function() {
+               return this._isOutput;
+           }.bind(this)
+        });
+
+        /**
+         * The block input/output name
+         * @private
+         */
+        this._cgName = cgPointName;
+        Object.defineProperty(this, "cgName", {
+            get: function () {
+                return this._cgName;
+            }.bind(this)
+        });
+
+        /**
+         * Connections from/to this point
+         * @type {Array<cg.Connection>}
+         * @private
+         */
+        this._cgConnections = [];
+        Object.defineProperty(this, "cgConnections", {
+            get: function () {
+                return this._cgConnections;
+            }.bind(this)
+        });
+
+        /**
+         * The point current value type
+         * Example: Number (Yellow color)
+         * @type {String}
+         * @private
+         */
+        this._cgValueType = undefined;
+        Object.defineProperty(this, "cgValueType", {
+            get: function () {
+                return this._cgValueType;
+            }.bind(this),
+            set: function(cgValueType) {
+                if (this._cgValueTypesAllowed.indexOf(cgValueType) === -1) {
+                    throw cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
+                }
+                if (this._cgConnections.length > 0) {
+                    // TODO: Check connections if valueType really changes
+                    // TODO: Handle type conversion
+                    throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
+                }
+                var oldCgValueType = this._cgValueType;
+                this._cgValueType = cgValueType;
+                // TODO: Graph emit
+                this.emit('value-type-changed', oldCgValueType, cgValueType);
+            }.bind(this)
+        });
+
+        /**
+         * The point current value
+         * @type {Object|null}
+         * @private
+         */
+        this._cgValue = null;
+        Object.defineProperty(this, "cgValue", {
+            get: function () {
+                return this._cgValue;
+            }.bind(this),
+            set: function(cgValue) {
+                this.cgValueType = pandora.typename(cgValue);
+                var oldCgValue = this._cgValue;
+                this._cgValue = cgValue;
+                // TODO: Graph emit
+                this.emit('value-changed', oldCgValue, cgValue);
+            }.bind(this)
+        });
+
+        /**
+         * The types this point can accept
+         * @type {Array<String>}
+         * @private
+         */
+        this._cgValueTypesAllowed = ["Number", "Boolean", "String"];
+
+    });
+
+    /**
+     * Adds a connection from this inbound point to an outbound point
+     * @param {cg.Point} cgPoint
+     * @return {cg.Connection}
+     */
+    Point.prototype.connect = function(cgPoint) {
+        if (this._isOutput === cgPoint.isOutput) {
+            throw new cg.GraphError("Point::addConnection() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", this._cgName, cgPoint.cgName);
+        }
+        if (this._isOutput) {
+            this._cgGraph.connectPoints(this, cgPoint);
+        } else {
+            this._cgGraph.connectPoints(cgPoint, this);
+        }
+    };
+
+    return Point;
+
+})();
+cg.Connection = (function () {
+
+    /**
+     *
+     * @extends {pandora.EventEmitter}
+     * @constructor
+     */
+    var Connection = pandora.class_("Connection", pandora.EventEmitter, function (cgInputPoint, cgOutputPoint) {
+        pandora.EventEmitter.call(this);
+
+        /**
+         *
+         * @type {cg.Point}
+         * @private
+         */
+        this._cgInputPoint = cgInputPoint;
+        Object.defineProperty(this, "cgInputPoint", {
+            get: function () {
+                return this._cgInputPoint;
+            }.bind(this)
+        });
+
+        /**
+         *
+         * @type {cg.Point}
+         * @private
+         */
+        this._cgOutputPoint = cgOutputPoint;
+        Object.defineProperty(this, "cgOutputPoint", {
+            get: function () {
+                return this._cgOutputPoint;
+            }.bind(this)
+        });
+    });
+
+    return Connection;
 
 })();
 cg.Function = (function() {
@@ -1015,5 +1321,21 @@ cg.Function = (function() {
     });
 
     return Function;
+
+})();
+cg.Instruction = (function() {
+
+    /**
+     *
+     * @extends {cg.Block}
+     * @param graph {cg.Graph}
+     * @param id {number}
+     * @constructor
+     */
+    var Instruction = pandora.class_("Instruction", cg.Block, function(graph, id) {
+        cg.Block.call(this, graph, id);
+    });
+
+    return Instruction;
 
 })();

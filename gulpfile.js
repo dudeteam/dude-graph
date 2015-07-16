@@ -8,8 +8,10 @@ var CG_SOURCES = [
     "lib/index.js",
     "lib/serialization/*.js",
     "lib/graph/utils/*.js",
-    "lib/graph/nodes/graph.js",
-    "lib/graph/nodes/block.js",
+    "lib/graph/graph.js",
+    "lib/graph/block.js",
+    "lib/graph/point.js",
+    "lib/graph/connection.js",
     "lib/graph/blocks/*.js"
 ];
 

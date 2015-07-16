@@ -8,35 +8,27 @@ var blocks = [
         "cgId": "0",
         "cgInputs": [
             {
-                "in": 32
-            },
-            {
-                "stuff": "the_string"
-            }
-        ],
-        "cgOutputs": [
-            {
-                "out": {
-                    "type": "Direction",
-                    "cgId": 1,
-                    "input": "in"
-                }
+                "cgName": "in",
+                "cgValueType": "Number"
             }
         ]
     },
     {
         "cgType": "Function",
         "cgId": "1",
-        "cgInputs": [
+        "cgOutputs": [
             {
-                "in": {
-                    "type": "Direction",
-                    "cgId": 0,
-                    "output": "out"
-                }
+                "cgType": "Point", // Will be used by default if not found
+                "cgName": "out",
+                "cgValue": 64,
+                "cgValueType": "Number" // Will be deduced by default from value if possible
             }
         ]
     }
+];
+
+var connections = [
+    {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0",  "cgInputName": "in"}
 ];
 
 describe("Graph", function () {
@@ -44,7 +36,7 @@ describe("Graph", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
 
-        loader.load(graph, blocks);
-        assert.equal(graph.blocks.length, 2);
+        loader.load(graph, blocks, connections);
+        assert.equal(graph.cgBlocks.length, 2);
     });
 });
