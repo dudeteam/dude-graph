@@ -1,4 +1,5 @@
-var assert = require("assert");
+var assert = require("chai").assert;
+var expect = require("chai").expect;
 var pandora = require('../../bower_components/pandora/lib/pandora');
 var cg = require("../../codegraph");
 
@@ -77,59 +78,60 @@ describe("Graph", function () {
     it("should test some basic error", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
-
-        try {
-            loader.load(graph, [
-                {
-                    "": ""
-                }
-            ]); // cgId is required
-            assert.fail();
-        } catch (exception) {
-
-        }
-        try {
-            loader.load(graph, [
-                {
-                    "cgId": "1"
-                },
-                {
-                    "cgId": "1"
-                }
-            ]); // cgId is not unique
-            assert.fail();
-        } catch (exception) {
-
-        }
-        try {
-            loader.load(graph, [
-                {
-                    "cgId": "2",
-                    "cgOutputs": [
-                        {
-                            "": ""
-                        }
-                    ]
-                }
-            ]); // cgName is missing in output definition
-            assert.fail();
-        } catch (exception) {
-
-        }
-        try {
-            loader.load(graph, [
-                {
-                    "cgId": "3",
-                    "cgOutputs": [
-                        {
-                            "cgName": "hello"
-                        }
-                    ]
-                }
-            ]); // cgValue or cgValueType is missing in output definition
-            assert.fail();
-        } catch (exception) {
-
-        }
+        expect(loader.load.bind(loader, graph, [
+            {"": ""}
+        ])).to.throw(/`cgId` is required/); // cgId is required
+        expect(loader.load.bind(loader, graph, [
+            {"cgId": "1"},
+            {"cgId": "1"}
+        ])).to.throw(/id \d already exists/); // cgId is not unique
+        expect(loader.load.bind(loader, graph, [
+            {
+                "cgId": "2",
+                "cgOutputs": [
+                    {"": ""}
+                ]
+            }
+        ])).to.throw(); // cgName is missing in output definition
+        expect(loader.load.bind(loader, graph, [
+            {
+                "cgId": "3",
+                "cgOutputs": [
+                    {"cgName": "hello"}
+                ]
+            }
+        ])).to.throw(/(cgValue|cgValueType)/); // cgValue or cgValueType is missing in output definition
+        expect(loader.load.bind(loader, graph, [
+            {
+                "cgId": "4",
+                "cgOutputs": [
+                    {
+                        "cgName": "hello",
+                        "cgValueType": "Number"
+                    }
+                ]
+            },
+            {
+                "cgId": "5",
+                "cgInputs": [
+                    {
+                        "cgName": "hello",
+                        "cgValueType": "Number"
+                    }
+                ]
+            },
+            {
+                "cgId": "6",
+                "cgInputs": [
+                    {
+                        "cgName": "hello",
+                        "cgValueType": "Number"
+                    }
+                ]
+            }
+        ], [
+            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "5", "cgInputName": "hello"},
+            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "6", "cgInputName": "hello"}
+        ])).to.throw(/Cannot accept more than \d connections/); // Too many connections on one output point
     });
 });

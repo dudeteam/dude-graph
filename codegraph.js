@@ -868,6 +868,11 @@ cg.Graph = (function () {
          * @private
          */
         this._cgNextBlockId = 0;
+        Object.defineProperty(this, "cgNextBlockId", {
+            get: function () {
+                return this._cgNextBlockId;
+            }.bind(this)
+        });
 
         /**
          * Collection of blocks in the graph
@@ -887,6 +892,11 @@ cg.Graph = (function () {
          * @private
          */
         this._cgBlocksIds = {};
+        Object.defineProperty(this, "cgBlocksIds", {
+            get: function () {
+                return this._cgBlocksIds;
+            }.bind(this)
+        });
 
         /**
          * Connections between blocks points
@@ -1210,6 +1220,11 @@ cg.Point = (function () {
          * @private
          */
         this._cgGraph = cgBlock.cgGraph;
+        Object.defineProperty(this, "cgGraph", {
+            get: function () {
+                return this._cgGraph;
+            }.bind(this)
+        });
 
         /**
          * The block it belongs to
@@ -1276,7 +1291,7 @@ cg.Point = (function () {
                 }
                 var oldCgValueType = this._cgValueType;
                 if (this._cgConnections.length > 0 && oldCgValueType !== cgValueType) {
-                    // TODO: Handle type conversion
+                    // TODO: Handle conversion
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
                 }
                 this._cgValueType = cgValueType;
@@ -1309,6 +1324,19 @@ cg.Point = (function () {
          * @private
          */
         this._cgValueTypesAllowed = ["Number", "Boolean", "String"];
+        Object.defineProperty(this, "cgValueTypesAllowed", {
+            get: function () {
+                return this._cgValueTypesAllowed;
+            }.bind(this)
+        });
+
+        /**
+         * The maximum number of connections this point can accept
+         * [0; Infinity] number of connections
+         * @type {Number}
+         * @private
+         */
+        this._cgMaxConnections = 1;
 
     });
 
@@ -1324,6 +1352,9 @@ cg.Point = (function () {
         if (cgPoint.cgValueType !== this._cgValueType) {
             // TODO: Handle conversion
             throw new cg.GraphError("Point::connect() Cannot connect two points of different value types");
+        }
+        if (this._cgConnections.length >= this._cgMaxConnections) {
+            throw new cg.GraphError("Point::connect() Cannot accept more than {0} connections", this._cgMaxConnections);
         }
         if (this._isOutput) {
             this._cgGraph.connectPoints(this, cgPoint);
