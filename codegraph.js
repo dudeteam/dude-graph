@@ -193,13 +193,7 @@ pandora.EventEmitter = (function () {
      * @param name
      */
     EventEmitter.prototype.emit = function (name) {
-        var args = [name];
-        pandora.forEach(Array.prototype.slice.call(arguments, 1), function (arg) {
-            if (arg && arg.constructor) {
-                args.push(pandora.typename(arg) + "(" + arg + ")");
-            }
-        });
-        console.log.apply(this, args);
+        console.log(name);
         if (this._listeners[name] === undefined) {
             return;
         }
