@@ -1,4 +1,3 @@
-var assert = require("chai").assert;
 var expect = require("chai").expect;
 var pandora = require('../../bower_components/pandora/lib/pandora');
 var cg = require("../../codegraph");
@@ -43,18 +42,15 @@ describe("Graph", function () {
             ++pointCreateEmit;
         });
         loader.load(graph, blocks, connections);
-        assert.equal(graph.cgBlocks.length, 2);
-        assert.equal(graph.cgBlocks.length, blockCreateEmit);
-        assert.equal(pointCreateEmit, 2);
-        assert.equal(graph.cgConnections.length, 1);
-        assert.equal(graph.blockById("1").outputByName("out").cgValue, 64);
-        assert.equal(graph.blockById("0").inputByName("in").cgValueType, "Number");
+        expect(graph.cgBlocks.length).to.be.equal(2);
+        expect(graph.cgBlocks.length).to.be.equal(blockCreateEmit);
+        expect(pointCreateEmit).to.be.equal(2);
+        expect(graph.cgConnections.length).to.be.equal(1);
+        expect(graph.blockById("1").outputByName("out").cgValue).to.be.equal(64);
+        expect(graph.blockById("0").inputByName("in").cgValueType).to.be.equal("Number");
         graph.blockById("1").outputByName("out").cgValue = 128;
-        assert.equal(graph.blockById("1").outputByName("out").cgValue, 128);
-        assert.equal(
-            graph.connectionsByPoint(graph.blockById("1").outputByName("out"))[0],
-            graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]
-        );
+        expect(graph.blockById("1").outputByName("out").cgValue).to.be.equal(128);
+        expect(graph.connectionsByPoint(graph.blockById("1").outputByName("out"))[0]).to.be.equal(graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]);
     });
     it("should test block copy", function () {
         var graph = new cg.Graph();
@@ -63,17 +59,11 @@ describe("Graph", function () {
         var blockWithInput = graph.blockById("0");
         blockWithInput.cgName = "My custom name";
         var blockWithInputClone = blockWithInput.clone(graph);
-        assert.equal(blockWithInput.cgName, blockWithInputClone.cgName);
-        assert.equal(blockWithInput.cgOutputs.length, blockWithInputClone.cgOutputs.length);
-        assert.equal(blockWithInput.cgInputs.length, blockWithInputClone.cgInputs.length);
-        assert.equal(
-            blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint,
-            graph.blockById("1").outputByName("out")
-        );
-        assert.equal(
-            blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint,
-            blockWithInputClone.inputByName("in").cgConnections[0].cgOutputPoint
-        );
+        expect(blockWithInput.cgName).to.be.equal(blockWithInputClone.cgName);
+        expect(blockWithInput.cgOutputs.length).to.be.equal(blockWithInputClone.cgOutputs.length);
+        expect(blockWithInput.cgInputs.length).to.be.equal(blockWithInputClone.cgInputs.length);
+        expect(blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint).to.be.equal(graph.blockById("1").outputByName("out"));
+        expect(blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint).to.be.equal(blockWithInputClone.inputByName("in").cgConnections[0].cgOutputPoint);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
