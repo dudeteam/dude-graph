@@ -59,12 +59,20 @@ describe("Graph", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
         loader.load(graph, blocks, connections);
-        var blockOutput = graph.blockById("0");
-        blockOutput.cgName = "My custom name";
-        var blockCloneOutput = blockOutput.clone(graph);
-        assert.equal(blockOutput.cgName, blockCloneOutput.cgName);
-        assert.equal(blockOutput._cgOutputs.length, blockCloneOutput._cgOutputs.length);
-        assert.equal(blockOutput._cgInputs.length, blockCloneOutput._cgInputs.length);
+        var blockWithInput = graph.blockById("0");
+        blockWithInput.cgName = "My custom name";
+        var blockWithInputClone = blockWithInput.clone(graph);
+        assert.equal(blockWithInput.cgName, blockWithInputClone.cgName);
+        assert.equal(blockWithInput.cgOutputs.length, blockWithInputClone.cgOutputs.length);
+        assert.equal(blockWithInput.cgInputs.length, blockWithInputClone.cgInputs.length);
+        assert.equal(
+            blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint,
+            graph.blockById("1").outputByName("out")
+        );
+        assert.equal(
+            blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint,
+            blockWithInputClone.inputByName("in").cgConnections[0].cgOutputPoint
+        );
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
