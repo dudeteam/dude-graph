@@ -55,6 +55,17 @@ describe("Graph", function () {
             graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]
         );
     });
+    it("should test block copy", function () {
+        var graph = new cg.Graph();
+        var loader = new cg.JSONLoader();
+        loader.load(graph, blocks, connections);
+        var blockOutput = graph.blockById("0");
+        blockOutput.cgName = "My custom name";
+        var blockCloneOutput = blockOutput.clone(graph);
+        assert.equal(blockOutput.cgName, blockCloneOutput.cgName);
+        assert.equal(blockOutput._cgOutputs.length, blockCloneOutput._cgOutputs.length);
+        assert.equal(blockOutput._cgInputs.length, blockCloneOutput._cgInputs.length);
+    });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
