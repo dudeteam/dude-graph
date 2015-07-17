@@ -34,7 +34,7 @@ gulp.task("watch", function () {
 
 gulp.task("test", function () {
     return gulp.src(['test/*.js', 'tests/**/*.js'], {read: false})
-        .pipe(mocha({reporter: 'progress'}));
+        .pipe(mocha({reporter: 'landing'}));
 });
 
 gulp.task("default", ["jshint", "build", "watch"]);
