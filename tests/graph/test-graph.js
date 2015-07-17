@@ -90,7 +90,7 @@ describe("Graph", function () {
                     {"cgName": "hello"}
                 ]
             }
-        ])).to.throw(/(cgValue|cgValueType)/); // cgValue or cgValueType is missing in output definition
+        ])).to.throw(/cgValueType is required/);
         expect(loader.load.bind(loader, graph, [
             {
                 "cgId": "4",
@@ -106,12 +106,34 @@ describe("Graph", function () {
                 "cgInputs": [
                     {
                         "cgName": "hello",
+                        "cgValueType": "String"
+                    }
+                ]
+            }
+        ], [
+            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "5", "cgInputName": "hello"}
+        ])).to.throw(/Cannot connect two points of different value types: `[0-9a-zA-Z-_]+` and `[0-9a-zA-Z-_]+`/);
+        expect(loader.load.bind(loader, graph, [
+            {
+                "cgId": "7",
+                "cgOutputs": [
+                    {
+                        "cgName": "hello",
                         "cgValueType": "Number"
                     }
                 ]
             },
             {
-                "cgId": "6",
+                "cgId": "8",
+                "cgInputs": [
+                    {
+                        "cgName": "hello",
+                        "cgValueType": "Number"
+                    }
+                ]
+            },
+            {
+                "cgId": "9",
                 "cgInputs": [
                     {
                         "cgName": "hello",
@@ -120,8 +142,8 @@ describe("Graph", function () {
                 ]
             }
         ], [
-            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "5", "cgInputName": "hello"},
-            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "6", "cgInputName": "hello"}
+            {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "8", "cgInputName": "hello"},
+            {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "9", "cgInputName": "hello"}
         ])).to.throw(/Cannot accept more than \d connections/); // Too many connections on one output point
     });
 });

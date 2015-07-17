@@ -1256,7 +1256,7 @@ cg.Point = (function () {
          */
         this._isOutput = isOutput;
         Object.defineProperty(this, "isOutput", {
-            get: function() {
+            get: function () {
                 return this._isOutput;
             }.bind(this)
         });
@@ -1274,6 +1274,25 @@ cg.Point = (function () {
         });
 
         /**
+         * The maximum number of connections this point can accept
+         * [0; Infinity] number of connections
+         * @type {Number}
+         * @private
+         */
+        this._cgMaxConnections = 1;
+        Object.defineProperty(this, "cgMaxConnections", {
+            get: function () {
+                return this._cgMaxConnections;
+            }.bind(this),
+            set: function (cgMaxConnections) {
+                if (cgMaxConnections instanceof Number || cgMaxConnections < 0) {
+                    throw new cg.GraphError("Point::cgMaxConnections must be a zero or positive number");
+                }
+                this._cgMaxConnections = cgMaxConnections;
+            }.bind(this)
+        });
+
+        /**
          * The point current value type
          * Example: Number (Yellow color)
          * @type {String}
@@ -1285,7 +1304,7 @@ cg.Point = (function () {
             get: function () {
                 return this._cgValueType;
             }.bind(this),
-            set: function(cgValueType) {
+            set: function (cgValueType) {
                 if (this._cgValueTypesAllowed.indexOf(cgValueType) === -1) {
                     throw cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
                 }
@@ -1310,7 +1329,7 @@ cg.Point = (function () {
             get: function () {
                 return this._cgValue;
             }.bind(this),
-            set: function(cgValue) {
+            set: function (cgValue) {
                 this.cgValueType = pandora.typename(cgValue);
                 var oldCgValue = this._cgValue;
                 this._cgValue = cgValue;
@@ -1331,12 +1350,13 @@ cg.Point = (function () {
         });
 
         /**
-         * The maximum number of connections this point can accept
-         * [0; Infinity] number of connections
-         * @type {Number}
+         * The types this point can implicitly convert
+         * @type {Array<{from: String, to: String, bidirectional: *Boolean}>}
          * @private
          */
-        this._cgMaxConnections = 1;
+        this._cgValueTypeConversionsAllowed = [
+            {"from": "Number", "to": "String", "bidirectional": true}
+        ];
 
     });
 
@@ -1345,13 +1365,13 @@ cg.Point = (function () {
      * @param {cg.Point} cgPoint
      * @return {cg.Connection}
      */
-    Point.prototype.connect = function(cgPoint) {
+    Point.prototype.connect = function (cgPoint) {
         if (this._isOutput === cgPoint.isOutput) {
             throw new cg.GraphError("Point::connect() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", this._cgName, cgPoint.cgName);
         }
-        if (cgPoint.cgValueType !== this._cgValueType) {
+        if (this._cgValueType !== cgPoint.cgValueType) {
             // TODO: Handle conversion
-            throw new cg.GraphError("Point::connect() Cannot connect two points of different value types");
+            throw new cg.GraphError("Point::connect() Cannot connect two points of different value types: `{0}` and `{1}`", this._cgValueType, cgPoint.cgValueType);
         }
         if (this._cgConnections.length >= this._cgMaxConnections) {
             throw new cg.GraphError("Point::connect() Cannot accept more than {0} connections", this._cgMaxConnections);
@@ -1369,7 +1389,7 @@ cg.Point = (function () {
      * @param cgBlock {cg.Block} The block on which this cloned point will be attached to
      * @return {cg.Point}
      */
-    Point.prototype.clone = function(cgBlock) {
+    Point.prototype.clone = function (cgBlock) {
         var cgPointClone = new cg.Point(cgBlock, this._cgName, this._isOutput);
         if (this._isOutput) {
             cgPointClone.cgValue = this._cgValue;
