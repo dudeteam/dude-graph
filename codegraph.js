@@ -998,6 +998,21 @@ cg.Graph = (function () {
         return cgConnections;
     };
 
+    /**
+     * Returns the list of connections for every points in the given block
+     * @param cgBlock
+     * @returns {Array<cg.Connection>}
+     */
+    Graph.prototype.connectionsByBlock = function(cgBlock) {
+        var cgConnections = [];
+        pandora.forEach(this._cgConnections, function (cgConnection) {
+            if (cgConnection.cgOutputPoint.cgBlock === cgBlock || cgConnection.cgInputPoint.cgBlock === cgBlock) {
+                cgConnections.push(cgConnection);
+            }
+        });
+        return cgConnections;
+    };
+
     return Graph;
 
 })();
@@ -1149,6 +1164,18 @@ cg.Block = (function () {
             var cgInputClone = cgInput.clone(cgBlockClone);
             cgBlockClone.addPoint(cgInputClone);
         });
+        var cgConnections = this._cgGraph.connectionsByBlock(this);
+        pandora.forEach(cgConnections, function (cgConnection) {
+            try {
+                if (cgConnection.cgOutputPoint.cgBlock === this) {
+                    cgBlockClone.outputByName(cgConnection.cgOutputPoint.cgName).connect(cgConnection.cgInputPoint);
+                } else if (cgConnection.cgInputPoint.cgBlock === this) {
+                    cgBlockClone.inputByName(cgConnection.cgInputPoint.cgName).connect(cgConnection.cgOutputPoint);
+                }
+            } catch (exception) {
+                console.error("Block::clone() Connection duplication silenced exception: ", exception);
+            }
+        }.bind(this));
         return cgBlockClone;
     };
 
