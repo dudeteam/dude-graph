@@ -12,7 +12,8 @@ var CG_SOURCES = [
     "lib/graph/block.js",
     "lib/graph/point.js",
     "lib/graph/connection.js",
-    "lib/graph/blocks/*.js"
+    "lib/graph/blocks/*.js",
+    "lib/graph/points/*.js"
 ];
 
 gulp.task("jshint", function () {

@@ -193,7 +193,13 @@ pandora.EventEmitter = (function () {
      * @param name
      */
     EventEmitter.prototype.emit = function (name) {
-        console.log(name);
+        var args = [name];
+        pandora.forEach(Array.prototype.slice.call(arguments, 1), function (arg) {
+            if (arg && arg.constructor) {
+                args.push(pandora.typename(arg) + "(" + arg + ")");
+            }
+        });
+        console.log.apply(this, args);
         if (this._listeners[name] === undefined) {
             return;
         }
@@ -926,7 +932,7 @@ cg.Graph = (function () {
             throw new cg.GraphError("Graph::addBlock() Block id is null");
         }
         if (this._cgBlocksIds[cgBlockId]) {
-            throw new cg.GraphError("Graph::addBlock() Block with id {0} already exists", cgBlockId);
+            throw new cg.GraphError("Graph::addBlock() Block with id `{0}` already exists", cgBlockId);
         }
         this._cgBlocks.push(cgBlock);
         this._cgBlocksIds[cgBlockId] = cgBlock;
@@ -966,6 +972,13 @@ cg.Graph = (function () {
     Graph.prototype.connectPoints = function(cgOutputPoint, cgInputPoint) {
         if (this.connectionByPoints(cgOutputPoint, cgInputPoint) !== null) {
             throw new cg.GraphError("Graph::connectPoints() Connection already exists between these two points: `{0}` and `{1}`", cgInputPoint.cgName, cgOutputPoint.cgName);
+        }
+        if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
+            throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
+        }
+        if (cgOutputPoint.cgValueType !== cgInputPoint.cgValueType) {
+            // TODO: Handle conversion
+            throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
         }
         var cgConnection = new cg.Connection(cgOutputPoint, cgInputPoint);
         this._cgConnections.push(cgConnection);
@@ -1366,15 +1379,8 @@ cg.Point = (function () {
      * @return {cg.Connection}
      */
     Point.prototype.connect = function (cgPoint) {
-        if (this._isOutput === cgPoint.isOutput) {
-            throw new cg.GraphError("Point::connect() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", this._cgName, cgPoint.cgName);
-        }
-        if (this._cgValueType !== cgPoint.cgValueType) {
-            // TODO: Handle conversion
-            throw new cg.GraphError("Point::connect() Cannot connect two points of different value types: `{0}` and `{1}`", this._cgValueType, cgPoint.cgValueType);
-        }
         if (this._cgConnections.length >= this._cgMaxConnections) {
-            throw new cg.GraphError("Point::connect() Cannot accept more than {0} connections", this._cgMaxConnections);
+            throw new cg.GraphError("Point::connect() Cannot accept more than `{0}` connection(s)", this._cgMaxConnections);
         }
         if (this._isOutput) {
             this._cgGraph.connectPoints(this, cgPoint);
@@ -1480,5 +1486,27 @@ cg.Instruction = (function() {
     });
 
     return Instruction;
+
+})();
+cg.Stream = (function () {
+
+    /**
+     * A stream
+     * @type {Function}
+     */
+    var Stream = pandora.class_("Stream", cg.Point, function (cgBlock, cgName, isOutput) {
+        cg.Point.call(cgBlock, cgName, isOutput);
+
+        /**
+         * A stream in
+         */
+        (function Initialization() {
+            if (!isOutput) {
+                this._cgMaxConnections = 1;
+            }
+        })();
+    });
+
+    return Stream;
 
 })();

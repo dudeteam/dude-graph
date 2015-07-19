@@ -74,7 +74,7 @@ describe("Graph", function () {
         expect(loader.load.bind(loader, graph, [
             {"cgId": "1"},
             {"cgId": "1"}
-        ])).to.throw(/id \d already exists/); // cgId is not unique
+        ])).to.throw(/id `\d` already exists/); // cgId is not unique
         expect(loader.load.bind(loader, graph, [
             {
                 "cgId": "2",
@@ -144,6 +144,6 @@ describe("Graph", function () {
         ], [
             {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "8", "cgInputName": "hello"},
             {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "9", "cgInputName": "hello"}
-        ])).to.throw(/Cannot accept more than \d connections/); // Too many connections on one output point
+        ])).to.throw(/Cannot accept more than `\d` connection/); // Too many connections on one output point
     });
 });
