@@ -2,33 +2,6 @@ var expect = require("chai").expect;
 var pandora = require('../../bower_components/pandora/lib/pandora');
 var cg = require("../../codegraph");
 
-var blocks = [
-    {
-        "cgId": "0",
-        "cgInputs": [
-            {
-                "cgType": "Point", // Will be used by default if not found
-                "cgName": "in",
-                "cgValueType": "Number"
-            }
-        ]
-    },
-    {
-        "cgId": "1",
-        "cgOutputs": [
-            {
-                "cgType": "Point", // Will be used by default if not found
-                "cgName": "out",
-                "cgValue": 64,
-                "cgValueType": "Number" // Will be deduced by default from value if possible
-            }
-        ]
-    }
-];
-var connections = [
-    {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
-];
-
 describe("Graph", function () {
     it("should deserialize a graph with some blocks and a connection", function () {
         var graph = new cg.Graph();
@@ -41,7 +14,28 @@ describe("Graph", function () {
         graph.on("cg-point-create", function () {
             ++pointCreateEmit;
         });
-        loader.load(graph, blocks, connections);
+        loader.load(graph, [{
+            "cgId": "0",
+            "cgInputs": [
+                {
+                    "cgType": "Point", // Will be used by default if not found
+                    "cgName": "in",
+                    "cgValueType": "Number"
+                }
+            ]
+        }, {
+            "cgId": "1",
+            "cgOutputs": [
+                {
+                    "cgType": "Point", // Will be used by default if not found
+                    "cgName": "out",
+                    "cgValue": 64,
+                    "cgValueType": "Number" // Will be deduced by default from value if possible
+                }
+            ]
+        }], [
+            {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+        ]);
         expect(graph.cgBlocks.length).to.be.equal(2);
         expect(graph.cgBlocks.length).to.be.equal(blockCreateEmit);
         expect(pointCreateEmit).to.be.equal(2);
@@ -55,15 +49,34 @@ describe("Graph", function () {
     it("should test block copy", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
-        loader.load(graph, blocks, connections);
+        loader.load(graph, [{
+            "cgId": "0",
+            "cgInputs": [
+                {
+                    "cgType": "Point", // Will be used by default if not found
+                    "cgName": "in",
+                    "cgValueType": "Number"
+                }
+            ]
+        }, {
+            "cgId": "1",
+            "cgOutputs": [
+                {
+                    "cgType": "Point", // Will be used by default if not found
+                    "cgName": "out",
+                    "cgValue": 64,
+                    "cgValueType": "Number" // Will be deduced by default from value if possible
+                }
+            ]
+        }], [
+            {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+        ]);
         var blockWithInput = graph.blockById("0");
         blockWithInput.cgName = "My custom name";
         var blockWithInputClone = blockWithInput.clone(graph);
         expect(blockWithInput.cgName).to.be.equal(blockWithInputClone.cgName);
         expect(blockWithInput.cgOutputs.length).to.be.equal(blockWithInputClone.cgOutputs.length);
         expect(blockWithInput.cgInputs.length).to.be.equal(blockWithInputClone.cgInputs.length);
-        expect(blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint).to.be.equal(graph.blockById("1").outputByName("out"));
-        expect(blockWithInput.inputByName("in").cgConnections[0].cgOutputPoint).to.be.equal(blockWithInputClone.inputByName("in").cgConnections[0].cgOutputPoint);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
@@ -82,7 +95,7 @@ describe("Graph", function () {
                     {"": ""}
                 ]
             }
-        ])).to.throw(); // cgName is missing in output definition
+        ])).to.throw(/`cgName` is required/);
         expect(loader.load.bind(loader, graph, [
             {
                 "cgId": "3",
@@ -110,9 +123,12 @@ describe("Graph", function () {
                     }
                 ]
             }
-        ], [
-            {"cgOutputBlockId": "4", "cgOutputName": "hello", "cgInputBlockId": "5", "cgInputName": "hello"}
-        ])).to.throw(/Cannot connect two points of different value types: `[0-9a-zA-Z-_]+` and `[0-9a-zA-Z-_]+`/);
+        ], [{
+            "cgOutputBlockId": "4",
+            "cgOutputName": "hello",
+            "cgInputBlockId": "5",
+            "cgInputName": "hello"
+        }])).to.throw(/Cannot connect two points of different value types: `[0-9a-zA-Z-_]+` and `[0-9a-zA-Z-_]+`/);
         expect(loader.load.bind(loader, graph, [
             {
                 "cgId": "7",

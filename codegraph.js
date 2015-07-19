@@ -1023,6 +1023,16 @@ cg.Graph = (function () {
         return cgConnections;
     };
 
+    /**
+     * Clone all the given blocks
+     * If connections exist between the clone blocks, this method will try to recreate them between the clone points
+     * Any connection to a block non cloned won't be duplicated
+     * @param cgBlocks {Array<cg.Block>}
+     */
+    Graph.prototype.cloneBlocks = function(cgBlocks) {
+        throw new cg.GraphError("Graph::cloneBlocks() Not yet implemented");
+    };
+
     return Graph;
 
 })();
@@ -1174,18 +1184,6 @@ cg.Block = (function () {
             var cgInputClone = cgInput.clone(cgBlockClone);
             cgBlockClone.addPoint(cgInputClone);
         });
-        var cgConnections = this._cgGraph.connectionsByBlock(this);
-        pandora.forEach(cgConnections, function (cgConnection) {
-            try {
-                if (cgConnection.cgOutputPoint.cgBlock === this) {
-                    cgBlockClone.outputByName(cgConnection.cgOutputPoint.cgName).connect(cgConnection.cgInputPoint);
-                } else if (cgConnection.cgInputPoint.cgBlock === this) {
-                    cgBlockClone.inputByName(cgConnection.cgInputPoint.cgName).connect(cgConnection.cgOutputPoint);
-                }
-            } catch (exception) {
-                console.error("Block::clone() Connection duplication silenced exception: ", exception);
-            }
-        }.bind(this));
         return cgBlockClone;
     };
 
@@ -1357,11 +1355,11 @@ cg.Point = (function () {
 
         /**
          * The types this point can implicitly convert
-         * @type {Array<{from: String, to: String, bidirectional: *Boolean}>}
+         * @type {Array<{from: String, to: String, commutative: *Boolean}>}
          * @private
          */
         this._cgValueTypeConversionsAllowed = [
-            {"from": "Number", "to": "String", "bidirectional": true}
+            {"from": "Number", "to": "String", "commutative": true}
         ];
 
     });
@@ -1384,7 +1382,6 @@ cg.Point = (function () {
 
     /**
      * Returns a cloned copy of this point
-     * The connections won't be cloned by this method
      * @param cgBlock {cg.Block} The block on which this cloned point will be attached to
      * @return {cg.Point}
      */
@@ -1491,13 +1488,21 @@ cg.Stream = (function () {
         cg.Point.call(cgBlock, cgName, isOutput);
 
         /**
-         * A stream in
+         * A stream in can accept only one connection
          */
         (function Initialization() {
             if (!isOutput) {
                 this._cgMaxConnections = 1;
             }
         })();
+
+        /**
+         * A stream cannot accept a value, only connections
+         * @type {Array<String>}
+         * @private
+         */
+        this._cgValueTypesAllowed = [];
+
     });
 
     return Stream;
