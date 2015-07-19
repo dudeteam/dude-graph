@@ -868,6 +868,7 @@ cg.Graph = (function () {
          */
         this._cgNextBlockId = 0;
         Object.defineProperty(this, "cgNextBlockId", {
+            configurable: true,
             get: function () {
                 return this._cgNextBlockId;
             }.bind(this)
@@ -880,6 +881,7 @@ cg.Graph = (function () {
          */
         this._cgBlocks = [];
         Object.defineProperty(this, "cgBlocks", {
+            configurable: true,
             get: function () {
                 return this._cgBlocks;
             }.bind(this)
@@ -892,6 +894,7 @@ cg.Graph = (function () {
          */
         this._cgBlocksIds = {};
         Object.defineProperty(this, "cgBlocksIds", {
+            configurable: true,
             get: function () {
                 return this._cgBlocksIds;
             }.bind(this)
@@ -904,7 +907,8 @@ cg.Graph = (function () {
          */
         this._cgConnections = [];
         Object.defineProperty(this, "cgConnections", {
-           get: function() {
+            configurable: true,
+            get: function() {
                return this._cgConnections;
            }.bind(this)
         });
@@ -1062,6 +1066,7 @@ cg.Block = (function () {
          */
         this._cgGraph = cgGraph;
         Object.defineProperty(this, "cgGraph", {
+            configurable: true,
             get: function () {
                 return this._cgGraph;
             }.bind(this)
@@ -1074,6 +1079,7 @@ cg.Block = (function () {
          */
         this._cgId = cgBlockId || cgGraph.nextBlockId();
         Object.defineProperty(this, "cgId", {
+            configurable: true,
             get: function () {
                 return this._cgId;
             }.bind(this)
@@ -1087,6 +1093,7 @@ cg.Block = (function () {
          */
         this._cgName = pandora.typename(this);
         Object.defineProperty(this, "cgName", {
+            configurable: true,
             get: function () {
                 return this._cgName;
             }.bind(this),
@@ -1104,6 +1111,7 @@ cg.Block = (function () {
          */
         this._cgOutputs = [];
         Object.defineProperty(this, "cgOutputs", {
+            configurable: true,
             get: function () {
                 return this._cgOutputs;
             }.bind(this)
@@ -1116,6 +1124,7 @@ cg.Block = (function () {
          */
         this._cgInputs = [];
         Object.defineProperty(this, "cgInputs", {
+            configurable: true,
             get: function () {
                 return this._cgInputs;
             }.bind(this)
@@ -1225,6 +1234,7 @@ cg.Point = (function () {
          */
         this._cgGraph = cgBlock.cgGraph;
         Object.defineProperty(this, "cgGraph", {
+            configurable: true,
             get: function () {
                 return this._cgGraph;
             }.bind(this)
@@ -1237,6 +1247,7 @@ cg.Point = (function () {
          */
         this._cgBlock = cgBlock;
         Object.defineProperty(this, "cgBlock", {
+            configurable: true,
             get: function () {
                 return this._cgBlock;
             }.bind(this)
@@ -1248,6 +1259,7 @@ cg.Point = (function () {
          */
         this._cgName = cgName;
         Object.defineProperty(this, "cgName", {
+            configurable: true,
             get: function () {
                 return this._cgName;
             }.bind(this)
@@ -1260,6 +1272,7 @@ cg.Point = (function () {
          */
         this._isOutput = isOutput;
         Object.defineProperty(this, "isOutput", {
+            configurable: true,
             get: function () {
                 return this._isOutput;
             }.bind(this)
@@ -1272,6 +1285,7 @@ cg.Point = (function () {
          */
         this._cgConnections = [];
         Object.defineProperty(this, "cgConnections", {
+            configurable: true,
             get: function () {
                 return this._cgConnections;
             }.bind(this)
@@ -1285,6 +1299,7 @@ cg.Point = (function () {
          */
         this._cgMaxConnections = 1;
         Object.defineProperty(this, "cgMaxConnections", {
+            configurable: true,
             get: function () {
                 return this._cgMaxConnections;
             }.bind(this),
@@ -1305,6 +1320,7 @@ cg.Point = (function () {
          */
         this._cgValueType = undefined;
         Object.defineProperty(this, "cgValueType", {
+            configurable: true,
             get: function () {
                 return this._cgValueType;
             }.bind(this),
@@ -1330,6 +1346,7 @@ cg.Point = (function () {
          */
         this._cgValue = null;
         Object.defineProperty(this, "cgValue", {
+            configurable: true,
             get: function () {
                 return this._cgValue;
             }.bind(this),
@@ -1348,6 +1365,7 @@ cg.Point = (function () {
          */
         this._cgValueTypesAllowed = ["Number", "Boolean", "String"];
         Object.defineProperty(this, "cgValueTypesAllowed", {
+            configurable: true,
             get: function () {
                 return this._cgValueTypesAllowed;
             }.bind(this)
@@ -1361,6 +1379,12 @@ cg.Point = (function () {
         this._cgValueTypeConversionsAllowed = [
             {"from": "Number", "to": "String", "commutative": true}
         ];
+        Object.defineProperty(this, "cgValueTypeConversionsAllowed", {
+            configurable: true,
+            get: function () {
+                return this._cgValueTypeConversionsAllowed;
+            }.bind(this)
+        });
 
     });
 
@@ -1424,6 +1448,7 @@ cg.Connection = (function () {
          */
         this._cgOutputPoint = cgOutputPoint;
         Object.defineProperty(this, "cgOutputPoint", {
+            configurable: true,
             get: function () {
                 return this._cgOutputPoint;
             }.bind(this)
@@ -1436,6 +1461,7 @@ cg.Connection = (function () {
          */
         this._cgInputPoint = cgInputPoint;
         Object.defineProperty(this, "cgInputPoint", {
+            configurable: true,
             get: function () {
                 return this._cgInputPoint;
             }.bind(this)
@@ -1488,21 +1514,13 @@ cg.Stream = (function () {
         cg.Point.call(cgBlock, cgName, isOutput);
 
         /**
-         * A stream in can accept only one connection
+         * A stream in
          */
         (function Initialization() {
             if (!isOutput) {
                 this._cgMaxConnections = 1;
             }
         })();
-
-        /**
-         * A stream cannot accept a value, only connections
-         * @type {Array<String>}
-         * @private
-         */
-        this._cgValueTypesAllowed = [];
-
     });
 
     return Stream;
