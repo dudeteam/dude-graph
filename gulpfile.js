@@ -22,20 +22,20 @@ gulp.task("jshint", function () {
         .pipe(jshint.reporter());
 });
 
-gulp.task("build", function () {
+gulp.task("build", ["jshint"], function () {
     return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(CG_SOURCES))
         .pipe(concat("codegraph.js"))
         //.pipe(uglify())
         .pipe(gulp.dest("."));
 });
 
-gulp.task("watch", function () {
+gulp.task("watch", ["build"], function () {
     gulp.watch(CG_SOURCES, ["jshint", "build"]);
 });
 
-gulp.task("test", function () {
+gulp.task("test", ["build"], function () {
     return gulp.src(['test/*.js', 'tests/**/*.js'], {read: false})
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task("default", ["jshint", "build", "watch"]);
+gulp.task("default", ["watch"]);
