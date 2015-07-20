@@ -14,25 +14,27 @@ describe("Graph", function () {
         graph.on("cg-point-create", function () {
             ++pointCreateEmit;
         });
-        loader.load(graph, [{
-            "cgId": "0",
-            "cgInputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "in",
-                    "cgValue": 64
-                }
-            ]
-        }, {
-            "cgId": "1",
-            "cgOutputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "out",
-                    "cgValueType": "Number" // Will be deduced by default from value if possible
-                }
-            ]
-        }], [
+        loader.load(graph, [
+            {
+                "cgId": "0",
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "in",
+                        "cgValue": 64
+                    }
+                ]
+            },
+            {
+                "cgId": "1",
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "out",
+                        "cgValueType": "Number" // Will be deduced by default from value if possible
+                    }
+                ]
+            }], [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
         ]);
         expect(graph.cgBlocks.length).to.be.equal(2);
@@ -48,25 +50,26 @@ describe("Graph", function () {
     it("should test block copy", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
-        loader.load(graph, [{
-            "cgId": "0",
-            "cgInputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "in",
-                    "cgValue": 32
-                }
-            ]
-        }, {
-            "cgId": "1",
-            "cgOutputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "out",
-                    "cgValueType": "Number"
-                }
-            ]
-        }], [
+        loader.load(graph, [
+            {
+                "cgId": "0",
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "in",
+                        "cgValue": 32
+                    }
+                ]
+            }, {
+                "cgId": "1",
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "out",
+                        "cgValueType": "Number"
+                    }
+                ]
+            }], [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
         ]);
         var blockWithInput = graph.blockById("0");
@@ -80,23 +83,24 @@ describe("Graph", function () {
     it("should test block connections and streams", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
-        loader.load(graph, [{
-            "cgId": "0",
-            "cgInputs": [
-                {
-                    "cgType": "Stream",
-                    "cgName": "in"
-                }
-            ]
-        }, {
-            "cgId": "1",
-            "cgOutputs": [
-                {
-                    "cgType": "Stream",
-                    "cgName": "out"
-                }
-            ]
-        }], [
+        loader.load(graph, [
+            {
+                "cgId": "0",
+                "cgInputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "in"
+                    }
+                ]
+            }, {
+                "cgId": "1",
+                "cgOutputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "out"
+                    }
+                ]
+            }], [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
         ]);
         expect(function () {
@@ -176,8 +180,8 @@ describe("Graph", function () {
                     "cgInputName": "exit code"
                 }
             ]
-        )
-        ;
+        );
+        var blockToClone = graph.cloneBlocks([graph.blockById("0"), graph.blockById("1")]);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
@@ -226,7 +230,8 @@ describe("Graph", function () {
                     }
                 ]
             }
-        ], [{
+        ], [
+            {
             "cgOutputBlockId": "4",
             "cgOutputName": "hello",
             "cgInputBlockId": "5",
@@ -266,6 +271,6 @@ describe("Graph", function () {
         ], [
             {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "8", "cgInputName": "hello"},
             {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "9", "cgInputName": "hello"}
-        ])).to.throw(/Cannot accept more than `\d` connection/); // Too many connections on one output point
+        ])).to.throw(/Cannot accept more than `\d` connection/);
     });
 });

@@ -211,9 +211,9 @@ pandora.EventEmitter = (function () {
 pandora.formatString = function () {
     var format = arguments[0];
     var firstOption = arguments[1];
-    if (!firstOption) {
+    if (arguments.length === 1) {
         return format;
-    } else if (typeof firstOption === "object") {
+    } else if (firstOption && typeof firstOption === "object") {
         return pandora.formatDictionary.apply(this, arguments);
     } else {
         return pandora.formatArray.apply(this, arguments);
@@ -229,7 +229,7 @@ pandora.formatString = function () {
 pandora.formatArray = function () {
     var args = Array.prototype.slice.call(arguments, 1);
     return arguments[0].replace(/{(\d+)}/g, function (match, number) {
-        return typeof args[number] != 'undefined' ? args[number] : match;
+        return args[number];
     });
 };
 
@@ -694,6 +694,35 @@ pandora.findIf = function(container, fn) {
     });
     return found;
 };
+cg.UUID = (function () {
+
+    /**
+     * Generate a random bit of a UUID
+     * @returns {String}
+     */
+    var s4 = function () {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
+    /**
+     * Random salted UUID generator
+     * @type {Object}
+     */
+    var UUID = {
+        "salt": s4()
+    };
+
+    /**
+     * Generate a random salted UUID
+     * @returns {String}
+     */
+    UUID.generate = function () {
+        return UUID.salt + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+    };
+
+    return UUID;
+
+})();
 cg.JSONLoader = (function () {
 
     /**
@@ -875,18 +904,6 @@ cg.Graph = (function () {
         pandora.EventEmitter.call(this);
 
         /**
-         * Next block id
-         * @type {Number}
-         * @private
-         */
-        this._cgNextBlockId = 0;
-        Object.defineProperty(this, "cgNextBlockId", {
-            get: function () {
-                return this._cgNextBlockId;
-            }.bind(this)
-        });
-
-        /**
          * Collection of blocks in the graph
          * @type {Array<cg.Block>}
          * @private
@@ -942,7 +959,6 @@ cg.Graph = (function () {
         }
         this._cgBlocks.push(cgBlock);
         this._cgBlocksIds[cgBlockId] = cgBlock;
-        this._cgNextBlockId = Math.max(this._cgNextBlockId, cgBlockId);
         this.emit("cg-block-create", cgBlock);
         return cgBlock;
     };
@@ -962,10 +978,10 @@ cg.Graph = (function () {
 
     /**
      * Returns the next unique block id
-     * @returns {Number}
+     * @returns {String}
      */
     Graph.prototype.nextBlockId = function () {
-        return ++this._cgNextBlockId;
+        return cg.UUID.generate();
     };
 
     /**
@@ -1043,13 +1059,17 @@ cg.Graph = (function () {
      * @param cgBlocks {Array<cg.Block>}
      */
     Graph.prototype.cloneBlocks = function(cgBlocks) {
-        throw new cg.GraphError("Graph::cloneBlocks() Not yet implemented");
-        /**
         var cgClonedBlocks = [];
+        var cgConnectionsToClone = [];
         pandora.forEach(cgBlocks, function (cgBlock) {
-            cgClonedBlocks.push(cgBlock.clone());
-        });
-         **/
+            cgClonedBlocks.push(cgBlock.clone(this));
+            var cgConnections = this.connectionsByBlock(cgBlock);
+            pandora.forEach(cgConnections, function (cgConnection) {
+                if (cgConnectionsToClone.indexOf(cgConnection) === -1) {
+                    cgConnectionsToClone.push(cgConnection);
+                }
+            });
+        }.bind(this));
     };
 
     return Graph;
@@ -1187,11 +1207,14 @@ cg.Block = (function () {
     };
 
     /**
-     * Returns a cloned copy of this block
-     * @param cgGraph {cg.Graph} The graph on which this cloned block will be attached to
+     * Returns a copy of this block
+     * @param cgGraph {cg.Graph} The graph on which the cloned block will be attached to
      * @return {cg.Block}
      */
     Block.prototype.clone = function (cgGraph) {
+        if (pandora.typename(this) !== "Block") {
+            throw new pandora.Exception("Block::clone() method must be overridden by `{0}`", pandora.typename(this));
+        }
         var cgBlockClone = new cg.Block(cgGraph);
         cgGraph.addBlock(cgBlockClone);
         cgBlockClone.cgName = this._cgName;
@@ -1405,11 +1428,14 @@ cg.Point = (function () {
     };
 
     /**
-     * Returns a cloned copy of this point
+     * Returns a copy of this point
      * @param cgBlock {cg.Block} The block on which this cloned point will be attached to
      * @return {cg.Point}
      */
     Point.prototype.clone = function (cgBlock) {
+        if (pandora.typename(this) !== "Point") {
+            throw new pandora.Exception("Point::clone() method must be overridden by `{0}`", pandora.typename(this));
+        }
         var cgPointClone = new cg.Point(cgBlock, this._cgName, this._isOutput);
         if (!this._isOutput) {
             cgPointClone.cgValue = this._cgValue;
@@ -1476,12 +1502,12 @@ cg.Function = (function() {
     /**
      *
      * @extends {cg.Block}
-     * @param graph {cg.Graph}
-     * @param id {number}
+     * @param cgGraph {cg.Graph}
+     * @param cgId {String}
      * @constructor
      */
-    var Function = pandora.class_("Function", cg.Block, function(graph, id) {
-        cg.Block.call(this, graph, id);
+    var Function = pandora.class_("Function", cg.Block, function(cgGraph, cgId) {
+        cg.Block.call(this, cgGraph, cgId);
     });
 
     return Function;
@@ -1492,12 +1518,12 @@ cg.Instruction = (function() {
     /**
      *
      * @extends {cg.Block}
-     * @param graph {cg.Graph}
-     * @param id {number}
+     * @param cgGraph {cg.Graph}
+     * @param cgId {String}
      * @constructor
      */
-    var Instruction = pandora.class_("Instruction", cg.Block, function(graph, id) {
-        cg.Block.call(this, graph, id);
+    var Instruction = pandora.class_("Instruction", cg.Block, function(cgGraph, cgId) {
+        cg.Block.call(this, cgGraph, cgId);
     });
 
     return Instruction;
@@ -1516,6 +1542,15 @@ cg.Stream = (function () {
         this._cgValueType = null;
         this._cgValueTypesAllowed = [];
     });
+
+    /**
+     * Returns a copy of this Stream
+     * @param cgBlock {cg.Block} The block on which the cloned stream will be attached to
+     * @returns {*}
+     */
+    Stream.prototype.clone = function (cgBlock) {
+        return new cg.Stream(cgBlock, this._cgName, this._isOutput);
+    };
 
     return Stream;
 
