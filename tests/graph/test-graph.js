@@ -181,11 +181,97 @@ describe("Graph", function () {
                 }
             ]
         );
+        var blocksCreated = 0;
+        graph.on("cg-block-create", function () {
+            ++blocksCreated;
+        });
         var blocksCloned = graph.cloneBlocks([graph.blockById("0"), graph.blockById("1")]);
+        expect(blocksCreated).to.be.equal(2);
         expect(blocksCloned[0].cgName).to.be.equal(graph.blockById("0").cgName);
         expect(blocksCloned[1].cgName).to.be.equal(graph.blockById("1").cgName);
         expect(graph.cgConnections[2].cgOutputPoint.cgName).to.be.equal(graph.cgConnections[1].cgOutputPoint.cgName);
         expect(graph.cgConnections[2].cgInputPoint.cgName).to.be.equal(graph.cgConnections[1].cgInputPoint.cgName);
+    });
+    it("should test remove blocks", function () {
+        var graph = new cg.Graph();
+        var loader = new cg.JSONLoader();
+        loader.load(graph, [
+                {
+                    "cgId": "UniqueIdCanBeAString",
+                    "cgName": "on_start",
+                    "cgOutputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "out"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "0",
+                    "cgName": "Sum",
+                    "cgInputs": [
+                        {
+                            "cgType": "Point",
+                            "cgName": "a",
+                            "cgValue": 32
+                        },
+                        {
+                            "cgType": "Point",
+                            "cgName": "b",
+                            "cgValue": 64
+                        }
+                    ],
+                    "cgOutputs": [
+                        {
+                            "cgType": "Point",
+                            "cgName": "sum",
+                            "cgValueType": "Number"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "1",
+                    "cgName": "Exit with code",
+                    "cgOutputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "out"
+                        }
+                    ],
+                    "cgInputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "in"
+                        },
+                        {
+                            "cgType": "Point",
+                            "cgName": "exit code",
+                            "cgValue": 0
+                        }
+                    ]
+                }
+            ],
+            [
+                {
+                    "cgOutputBlockId": "UniqueIdCanBeAString",
+                    "cgOutputName": "out",
+                    "cgInputBlockId": "1",
+                    "cgInputName": "in"
+                },
+                {
+                    "cgOutputBlockId": "0",
+                    "cgOutputName": "sum",
+                    "cgInputBlockId": "1",
+                    "cgInputName": "exit code"
+                }
+            ]
+        );
+        expect(graph.cgBlocks.length).to.be.equal(3);
+        expect(graph.cgConnections.length).to.be.equal(2);
+        graph.removeBlock(graph.blockById("UniqueIdCanBeAString"));
+        expect(graph.cgBlocks.length).to.be.equal(2);
+        expect(graph.cgConnections.length).to.be.equal(1);
+        expect(graph.blockById("UniqueIdCanBeAString").bind(graph)).to.throw();
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
@@ -236,11 +322,11 @@ describe("Graph", function () {
             }
         ], [
             {
-            "cgOutputBlockId": "4",
-            "cgOutputName": "hello",
-            "cgInputBlockId": "5",
-            "cgInputName": "hello"
-        }])).to.throw(/Cannot connect two points of different value types: `[0-9a-zA-Z-_]+` and `[0-9a-zA-Z-_]+`/);
+                "cgOutputBlockId": "4",
+                "cgOutputName": "hello",
+                "cgInputBlockId": "5",
+                "cgInputName": "hello"
+            }])).to.throw(/Cannot connect two points of different value types: `[0-9a-zA-Z-_]+` and `[0-9a-zA-Z-_]+`/);
         expect(loader.load.bind(loader, graph, [
             {
                 "cgId": "7",
