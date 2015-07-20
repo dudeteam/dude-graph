@@ -934,9 +934,9 @@ cg.Graph = (function () {
          */
         this._cgConnections = [];
         Object.defineProperty(this, "cgConnections", {
-            get: function() {
-               return this._cgConnections;
-           }.bind(this)
+            get: function () {
+                return this._cgConnections;
+            }.bind(this)
         });
     });
 
@@ -991,7 +991,7 @@ cg.Graph = (function () {
      * @emit "cg-connection-create" {cg.Connection}
      * @returns {cg.Connection|null}
      */
-    Graph.prototype.connectPoints = function(cgOutputPoint, cgInputPoint) {
+    Graph.prototype.connectPoints = function (cgOutputPoint, cgInputPoint) {
         if (this.connectionByPoints(cgOutputPoint, cgInputPoint) !== null) {
             throw new cg.GraphError("Graph::connectPoints() Connection already exists between these two points: `{0}` and `{1}`", cgInputPoint.cgName, cgOutputPoint.cgName);
         }
@@ -1016,7 +1016,7 @@ cg.Graph = (function () {
      * @param {cg.Point} cgInputPoint
      * @returns {cg.Connection|null}
      */
-    Graph.prototype.connectionByPoints = function(cgOutputPoint, cgInputPoint) {
+    Graph.prototype.connectionByPoints = function (cgOutputPoint, cgInputPoint) {
         return pandora.findIf(this._cgConnections, function (cgConnection) {
             return cgConnection.cgOutputPoint === cgOutputPoint && cgConnection.cgInputPoint === cgInputPoint;
         });
@@ -1042,7 +1042,7 @@ cg.Graph = (function () {
      * @param cgBlock
      * @returns {Array<cg.Connection>}
      */
-    Graph.prototype.connectionsByBlock = function(cgBlock) {
+    Graph.prototype.connectionsByBlock = function (cgBlock) {
         var cgConnections = [];
         pandora.forEach(this._cgConnections, function (cgConnection) {
             if (cgConnection.cgOutputPoint.cgBlock === cgBlock || cgConnection.cgInputPoint.cgBlock === cgBlock) {
@@ -1058,18 +1058,26 @@ cg.Graph = (function () {
      * Connections from/to a cloned block to/from a non cloned block won't be duplicated
      * @param cgBlocks {Array<cg.Block>}
      */
-    Graph.prototype.cloneBlocks = function(cgBlocks) {
+    Graph.prototype.cloneBlocks = function (cgBlocks) {
+        var cgCorrespondingBlocks = [];
         var cgClonedBlocks = [];
         var cgConnectionsToClone = [];
         pandora.forEach(cgBlocks, function (cgBlock) {
-            cgClonedBlocks.push(cgBlock.clone(this));
+            var cgClonedBlock = cgBlock.clone(this);
+            cgCorrespondingBlocks[cgBlock.cgId] = cgClonedBlock;
+            cgClonedBlocks.push(cgClonedBlock);
             var cgConnections = this.connectionsByBlock(cgBlock);
             pandora.forEach(cgConnections, function (cgConnection) {
-                if (cgConnectionsToClone.indexOf(cgConnection) === -1) {
+                if (cgConnectionsToClone.indexOf(cgConnection) === -1 &&
+                    cgBlocks.indexOf(cgConnection.cgOutputPoint.cgBlock) !== -1 &&
+                    cgBlocks.indexOf(cgConnection.cgInputPoint.cgBlock) !== -1) {
                     cgConnectionsToClone.push(cgConnection);
                 }
             });
         }.bind(this));
+        pandora.forEach(cgConnectionsToClone, function (cgConnectionToClone) {
+            console.log(cgConnectionToClone.cgOutputPoint.cgName, "to", cgConnectionToClone.cgInputPoint.cgName);
+        });
     };
 
     return Graph;
