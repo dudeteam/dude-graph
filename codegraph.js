@@ -800,15 +800,14 @@ cg.JSONLoader = (function () {
         var cgValue = cgPointData.cgValue;
         var cgValueType = cgPointData.cgValueType;
         var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
-
-        if (cgValue) {
-            if (!isOutput) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}`: Cannot set cgValue for an input point", cgBlock.cgId);
+        if (cgValue !== undefined) {
+            if (isOutput) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: Cannot set cgValue for an output point", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
             }
             cgPoint.cgValue = cgValue;
         } else {
             if (!cgValueType) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}`: cgValueType is required and cannot be deduced from cgValue", cgBlock.cgId);
+                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required and cannot be deduced from cgValue", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
             }
             cgPoint.cgValueType = cgValueType;
         }
@@ -1049,6 +1048,12 @@ cg.Graph = (function () {
      */
     Graph.prototype.cloneBlocks = function(cgBlocks) {
         throw new cg.GraphError("Graph::cloneBlocks() Not yet implemented");
+        /**
+        var cgClonedBlocks = [];
+        pandora.forEach(cgBlocks, function (cgBlock) {
+            cgClonedBlocks.push(cgBlock.clone());
+        });
+         **/
     };
 
     return Graph;
@@ -1328,11 +1333,11 @@ cg.Point = (function () {
         /**
          * The point current value type
          * Example: Number (Yellow color)
-         * @type {String}
+         * @type {String|null}
          * @emit "cg-point-value-type-change" {cg.Point} {Object} {Object}
          * @private
          */
-        this._cgValueType = undefined;
+        this._cgValueType = null;
         Object.defineProperty(this, "cgValueType", {
             configurable: true,
             get: function () {
@@ -1425,10 +1430,11 @@ cg.Point = (function () {
      */
     Point.prototype.clone = function (cgBlock) {
         var cgPointClone = new cg.Point(cgBlock, this._cgName, this._isOutput);
-        if (this._isOutput) {
+        if (!this._isOutput) {
             cgPointClone.cgValue = this._cgValue;
+        } else if (this._cgValueType !== null) {
+            cgPointClone.cgValueType = this._cgValueType;
         }
-        cgPointClone.cgValueType = this._cgValueType;
         return cgPointClone;
     };
 

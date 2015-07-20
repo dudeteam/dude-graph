@@ -18,18 +18,17 @@ describe("Graph", function () {
             "cgId": "0",
             "cgInputs": [
                 {
-                    "cgType": "Point", // Will be used by default if not found
+                    "cgType": "Point",
                     "cgName": "in",
-                    "cgValueType": "Number"
+                    "cgValue": 64
                 }
             ]
         }, {
             "cgId": "1",
             "cgOutputs": [
                 {
-                    "cgType": "Point", // Will be used by default if not found
+                    "cgType": "Point",
                     "cgName": "out",
-                    "cgValue": 64,
                     "cgValueType": "Number" // Will be deduced by default from value if possible
                 }
             ]
@@ -40,10 +39,10 @@ describe("Graph", function () {
         expect(graph.cgBlocks.length).to.be.equal(blockCreateEmit);
         expect(pointCreateEmit).to.be.equal(2);
         expect(graph.cgConnections.length).to.be.equal(1);
-        expect(graph.blockById("1").outputByName("out").cgValue).to.be.equal(64);
-        expect(graph.blockById("0").inputByName("in").cgValueType).to.be.equal("Number");
-        graph.blockById("1").outputByName("out").cgValue = 128;
-        expect(graph.blockById("1").outputByName("out").cgValue).to.be.equal(128);
+        expect(graph.blockById("0").inputByName("in").cgValue).to.be.equal(64);
+        expect(graph.blockById("1").outputByName("out").cgValueType).to.be.equal("Number");
+        graph.blockById("0").inputByName("in").cgValue = 128;
+        expect(graph.blockById("0").inputByName("in").cgValue).to.be.equal(128);
         expect(graph.connectionsByPoint(graph.blockById("1").outputByName("out"))[0]).to.be.equal(graph.connectionsByPoint(graph.blockById("0").inputByName("in"))[0]);
     });
     it("should test block copy", function () {
@@ -53,19 +52,18 @@ describe("Graph", function () {
             "cgId": "0",
             "cgInputs": [
                 {
-                    "cgType": "Point", // Will be used by default if not found
+                    "cgType": "Point",
                     "cgName": "in",
-                    "cgValueType": "Number"
+                    "cgValue": 32
                 }
             ]
         }, {
             "cgId": "1",
             "cgOutputs": [
                 {
-                    "cgType": "Point", // Will be used by default if not found
+                    "cgType": "Point",
                     "cgName": "out",
-                    "cgValue": 64,
-                    "cgValueType": "Number" // Will be deduced by default from value if possible
+                    "cgValueType": "Number"
                 }
             ]
         }], [
@@ -77,6 +75,7 @@ describe("Graph", function () {
         expect(blockWithInput.cgName).to.be.equal(blockWithInputClone.cgName);
         expect(blockWithInput.cgOutputs.length).to.be.equal(blockWithInputClone.cgOutputs.length);
         expect(blockWithInput.cgInputs.length).to.be.equal(blockWithInputClone.cgInputs.length);
+        expect(blockWithInput.inputByName("in").cgValue).to.be.equal(blockWithInputClone.inputByName("in").cgValue);
     });
     it("should test block connections and streams", function () {
         var graph = new cg.Graph();
@@ -100,9 +99,85 @@ describe("Graph", function () {
         }], [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
         ]);
-        expect(function() {
+        expect(function () {
             graph.blockById("0").inputByName("in").cgValue = 32;
         }).to.throw(/Cannot change cgValueType to a non allowed type `Number`/);
+    });
+    it("should test many connections and clone blocks and connections", function () {
+        var graph = new cg.Graph();
+        var loader = new cg.JSONLoader();
+        loader.load(graph, [
+                {
+                    "cgId": "UniqueIdCanBeAString",
+                    "cgName": "on_start",
+                    "cgOutputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "out"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "0",
+                    "cgName": "Sum",
+                    "cgInputs": [
+                        {
+                            "cgType": "Point",
+                            "cgName": "a",
+                            "cgValue": 32
+                        },
+                        {
+                            "cgType": "Point",
+                            "cgName": "b",
+                            "cgValue": 64
+                        }
+                    ],
+                    "cgOutputs": [
+                        {
+                            "cgType": "Point",
+                            "cgName": "sum",
+                            "cgValueType": "Number"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "1",
+                    "cgName": "Exit with code",
+                    "cgOutputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "out"
+                        }
+                    ],
+                    "cgInputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "in"
+                        },
+                        {
+                            "cgType": "Point",
+                            "cgName": "exit code",
+                            "cgValue": 0
+                        }
+                    ]
+                }
+            ],
+            [
+                {
+                    "cgOutputBlockId": "UniqueIdCanBeAString",
+                    "cgOutputName": "out",
+                    "cgInputBlockId": "1",
+                    "cgInputName": "in"
+                },
+                {
+                    "cgOutputBlockId": "0",
+                    "cgOutputName": "sum",
+                    "cgInputBlockId": "1",
+                    "cgInputName": "exit code"
+                }
+            ]
+        )
+        ;
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
@@ -126,7 +201,7 @@ describe("Graph", function () {
             {
                 "cgId": "3",
                 "cgOutputs": [
-                    {"cgName": "hello"}
+                    {"cgType": "Point", "cgName": "hello"}
                 ]
             }
         ])).to.throw(/cgValueType is required/);
@@ -135,6 +210,7 @@ describe("Graph", function () {
                 "cgId": "4",
                 "cgOutputs": [
                     {
+                        "cgType": "Point",
                         "cgName": "hello",
                         "cgValueType": "Number"
                     }
@@ -144,6 +220,7 @@ describe("Graph", function () {
                 "cgId": "5",
                 "cgInputs": [
                     {
+                        "cgType": "Point",
                         "cgName": "hello",
                         "cgValueType": "String"
                     }
@@ -160,6 +237,7 @@ describe("Graph", function () {
                 "cgId": "7",
                 "cgOutputs": [
                     {
+                        "cgType": "Point",
                         "cgName": "hello",
                         "cgValueType": "Number"
                     }
@@ -169,6 +247,7 @@ describe("Graph", function () {
                 "cgId": "8",
                 "cgInputs": [
                     {
+                        "cgType": "Point",
                         "cgName": "hello",
                         "cgValueType": "Number"
                     }
@@ -178,6 +257,7 @@ describe("Graph", function () {
                 "cgId": "9",
                 "cgInputs": [
                     {
+                        "cgType": "Point",
                         "cgName": "hello",
                         "cgValueType": "Number"
                     }
