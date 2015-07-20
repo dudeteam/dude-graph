@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Codegraph - Demo</title>
+    </head>
+    <body>
+        <canvas id="cg-canvas"></canvas>
+        <script src="bower_components/d3/d3.js"></script>
+        <script src="codegraph.js"></script>
+        <script>
+            var blocks = [
+                {
+                    "cgId": "0",
+                    "cgInputs": [
+                        {
+                            "cgType": "Point", // Will be used by default if not found
+                            "cgName": "in",
+                            "cgValueType": "Number"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "1",
+                    "cgOutputs": [
+                        {
+                            "cgType": "Point", // Will be used by default if not found
+                            "cgName": "out",
+                            "cgValueType": "Number" // Will be deduced by default from value if possible
+                        }
+                    ]
+                }
+            ];
+            var connections = [
+                {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+            ];
+        </script>
+        <script>
+            var graph = new cg.Graph();
+            var loader = new cg.JSONLoader();
+            var renderer = new cg.Renderer();
+            renderer.create(document.querySelector("#cg-canvas"), graph);
+            loader.load(graph, blocks, connections);
+        </script>
+    </body>
+</html>

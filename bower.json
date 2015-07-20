@@ -24,7 +24,8 @@
     "test",
     "tests"
   ],
-  "devDependencies": {
-    "pandora": "~0.0.11"
+  "dependencies": {
+    "pandora": "~0.0.11",
+    "d3": "~3.5.6"
   }
 }
