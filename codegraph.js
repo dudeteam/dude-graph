@@ -211,9 +211,9 @@ pandora.EventEmitter = (function () {
 pandora.formatString = function () {
     var format = arguments[0];
     var firstOption = arguments[1];
-    if (!firstOption) {
+    if (arguments.length === 1) {
         return format;
-    } else if (typeof firstOption === "object") {
+    } else if (firstOption && typeof firstOption === "object") {
         return pandora.formatDictionary.apply(this, arguments);
     } else {
         return pandora.formatArray.apply(this, arguments);
@@ -229,7 +229,7 @@ pandora.formatString = function () {
 pandora.formatArray = function () {
     var args = Array.prototype.slice.call(arguments, 1);
     return arguments[0].replace(/{(\d+)}/g, function (match, number) {
-        return typeof args[number] != 'undefined' ? args[number] : match;
+        return args[number];
     });
 };
 
@@ -818,6 +818,20 @@ cg.JSONLoader = (function () {
 
     /**
      *
+     * @param cgBlock {cg.Block}
+     * @param cgPointData {Object}
+     * @param isOutput {Boolean}
+     * @returns {cg.Point}
+     * @private
+     */
+    JSONLoader.prototype._loadPointStream = function(cgBlock, cgPointData, isOutput) {
+        var cgPointStream = new cg.Stream(cgBlock, cgPointData.cgName, isOutput);
+        cgBlock.addPoint(cgPointStream);
+        return cgPointStream;
+    };
+
+    /**
+     *
      * @param cgGraph {cg.Graph}
      * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
      * @private
@@ -1029,8 +1043,8 @@ cg.Graph = (function () {
 
     /**
      * Clone all the given blocks
-     * If connections exist between the clone blocks, this method will try to recreate them between the clone points
-     * Any connection to a block non cloned won't be duplicated
+     * If connections exist between the cloned blocks, this method will try to recreate them
+     * Connections from/to a cloned block to/from a non cloned block won't be duplicated
      * @param cgBlocks {Array<cg.Block>}
      */
     Graph.prototype.cloneBlocks = function(cgBlocks) {
@@ -1511,16 +1525,11 @@ cg.Stream = (function () {
      * @type {Function}
      */
     var Stream = pandora.class_("Stream", cg.Point, function (cgBlock, cgName, isOutput) {
-        cg.Point.call(cgBlock, cgName, isOutput);
-
-        /**
-         * A stream in
-         */
-        (function Initialization() {
-            if (!isOutput) {
-                this._cgMaxConnections = 1;
-            }
-        })();
+        cg.Point.call(this, cgBlock, cgName, isOutput);
+        this._cgMaxConnections = 1;
+        this._cgValue = null;
+        this._cgValueType = null;
+        this._cgValueTypesAllowed = [];
     });
 
     return Stream;

@@ -78,6 +78,32 @@ describe("Graph", function () {
         expect(blockWithInput.cgOutputs.length).to.be.equal(blockWithInputClone.cgOutputs.length);
         expect(blockWithInput.cgInputs.length).to.be.equal(blockWithInputClone.cgInputs.length);
     });
+    it("should test block connections and streams", function () {
+        var graph = new cg.Graph();
+        var loader = new cg.JSONLoader();
+        loader.load(graph, [{
+            "cgId": "0",
+            "cgInputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "in"
+                }
+            ]
+        }, {
+            "cgId": "1",
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
+                }
+            ]
+        }], [
+            {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+        ]);
+        expect(function() {
+            graph.blockById("0").inputByName("in").cgValue = 32;
+        }).to.throw(/Cannot change cgValueType to a non allowed type `Number`/);
+    });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
         var loader = new cg.JSONLoader();
