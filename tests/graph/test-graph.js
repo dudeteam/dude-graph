@@ -181,7 +181,11 @@ describe("Graph", function () {
                 }
             ]
         );
-        var blockToClone = graph.cloneBlocks([graph.blockById("0"), graph.blockById("1")]);
+        var blocksCloned = graph.cloneBlocks([graph.blockById("0"), graph.blockById("1")]);
+        expect(blocksCloned[0].cgName).to.be.equal(graph.blockById("0").cgName);
+        expect(blocksCloned[1].cgName).to.be.equal(graph.blockById("1").cgName);
+        expect(graph.cgConnections[2].cgOutputPoint.cgName).to.be.equal(graph.cgConnections[1].cgOutputPoint.cgName);
+        expect(graph.cgConnections[2].cgInputPoint.cgName).to.be.equal(graph.cgConnections[1].cgInputPoint.cgName);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();

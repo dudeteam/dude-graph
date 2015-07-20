@@ -1057,6 +1057,7 @@ cg.Graph = (function () {
      * If connections exist between the cloned blocks, this method will try to recreate them
      * Connections from/to a cloned block to/from a non cloned block won't be duplicated
      * @param cgBlocks {Array<cg.Block>}
+     * @returns {Array<cg.Block>} the cloned blocks
      */
     Graph.prototype.cloneBlocks = function (cgBlocks) {
         var cgCorrespondingBlocks = [];
@@ -1076,8 +1077,15 @@ cg.Graph = (function () {
             });
         }.bind(this));
         pandora.forEach(cgConnectionsToClone, function (cgConnectionToClone) {
-            console.log(cgConnectionToClone.cgOutputPoint.cgName, "to", cgConnectionToClone.cgInputPoint.cgName);
+            try {
+                cgCorrespondingBlocks[cgConnectionToClone.cgOutputPoint.cgBlock.cgId].outputByName(cgConnectionToClone.cgOutputPoint.cgName).connect(
+                    cgCorrespondingBlocks[cgConnectionToClone.cgInputPoint.cgBlock.cgId].inputByName(cgConnectionToClone.cgInputPoint.cgName)
+                );
+            } catch (exception) {
+                console.error("Graph::cloneBlocks() Connection duplication silenced exception: ", exception);
+            }
         });
+        return cgClonedBlocks;
     };
 
     return Graph;
