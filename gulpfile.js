@@ -7,13 +7,13 @@ var mocha = require('gulp-mocha');
 var CG_SOURCES = [
     "lib/index.js",
     "lib/graph/utils/*.js",
-    "lib/serialization/*.js",
     "lib/graph/graph.js",
     "lib/graph/block.js",
     "lib/graph/point.js",
     "lib/graph/connection.js",
     "lib/graph/blocks/*.js",
     "lib/graph/points/*.js",
+    "lib/serialization/*.js",
     "lib/renderer/renderer.js"
 ];
 

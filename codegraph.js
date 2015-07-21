@@ -723,176 +723,6 @@ cg.UUID = (function () {
     return UUID;
 
 })();
-cg.JSONLoader = (function () {
-
-    /**
-     *
-     * @extends {pandora.EventEmitter}
-     * @constructor
-     */
-    var JSONLoader = pandora.class_("JSONLoader", pandora.EventEmitter, function () {
-        pandora.EventEmitter.call(this);
-    });
-
-    /**
-     *
-     * @param cgGraph {cg.Graph}
-     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
-     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
-     */
-    JSONLoader.prototype.load = function (cgGraph, cgBlocksData, cgConnectionsData) {
-        this._loadBlocks(cgGraph, cgBlocksData);
-        this._loadPoints(cgGraph, cgBlocksData);
-        if (cgConnectionsData) {
-            this._loadConnections(cgGraph, cgConnectionsData);
-        }
-    };
-
-    /**
-     *
-     * @param cgGraph {cg.Graph}
-     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32"}>}
-     * @private
-     */
-    JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
-        var self = this;
-        pandora.forEach(cgBlocksData, function (cgBlockData) {
-            if (!cgBlockData.hasOwnProperty("cgId")) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
-            }
-            var cgBlockType = cgBlockData.cgType || "Block";
-            var cgBlockDeserializer = self[pandora.camelcase("_loadBlock" + cgBlockType)];
-            if (!cgBlockDeserializer) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block `{0}`: Cannot deserialize block of type `{1}`", cgBlockData.cgId, cgBlockType);
-            }
-            cgBlockDeserializer(cgGraph, cgBlockData);
-        });
-    };
-
-    /**
-     *
-     * @param cgGraph {cg.Graph}
-     * @param cgBlockData {{cgId: "32", cgType: "Block|undefined"}}
-     * @returns {cg.Block}
-     * @private
-     */
-    JSONLoader.prototype._loadBlockBlock = function(cgGraph, cgBlockData) {
-        var cgBlock = new cg.Block(cgGraph, cgBlockData.cgId);
-        cgGraph.addBlock(cgBlock);
-        return cgBlock;
-    };
-
-    /**
-     *
-     * @param cgGraph {cg.Graph}
-     * @param cgBlocksData {Array<{cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
-     * @private
-     */
-    JSONLoader.prototype._loadPoints = function (cgGraph, cgBlocksData) {
-        var self = this;
-        var loadPoint = function(cgBlock, cgPointData, isOutput) {
-            if (!cgPointData.cgName) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Point property `cgName` is required", cgBlock.cgId);
-            }
-            var cgPointType = cgPointData.cgType || "Point";
-            var cgPointDeserializer = self[pandora.camelcase("_loadPoint" + cgPointType)];
-            if (!cgPointDeserializer) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Cannot deserialize point `{1}` of type `{2}`", cgBlock.cgId, cgPointData.cgName, cgPointType);
-            }
-            cgPointDeserializer(cgBlock, cgPointData, isOutput);
-        };
-        pandora.forEach(cgBlocksData, function (cgBlockData) {
-            var cgBlock = cgGraph.blockById(cgBlockData.cgId);
-            if (cgBlockData.cgOutputs) {
-                pandora.forEach(cgBlockData.cgOutputs, function (output) {
-                    loadPoint(cgBlock, output, true);
-                });
-            }
-            if (cgBlockData.cgInputs) {
-                pandora.forEach(cgBlockData.cgInputs, function (input) {
-                    loadPoint(cgBlock, input, false);
-                });
-            }
-        });
-    };
-
-    /**
-     *
-     * @param cgBlock {cg.Block}
-     * @param cgPointData {Object}
-     * @param isOutput {Boolean}
-     * @returns {cg.Point}
-     * @private
-     */
-    JSONLoader.prototype._loadPointPoint = function(cgBlock, cgPointData, isOutput) {
-        var cgName = cgPointData.cgName;
-        var cgValue = cgPointData.cgValue;
-        var cgValueType = cgPointData.cgValueType;
-        var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
-        if (cgValue !== undefined) {
-            if (isOutput) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: Cannot set cgValue for an output point", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
-            }
-            cgPoint.cgValue = cgValue;
-        } else {
-            if (!cgValueType) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required and cannot be deduced from cgValue", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
-            }
-            cgPoint.cgValueType = cgValueType;
-        }
-        cgBlock.addPoint(cgPoint);
-        return cgPoint;
-    };
-
-    /**
-     *
-     * @param cgBlock {cg.Block}
-     * @param cgPointData {Object}
-     * @param isOutput {Boolean}
-     * @returns {cg.Point}
-     * @private
-     */
-    JSONLoader.prototype._loadPointStream = function(cgBlock, cgPointData, isOutput) {
-        var cgPointStream = new cg.Stream(cgBlock, cgPointData.cgName, isOutput);
-        cgBlock.addPoint(cgPointStream);
-        return cgPointStream;
-    };
-
-    /**
-     *
-     * @param cgGraph {cg.Graph}
-     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
-     * @private
-     */
-    JSONLoader.prototype._loadConnections = function(cgGraph, cgConnectionsData) {
-        pandora.forEach(cgConnectionsData, function (cgConnectionData) {
-            var cgOutputBlockId = cgConnectionData.cgOutputBlockId;
-            var cgOutputName = cgConnectionData.cgOutputName;
-            var cgInputBlockId = cgConnectionData.cgInputBlockId;
-            var cgInputName = cgConnectionData.cgInputName;
-            var cgOutputBlock = cgGraph.blockById(cgOutputBlockId);
-            if (!cgOutputBlock) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output block not found for id `{0}`", cgOutputBlockId);
-            }
-            var cgInputBlock = cgGraph.blockById(cgInputBlockId);
-            if (!cgInputBlock) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input block not found for id `{0}`", cgInputBlockId);
-            }
-            var cgOutputPoint = cgOutputBlock.outputByName(cgOutputName);
-            if (!cgOutputPoint) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output point `{0}` not found in block `{1}`", cgOutputName, cgOutputBlockId);
-            }
-            var cgInputPoint = cgInputBlock.inputByName(cgInputName);
-            if (!cgInputPoint) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input point `{0}` not found in block `{1}`", cgInputName, cgInputBlockId);
-            }
-            cgOutputPoint.connect(cgInputPoint);
-        });
-    };
-
-    return JSONLoader;
-
-})();
 cg.Graph = (function () {
 
     /**
@@ -996,8 +826,9 @@ cg.Graph = (function () {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
         if (cgOutputPoint.cgValueType !== cgInputPoint.cgValueType) {
-            // TODO: Handle conversion
-            throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
+            if (!cgInputPoint.canConvertType(cgOutputPoint.cgValueType)) {
+                throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
+            }
         }
         var cgConnection = new cg.Connection(cgOutputPoint, cgInputPoint);
         this._cgConnections.push(cgConnection);
@@ -1414,13 +1245,17 @@ cg.Point = (function () {
                 return this._cgValueType;
             }.bind(this),
             set: function (cgValueType) {
-                if (this._cgValueTypesAllowed.indexOf(cgValueType) === -1) {
-                    throw cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
+                if (!this.canAcceptType(cgValueType)) {
+                    throw new cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
                 }
                 var oldCgValueType = this._cgValueType;
-                if (this._cgConnections.length > 0 && oldCgValueType !== cgValueType) {
-                    // TODO: Handle conversion
-                    throw cg.GraphError("Point::cgValueType() Cannot change cgValueType if connections are bound to this point `{0}`", cgValueType);
+                if (oldCgValueType !== null && oldCgValueType !== cgValueType) { // Check if connections accept the value type change
+                    pandora.forEach(this._cgConnections, function (cgConnection) {
+                        var cgOtherPoint = cgConnection.otherPoint(this);
+                        if (!(cgOtherPoint.canAcceptType(cgValueType) || cgOtherPoint.canConvertType(cgValueType))) {
+                            throw new cg.GraphError("Point::cgValueType() Cannot change cgValueType: connected point `{0}` does not allow the value type: `{1}`", cgOtherPoint.cgName, cgValueType);
+                        }
+                    }.bind(this));
                 }
                 this._cgValueType = cgValueType;
                 this._cgGraph.emit("cg-point-value-type-change", this, oldCgValueType, cgValueType);
@@ -1447,7 +1282,7 @@ cg.Point = (function () {
         });
 
         /**
-         * The types this point can accept
+         * The types this point can accept for a cgValue or connections
          * @type {Array<String>}
          * @private
          */
@@ -1459,7 +1294,7 @@ cg.Point = (function () {
         });
 
         /**
-         * The types this point can implicitly convert
+         * The types this point can implicitly convert to when connecting this point to another point with a different cgValueType
          * @type {Array<{from: String, to: String, commutative: *Boolean}>}
          * @private
          */
@@ -1506,6 +1341,29 @@ cg.Point = (function () {
             cgPointClone.cgValueType = this._cgValueType;
         }
         return cgPointClone;
+    };
+
+    /**
+     * Returns whether this point can accept this type as a cgValueType
+     * @param cgValueType {String}
+     */
+    Point.prototype.canAcceptType = function (cgValueType) {
+        return this._cgValueTypesAllowed.indexOf(cgValueType) !== -1;
+    };
+
+    /**
+     * Returns whether this point can convert this type from the current cgValueType
+     * @param cgType {String}
+     * @return {Boolean}
+     */
+    Point.prototype.canConvertType = function (cgType) {
+        return pandora.findIf(this._cgValueTypeConversionsAllowed, function (cgValueTypeConversionAllowed) {
+                if (this._isOutput) {
+                    return cgValueTypeConversionAllowed.from === this.cgValueType && cgValueTypeConversionAllowed.to === cgType;
+                } else {
+                    return cgValueTypeConversionAllowed.from === cgType && cgValueTypeConversionAllowed.to === this.cgValueType;
+                }
+            }.bind(this)) !== null;
     };
 
     return Point;
@@ -1556,6 +1414,20 @@ cg.Connection = (function () {
         });
 
     });
+
+    /***
+     * Returns the other point
+     * @param cgPoint {cg.Point}
+     * returns {cg.Point}
+     */
+    Connection.prototype.otherPoint = function (cgPoint) {
+        if (cgPoint === this._cgOutputPoint) {
+            return this._cgInputPoint;
+        } else if (cgPoint === this._cgInputPoint) {
+            return this._cgOutputPoint;
+        }
+        throw new cg.GraphError("Connection::otherPoint() Point `{0}` is not in this connection", cgPoint.cgName);
+    };
 
     return Connection;
 
@@ -1616,6 +1488,176 @@ cg.Stream = (function () {
     };
 
     return Stream;
+
+})();
+cg.JSONLoader = (function () {
+
+    /**
+     *
+     * @extends {pandora.EventEmitter}
+     * @constructor
+     */
+    var JSONLoader = pandora.class_("JSONLoader", pandora.EventEmitter, function () {
+        pandora.EventEmitter.call(this);
+    });
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
+     */
+    JSONLoader.prototype.load = function (cgGraph, cgBlocksData, cgConnectionsData) {
+        this._loadBlocks(cgGraph, cgBlocksData);
+        this._loadPoints(cgGraph, cgBlocksData);
+        if (cgConnectionsData) {
+            this._loadConnections(cgGraph, cgConnectionsData);
+        }
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32"}>}
+     * @private
+     */
+    JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
+        var self = this;
+        pandora.forEach(cgBlocksData, function (cgBlockData) {
+            if (!cgBlockData.hasOwnProperty("cgId")) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
+            }
+            var cgBlockType = cgBlockData.cgType || "Block";
+            var cgBlockDeserializer = self[pandora.camelcase("_loadBlock" + cgBlockType)];
+            if (!cgBlockDeserializer) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block `{0}`: Cannot deserialize block of type `{1}`", cgBlockData.cgId, cgBlockType);
+            }
+            cgBlockDeserializer(cgGraph, cgBlockData);
+        });
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgBlockData {{cgId: "32", cgType: "Block|undefined"}}
+     * @returns {cg.Block}
+     * @private
+     */
+    JSONLoader.prototype._loadBlockBlock = function(cgGraph, cgBlockData) {
+        var cgBlock = new cg.Block(cgGraph, cgBlockData.cgId);
+        cgGraph.addBlock(cgBlock);
+        return cgBlock;
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgBlocksData {Array<{cgId: "32", cgInputs: *Object, cgOutputs: *Object}>}
+     * @private
+     */
+    JSONLoader.prototype._loadPoints = function (cgGraph, cgBlocksData) {
+        var self = this;
+        var loadPoint = function(cgBlock, cgPointData, isOutput) {
+            if (!cgPointData.cgName) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Point property `cgName` is required", cgBlock.cgId);
+            }
+            var cgPointType = cgPointData.cgType || "Point";
+            var cgPointDeserializer = self[pandora.camelcase("_loadPoint" + cgPointType)];
+            if (!cgPointDeserializer) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Cannot deserialize point `{1}` of type `{2}`", cgBlock.cgId, cgPointData.cgName, cgPointType);
+            }
+            cgPointDeserializer(cgBlock, cgPointData, isOutput);
+        };
+        pandora.forEach(cgBlocksData, function (cgBlockData) {
+            var cgBlock = cgGraph.blockById(cgBlockData.cgId);
+            if (cgBlockData.cgOutputs) {
+                pandora.forEach(cgBlockData.cgOutputs, function (output) {
+                    loadPoint(cgBlock, output, true);
+                });
+            }
+            if (cgBlockData.cgInputs) {
+                pandora.forEach(cgBlockData.cgInputs, function (input) {
+                    loadPoint(cgBlock, input, false);
+                });
+            }
+        });
+    };
+
+    /**
+     *
+     * @param cgBlock {cg.Block}
+     * @param cgPointData {Object}
+     * @param isOutput {Boolean}
+     * @returns {cg.Point}
+     * @private
+     */
+    JSONLoader.prototype._loadPointPoint = function(cgBlock, cgPointData, isOutput) {
+        var cgName = cgPointData.cgName;
+        var cgValue = cgPointData.cgValue;
+        var cgValueType = cgPointData.cgValueType;
+        var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
+        if (cgValue !== undefined) {
+            if (isOutput) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: Cannot set cgValue for an output point", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
+            }
+            cgPoint.cgValue = cgValue;
+        } else {
+            if (!cgValueType) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required and cannot be deduced from cgValue", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
+            }
+            cgPoint.cgValueType = cgValueType;
+        }
+        cgBlock.addPoint(cgPoint);
+        return cgPoint;
+    };
+
+    /**
+     *
+     * @param cgBlock {cg.Block}
+     * @param cgPointData {Object}
+     * @param isOutput {Boolean}
+     * @returns {cg.Point}
+     * @private
+     */
+    JSONLoader.prototype._loadPointStream = function(cgBlock, cgPointData, isOutput) {
+        var cgPointStream = new cg.Stream(cgBlock, cgPointData.cgName, isOutput);
+        cgBlock.addPoint(cgPointStream);
+        return cgPointStream;
+    };
+
+    /**
+     *
+     * @param cgGraph {cg.Graph}
+     * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
+     * @private
+     */
+    JSONLoader.prototype._loadConnections = function(cgGraph, cgConnectionsData) {
+        pandora.forEach(cgConnectionsData, function (cgConnectionData) {
+            var cgOutputBlockId = cgConnectionData.cgOutputBlockId;
+            var cgOutputName = cgConnectionData.cgOutputName;
+            var cgInputBlockId = cgConnectionData.cgInputBlockId;
+            var cgInputName = cgConnectionData.cgInputName;
+            var cgOutputBlock = cgGraph.blockById(cgOutputBlockId);
+            if (!cgOutputBlock) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output block not found for id `{0}`", cgOutputBlockId);
+            }
+            var cgInputBlock = cgGraph.blockById(cgInputBlockId);
+            if (!cgInputBlock) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input block not found for id `{0}`", cgInputBlockId);
+            }
+            var cgOutputPoint = cgOutputBlock.outputByName(cgOutputName);
+            if (!cgOutputPoint) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Output point `{0}` not found in block `{1}`", cgOutputName, cgOutputBlockId);
+            }
+            var cgInputPoint = cgInputBlock.inputByName(cgInputName);
+            if (!cgInputPoint) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadConnections() Input point `{0}` not found in block `{1}`", cgInputName, cgInputBlockId);
+            }
+            cgOutputPoint.connect(cgInputPoint);
+        });
+    };
+
+    return JSONLoader;
 
 })();
 cg.Renderer = (function () {
