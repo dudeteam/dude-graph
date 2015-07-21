@@ -3,12 +3,56 @@
     <head>
         <meta charset="utf-8">
         <title>Codegraph - Demo</title>
+        <style>
+            body {
+                margin: 0;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
+            #cg-svg {
+                background: #2C2C2C;
+                width: 100%;
+                height: 100%;
+            }
+            .cg-group > rect {
+                fill: rgba(255, 255, 255, 0.5);
+            }
+            .cg-block > rect {
+                fill: #222222;
+            }
+        </style>
     </head>
     <body>
-        <canvas id="cg-canvas"></canvas>
+        <svg id="cg-svg"></svg>
         <script src="bower_components/d3/d3.js"></script>
         <script src="codegraph.js"></script>
         <script>
+            var data = {
+                "cgGroups": [
+                    {
+                        "cgType": "group",
+                        "cgDescription": "Test",
+                        "cgPosition": [0, 0],
+                        "cgSize": [200, 200],
+                        "cgBlocks": ["0"]
+                    }
+                ],
+                "cgBlocks": [
+                    {
+                        "cgType": "block",
+                        "cgId": "0",
+                        "cgPosition": [10, 40]
+                    },
+                    {
+                        "cgType": "block",
+                        "cgId": "1",
+                        "cgPosition": [240, 240]
+                    }
+                ]
+            };
             var blocks = [
                 {
                     "cgId": "0",
@@ -39,7 +83,7 @@
             var graph = new cg.Graph();
             var loader = new cg.JSONLoader();
             var renderer = new cg.Renderer();
-            renderer.create(document.querySelector("#cg-canvas"), graph);
+            renderer.create(document.querySelector("#cg-svg"), data, graph);
             loader.load(graph, blocks, connections);
         </script>
     </body>
