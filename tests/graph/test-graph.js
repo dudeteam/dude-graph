@@ -271,7 +271,7 @@ describe("Graph", function () {
         graph.removeBlock(graph.blockById("UniqueIdCanBeAString"));
         expect(graph.cgBlocks.length).to.be.equal(2);
         expect(graph.cgConnections.length).to.be.equal(1);
-        expect(graph.blockById("UniqueIdCanBeAString").bind(graph)).to.throw();
+        expect(graph.blockById.bind(graph, "UniqueIdCanBeAString")).to.throw();
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();
