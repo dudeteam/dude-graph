@@ -1644,19 +1644,26 @@ cg.Renderer = (function () {
     };
 
     Renderer.prototype._createGroups = function (root, data, cgGraph) {
-        root.append("svg:g").attr("id", "cgGroups")
+        var currentGroup = root.append("svg:g").attr("id", "cgGroups")
             .selectAll(".cg-group")
             .data(data.cgGroups, function (cgGroup) {
                 return cgGroup.cgId;
             })
             .enter()
             .append("svg:g")
+                .attr("transform", function (cgGroup) { return "translate(" + cgGroup.cgPosition + ")"; });
+        currentGroup
             .attr("class", "cg-group")
             .append("svg:rect")
-            .attr("transform", function (cgGroup) { return "translate(" + cgGroup.cgPosition + ")"; })
             .attr("rx", 5).attr("ry", 5)
             .attr("width", function (cgGroup) { return cgGroup.cgSize[0]; })
             .attr("height", function (cgGroup) { return cgGroup.cgSize[1]; });
+        currentGroup
+            .append("svg:text")
+                .text(function (cgGroup) { return cgGroup.cgDescription; })
+                .attr("class", "cg-title")
+                .attr("text-anchor", "middle")
+                .attr("transform", function (cgGroup) { return "translate(" + [cgGroup.cgSize[0] / 2, 15] + ")"; });
     };
 
     Renderer.prototype._createBlocks = function (root, data, cgGraph) {
