@@ -105,7 +105,7 @@ describe("Graph", function () {
         ]);
         expect(function () {
             graph.blockById("0").inputByName("in").cgValue = 32;
-        }).to.throw(/Cannot change cgValueType to a non allowed type `Number`/);
+        }).to.throw(/Stream has no `cgValue`/);
     });
     it("should test many connections and clone blocks and connections", function () {
         var graph = new cg.Graph();
@@ -296,32 +296,38 @@ describe("Graph", function () {
                         "cgValueType": "String"
                     }
                 ]
+            },
+            {
+                "cgId": "2",
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "helloB",
+                        "cgValueType": "Boolean"
+                    }
+                ]
             }
         ], [
             {
                 "cgOutputBlockId": "0",
                 "cgOutputName": "helloN",
-                "cgInputBlockId": "1",
-                "cgInputName": "helloS"
+                "cgInputBlockId": "2",
+                "cgInputName": "helloB"
             }]);
         expect(graph.blockById("0").outputByName("helloN").cgValueType).to.be.equal("Number");
         expect(graph.blockById("1").inputByName("helloS").cgValueType).to.be.equal("String");
         graph.blockById("1").inputByName("helloS").cgValue = 32;
         expect(graph.blockById("1").inputByName("helloS").cgValueType).to.be.equal("Number");
-        graph.blockById("1").inputByName("helloS")._cgValueTypesAllowed.push("Array");
         expect(function () {
             graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
         }).to.throw(/connected point `helloN` does not allow the value type: `Array`/);
-        graph.blockById("0").outputByName("helloN")._cgValueTypeConversionsAllowed.push(
-            {"from": "Array", "to": "Number", "commutative": false}
-        );
         expect(function () {
             graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
         }).to.throw(/connected point `helloN` does not allow the value type: `Array`/);
-        graph.blockById("0").outputByName("helloN")._cgValueTypeConversionsAllowed.push(
-            {"from": "Number", "to": "Array", "commutative": false}
-        );
         graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
+    });
+    it("should test template blocks", function () {
+
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();

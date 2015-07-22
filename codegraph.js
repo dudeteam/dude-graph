@@ -734,6 +734,19 @@ cg.Graph = (function () {
         pandora.EventEmitter.call(this);
 
         /**
+         * All existing types for this graph instance, the key being the type name and the value being an array
+         * of all possible conversions.
+         * @type {Object<String, Array>}
+         */
+        this._cgTypes = {
+            "Stream": ["Stream"],
+            "Array": ["Array"],
+            "String": ["String"],
+            "Number": ["Number", "Boolean"],
+            "Boolean": ["Boolean", "Number"]
+        };
+
+        /**
          * Collection of blocks in the graph
          * @type {Array<cg.Block>}
          * @private
@@ -769,6 +782,16 @@ cg.Graph = (function () {
             }.bind(this)
         });
     });
+
+    /**
+     * Checks whether the first type can be converted into the second one.
+     * @param firstType {String}
+     * @param secondType {String}
+     * @returns {Boolean}
+     */
+    Graph.prototype.canConvert = function (firstType, secondType) {
+        return this._cgTypes[firstType] && this._cgTypes[firstType].indexOf(secondType) !== -1;
+    };
 
     /**
      * Adds a block to the graph
@@ -825,10 +848,8 @@ cg.Graph = (function () {
         if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
-        if (cgOutputPoint.cgValueType !== cgInputPoint.cgValueType) {
-            if (!cgInputPoint.canConvertType(cgOutputPoint.cgValueType)) {
-                throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
-            }
+        if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType)) {
+            throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
         }
         var cgConnection = new cg.Connection(cgOutputPoint, cgInputPoint);
         this._cgConnections.push(cgConnection);
@@ -1030,6 +1051,14 @@ cg.Block = (function () {
                 this._cgGraph.emit("cg-block-name-changed", this, oldCgName, cgName);
             }.bind(this)
         });
+
+        /**
+         * Template types that can be used on this block points. Each template type contains a list of possibly
+         * applicable types.
+         * @type {Array}
+         * @private
+         */
+        this._cgTemplates = [];
 
         /**
          * Output points
@@ -1245,20 +1274,9 @@ cg.Point = (function () {
                 return this._cgValueType;
             }.bind(this),
             set: function (cgValueType) {
-                if (!this.canAcceptType(cgValueType)) {
-                    throw new cg.GraphError("Point::cgValueType() Cannot change cgValueType to a non allowed type `{0}`", cgValueType);
-                }
-                var oldCgValueType = this._cgValueType;
-                if (oldCgValueType !== null && oldCgValueType !== cgValueType) { // Check if connections accept the value type change
-                    pandora.forEach(this._cgConnections, function (cgConnection) {
-                        var cgOtherPoint = cgConnection.otherPoint(this);
-                        if (!(cgOtherPoint.canAcceptType(cgValueType) || cgOtherPoint.canConvertType(cgValueType))) {
-                            throw new cg.GraphError("Point::cgValueType() Cannot change cgValueType: connected point `{0}` does not allow the value type: `{1}`", cgOtherPoint.cgName, cgValueType);
-                        }
-                    }.bind(this));
-                }
+                var old = this._cgValueType;
                 this._cgValueType = cgValueType;
-                this._cgGraph.emit("cg-point-value-type-change", this, oldCgValueType, cgValueType);
+                this._cgGraph.emit("cg-point-value-type-change", this, old, cgValueType);
             }.bind(this)
         });
 
@@ -1270,6 +1288,7 @@ cg.Point = (function () {
          */
         this._cgValue = null;
         Object.defineProperty(this, "cgValue", {
+            configurable: true,
             get: function () {
                 return this._cgValue;
             }.bind(this),
@@ -1278,32 +1297,6 @@ cg.Point = (function () {
                 var oldCgValue = this._cgValue;
                 this._cgValue = cgValue;
                 this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
-            }.bind(this)
-        });
-
-        /**
-         * The types this point can accept for a cgValue or connections
-         * @type {Array<String>}
-         * @private
-         */
-        this._cgValueTypesAllowed = ["Number", "Boolean", "String"];
-        Object.defineProperty(this, "cgValueTypesAllowed", {
-            get: function () {
-                return this._cgValueTypesAllowed;
-            }.bind(this)
-        });
-
-        /**
-         * The types this point can implicitly convert to when connecting this point to another point with a different cgValueType
-         * @type {Array<{from: String, to: String, commutative: *Boolean}>}
-         * @private
-         */
-        this._cgValueTypeConversionsAllowed = [
-            {"from": "Number", "to": "String", "commutative": true}
-        ];
-        Object.defineProperty(this, "cgValueTypeConversionsAllowed", {
-            get: function () {
-                return this._cgValueTypeConversionsAllowed;
             }.bind(this)
         });
 
@@ -1341,29 +1334,6 @@ cg.Point = (function () {
             cgPointClone.cgValueType = this._cgValueType;
         }
         return cgPointClone;
-    };
-
-    /**
-     * Returns whether this point can accept this type as a cgValueType
-     * @param cgValueType {String}
-     */
-    Point.prototype.canAcceptType = function (cgValueType) {
-        return this._cgValueTypesAllowed.indexOf(cgValueType) !== -1;
-    };
-
-    /**
-     * Returns whether this point can convert this type from the current cgValueType
-     * @param cgType {String}
-     * @return {Boolean}
-     */
-    Point.prototype.canConvertType = function (cgType) {
-        return pandora.findIf(this._cgValueTypeConversionsAllowed, function (cgValueTypeConversionAllowed) {
-                if (this._isOutput) {
-                    return cgValueTypeConversionAllowed.from === this.cgValueType && cgValueTypeConversionAllowed.to === cgType;
-                } else {
-                    return cgValueTypeConversionAllowed.from === cgType && cgValueTypeConversionAllowed.to === this.cgValueType;
-                }
-            }.bind(this)) !== null;
     };
 
     return Point;
@@ -1473,9 +1443,15 @@ cg.Stream = (function () {
     var Stream = pandora.class_("Stream", cg.Point, function (cgBlock, cgName, isOutput) {
         cg.Point.call(this, cgBlock, cgName, isOutput);
         this._cgMaxConnections = 1;
-        this._cgValue = null;
-        this._cgValueType = null;
-        this._cgValueTypesAllowed = [];
+        this._cgValueType = "Stream";
+        Object.defineProperty(this, "cgValue", {
+            get: function () {
+                throw new cg.GraphError("Stream has no `cgValue`.");
+            }.bind(this),
+            set: function () {
+                throw new cg.GraphError("Stream has no `cgValue`.");
+            }.bind(this)
+        });
     });
 
     /**
