@@ -21,25 +21,29 @@
         <script src="codegraph.js"></script>
         <script>
             var data = {
-                "cgGroups": [
+                "zoom": {
+                    "translate": [0, 0],
+                    "scale": 1
+                },
+                "groups": [
                     {
-                        "cgType": "group",
-                        "cgDescription": "Does some initialization...",
-                        "cgPosition": [10, 20],
-                        "cgSize": [200, 200],
-                        "cgBlocks": ["0"]
+                        "type": "group",
+                        "description": "Does some initialization...",
+                        "position": [10, 20],
+                        "size": [200, 200],
+                        "blocks": ["0"]
                     }
                 ],
-                "cgBlocks": [
+                "blocks": [
                     {
-                        "cgType": "block",
-                        "cgId": "0",
-                        "cgPosition": [10, 40]
+                        "type": "block",
+                        "id": "0",
+                        "position": [10, 40]
                     },
                     {
-                        "cgType": "block",
-                        "cgId": "1",
-                        "cgPosition": [240, 240]
+                        "type": "block",
+                        "id": "1",
+                        "position": [240, 240]
                     }
                 ]
             };
