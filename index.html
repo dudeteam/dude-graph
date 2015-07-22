@@ -72,8 +72,8 @@
         <script>
             var graph = new cg.Graph();
             var loader = new cg.JSONLoader();
-            var renderer = new cg.Renderer();
-            renderer.create(document.querySelector("#cg-svg"), data, graph);
+            var renderer = new cg.Renderer(document.querySelector("#cg-svg"), data, graph);
+            renderer.create();
             loader.load(graph, blocks, connections);
         </script>
     </body>

@@ -1663,39 +1663,50 @@ cg.Stream = (function () {
 cg.Renderer = (function () {
 
     /**
-     *
+     * Creates a new cg.Renderer from a DOM node and some graph data.
      * @extends {pandora.EventEmitter}
      * @constructor
-     */
-    var Renderer = pandora.class_("Renderer", pandora.EventEmitter, function () {
-        pandora.EventEmitter.call(this);
-    });
-
-    /**
-     * Creates the svg graph from the given cgGraph. This method will also listen the graph's events in order to
-     * updated the rendered svg graph.
-     * @param el The canvas DOM Element on which the svg will be append
+     * @param svg The svg DOM Element on which the svg will be append
      * @param data The serialized renderer elements
      * @param cgGraph The graph that will be rendered
      */
-    Renderer.prototype.create = function (el, data, cgGraph) {
-        var svg = d3.select(el);
-        var root = svg.append("svg:g").attr("id", "cgRoot");
-        this._createGroups(root, data, cgGraph);
-        this._createBlocks(root, data, cgGraph);
+    var Renderer = pandora.class_("Renderer", pandora.EventEmitter, function (svg, data, cgGraph) {
+        pandora.EventEmitter.call(this);
+        this._svg = d3.select(svg);
+        this._root = this._svg.append("svg:g").attr("id", "cgRoot");
+        this._data = data;
+        this._cgGraph = cgGraph;
+
+        /**
+         * Returns all groups and blocks currently selected.
+         * @type {d3.Array}
+         */
+        Object.defineProperty(this, "selection", {
+            get: function () {
+                return this._root.selectAll(".selected");
+            }.bind(this)
+        });
+    });
+
+    /**
+     * Creates the svg nodes and  listen the graph's events in order to update the rendered svg graph.
+     */
+    Renderer.prototype.create = function () {
+        this._createGroups();
+        this._createBlocks();
     };
 
-    Renderer.prototype._createGroups = function (root, data, cgGraph) {
-        var currentGroup = root.append("svg:g").attr("id", "cgGroups")
+    Renderer.prototype._createGroups = function () {
+        var currentGroup = this._root.append("svg:g").attr("id", "cgGroups")
             .selectAll(".cg-group")
-            .data(data.cgGroups, function (cgGroup) {
+            .data(this._data.cgGroups, function (cgGroup) {
                 return cgGroup.cgId;
             })
             .enter()
             .append("svg:g")
+                .attr("class", "cg-group")
                 .attr("transform", function (cgGroup) { return "translate(" + cgGroup.cgPosition + ")"; });
         currentGroup
-            .attr("class", "cg-group")
             .append("svg:rect")
             .attr("rx", 5).attr("ry", 5)
             .attr("width", function (cgGroup) { return cgGroup.cgSize[0]; })
@@ -1708,20 +1719,44 @@ cg.Renderer = (function () {
                 .attr("transform", function (cgGroup) { return "translate(" + [cgGroup.cgSize[0] / 2, 15] + ")"; });
     };
 
-    Renderer.prototype._createBlocks = function (root, data, cgGraph) {
-        root.append("svg:g").attr("id", "cgBlocks")
+    Renderer.prototype._createBlocks = function () {
+        var renderer = this;
+        var currentBlock = this._root.append("svg:g").attr("id", "cgBlocks")
             .selectAll(".cg-block")
-            .data(data.cgBlocks, function (cgBlock) {
+            .data(this._data.cgBlocks, function (cgBlock) {
                 return cgBlock.cgId;
             })
             .enter()
             .append("svg:g")
                 .attr("class", "cg-block")
-                .append("svg:rect")
-                    .attr("transform", function (block) { return "translate(" + block.cgPosition + ")"; })
-                    .attr("rx", 5).attr("ry", 5)
-                    .attr("width", function () { return 100; })
-                    .attr("height", function () { return 100; });
+                .call(d3.behavior.drag()
+                .on("dragstart", function () {
+                    var node = d3.select(this);
+                    renderer._addToSelection(node, !d3.event.sourceEvent.shiftKey);
+                }));
+        currentBlock
+            .append("svg:rect")
+                .attr("transform", function (block) { return "translate(" + block.cgPosition + ")"; })
+                .attr("rx", 5).attr("ry", 5)
+                .attr("width", function () { return 100; })
+                .attr("height", function () { return 100; });
+    };
+
+    /**
+     * Adds the given `node` to the current selection.
+     * @param node The svg `node` to select
+     * @param clear {Boolean?} If true, everything but this `node` will be unselected
+     * @private
+     */
+    Renderer.prototype._addToSelection = function (node, clear) {
+        if (clear) {
+            this._clearSelection();
+        }
+        node.classed("selected", true);
+    };
+
+    Renderer.prototype._clearSelection = function () {
+        this.selection.classed("selected", false);
     };
 
     return Renderer;
