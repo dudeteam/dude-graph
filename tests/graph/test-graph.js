@@ -21,6 +21,7 @@ describe("Graph", function () {
                     {
                         "cgType": "Point",
                         "cgName": "in",
+                        "cgValueType": "Number",
                         "cgValue": 64
                     }
                 ]
@@ -57,6 +58,7 @@ describe("Graph", function () {
                     {
                         "cgType": "Point",
                         "cgName": "in",
+                        "cgValueType": "Number",
                         "cgValue": 32
                     }
                 ]
@@ -128,11 +130,13 @@ describe("Graph", function () {
                         {
                             "cgType": "Point",
                             "cgName": "a",
+                            "cgValueType": "Number",
                             "cgValue": 32
                         },
                         {
                             "cgType": "Point",
                             "cgName": "b",
+                            "cgValueType": "Number",
                             "cgValue": 64
                         }
                     ],
@@ -161,6 +165,7 @@ describe("Graph", function () {
                         {
                             "cgType": "Point",
                             "cgName": "exit code",
+                            "cgValueType": "Number",
                             "cgValue": 0
                         }
                     ]

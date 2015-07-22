@@ -1293,7 +1293,6 @@ cg.Point = (function () {
                 return this._cgValue;
             }.bind(this),
             set: function (cgValue) {
-                this.cgValueType = pandora.typename(cgValue);
                 var oldCgValue = this._cgValue;
                 this._cgValue = cgValue;
                 this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
@@ -1498,18 +1497,17 @@ cg.JSONLoader = (function () {
      * @private
      */
     JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
-        var self = this;
         pandora.forEach(cgBlocksData, function (cgBlockData) {
             if (!cgBlockData.hasOwnProperty("cgId")) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
             }
             var cgBlockType = cgBlockData.cgType || "Block";
-            var cgBlockDeserializer = self[pandora.camelcase("_loadBlock" + cgBlockType)];
+            var cgBlockDeserializer = this[pandora.camelcase("_loadBlock" + cgBlockType)];
             if (!cgBlockDeserializer) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block `{0}`: Cannot deserialize block of type `{1}`", cgBlockData.cgId, cgBlockType);
             }
             cgBlockDeserializer(cgGraph, cgBlockData);
-        });
+        }.bind(this));
     };
 
     /**
@@ -1572,16 +1570,15 @@ cg.JSONLoader = (function () {
         var cgValue = cgPointData.cgValue;
         var cgValueType = cgPointData.cgValueType;
         var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
+        if (!cgValueType) {
+            throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
+        }
+        cgPoint.cgValueType = cgValueType;
         if (cgValue !== undefined) {
             if (isOutput) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: Cannot set cgValue for an output point", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
             }
             cgPoint.cgValue = cgValue;
-        } else {
-            if (!cgValueType) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required and cannot be deduced from cgValue", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
-            }
-            cgPoint.cgValueType = cgValueType;
         }
         cgBlock.addPoint(cgPoint);
         return cgPoint;
