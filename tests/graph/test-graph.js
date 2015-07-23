@@ -335,7 +335,60 @@ describe("Graph", function () {
         //graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
     });
     it("should test template blocks", function () {
-
+        var graph = new cg.Graph();
+        var loader = new cg.JSONLoader();
+        loader.load(graph, [
+            {
+                "cgId": "0",
+                "cgName": "mix",
+                "cgTemplates": {
+                    "genType": ["Number", "Vec2", "Vec3", "Vec4"]
+                },
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "x",
+                        "cgTemplate": "genType",
+                        "cgValueType": "Number"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "y",
+                        "cgTemplate": "genType",
+                        "cgValueType": "Number"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "a",
+                        "cgValueType": "Number"
+                    }
+                ],
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "value",
+                        "cgTemplate": "genType",
+                        "cgValueType": "Number"
+                    }
+                ]
+            },
+            {
+                "cgId": "1",
+                "cgName": "position",
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "value",
+                        "cgValueType": "Vec3"
+                    }
+                ]
+            }], [
+            {"cgOutputBlockId": "1", "cgOutputName": "value", "cgInputBlockId": "0", "cgInputName": "x"}
+        ]);
+        expect(graph.blockById("0").inputByName("x").cgValueType).to.be.equal("Vec3");
+        expect(graph.blockById("0").inputByName("y").cgValueType).to.be.equal("Vec3");
+        expect(graph.blockById("0").inputByName("a").cgValueType).to.be.equal("Number");
+        expect(graph.blockById("0").outputByName("value").cgValueType).to.be.equal("Vec3");
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();

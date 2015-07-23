@@ -743,7 +743,11 @@ cg.Graph = (function () {
             "Array": ["Array"],
             "String": ["String"],
             "Number": ["Number", "Boolean"],
-            "Boolean": ["Boolean", "Number"]
+            "Boolean": ["Boolean", "Number"],
+            "Vec2": ["Vec2"],
+            "Vec3": ["Vec3"],
+            "Vec4": ["Vec4"],
+            "Color": ["Color", "Vec4"]
         };
 
         /**
@@ -830,6 +834,16 @@ cg.Graph = (function () {
     };
 
     /**
+     * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
+     * @param point The point on which the connection will be created
+     * @param type The type of the connection that we try to attach
+     * @returns {boolean}
+     */
+    Graph.prototype.updateTemplate = function (point, type) {
+        return point.cgBlock.updateTemplate(point, type);
+    };
+
+    /**
      * Adds a block to the graph
      * @param {cg.Block} cgBlock to add to the graph
      * @emit "cg-block-create" {cg.Block}
@@ -884,7 +898,8 @@ cg.Graph = (function () {
         if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
-        if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType)) {
+        if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType) &&
+            !this.updateTemplate(cgInputPoint, cgOutputPoint.cgValueType)) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
         }
         var cgConnection = new cg.Connection(cgOutputPoint, cgInputPoint);
@@ -1034,10 +1049,13 @@ cg.Block = (function () {
      * Block is the base class for all codegraph nodes
      * A Block has a list of inputs and outputs points
      * @param cgGraph {cg.Graph}
-     * @param cgBlockId {String}
+     * @param data {{cgId: Number, cgTemplates: Object}}
      * @constructor
      */
-    var Block = pandora.class_("Block", function (cgGraph, cgBlockId) {
+    var Block = pandora.class_("Block", function (cgGraph, data) {
+
+        data = data || {};
+
         /**
          * Check the reference to the graph
          */
@@ -1064,7 +1082,7 @@ cg.Block = (function () {
          * @type {String}
          * @private
          */
-        this._cgId = cgBlockId || cgGraph.nextBlockId();
+        this._cgId = data.cgId || cgGraph.nextBlockId();
         Object.defineProperty(this, "cgId", {
             get: function () {
                 return this._cgId;
@@ -1092,10 +1110,15 @@ cg.Block = (function () {
         /**
          * Template types that can be used on this block points. Each template type contains a list of possibly
          * applicable types.
-         * @type {Array}
+         * @type {Object<String, Array>}
          * @private
          */
-        this._cgTemplates = [];
+        this._cgTemplates = data.cgTemplates || {};
+        Object.defineProperty(this, "cgTemplates", {
+            get: function () {
+                return this._cgTemplates;
+            }.bind(this)
+        });
 
         /**
          * Output points
@@ -1168,6 +1191,32 @@ cg.Block = (function () {
     };
 
     /**
+     * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
+     * @param point The point on which the connection will be created
+     * @param type The type of the connection that we try to attach
+     * @returns {boolean}
+     */
+    Block.prototype.updateTemplate = function (point, type) {
+        if (point.cgTemplate === null || this.cgTemplates[point.cgTemplate].indexOf(type) === -1) {
+            return false;
+        }
+        point.cgValueType = type;
+        var updateValueType = function (currentPoint) {
+            if (currentPoint.cgTemplate === point.cgTemplate) {
+                if (point.cgConnections.length === 0) {
+                    currentPoint.cgValueType = type;
+                } else {
+                    throw new cg.GraphError("Cannot infer template `{0}` in `{1}` for `{2}` in block `{3}`",
+                        point.cgTemplate, type, point.cgName, this.cgId);
+                }
+            }
+        };
+        pandora.forEach(this._cgInputs, updateValueType.bind(this));
+        pandora.forEach(this._cgOutputs, updateValueType.bind(this));
+        return true;
+    };
+
+    /**
      * Returns a copy of this block
      * @param cgGraph {cg.Graph} The graph on which the cloned block will be attached to
      * @return {cg.Block}
@@ -1217,9 +1266,10 @@ cg.Point = (function () {
      * @param cgBlock {cg.Block} The block this point refers to
      * @param cgName {String} The block point name for the input or output
      * @param isOutput {Boolean} True if this point is an output, False for an input
+     * @param cgTemplate {String} Optional parameter to specify a template to use to dynamically change the type
      * @constructor
      */
-    var Point = pandora.class_("Point", function (cgBlock, cgName, isOutput) {
+    var Point = pandora.class_("Point", function (cgBlock, cgName, isOutput, cgTemplate) {
         /**
          * The graph of the block
          * @type {cg.Graph}
@@ -1296,6 +1346,16 @@ cg.Point = (function () {
                 }
                 this._cgMaxConnections = cgMaxConnections;
             }.bind(this)
+        });
+
+        /**
+         * The name of the template type used (from parent block).
+         * @type {String|null}
+         * @private
+         */
+        this._cgTemplate = cgTemplate || null;
+        Object.defineProperty(this, "cgTemplate", {
+            get: function () { return this._cgTemplate; }.bind(this)
         });
 
         /**
@@ -1553,12 +1613,12 @@ cg.JSONLoader = (function () {
     /**
      *
      * @param cgGraph {cg.Graph}
-     * @param cgBlockData {{cgId: "32", cgType: "Block|undefined"}}
+     * @param cgBlockData {{cgId: Number, cgTemplates: Object}}
      * @returns {cg.Block}
      * @private
      */
     JSONLoader.prototype._loadBlockBlock = function(cgGraph, cgBlockData) {
-        var cgBlock = new cg.Block(cgGraph, cgBlockData.cgId);
+        var cgBlock = new cg.Block(cgGraph, cgBlockData);
         cgGraph.addBlock(cgBlock);
         return cgBlock;
     };
@@ -1609,7 +1669,7 @@ cg.JSONLoader = (function () {
         var cgName = cgPointData.cgName;
         var cgValue = cgPointData.cgValue;
         var cgValueType = cgPointData.cgValueType;
-        var cgPoint = new cg.Point(cgBlock, cgName, isOutput);
+        var cgPoint = new cg.Point(cgBlock, cgName, isOutput, cgPointData.cgTemplate);
         if (!cgValueType) {
             throw new cg.GraphSerializationError("JSONLoader::_loadPointPoint() Block `{0}` and {1} `{2}`: cgValueType is required", cgBlock.cgId, (isOutput ? "output" : "input"), cgName);
         }
