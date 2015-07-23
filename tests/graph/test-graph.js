@@ -324,15 +324,15 @@ describe("Graph", function () {
             }]);
         expect(graph.blockById("0").outputByName("helloN").cgValueType).to.be.equal("Number");
         expect(graph.blockById("1").inputByName("helloS").cgValueType).to.be.equal("String");
-        graph.blockById("1").inputByName("helloS").cgValue = 32;
-        expect(graph.blockById("1").inputByName("helloS").cgValueType).to.be.equal("Number");
+        graph.blockById("2").inputByName("helloB").cgValue = true;
+        expect(graph.blockById("2").inputByName("helloB").cgValueType).to.be.equal("Boolean");
         expect(function () {
             graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
-        }).to.throw(/connected point `helloN` does not allow the value type: `Array`/);
-        expect(function () {
-            graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
-        }).to.throw(/connected point `helloN` does not allow the value type: `Array`/);
-        graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
+        }).to.throw(/Point::cgValue Invalid value `32,64` for `String` in `helloS`/);
+        //expect(function () {
+        //    graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
+        //}).to.throw(/connected point `helloN` does not allow the value type: `Array`/);
+        //graph.blockById("1").inputByName("helloS").cgValue = [32, 64];
     });
     it("should test template blocks", function () {
 

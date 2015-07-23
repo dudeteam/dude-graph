@@ -747,6 +747,24 @@ cg.Graph = (function () {
         };
 
         /**
+         * All validators attached to types.
+         */
+        this._validators = {
+            "Array": function (value) {
+                return pandora.typename(value) === "Array";
+            },
+            "String": function (value) {
+                return pandora.typename(value) === "String";
+            },
+            "Number": function (value) {
+                return pandora.typename(value) === "Number";
+            },
+            "Boolean": function (value) {
+                return pandora.typename(value) === "Boolean";
+            }
+        };
+
+        /**
          * Collection of blocks in the graph
          * @type {Array<cg.Block>}
          * @private
@@ -784,6 +802,15 @@ cg.Graph = (function () {
     });
 
     /**
+     * Add a validator predicate for the given `type`
+     * @param type {String} The type on which this validator will be applied
+     * @param fn {Function} A function which takes a value in parameter and returns true if it can be assigned
+     */
+    Graph.prototype.addValidator = function (type, fn) {
+        this._validators[type] = fn;
+    };
+
+    /**
      * Checks whether the first type can be converted into the second one.
      * @param firstType {String}
      * @param secondType {String}
@@ -791,6 +818,15 @@ cg.Graph = (function () {
      */
     Graph.prototype.canConvert = function (firstType, secondType) {
         return this._cgTypes[firstType] && this._cgTypes[firstType].indexOf(secondType) !== -1;
+    };
+
+    /**
+     * Checks whether the given `value` is assignable to the given `type`.
+     * @param value {*} A value to check.
+     * @param type {String} The type that the value should have
+     */
+    Graph.prototype.canAssign = function (value, type) {
+        return value === null || (this._validators[type] && this._validators[type](value));
     };
 
     /**
@@ -1294,9 +1330,15 @@ cg.Point = (function () {
                 return this._cgValue;
             }.bind(this),
             set: function (cgValue) {
-                var oldCgValue = this._cgValue;
-                this._cgValue = cgValue;
-                this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
+                if (this._cgGraph.canAssign(cgValue, this._cgValueType)) {
+                    var oldCgValue = this._cgValue;
+                    this._cgValue = cgValue;
+                    this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
+                } else {
+                    throw new cg.GraphError("Point::cgValue Invalid value `{0}` for `{1}` in `{2}`",
+                        String(cgValue),
+                        this._cgValueType, this._cgName);
+                }
             }.bind(this)
         });
 
@@ -1328,8 +1370,8 @@ cg.Point = (function () {
             throw new pandora.Exception("Point::clone() method must be overridden by `{0}`", pandora.typename(this));
         }
         var cgPointClone = new cg.Point(cgBlock, this._cgName, this._isOutput);
-        cgPointClone.cgValue = this._cgValue;
         cgPointClone.cgValueType = this._cgValueType;
+        cgPointClone.cgValue = this._cgValue;
         return cgPointClone;
     };
 
