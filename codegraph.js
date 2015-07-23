@@ -978,11 +978,12 @@ cg.Graph = (function () {
         }.bind(this));
         pandora.forEach(cgConnectionsToClone, function (cgConnectionToClone) {
             try {
-                cgCorrespondingBlocks[cgConnectionToClone.cgOutputPoint.cgBlock.cgId].outputByName(cgConnectionToClone.cgOutputPoint.cgName).connect(
-                    cgCorrespondingBlocks[cgConnectionToClone.cgInputPoint.cgBlock.cgId].inputByName(cgConnectionToClone.cgInputPoint.cgName)
-                );
+                cgCorrespondingBlocks[cgConnectionToClone.cgOutputPoint.cgBlock.cgId]
+                        .outputByName(cgConnectionToClone.cgOutputPoint.cgName)
+                    .connect(cgCorrespondingBlocks[cgConnectionToClone.cgInputPoint.cgBlock.cgId]
+                        .inputByName(cgConnectionToClone.cgInputPoint.cgName));
             } catch (exception) {
-                console.error("Graph::cloneBlocks() Connection duplication silenced exception: ", exception);
+                throw new cg.GraphError("Graph::cloneBlocks() Connection duplication silenced exception: " + exception);
             }
         });
         return cgClonedBlocks;
@@ -1700,30 +1701,20 @@ cg.Renderer = (function () {
             })
             .enter()
             .append("svg:g")
-            .attr("class", "cg-group")
-            .attr("transform", function (group) {
-                return "translate(" + group.position + ")";
-            })
-            .call(this._createDragBehavior());
+                .attr("class", "cg-group")
+                .attr("transform", function (group) { return "translate(" + group.position + ")"; })
+                .call(this._createDragBehavior());
         currentGroup
             .append("svg:rect")
             .attr("rx", 5).attr("ry", 5)
-            .attr("width", function (group) {
-                return group.size[0];
-            })
-            .attr("height", function (group) {
-                return group.size[1];
-            });
+            .attr("width", function (group) { return group.size[0]; })
+            .attr("height", function (group) { return group.size[1]; });
         currentGroup
             .append("svg:text")
-            .text(function (group) {
-                return group.description;
-            })
-            .attr("class", "cg-title")
-            .attr("text-anchor", "middle")
-            .attr("transform", function (group) {
-                return "translate(" + [group.size[0] / 2, 15] + ")";
-            });
+                .text(function (group) { return group.description; })
+                .attr("class", "cg-title")
+                .attr("text-anchor", "middle")
+                .attr("transform", function (group) { return "translate(" + [group.size[0] / 2, 15] + ")"; });
     };
 
     Renderer.prototype._createBlocks = function () {
@@ -1734,27 +1725,20 @@ cg.Renderer = (function () {
             })
             .enter()
             .append("svg:g")
-            .attr("transform", function (block) {
-                return "translate(" + block.position + ")";
-            })
-            .attr("class", "cg-block")
-            .call(this._createDragBehavior());
+                .attr("class", "cg-block")
+                .call(this._createDragBehavior());
         currentBlock
             .append("svg:rect")
-            .attr("rx", 5).attr("ry", 5)
-            .attr("width", function () {
-                return 100;
-            })
-            .attr("height", function () {
-                return 100;
-            });
+                .attr("transform", function (block) { return "translate(" + block.position + ")"; })
+                .attr("rx", 5).attr("ry", 5)
+                .attr("width", function () { return 100; })
+                .attr("height", function () { return 100; });
     };
 
     Renderer.prototype._createDragBehavior = function () {
         var renderer = this;
         return d3.behavior.drag()
             .on("dragstart", function () {
-                d3.event.sourceEvent.stopPropagation();
                 var d3Node = d3.select(this);
                 renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
             })
@@ -1763,9 +1747,7 @@ cg.Renderer = (function () {
                     node.position[0] += d3.event.dx;
                     node.position[1] += d3.event.dy;
                 });
-                renderer.selection.attr("transform", function (node) {
-                    return "translate(" + node.position + ")";
-                });
+                renderer.selection.attr("transform", function (node) { return "translate(" + node.position + ")"; });
             });
     };
 
