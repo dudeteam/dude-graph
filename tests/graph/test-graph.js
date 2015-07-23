@@ -382,6 +382,17 @@ describe("Graph", function () {
                         "cgValueType": "Vec3"
                     }
                 ]
+            },
+            {
+                "cgId": "2",
+                "cgName": "message",
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "value",
+                        "cgValueType": "String"
+                    }
+                ]
             }], [
             {"cgOutputBlockId": "1", "cgOutputName": "value", "cgInputBlockId": "0", "cgInputName": "x"}
         ]);
@@ -389,6 +400,9 @@ describe("Graph", function () {
         expect(graph.blockById("0").inputByName("y").cgValueType).to.be.equal("Vec3");
         expect(graph.blockById("0").inputByName("a").cgValueType).to.be.equal("Number");
         expect(graph.blockById("0").outputByName("value").cgValueType).to.be.equal("Vec3");
+        expect(function () {
+            graph.blockById("0").inputByName("y").connect(graph.blockById("2").outputByName("value"))
+        }).to.throw(/Graph::connectPoints\(\) Cannot connect two points of different value types: `String` and `Vec3`/);
     });
     it("should test some basic error", function () {
         var graph = new cg.Graph();

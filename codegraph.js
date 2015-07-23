@@ -1201,19 +1201,23 @@ cg.Block = (function () {
             return false;
         }
         point.cgValueType = type;
+        var failToInfer = false;
         var updateValueType = function (currentPoint) {
+            if (failToInfer) {
+                return true;
+            }
             if (currentPoint.cgTemplate === point.cgTemplate) {
                 if (point.cgConnections.length === 0) {
                     currentPoint.cgValueType = type;
                 } else {
-                    throw new cg.GraphError("Cannot infer template `{0}` in `{1}` for `{2}` in block `{3}`",
-                        point.cgTemplate, type, point.cgName, this.cgId);
+                    failToInfer = true;
+                    return true;
                 }
             }
         };
         pandora.forEach(this._cgInputs, updateValueType.bind(this));
         pandora.forEach(this._cgOutputs, updateValueType.bind(this));
-        return true;
+        return !failToInfer;
     };
 
     /**
