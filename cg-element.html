@@ -12,10 +12,13 @@ methods and properties.
 -->
 <dom-module id="cg-element">
     <style>
+        :host {
+            --cg-background: #333333;
+        }
         #svg {
             width: 100%;
             height: 100%;
-            background: #333333;
+            background: var(--cg-background);
         }
     </style>
     <template>
