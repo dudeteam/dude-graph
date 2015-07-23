@@ -13,14 +13,16 @@
                 left: 0;
             }
         </style>
-        <link rel="stylesheet" href="../themes/dude.css">
+        <link rel="import" href="../themes/dude.html">
+        <link rel="import" href="../cg-element.html">
     </head>
     <body>
-        <svg id="cg-svg"></svg>
-        <script src="../../d3/d3.js"></script>
-        <script src="../codegraph.js"></script>
+        <template id="demo" is="dom-bind">
+            <cg-element graph-data="{{graphData}}" renderer-data="{{rendererData}}"></cg-element>
+        </template>
         <script>
-            var data = {
+            var demo = document.querySelector("#demo");
+            demo.rendererData = {
                 "zoom": {
                     "translate": [0, 0],
                     "scale": 1
@@ -47,38 +49,33 @@
                     }
                 ]
             };
-            var blocks = [
-                {
-                    "cgId": "0",
-                    "cgInputs": [
-                        {
-                            "cgType": "Point", // Will be used by default if not found
-                            "cgName": "in",
-                            "cgValueType": "Number"
-                        }
-                    ]
-                },
-                {
-                    "cgId": "1",
-                    "cgOutputs": [
-                        {
-                            "cgType": "Point", // Will be used by default if not found
-                            "cgName": "out",
-                            "cgValueType": "Number" // Will be deduced by default from value if possible
-                        }
-                    ]
-                }
-            ];
-            var connections = [
-                {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
-            ];
-        </script>
-        <script>
-            var graph = new cg.Graph();
-            var loader = new cg.JSONLoader();
-            var renderer = new cg.Renderer(document.querySelector("#cg-svg"), data, graph);
-            renderer.create();
-            loader.load(graph, blocks, connections);
+            demo.graphData = {
+                "blocks":[
+                    {
+                        "cgId": "0",
+                        "cgInputs": [
+                            {
+                                "cgType": "Point", // Will be used by default if not found
+                                "cgName": "in",
+                                "cgValueType": "Number"
+                            }
+                        ]
+                    },
+                    {
+                        "cgId": "1",
+                        "cgOutputs": [
+                            {
+                                "cgType": "Point", // Will be used by default if not found
+                                "cgName": "out",
+                                "cgValueType": "Number" // Will be deduced by default from value if possible
+                            }
+                        ]
+                    }
+                ],
+                "connections": [
+                    {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+                ]
+            };
         </script>
     </body>
 </html>

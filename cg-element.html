@@ -1,0 +1,51 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`cg-element` is a Polymer element which creates a codegraph svg renderer which can be manipulated using several
+methods and properties.
+@group Codegraph
+@element cg-element
+@demo demo/index.html
+-->
+<dom-module id="cg-element">
+    <style>
+        #svg {
+            width: 100%;
+            height: 100%;
+            background: #333333;
+        }
+    </style>
+    <template>
+        <svg id="svg"></svg>
+    </template>
+</dom-module>
+<script src="../d3/d3.js"></script>
+<script src="codegraph.js"></script>
+<script>
+    var CgElement= Polymer({
+        is: "cg-element",
+        properties: {
+
+            /**
+             * This JSON represents the graph data for a given codegraph.
+             */
+            graphData: Object,
+
+            /**
+             * This JSON represents the graphical blocks to render.
+             */
+            rendererData: Object
+
+        },
+        ready: function () {
+            this._graph = new cg.Graph();
+            this._loader = new cg.JSONLoader();
+            this._renderer = new cg.Renderer(this.$.svg, this.rendererData, this._graph);
+            this._renderer.create();
+            this._loader.load(this._graph, this.graphData);
+        }
+    });
+</script>
