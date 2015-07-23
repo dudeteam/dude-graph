@@ -1328,11 +1328,8 @@ cg.Point = (function () {
             throw new pandora.Exception("Point::clone() method must be overridden by `{0}`", pandora.typename(this));
         }
         var cgPointClone = new cg.Point(cgBlock, this._cgName, this._isOutput);
-        if (!this._isOutput) {
-            cgPointClone.cgValue = this._cgValue;
-        } else if (this._cgValueType !== null) {
-            cgPointClone.cgValueType = this._cgValueType;
-        }
+        cgPointClone.cgValue = this._cgValue;
+        cgPointClone.cgValueType = this._cgValueType;
         return cgPointClone;
     };
 
