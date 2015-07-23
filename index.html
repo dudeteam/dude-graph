@@ -1,84 +1,20 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+Authored by Jeremie Taboada <taboada.jeremie@gmail.com>
+-->
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Codegraph - Demo</title>
-        <style>
-            body {
-                margin: 0;
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-            }
-        </style>
-        <link rel="stylesheet" href="themes/dude.css">
-    </head>
-    <body>
-        <svg id="cg-svg"></svg>
-        <script src="bower_components/d3/d3.js"></script>
-        <script src="codegraph.js"></script>
-        <script>
-            var data = {
-                "zoom": {
-                    "translate": [0, 0],
-                    "scale": 1
-                },
-                "groups": [
-                    {
-                        "type": "group",
-                        "description": "Does some initialization...",
-                        "position": [10, 20],
-                        "size": [200, 200],
-                        "blocks": ["0"]
-                    }
-                ],
-                "blocks": [
-                    {
-                        "type": "block",
-                        "id": "0",
-                        "position": [10, 40]
-                    },
-                    {
-                        "type": "block",
-                        "id": "1",
-                        "position": [240, 240]
-                    }
-                ]
-            };
-            var blocks = [
-                {
-                    "cgId": "0",
-                    "cgInputs": [
-                        {
-                            "cgType": "Point", // Will be used by default if not found
-                            "cgName": "in",
-                            "cgValueType": "Number"
-                        }
-                    ]
-                },
-                {
-                    "cgId": "1",
-                    "cgOutputs": [
-                        {
-                            "cgType": "Point", // Will be used by default if not found
-                            "cgName": "out",
-                            "cgValueType": "Number" // Will be deduced by default from value if possible
-                        }
-                    ]
-                }
-            ];
-            var connections = [
-                {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
-            ];
-        </script>
-        <script>
-            var graph = new cg.Graph();
-            var loader = new cg.JSONLoader();
-            var renderer = new cg.Renderer(document.querySelector("#cg-svg"), data, graph);
-            renderer.create();
-            loader.load(graph, blocks, connections);
-        </script>
-    </body>
+<head>
+    <title>codegraph</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../iron-component-page/iron-component-page.html">
+</head>
+<body>
+
+<iron-component-page></iron-component-page>
+
+</body>
 </html>

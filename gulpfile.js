@@ -2,7 +2,8 @@ var gulp = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var jshint = require("gulp-jshint");
-var mocha = require('gulp-mocha');
+var mocha = require("gulp-mocha");
+var shell = require("gulp-shell");
 
 var CG_SOURCES = [
     "lib/index.js",
@@ -39,4 +40,6 @@ gulp.task("test", ["build"], function () {
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task("default", ["watch"]);
+gulp.task("serve", ["watch"], shell.task("polyserve"));
+
+gulp.task("default", ["serve"]);
