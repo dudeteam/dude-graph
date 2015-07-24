@@ -45,7 +45,7 @@ methods and properties.
             this._loader = new cg.JSONLoader();
             this._renderer = new cg.Renderer(this.$.svg, this.rendererData, this._graph);
             this._renderer.create();
-            this._loader.load(this._graph, this.graphData);
+            this._loader.load(this._graph, this.graphData.blocks, this.graphData.connections);
         }
     });
 </script>
