@@ -1,81 +1,99 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Codegraph - Demo</title>
-        <style>
-            body {
-                margin: 0;
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
+<head>
+    <meta charset="utf-8">
+    <title>Codegraph - Demo</title>
+    <style>
+        body {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+    <link rel="import" href="../themes/dude.html">
+    <link rel="import" href="../cg-element.html">
+</head>
+<body>
+<template id="demo" is="dom-bind">
+    <cg-element graph-data="{{graphData}}" renderer-data="{{rendererData}}"></cg-element>
+</template>
+<script>
+    var demo = document.querySelector("#demo");
+    demo.rendererData = {
+        "config": {
+            "zoom": {
+                "translate": [0, 0],
+                "scale": 1
             }
-        </style>
-        <link rel="import" href="../themes/dude.html">
-        <link rel="import" href="../cg-element.html">
-    </head>
-    <body>
-        <template id="demo" is="dom-bind">
-            <cg-element graph-data="{{graphData}}" renderer-data="{{rendererData}}"></cg-element>
-        </template>
-        <script>
-            var demo = document.querySelector("#demo");
-            demo.rendererData = {
-                "zoom": {
-                    "translate": [0, 0],
-                    "scale": 1
-                },
-                "groups": [
+        },
+        "groups": [
+            {
+                "id": "0",
+                "type": "group",
+                "description": "Something interesting",
+                "position": [10, 20],
+                "size": [200, 200]
+            },
+            {
+                "id": "Koala",
+                "type": "group",
+                "description": "Child",
+                "position": [10, 20],
+                "size": [100, 100],
+                "group": "0"
+            }
+        ],
+        "blocks": [
+            {
+                "id": "0",
+                "type": "block",
+                "position": [10, 40],
+                "group": "0"
+            },
+            {
+                "id": "Scream",
+                "type": "block",
+                "position": [240, 240],
+                "group": "Koala"
+            },
+            {
+                "id": "Scream",
+                "type": "block",
+                "position": [240, 240],
+                "group": "Koala"
+            }
+        ]
+    };
+    demo.graphData = {
+        "blocks": [
+            {
+                "cgId": "0",
+                "cgInputs": [
                     {
-                        "type": "group",
-                        "description": "Does some initialization...",
-                        "position": [10, 20],
-                        "size": [200, 200],
-                        "blocks": ["0"]
-                    }
-                ],
-                "blocks": [
-                    {
-                        "type": "block",
-                        "id": "0",
-                        "position": [10, 40]
-                    },
-                    {
-                        "type": "block",
-                        "id": "1",
-                        "position": [240, 240]
+                        "cgType": "Point", // Will be used by default if not found
+                        "cgName": "in",
+                        "cgValueType": "Number"
                     }
                 ]
-            };
-            demo.graphData = {
-                "blocks":[
+            },
+            {
+                "cgId": "1",
+                "cgOutputs": [
                     {
-                        "cgId": "0",
-                        "cgInputs": [
-                            {
-                                "cgType": "Point", // Will be used by default if not found
-                                "cgName": "in",
-                                "cgValueType": "Number"
-                            }
-                        ]
-                    },
-                    {
-                        "cgId": "1",
-                        "cgOutputs": [
-                            {
-                                "cgType": "Point", // Will be used by default if not found
-                                "cgName": "out",
-                                "cgValueType": "Number" // Will be deduced by default from value if possible
-                            }
-                        ]
+                        "cgType": "Point", // Will be used by default if not found
+                        "cgName": "out",
+                        "cgValueType": "Number" // Will be deduced by default from value if possible
                     }
-                ],
-                "connections": [
-                    {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
                 ]
-            };
-        </script>
-    </body>
+            }
+        ],
+        "connections": [
+            {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
+        ]
+    };
+</script>
+</body>
 </html>
