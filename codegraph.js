@@ -1754,7 +1754,7 @@ cg.Renderer = (function () {
      * Default renderer configuration
      * @type {{zoom: {min: number, max: number}}}
      */
-    var RENDERER_CONFIG = {
+    var DEFAULT_RENDERER_CONFIG = {
         "zoom": {
             "min": 0.25,
             "max": 5
@@ -1769,7 +1769,7 @@ cg.Renderer = (function () {
      * @param data The serialized renderer elements
      * @param cgGraph The graph that will be rendered
      */
-    var Renderer = pandora.class_("Renderer", pandora.EventEmitter, function (svg, data, cgGraph) {
+    var Renderer = pandora.class_("Renderer", pandora.EventEmitter, function (svg, cgGraph, data) {
         pandora.EventEmitter.call(this);
 
         /**
@@ -1807,7 +1807,7 @@ cg.Renderer = (function () {
          * @type {{zoom: {min: Number, max: Number}}}
          * @private
          */
-        this._config = data.config;
+        this._config = pandora.mergeObjects(data.config, DEFAULT_RENDERER_CONFIG, true, true);
 
         /**
          * The renderer groups
@@ -1920,74 +1920,33 @@ cg.Renderer = (function () {
         }.bind(this));
     };
 
-    /**
-     * Creates zoom and pan
-     * @private
-     */
-    Renderer.prototype._createZoomBehavior = function () {
-        var renderer = this;
-        this._zoom = d3.behavior.zoom()
-            .scaleExtent([RENDERER_CONFIG.zoom.min, RENDERER_CONFIG.zoom.max])
-            .on("zoom", function () {
-                if (d3.event.sourceEvent) {
-                    pandora.preventCallback(d3.event.sourceEvent);
-                }
-                renderer._rootSvg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-                renderer._config.zoom.translate = renderer._zoom.translate();
-                renderer._config.zoom.scale = renderer._zoom.scale();
-            }.bind(this));
-        this._svg.call(this._zoom);
-    };
-
-    /**
-     * Creates the drag and drop behavior
-     * @returns {d3.behavior.drag}
-     * @private
-     */
-    Renderer.prototype._createDragBehavior = function () {
-        var renderer = this;
-        return d3.behavior.drag()
-            .on("dragstart", function () {
-                var d3Node = d3.select(this);
-                d3.event.sourceEvent.stopPropagation();
-                renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
-            })
-            .on("drag", function () {
-                renderer.selection.each(function (node) {
-                    node.position[0] += d3.event.dx;
-                    node.position[1] += d3.event.dy;
-                });
-                renderer.selection.attr("transform", function (node) {
-                    return "translate(" + node.position + ")";
-                });
-            });
-    };
-
-    /**
-     * Adds the given `node` to the current selection.
-     * @param node {d3.selection} The svg `node` to select
-     * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
-     * @private
-     */
-    Renderer.prototype._addToSelection = function (node, clearSelection) {
-        if (clearSelection) {
-            this._clearSelection();
-        }
-        node.classed("selected", true);
-    };
-
-    /**
-     * Clears the selection
-     * @private
-     */
-    Renderer.prototype._clearSelection = function () {
-        this.selection.classed("selected", false);
-    };
-
     return Renderer;
 
 })();
 
+/**
+ * Creates the drag and drop behavior
+ * @returns {d3.behavior.drag}
+ * @private
+ */
+cg.Renderer.prototype._createDragBehavior = function () {
+    var renderer = this;
+    return d3.behavior.drag()
+        .on("dragstart", function () {
+            var d3Node = d3.select(this);
+            d3.event.sourceEvent.stopPropagation();
+            renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
+        })
+        .on("drag", function () {
+            renderer.selection.each(function (node) {
+                node.position[0] += d3.event.dx;
+                node.position[1] += d3.event.dy;
+            });
+            renderer.selection.attr("transform", function (node) {
+                return "translate(" + node.position + ")";
+            });
+        });
+};
 /**
  * Creates renderer blocks
  * @private
@@ -2022,7 +1981,8 @@ cg.Renderer.prototype._updateRendererBlocks = function () {
         });
     updatedRendererBlocks
         .select("rect")
-        .attr("rx", 5).attr("ry", 5)
+        .attr("rx", 5)
+        .attr("ry", 5)
         .attr("width", function () {
             return 100;
         })
@@ -2139,4 +2099,42 @@ cg.Renderer.prototype._removeRendererGroups = function () {
         .selectAll(".cg-group")
         .exit()
         .remove();
+};
+/**
+ * Adds the given `node` to the current selection.
+ * @param node {d3.selection} The svg `node` to select
+ * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
+ * @private
+ */
+cg.Renderer.prototype._addToSelection = function (node, clearSelection) {
+    if (clearSelection) {
+        this._clearSelection();
+    }
+    node.classed("selected", true);
+};
+
+/**
+ * Clears the selection
+ * @private
+ */
+cg.Renderer.prototype._clearSelection = function () {
+    this.selection.classed("selected", false);
+};
+/**
+ * Creates zoom and pan
+ * @private
+ */
+cg.Renderer.prototype._createZoomBehavior = function () {
+    var renderer = this;
+    this._zoom = d3.behavior.zoom()
+        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
+        .on("zoom", function () {
+            if (d3.event.sourceEvent) {
+                pandora.preventCallback(d3.event.sourceEvent);
+            }
+            renderer._rootSvg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._config.zoom.translate = renderer._zoom.translate();
+            renderer._config.zoom.scale = renderer._zoom.scale();
+        }.bind(this));
+    this._svg.call(this._zoom);
 };
