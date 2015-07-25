@@ -1859,11 +1859,9 @@ cg.Renderer = (function () {
         this._createGroups();
         this._createBlocks();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
-            console.log("Block created");
             this._addCgBlock(cgBlock);
         }.bind(this));
         this._cgGraph.on("cg-block-remove", function (cgBlock) {
-            console.log("Block removed");
             this._removeCgBlock(cgBlock);
         }.bind(this));
         // Helper to remove the selected blocks
@@ -2044,9 +2042,6 @@ cg.Renderer.prototype._removeBlocks = function () {
             return block.id;
         })
         .exit()
-        .each(function (block) {
-            console.log("Block", block.id, "removed from svg")
-        })
         .remove();
 };
 
