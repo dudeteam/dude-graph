@@ -41,6 +41,6 @@ gulp.task("test", ["build"], function () {
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task("serve", ["watch"], shell.task("polyserve -p 9999 -o demo"));
+gulp.task("serve", ["watch"], shell.task("polyserve -p 9999 -o \"demo\""));
 
 gulp.task("default", ["serve"]);
