@@ -1814,20 +1814,20 @@ cg.Renderer = (function () {
          * @type {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
          * @private
          */
-        this._groups = data.groups;
+        this._rendererGroups = data.groups;
 
         /**
          * The renderer blocks
          * @type {Array<{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
          * @private
          */
-        this._blocks = data.blocks;
+        this._rendererBlocks = data.blocks;
 
         /**
          * Association map from id to renderer group
          * @type {d3.map<String, {id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
          */
-        this._groupIds = d3.map(data.groups, function (group) {
+        this._rendererGroupIds = d3.map(data.groups, function (group) {
             return group.id;
         });
 
@@ -1835,7 +1835,7 @@ cg.Renderer = (function () {
          * Association map from id to renderer block
          * @type {d3.map<String, {id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
          */
-        this._blockIds = d3.map(data.blocks, function (block) {
+        this._rendererBlockIds = d3.map(data.blocks, function (block) {
             return block.id;
         });
 
@@ -1856,8 +1856,8 @@ cg.Renderer = (function () {
     Renderer.prototype.initialize = function () {
         this._initialize();
         this._createZoomBehavior();
-        this._createGroups();
-        this._createBlocks();
+        this._createRendererGroups();
+        this._createRendererBlocks();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             this._addCgBlock(cgBlock);
         }.bind(this));
@@ -1879,8 +1879,8 @@ cg.Renderer = (function () {
     };
 
     /**
-     * Initialize groups and blocks
-     * Add parent and children references, and also cgBlocks references
+     * Initialize renderer groups and blocks
+     * Add parent and children references, and also cgBlocks references to renderer blocks
      * @private
      */
     Renderer.prototype._initialize = function () {
@@ -1890,10 +1890,10 @@ cg.Renderer = (function () {
             }
             group.children.add(child);
         };
-        this._groups.forEach(function (group) {
+        this._rendererGroups.forEach(function (group) {
             group.type = "group";
             if (group.group) {
-                var parent = this._groupIds.get(group.group);
+                var parent = this._rendererGroupIds.get(group.group);
                 if (!parent) {
                     throw new cg.RendererError("Renderer() Cannot find parent `{0}` for group `{1}`", group.group, group.id);
                 }
@@ -1901,10 +1901,10 @@ cg.Renderer = (function () {
                 addChildToGroup(parent, group);
             }
         }.bind(this));
-        this._blocks.forEach(function (block) {
+        this._rendererBlocks.forEach(function (block) {
             block.type = "block";
             if (block.group) {
-                var parent = this._groupIds.get(block.group);
+                var parent = this._rendererGroupIds.get(block.group);
                 if (!parent) {
                     throw new cg.RendererError("Renderer::initialize() Cannot find parent `{0}` for block `{1}`", block.group, block.id);
                 }
@@ -1914,7 +1914,7 @@ cg.Renderer = (function () {
             }
         }.bind(this));
         pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
-            if (!this._blockIds.has(cgBlock.cgId)) {
+            if (!this._rendererBlockIds.has(cgBlock.cgId)) {
                 throw new cg.RendererError("Renderer::initialize() cgBlock `{0}` is not bound to the renderer", cgBlock.cgId);
             }
         }.bind(this));
@@ -1965,12 +1965,12 @@ cg.Renderer = (function () {
 
     /**
      * Adds the given `node` to the current selection.
-     * @param node The svg `node` to select
-     * @param clear {Boolean?} If true, everything but this `node` will be unselected
+     * @param node {d3.selection} The svg `node` to select
+     * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
      * @private
      */
-    Renderer.prototype._addToSelection = function (node, clear) {
-        if (clear) {
+    Renderer.prototype._addToSelection = function (node, clearSelection) {
+        if (clearSelection) {
             this._clearSelection();
         }
         node.classed("selected", true);
@@ -1989,13 +1989,13 @@ cg.Renderer = (function () {
 })();
 
 /**
- * Renderer the new blocks
+ * Creates renderer blocks
  * @private
  */
-cg.Renderer.prototype._createBlocks = function () {
-    var createdBlocks = this._blocksSvg
+cg.Renderer.prototype._createRendererBlocks = function () {
+    var createdRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .data(this._blocks, function (block) {
+        .data(this._rendererBlocks, function (block) {
             return block.id;
         })
         .enter()
@@ -2005,22 +2005,22 @@ cg.Renderer.prototype._createBlocks = function () {
         })
         .attr("class", "cg-block")
         .call(this._createDragBehavior());
-    createdBlocks
+    createdRendererBlocks
         .append("svg:rect");
-    this._updateBlocks();
+    this._updateRendererBlocks();
 };
 
 /**
- * Update the existing blocks
+ * Updates renderer blocks
  * @private
  */
-cg.Renderer.prototype._updateBlocks = function () {
-    var updatedBlocks = this._blocksSvg
+cg.Renderer.prototype._updateRendererBlocks = function () {
+    var updatedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
         .attr("transform", function (block) {
             return "translate(" + block.position + ")";
         });
-    updatedBlocks
+    updatedRendererBlocks
         .select("rect")
         .attr("rx", 5).attr("ry", 5)
         .attr("width", function () {
@@ -2032,13 +2032,13 @@ cg.Renderer.prototype._updateBlocks = function () {
 };
 
 /**
- * Remove the old blocks
+ * Removes renderer blocks
  * @private
  */
-cg.Renderer.prototype._removeBlocks = function () {
-    var removedBlocks = this._blocksSvg
+cg.Renderer.prototype._removeRendererBlocks = function () {
+    var removedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .data(this._blocks, function (block) {
+        .data(this._rendererBlocks, function (block) {
             return block.id;
         })
         .exit()
@@ -2046,40 +2046,40 @@ cg.Renderer.prototype._removeBlocks = function () {
 };
 
 /**
- * Adds a new cgBlock to the renderer
- * @param cgBlock {cg.Block}
+ * Adds a new renderer block with the given cgBlock
+ * @param cgBlock {cg.cgBlock}
  * @private
  */
 cg.Renderer.prototype._addCgBlock = function (cgBlock) {
-    this._blocks.push({
+    this._rendererBlocks.push({
         "id": cgBlock.cgId,
         "type": "block",
-        "description": cgBlock.cgName,
         "cgBlock": cgBlock,
+        "description": cgBlock.cgName,
         "position": cgBlock.cgPosition || [0, 0]
     });
-    this._blockIds.set(cgBlock.cgId, this._blocks[this._blocks.length - 1]);
-    this._createBlocks();
+    this._rendererBlockIds.set(cgBlock.cgId, this._rendererBlocks[this._rendererBlocks.length - 1]);
+    this._createRendererBlocks();
 };
 
 /**
- * Removed a cgBlock from the renderer
- * @param cgBlock
+ * Removes the renderer block linked with the given cgBlock
+ * @param cgBlock {cg.cgBlock}
  * @private
  */
 cg.Renderer.prototype._removeCgBlock = function (cgBlock) {
-    this._blocks.splice(this._blocks.indexOf(this._blockIds.get(cgBlock.cgId)), 1);
-    this._blockIds.remove(cgBlock.cgId);
-    this._removeBlocks();
+    this._rendererBlocks.splice(this._rendererBlocks.indexOf(this._rendererBlockIds.get(cgBlock.cgId)), 1);
+    this._rendererBlockIds.remove(cgBlock.cgId);
+    this._removeRendererBlocks();
 };
 /**
- * Create the groups
+ * Creates renderer groups
  * @private
  */
-cg.Renderer.prototype._createGroups = function () {
-    var createdGroups = this._groupsSvg
+cg.Renderer.prototype._createRendererGroups = function () {
+    var createdRendererGroups = this._groupsSvg
         .selectAll(".cg-group")
-        .data(this._groups, function (group) {
+        .data(this._rendererGroups, function (group) {
             return group.id;
         })
         .enter()
@@ -2089,26 +2089,26 @@ cg.Renderer.prototype._createGroups = function () {
         })
         .attr("class", "cg-group")
         .call(this._createDragBehavior());
-    createdGroups
+    createdRendererGroups
         .append("svg:rect");
-    createdGroups
+    createdRendererGroups
         .append("svg:text");
-    this._updateGroups();
+    this._updateRendererGroups();
 };
 
 /**
- * Update the groups
+ * Updates renderer groups
  * @private
  */
-cg.Renderer.prototype._updateGroups = function () {
-    var updatedGroups = this._groupsSvg
+cg.Renderer.prototype._updateRendererGroups = function () {
+    var updatedRendererGroups = this._groupsSvg
         .selectAll(".cg-group");
-    updatedGroups
+    updatedRendererGroups
         .select("g")
         .attr("transform", function (cgGroup) {
             return "translate(" + cgGroup.position + ")";
         });
-    updatedGroups
+    updatedRendererGroups
         .select("rect")
         .attr("rx", 5)
         .attr("ry", 5)
@@ -2118,7 +2118,7 @@ cg.Renderer.prototype._updateGroups = function () {
         .attr("height", function (cgGroup) {
             return cgGroup.size[1];
         });
-    updatedGroups
+    updatedRendererGroups
         .select("text")
         .text(function (cgGroup) {
             return cgGroup.description;
@@ -2131,11 +2131,11 @@ cg.Renderer.prototype._updateGroups = function () {
 };
 
 /**
- * Remove the groups
+ * Removes renderer groups
  * @private
  */
-cg.Renderer.prototype._removeGroups = function () {
-    var removedGroups = this._groupsSvg
+cg.Renderer.prototype._removeRendererGroups = function () {
+    var removedRendererGroups = this._groupsSvg
         .selectAll(".cg-group")
         .exit()
         .remove();
