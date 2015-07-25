@@ -15,7 +15,8 @@ var CG_SOURCES = [
     "lib/graph/blocks/*.js",
     "lib/graph/points/*.js",
     "lib/serialization/*.js",
-    "lib/renderer/renderer.js"
+    "lib/renderer/renderer.js",
+    "lib/renderer/*.js"
 ];
 
 gulp.task("jshint", function () {
@@ -40,6 +41,6 @@ gulp.task("test", ["build"], function () {
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task("serve", ["watch"], shell.task("polyserve"));
+gulp.task("serve", ["watch"], shell.task("polyserve -p 9999 -o demo"));
 
 gulp.task("default", ["serve"]);
