@@ -1848,6 +1848,28 @@ cg.Renderer = (function () {
                 return this._rootSvg.selectAll(".selected");
             }.bind(this)
         });
+
+        /**
+         * Returns all groups and blocks currently selected, with groups children
+         * @type {d3.selection}
+         */
+        Object.defineProperty(this, "groupedSelection", {
+            get: function () {
+                var renderer = this;
+                var groupedSelection = d3.set();
+                this.selection.each(function (rendererNode) {
+                    (function handleGroupSelection(rendererNode) {
+                        groupedSelection.add(renderer._getUniqueElementId(rendererNode, true));
+                        if (rendererNode.type === "group") {
+                            rendererNode.children.forEach(function (childNode) {
+                                handleGroupSelection(childNode);
+                            });
+                        }
+                    })(rendererNode);
+                });
+                return d3.selectAll(groupedSelection.values().join(", "));
+            }.bind(this)
+        });
     });
 
     /**
@@ -1886,9 +1908,9 @@ cg.Renderer = (function () {
     Renderer.prototype._initialize = function () {
         var addChildToGroup = function (group, child) {
             if (!group.children) {
-                group.children = d3.set();
+                group.children = [];
             }
-            group.children.add(child);
+            group.children.push(child);
         };
         this._rendererGroups.forEach(function (group) {
             group.type = "group";
@@ -1938,13 +1960,17 @@ cg.Renderer.prototype._createDragBehavior = function () {
             renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
         })
         .on("drag", function () {
-            renderer.selection.each(function (node) {
-                node.position[0] += d3.event.dx;
-                node.position[1] += d3.event.dy;
+            var selection = renderer.groupedSelection;
+            selection.each(function(rendererNode) {
+                rendererNode.position[0] += d3.event.dx;
+                rendererNode.position[1] += d3.event.dy;
             });
-            renderer.selection.attr("transform", function (node) {
-                return "translate(" + node.position + ")";
+            selection.attr("transform", function (rendererNode) {
+                return "translate(" + rendererNode.position + ")";
             });
+        })
+        .on("dragend", function () {
+
         });
 };
 /**
@@ -1954,14 +1980,14 @@ cg.Renderer.prototype._createDragBehavior = function () {
 cg.Renderer.prototype._createRendererBlocks = function () {
     var createdRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .data(this._rendererBlocks, function (block) {
-            return block.id;
+        .data(this._rendererBlocks, function (rendererBlock) {
+            return rendererBlock.id;
         })
         .enter()
         .append("svg:g")
-        .attr("id", function (block) {
-            return "cg-block-" + block.id;
-        })
+        .attr("id", function (rendererBlock) {
+            return this._getUniqueElementId(rendererBlock);
+        }.bind(this))
         .attr("class", "cg-block")
         .call(this._createDragBehavior());
     createdRendererBlocks
@@ -1976,8 +2002,8 @@ cg.Renderer.prototype._createRendererBlocks = function () {
 cg.Renderer.prototype._updateRendererBlocks = function () {
     var updatedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .attr("transform", function (block) {
-            return "translate(" + block.position + ")";
+        .attr("transform", function (rendererBlock) {
+            return "translate(" + rendererBlock.position + ")";
         });
     updatedRendererBlocks
         .select("rect")
@@ -1998,8 +2024,8 @@ cg.Renderer.prototype._updateRendererBlocks = function () {
 cg.Renderer.prototype._removeRendererBlocks = function () {
     var removedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .data(this._rendererBlocks, function (block) {
-            return block.id;
+        .data(this._rendererBlocks, function (rendererBlock) {
+            return rendererBlock.id;
         })
         .exit()
         .remove();
@@ -2039,14 +2065,14 @@ cg.Renderer.prototype._removeCgBlock = function (cgBlock) {
 cg.Renderer.prototype._createRendererGroups = function () {
     var createdRendererGroups = this._groupsSvg
         .selectAll(".cg-group")
-        .data(this._rendererGroups, function (group) {
-            return group.id;
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
         })
         .enter()
         .append("svg:g")
-        .attr("id", function (group) {
-            return "cg-group-" + group.id;
-        })
+        .attr("id", function (rendererGroup) {
+            return this._getUniqueElementId(rendererGroup);
+        }.bind(this))
         .attr("class", "cg-group")
         .call(this._createDragBehavior());
     createdRendererGroups
@@ -2065,28 +2091,28 @@ cg.Renderer.prototype._updateRendererGroups = function () {
         .selectAll(".cg-group");
     updatedRendererGroups
         .select("g")
-        .attr("transform", function (cgGroup) {
-            return "translate(" + cgGroup.position + ")";
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + rendererGroup.position + ")";
         });
     updatedRendererGroups
         .select("rect")
         .attr("rx", 5)
         .attr("ry", 5)
-        .attr("width", function (cgGroup) {
-            return cgGroup.size[0];
+        .attr("width", function (rendererGroup) {
+            return rendererGroup.size[0];
         })
-        .attr("height", function (cgGroup) {
-            return cgGroup.size[1];
+        .attr("height", function (rendererGroup) {
+            return rendererGroup.size[1];
         });
     updatedRendererGroups
         .select("text")
-        .text(function (cgGroup) {
-            return cgGroup.description;
+        .text(function (rendererGroup) {
+            return rendererGroup.description;
         })
         .attr("class", "cg-title")
         .attr("text-anchor", "middle")
-        .attr("transform", function (cgGroup) {
-            return "translate(" + [cgGroup.size[0] / 2, 15] + ")";
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + [rendererGroup.size[0] / 2, 15] + ")";
         });
 };
 
@@ -2119,6 +2145,16 @@ cg.Renderer.prototype._addToSelection = function (node, clearSelection) {
  */
 cg.Renderer.prototype._clearSelection = function () {
     this.selection.classed("selected", false);
+};
+/**
+ * Returns an unique HTML usable id for the given rendererNode
+ * @param rendererNode {{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}|{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}}
+ * @param hashtag {Boolean?}
+ * @return {String}
+ * @private
+ */
+cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
+    return pandora.formatString("{0}cg-{1}-{2}", hashtag ? "#" : "", rendererNode.type, rendererNode.id);
 };
 /**
  * Creates zoom and pan
