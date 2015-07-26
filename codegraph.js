@@ -1850,7 +1850,8 @@ cg.Renderer = (function () {
         });
 
         /**
-         * Returns all groups and blocks currently selected, with groups children
+         * Returns all groups and blocks currently selected
+         * Groups children are also added to selection even if they are not selected directly
          * @type {d3.selection}
          */
         Object.defineProperty(this, "groupedSelection", {
@@ -2141,15 +2142,15 @@ cg.Renderer.prototype._removeRendererGroups = function () {
 };
 /**
  * Adds the given `node` to the current selection.
- * @param node {d3.selection} The svg `node` to select
+ * @param d3Node {d3.selection} The svg `node` to select
  * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
  * @private
  */
-cg.Renderer.prototype._addToSelection = function (node, clearSelection) {
+cg.Renderer.prototype._addToSelection = function (d3Node, clearSelection) {
     if (clearSelection) {
         this._clearSelection();
     }
-    node.classed("selected", true);
+    d3Node.classed("selected", true);
 };
 
 /**
