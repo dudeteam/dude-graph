@@ -1106,7 +1106,7 @@ cg.Block = (function () {
          * @emit "cg-block-name-changed" {cg.Block} {String} {String}
          * @private
          */
-        this._cgName = pandora.typename(this);
+        this._cgName = data.cgName || pandora.typename(this);
         Object.defineProperty(this, "cgName", {
             get: function () {
                 return this._cgName;
@@ -2006,6 +2006,12 @@ cg.Renderer.prototype._createRendererBlocks = function () {
         .call(this._createDragBehavior());
     createdRendererBlocks
         .append("svg:rect");
+    createdRendererBlocks
+        .append("svg:text")
+            .text(function (block) {
+                return this._cgGraph.blockById(block.id).cgName;
+            }.bind(this))
+            .attr("transform", "translate(" + [0, 15] + ")");
     this._updateRendererBlocks();
 };
 
@@ -2019,11 +2025,11 @@ cg.Renderer.prototype._updateRendererBlocks = function () {
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
+    this._createRendererPoints(updatedRendererBlocks.append("svg:g"));
     updatedRendererBlocks
         .select("rect")
         .attr("rx", 5)
-        .attr("ry", 5)
-        .attr("width", function () {
+        .attr("ry", 5).attr("width", function () {
             return 100;
         })
         .attr("height", function () {
@@ -2139,6 +2145,26 @@ cg.Renderer.prototype._removeRendererGroups = function () {
         .selectAll(".cg-group")
         .exit()
         .remove();
+};
+/**
+ * Creates renderer points.
+ * @param parentSvg The svg group which will contains the renderer points of the current block
+ * @private
+ */
+cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
+    parentSvg
+        .selectAll(".cg-point")
+        .data(function (block) {
+            var cgBlock = this._cgGraph.blockById(block.id);
+            return cgBlock.cgInputs.concat(cgBlock.cgOutputs);
+        }.bind(this))
+        .enter()
+        .append("svg:g")
+            .attr("class", "cg-point")
+            .append("svg:text")
+                .text(function (cgPoint) {
+                    return cgPoint.cgName;
+                });
 };
 /**
  * Adds the given `node` to the current selection.
