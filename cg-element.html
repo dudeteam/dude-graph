@@ -40,14 +40,19 @@ methods and properties.
             /**
              * This JSON represents the graphical blocks to render.
              */
-            rendererData: Object
+            rendererData: Object,
+
+            /**
+             * A list of blocks models used as shortcuts to generate blocks.
+             */
+            modelsData: Object
 
         },
         ready: function () {
             this._graph = new cg.Graph();
-            this._loader = new cg.JSONLoader();
-            this._loader.load(this._graph, this.graphData.blocks, this.graphData.connections);
+            this._loader = new cg.JSONLoader(this._graph, this.graphData, this.modelsData);
             this._renderer = new cg.Renderer(this.$.svg, this._graph, this.rendererData);
+            this._loader.load();
             this._renderer.initialize();
         }
     });

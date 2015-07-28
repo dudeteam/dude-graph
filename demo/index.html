@@ -18,7 +18,10 @@
 </head>
 <body>
 <template id="demo" is="dom-bind">
-    <cg-element graph-data="{{graphData}}" renderer-data="{{rendererData}}"></cg-element>
+    <cg-element graph-data="{{graphData}}"
+                renderer-data="{{rendererData}}"
+                models-data="{{modelsData}}">
+    </cg-element>
 </template>
 <script>
     var demo = document.querySelector("#demo");
@@ -64,8 +67,47 @@
                 "type": "block",
                 "position": [400, 240],
                 "group": "Koala"
+            },
+            {
+                "id": "3",
+                "type": "block",
+                "position": [600, 600]
+            },
+            {
+                "id": "4",
+                "type": "block",
+                "position": [100, 500]
             }
         ]
+    };
+    demo.modelsData = {
+        "mix": {
+            "cgType": "Function",
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "x",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "y",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "a",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgOutputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "value",
+                    "cgValueType": "Number"
+                }
+            ]
+        }
     };
     demo.graphData = {
         "blocks": [
@@ -100,6 +142,13 @@
                         "cgValueType": "Number"
                     }
                 ]
+            },
+            { "cgId": "3", "cgModel": "mix" },
+            {
+                "cgId": "4",
+                "cgType": "Variable",
+                "cgValueType": "Number",
+                "cgValue": 5
             }
         ],
         "connections": [
