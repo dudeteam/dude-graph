@@ -1135,7 +1135,7 @@ cg.Block = (function () {
          * @emit "cg-block-name-changed" {cg.Block} {String} {String}
          * @private
          */
-        this._cgName = data.cgName || pandora.typename(this);
+        this._cgName = data.cgName || data.cgModel || pandora.typename(this);
         Object.defineProperty(this, "cgName", {
             get: function () {
                 return this._cgName;
@@ -1783,9 +1783,11 @@ cg.JSONLoader = (function () {
                 throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
             }
             if (cgBlockData.cgModel) {
-                var id = cgBlockData.cgId;
-                cgBlockData = this._models[cgBlockData.cgModel];
-                cgBlockData.cgId = id;
+                if (this._models[cgBlockData.cgModel] === undefined) {
+                    throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Model `{0}` not found",
+                        cgBlockData.cgModel);
+                }
+                pandora.mergeObjects(cgBlockData, this._models[cgBlockData.cgModel]);
             }
             var cgBlockType = cgBlockData.cgType || "Block";
             var cgBlockDeserializer = this._blockTypes[cgBlockType];
