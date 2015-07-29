@@ -515,4 +515,85 @@ describe("Graph", function () {
             {"cgOutputBlockId": "7", "cgOutputName": "hello", "cgInputBlockId": "9", "cgInputName": "hello"}
         ])).to.throw(/Cannot accept more than `\d` connection/);
     });
+    it("should test native blocks", function () {
+        var graph = new cg.Graph({
+            "blocks": [
+                {
+                    "cgId": "0",
+                    "cgType": "Instruction",
+                    "cgName": "print",
+                    "cgInputs": [
+                        {
+                            "cgType": "Point",
+                            "cgValueType": "String",
+                            "cgName": "message"
+                        }
+                    ]
+                },
+                {
+                    "cgId": "1",
+                    "cgType": "Instruction",
+                    "cgName": "add_string",
+                    "cgInputs": [
+                        {
+                            "cgType": "Point",
+                            "cgValueType": "String",
+                            "cgName": "str"
+                        }
+                    ],
+                    "cgReturn": {"cgValueType": "String"}
+                },
+                {
+                    "cgId": "2",
+                    "cgType": "Function",
+                    "cgName": "rand",
+                    "cgReturn": {"cgValueType": "Number"}
+                },
+                {
+                    "cgId": "3",
+                    "cgType": "Getter",
+                    "cgName": "Entity.name",
+                    "cgClassType": "Entity",
+                    "cgValueType": "String"
+                },
+                {
+                    "cgId": "4",
+                    "cgType": "Each"
+                },
+                {
+                    "cgId": "5",
+                    "cgType": "Range"
+                },
+                {
+                    "cgId": "6",
+                    "cgType": "Condition"
+                },
+                {
+                    "cgId": "7",
+                    "cgType": "Variable",
+                    "cgName": "size",
+                    "cgValueType": "Number",
+                    "cgValue": 10
+                }
+            ]
+        });
+        graph.loader.load();
+        expect(pandora.typename(graph.blockById("0").cgInputs[0])).to.be.equal("Stream");
+        expect(pandora.typename(graph.blockById("0").cgOutputs[0])).to.be.equal("Stream");
+        expect(graph.blockById("0").cgName).to.be.equal("print");
+        expect(graph.blockById("0").cgInputs[1].cgValueType).to.be.equal("String");
+        expect(pandora.typename(graph.blockById("1").cgInputs[0])).to.be.equal("Stream");
+        expect(pandora.typename(graph.blockById("1").cgOutputs[0])).to.be.equal("Stream");
+        expect(graph.blockById("1").cgOutputs[1].cgValueType).to.be.equal("String");
+        expect(graph.blockById("2").cgOutputs[0].cgValueType).to.be.equal("Number");
+        expect(graph.blockById("3").cgOutputs[0].cgValueType).to.be.equal("String");
+        expect(graph.blockById("3").cgInputs[0].cgValueType).to.be.equal("Entity");
+        expect(graph.blockById("7").cgOutputs[0].cgValueType).to.be.equal("Number");
+        expect(graph.blockById("7").cgName).to.be.equal("size");
+        expect(graph.blockById("7").cgValueType).to.be.equal("Number");
+        expect(graph.blockById("7").cgValue).to.be.equal(10);
+    });
+    it("should test models", function () {
+        // TODO
+    });
 });

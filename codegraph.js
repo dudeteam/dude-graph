@@ -1570,9 +1570,8 @@ cg.Condition = (function () {
             cgName: data.cgName,
             cgInputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "in",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -1582,14 +1581,12 @@ cg.Condition = (function () {
             ],
             cgOutputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "true",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
-                    "cgType": "Point",
                     "cgName": "false",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 }
             ]
         });
@@ -1613,9 +1610,8 @@ cg.Each = (function () {
             cgName: data.cgName,
             cgInputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "in",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -1625,9 +1621,8 @@ cg.Each = (function () {
             ],
             cgOutputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "current",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -1635,9 +1630,8 @@ cg.Each = (function () {
                     "cgValueType": "Number"
                 },
                 {
-                    "cgType": "Point",
                     "cgName": "completed",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 }
             ]
         });
@@ -1720,15 +1714,13 @@ cg.Instruction = (function () {
      */
     var Instruction = pandora.class_("Instruction", cg.Block, function (cgGraph, data) {
         data.cgInputs.unshift({
-            "cgType": "Point",
             "cgName": "in",
-            "cgValueType": "Stream"
+            "cgType": "Stream"
         });
         data.cgOutputs = [
             {
-                "cgType": "Point",
                 "cgName": "out",
-                "cgValueType": "Stream"
+                "cgType": "Stream"
             }
         ];
         if (data.cgReturn) {
@@ -1793,9 +1785,8 @@ cg.Range = (function () {
             cgName: data.cgName,
             cgInputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "in",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -1815,9 +1806,8 @@ cg.Range = (function () {
             ],
             cgOutputs: [
                 {
-                    "cgType": "Point",
                     "cgName": "current",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -1825,9 +1815,8 @@ cg.Range = (function () {
                     "cgValueType": "Number"
                 },
                 {
-                    "cgType": "Point",
                     "cgName": "completed",
-                    "cgValueType": "Stream"
+                    "cgType": "Stream"
                 }
             ]
         });
