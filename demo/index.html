@@ -82,10 +82,18 @@
                 "id": "5",
                 "type": "block",
                 "position": [200, 400]
+            },
+            {
+                "id": "6",
+                "type": "block",
+                "position": [300, 300]
             }
         ]
     };
     demo.modelsData = {
+
+        // Entity
+
         "Entity.destroy": {
             "cgType": "Instruction",
             "cgInputs": [
@@ -110,7 +118,7 @@
                     "cgValueType": "String"
                 }
             ],
-            "cgReturnType": "Entity"
+            "cgReturn": {"cgValueType": "Entity"}
         },
         "Entity.has_behavior": {
             "cgType": "Function",
@@ -126,7 +134,7 @@
                     "cgValueType": "String"
                 }
             ],
-            "cgReturnType": "Boolean"
+            "cgReturn": {"cgValueType": "Boolean"}
         },
         "Entity.add_behavior": {
             "cgType": "Instruction",
@@ -142,7 +150,7 @@
                     "cgValueType": "String"
                 }
             ],
-            "cgReturnType": "Behavior"
+            "cgReturn": {"cgValueType": "Behavior"}
         },
         "Entity.behavior": {
             "cgType": "Instruction",
@@ -158,12 +166,125 @@
                     "cgValueType": "String"
                 }
             ],
-            "cgReturnType": "Behavior"
+            "cgReturn": {"cgValueType": "Behavior"}
         },
         "Entity.name": {
             "cgType": "Getter",
             "cgClassType": "Entity",
             "cgValueType": "String"
+        },
+        "Entity.parent": {
+            "cgType": "Getter",
+            "cgClassType": "Entity",
+            "cgValueType": "Entity"
+        },
+
+        // Operators
+
+        "greater_than": {
+            "cgType": "Operator",
+            "cgTemplates": {
+                "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
+            },
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "first"
+                },
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "second"
+                }
+            ],
+            "cgReturn": {"cgValueType": "Boolean"}
+        },
+        "add": {
+            "cgType": "Operator",
+            "cgTemplates": {
+                "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
+            },
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "first"
+                },
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "second"
+                }
+            ],
+            "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
+        },
+        "substract": {
+            "cgType": "Operator",
+            "cgTemplates": {
+                "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
+            },
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "first"
+                },
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "second"
+                }
+            ],
+            "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
+        },
+        "multiply": {
+            "cgType": "Operator",
+            "cgTemplates": {
+                "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
+            },
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "first"
+                },
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "second"
+                }
+            ],
+            "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
+        },
+        "divide": {
+            "cgType": "Operator",
+            "cgTemplates": {
+                "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
+            },
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "first"
+                },
+                {
+                    "cgType": "Point",
+                    "cgTemplate": "TValue",
+                    "cgValueType": "Number",
+                    "cgName": "second"
+                }
+            ],
+            "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
         }
     };
     demo.graphData = {
@@ -202,7 +323,8 @@
             },
             {"cgId": "3", "cgModel": "Entity.add_entity"},
             {"cgId": "4", "cgType": "Variable", "cgValueType": "Number", "cgValue": 5},
-            {"cgId": "5", "cgModel": "Entity.name"}
+            {"cgId": "5", "cgModel": "Entity.name"},
+            {"cgId": "6", "cgModel": "add"}
         ],
         "connections": [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}

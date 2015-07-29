@@ -1659,10 +1659,11 @@ cg.Function = (function () {
             cgId: data.cgId,
             cgName: data.cgName,
             cgInputs: data.cgInputs,
-            cgOutputs: data.cgReturnType ? [{
+            cgOutputs: data.cgReturn ? [{
                 cgType: "Point",
                 cgName: "value",
-                cgValueType: data.cgReturnType
+                cgValueType: data.cgReturn.cgValueType,
+                cgTemplate: data.cgReturn.cgTemplate
             }] : null
         });
     });
@@ -1729,17 +1730,51 @@ cg.Instruction = (function () {
                 "cgValueType": "Stream"
             }
         ];
-        if (data.cgReturnType) {
+        if (data.cgReturn) {
             data.cgOutputs.push({
                 "cgType": "Point",
                 "cgName": "value",
-                "cgValueType": data.cgReturnType
+                "cgValueType": data.cgReturn.cgValueType,
+                "cgTemplate": data.cgReturn.cgTemplate
             });
         }
         cg.Block.call(this, cgGraph, data);
     });
 
     return Instruction;
+
+})();
+cg.Operator = (function () {
+
+    /**
+     * This block represents a simple Operator that takes some inputs and returns one or zero output.
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Operator = pandora.class_("Operator", cg.Block, function (cgGraph, data) {
+        cg.Block.call(this, cgGraph, {
+            cgId: data.cgId,
+            cgName: data.cgName,
+            cgModel: data.cgModel,
+            cgInputs: data.cgInputs,
+            cgOutputs: data.cgReturn ? [{
+                cgType: "Point",
+                cgName: "value",
+                cgValueType: data.cgReturn.cgValueType,
+                cgTemplate: data.cgReturn.cgTemplate
+            }] : null
+        });
+        if (data.cgInputs.length != 2) {
+            throw new cg.GraphError("Operator `{0}` should only take 2 inputs", this.cgId);
+        }
+        if (!data.cgReturn) {
+            throw new cg.GraphError("Operator `{0}` should return a value", this.cgId);
+        }
+    });
+
+    return Operator;
 
 })();
 cg.Range = (function () {
@@ -1914,6 +1949,7 @@ cg.JSONLoader = (function () {
         this.addBlockType(cg.Range);
         this.addBlockType(cg.Condition);
         this.addBlockType(cg.Getter);
+        this.addBlockType(cg.Operator);
         this.addPointType(cg.Stream);
         this.addPointType(cg.Point);
     });
