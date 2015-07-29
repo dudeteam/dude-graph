@@ -2231,7 +2231,7 @@ cg.Renderer = (function () {
         this._createZoomBehavior();
         this._createRendererBlocks();
         this._createRendererGroups();
-        // A second pass is needed
+        // TODO: Order groups to eliminate this second call
         this._createRendererGroups();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             this._addCgBlock(cgBlock);
@@ -2356,6 +2356,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
             var selection = renderer.groupedSelection;
             var parentsToUpdate = [];
             selection.each(function (rendererNode) {
+                // TODO: Think of a better way to do this
                 if (rendererNode.parent) {
                     var parentRendererNode = rendererNode;
                     while (parentRendererNode) {
@@ -2368,7 +2369,9 @@ cg.Renderer.prototype._createDragBehavior = function () {
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
-            renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(parentsToUpdate));
+            if (parentsToUpdate.length > 0) {
+                renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(parentsToUpdate));
+            }
             selection.attr("transform", function (rendererNode) {
                 return "translate(" + rendererNode.position + ")";
             });
@@ -2470,6 +2473,7 @@ cg.Renderer.prototype._updateRendererBlocks = function () {
 
 /**
  * Updates selected renderer blocks
+ * @param updatedRendererBlocks {d3.selection}
  * @private
  */
 cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererBlocks) {
@@ -2564,7 +2568,7 @@ cg.Renderer.prototype._updateRendererGroups = function () {
 };
 
 /**
- * Updates the selected renderer groups
+ * Updates selected renderer groups
  * @param updatedRendererGroups {d3.selection}
  * @private
  */
