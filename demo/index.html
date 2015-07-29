@@ -77,36 +77,93 @@
                 "id": "4",
                 "type": "block",
                 "position": [100, 500]
+            },
+            {
+                "id": "5",
+                "type": "block",
+                "position": [200, 400]
             }
         ]
     };
     demo.modelsData = {
-        "mix": {
+        "Entity.destroy": {
+            "cgType": "Instruction",
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Entity"
+                }
+            ]
+        },
+        "Entity.add_entity": {
+            "cgType": "Instruction",
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Entity"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "name",
+                    "cgValueType": "String"
+                }
+            ],
+            "cgReturnType": "Entity"
+        },
+        "Entity.has_behavior": {
             "cgType": "Function",
             "cgInputs": [
                 {
                     "cgType": "Point",
-                    "cgName": "x",
-                    "cgValueType": "Number"
+                    "cgName": "this",
+                    "cgValueType": "Entity"
                 },
                 {
                     "cgType": "Point",
-                    "cgName": "y",
-                    "cgValueType": "Number"
-                },
-                {
-                    "cgType": "Point",
-                    "cgName": "a",
-                    "cgValueType": "Number"
+                    "cgName": "name",
+                    "cgValueType": "String"
                 }
             ],
-            "cgOutputs": [
+            "cgReturnType": "Boolean"
+        },
+        "Entity.add_behavior": {
+            "cgType": "Instruction",
+            "cgInputs": [
                 {
                     "cgType": "Point",
-                    "cgName": "value",
-                    "cgValueType": "Number"
+                    "cgName": "this",
+                    "cgValueType": "Entity"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "name",
+                    "cgValueType": "String"
                 }
-            ]
+            ],
+            "cgReturnType": "Behavior"
+        },
+        "Entity.behavior": {
+            "cgType": "Instruction",
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Entity"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "name",
+                    "cgValueType": "String"
+                }
+            ],
+            "cgReturnType": "Behavior"
+        },
+        "Entity.name": {
+            "cgType": "Getter",
+            "cgClassType": "Entity",
+            "cgValueType": "String"
         }
     };
     demo.graphData = {
@@ -143,13 +200,9 @@
                     }
                 ]
             },
-            { "cgId": "3", "cgModel": "mix" },
-            {
-                "cgId": "4",
-                "cgType": "Variable",
-                "cgValueType": "Number",
-                "cgValue": 5
-            }
+            {"cgId": "3", "cgModel": "Entity.add_entity"},
+            {"cgId": "4", "cgType": "Variable", "cgValueType": "Number", "cgValue": 5},
+            {"cgId": "5", "cgModel": "Entity.name"}
         ],
         "connections": [
             {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
