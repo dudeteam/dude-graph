@@ -1554,6 +1554,97 @@ cg.Connection = (function () {
     return Connection;
 
 })();
+cg.Condition = (function () {
+
+    /**
+     *
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Condition = pandora.class_("Condition", cg.Block, function (cgGraph, data) {
+        cg.Block.call(this, cgGraph, {
+            cgId: data.cgId,
+            cgName: data.cgName,
+            cgInputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "in",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "test",
+                    "cgValueType": "Boolean"
+                }
+            ],
+            cgOutputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "true",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "false",
+                    "cgValueType": "Stream"
+                }
+            ]
+        });
+    });
+
+    return Condition;
+
+})();
+cg.Each = (function () {
+
+    /**
+     *
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Each = pandora.class_("Each", cg.Block, function (cgGraph, data) {
+        cg.Block.call(this, cgGraph, {
+            cgId: data.cgId,
+            cgName: data.cgName,
+            cgInputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "in",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "list",
+                    "cgValueType": "List"
+                }
+            ],
+            cgOutputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "current",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "index",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "completed",
+                    "cgValueType": "Stream"
+                }
+            ]
+        });
+    });
+
+    return Each;
+
+})();
 cg.Function = (function () {
 
     /**
@@ -1584,6 +1675,64 @@ cg.Instruction = (function () {
     });
 
     return Instruction;
+
+})();
+cg.Range = (function () {
+
+    /**
+     *
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Range = pandora.class_("Range", cg.Block, function (cgGraph, data) {
+        cg.Block.call(this, cgGraph, {
+            cgId: data.cgId,
+            cgName: data.cgName,
+            cgInputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "in",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "start",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "end",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "delta",
+                    "cgValueType": "Number"
+                }
+            ],
+            cgOutputs: [
+                {
+                    "cgType": "Point",
+                    "cgName": "current",
+                    "cgValueType": "Stream"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "index",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "completed",
+                    "cgValueType": "Stream"
+                }
+            ]
+        });
+    });
+
+    return Range;
 
 })();
 cg.Variable = (function () {
@@ -1629,6 +1778,10 @@ cg.Variable = (function () {
         Object.defineProperty(this, "cgValue", {
             get: function () {
                 return this._cgValue;
+            }.bind(this),
+            set: function (value) {
+                this._cgValue = value;
+                this.cgOutputs[0].cgValue = value;
             }.bind(this)
         });
 
