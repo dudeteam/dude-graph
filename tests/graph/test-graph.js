@@ -594,6 +594,25 @@ describe("Graph", function () {
         expect(graph.blockById("7").cgValue).to.be.equal(10);
     });
     it("should test models", function () {
-        // TODO
+        var graph = new cg.Graph({
+            "blocks": [
+                {"cgId": "0", "cgModel": "do_stuff"},
+                {"cgId": "1", "cgModel": "do_stuff", "cgName": "custom_name"}
+            ]
+        }, {
+            "do_stuff": {
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "is_true",
+                        "cgValueType": "Boolean"
+                    }
+                ]
+            }
+        });
+        graph.loader.load();
+        expect(graph.blockById("0").cgInputs[0].cgName).to.be.equal("is_true");
+        expect(graph.blockById("0").cgName).to.be.equal("do_stuff");
+        expect(graph.blockById("1").cgName).to.be.equal("custom_name");
     });
 });
