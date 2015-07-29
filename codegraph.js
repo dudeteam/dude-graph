@@ -679,6 +679,33 @@ cg.GraphSerializationError = (function () {
  * This file gathers some stub that could be moved to pandora
  */
 
+// overrides pandora.typename to handle constructor.name
+pandora.typename = function (value) {
+    if (value.constructor.typename !== undefined) {
+        return value.constructor.typename;
+    } else if (value.constructor.name !== "") {
+        return value.constructor.name;
+    }
+    switch (typeof value) {
+        case "boolean": return "Boolean";
+        case "number": return "Number";
+        case "string": return "String";
+        case "function": return "Function";
+        case "object":
+            if (value instanceof Array) {
+                return "Array";
+            } else if (value instanceof Object) {
+                return "Object";
+            }
+    }
+    if (value === null) {
+        return "null";
+    } else if (value === undefined) {
+        return "undefined";
+    }
+    return "Unknown";
+};
+
 /**
  * Finds a specific item in a collection
  * @param container {Array<Object>}
@@ -741,8 +768,10 @@ cg.Graph = (function () {
      * @extends {pandora.EventEmitter}
      * @constructor
      */
-    var Graph = pandora.class_("Graph", pandora.EventEmitter, function () {
+    var Graph = pandora.class_("Graph", pandora.EventEmitter, function (data, models) {
         pandora.EventEmitter.call(this);
+
+        this.loader = new cg.JSONLoader(this, data, models);
 
         /**
          * All existing types for this graph instance, the key being the type name and the value being an array
@@ -1132,6 +1161,18 @@ cg.Block = (function () {
         });
 
         /**
+         * Input points
+         * @type {Array<cg.Point>}
+         * @private
+         */
+        this._cgInputs = [];
+        Object.defineProperty(this, "cgInputs", {
+            get: function () {
+                return this._cgInputs;
+            }.bind(this)
+        });
+
+        /**
          * Output points
          * @type {Array<cg.Point>}
          * @private
@@ -1143,17 +1184,7 @@ cg.Block = (function () {
             }.bind(this)
         });
 
-        /**
-         * Input points
-         * @type {Array<cg.Point>}
-         * @private
-         */
-        this._cgInputs = [];
-        Object.defineProperty(this, "cgInputs", {
-            get: function () {
-                return this._cgInputs;
-            }.bind(this)
-        });
+        cgGraph.loader.loadPoints(this, data);
 
     });
 
@@ -1657,14 +1688,23 @@ cg.JSONLoader = (function () {
         this._models = models;
         this._pointTypes = {};
         this._blockTypes = {};
-        this.addBlockType("Block", cg.Block);
-        this.addBlockType("Function", cg.Function);
-        this.addBlockType("Variable", cg.Variable);
-        this.addPointType("Stream", cg.Stream);
-        this.addPointType("Point", cg.Point);
+        this.addBlockType(cg.Block);
+        this.addBlockType(cg.Function);
+        this.addBlockType(cg.Variable);
+        this.addPointType(cg.Stream);
+        this.addPointType(cg.Point);
     });
 
-    JSONLoader.prototype.addPointType = function (typeName, pointType) {
+    /**
+     * Registers the given point type as a possible point that can be found into the graph. All points should inherit
+     * from cg.Point.
+     * @param pointType
+     */
+    JSONLoader.prototype.addPointType = function (pointType) {
+        var typeName = pandora.typename(pointType.prototype);
+        if (this._pointTypes[typeName] !== undefined) {
+            throw new cg.GraphSerializationError("Point type `{0}` already added to the loader");
+        }
         this._pointTypes[typeName] = function (cgBlock, cgPointData, isOutput) {
             var point = new pointType(cgBlock, cgPointData, isOutput);
             cgBlock.addPoint(point);
@@ -1672,7 +1712,16 @@ cg.JSONLoader = (function () {
         };
     };
 
-    JSONLoader.prototype.addBlockType = function (typeName, blockType) {
+    /**
+     * Registers the given block type as a possible block that can be found into the graph. All blocks should inherit
+     * from cg.Block.
+     * @param blockType
+     */
+    JSONLoader.prototype.addBlockType = function (blockType) {
+        var typeName = pandora.typename(blockType.prototype);
+        if (this._blockTypes[typeName] !== undefined) {
+            throw new cg.GraphSerializationError("Block type `{0}` already added to the loader");
+        }
         this._blockTypes[typeName] = function (cgGraph, cgBlockData) {
             var block = new blockType(cgGraph, cgBlockData);
             cgGraph.addBlock(block);
@@ -1691,9 +1740,41 @@ cg.JSONLoader = (function () {
     };
 
     /**
+     * Loads the points of a given block, this method is called automatically be the cg.Block instances to load
+     * their points.
+     * @param cgBlock {cg.Block}
+     * @param cgBlockData {Object}
+     * @private
+     */
+    JSONLoader.prototype.loadPoints = function (cgBlock, cgBlockData) {
+        var self = this;
+        var loadPoint = function (cgBlock, cgPointData, isOutput) {
+            if (!cgPointData.cgName) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Point property `cgName` is required", cgBlock.cgId);
+            }
+            var cgPointType = cgPointData.cgType || "Point";
+            var cgPointDeserializer = self._pointTypes[cgPointType];
+            if (!cgPointDeserializer) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Cannot deserialize point `{1}` of type `{2}`", cgBlock.cgId, cgPointData.cgName, cgPointType);
+            }
+            cgPointDeserializer.call(self, cgBlock, cgPointData, isOutput);
+        };
+        if (cgBlockData.cgOutputs) {
+            pandora.forEach(cgBlockData.cgOutputs, function (output) {
+                loadPoint(cgBlock, output, true);
+            });
+        }
+        if (cgBlockData.cgInputs) {
+            pandora.forEach(cgBlockData.cgInputs, function (input) {
+                loadPoint(cgBlock, input, false);
+            });
+        }
+    };
+
+    /**
      *
-     * @param cgGraph {cg.Graph}
-     * @param cgBlocksData {Array<{cgType: "Function", cgId: "32"}>}
+     * @param cgGraph
+     * @param cgBlocksData {Array<Object>}
      * @private
      */
     JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
@@ -1709,43 +1790,10 @@ cg.JSONLoader = (function () {
             var cgBlockType = cgBlockData.cgType || "Block";
             var cgBlockDeserializer = this._blockTypes[cgBlockType];
             if (!cgBlockDeserializer) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block `{0}`: Cannot deserialize block of type `{1}`", cgBlockData.cgId, cgBlockType);
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Type `{0}` not added to the loader", cgBlockType);
             }
             cgBlockDeserializer.call(this, cgGraph, cgBlockData);
-            this._loadPoints(cgGraph, cgBlockData);
         }.bind(this));
-    };
-
-    /**
-     *
-     * @param cgGraph {cg.Block}
-     * @param cgBlockData {Object}
-     * @private
-     */
-    JSONLoader.prototype._loadPoints = function (cgGraph, cgBlockData) {
-        var self = this;
-        var loadPoint = function (cgBlock, cgPointData, isOutput) {
-            if (!cgPointData.cgName) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Point property `cgName` is required", cgBlock.cgId);
-            }
-            var cgPointType = cgPointData.cgType || "Point";
-            var cgPointDeserializer = self._pointTypes[cgPointType];
-            if (!cgPointDeserializer) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadPoints() Block `{0}`: Cannot deserialize point `{1}` of type `{2}`", cgBlock.cgId, cgPointData.cgName, cgPointType);
-            }
-            cgPointDeserializer.call(self, cgBlock, cgPointData, isOutput);
-        };
-        var cgBlock = cgGraph.blockById(cgBlockData.cgId);
-        if (cgBlockData.cgOutputs) {
-            pandora.forEach(cgBlockData.cgOutputs, function (output) {
-                loadPoint(cgBlock, output, true);
-            });
-        }
-        if (cgBlockData.cgInputs) {
-            pandora.forEach(cgBlockData.cgInputs, function (input) {
-                loadPoint(cgBlock, input, false);
-            });
-        }
     };
 
     /**

@@ -49,10 +49,9 @@ methods and properties.
 
         },
         ready: function () {
-            this._graph = new cg.Graph();
-            this._loader = new cg.JSONLoader(this._graph, this.graphData, this.modelsData);
+            this._graph = new cg.Graph(this.graphData, this.modelsData);
             this._renderer = new cg.Renderer(this.$.svg, this._graph, this.rendererData);
-            this._loader.load();
+            this._graph.loader.load();
             this._renderer.initialize();
         }
     });
