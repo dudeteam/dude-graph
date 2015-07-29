@@ -2092,6 +2092,9 @@ cg.Renderer = (function () {
         "zoom": {
             "min": 0.25,
             "max": 5
+        },
+        "group": {
+            "margin": 32
         }
     };
 
@@ -2107,16 +2110,17 @@ cg.Renderer = (function () {
         pandora.EventEmitter.call(this);
 
         /**
+         * Renderer configuration
+         * @type {{zoom: {min: Number, max: Number}}}
+         * @private
+         */
+        this._config = pandora.mergeObjects(data.config, DEFAULT_RENDERER_CONFIG, true, true);
+
+        /**
          * The root SVG node of the renderer
          * @type {d3.selection}
          */
         this._svg = d3.select(svg);
-
-        /**
-         * The SVG point used for matrix transformations
-         * @type {SVGPoint}
-         */
-        this._svgPoint = this._svg.node().createSVGPoint();
 
         /**
          * The root group node of the renderer
@@ -2137,24 +2141,16 @@ cg.Renderer = (function () {
         this._blocksSvg = this._rootSvg.append("svg:g").attr("id", "cgBlocks");
 
         /**
+         * The SVG point used for matrix transformations
+         * @type {SVGPoint}
+         */
+        this._svgPoint = this._svg.node().createSVGPoint();
+
+        /**
          * The cgGraph to render
          * @type {cg.Graph}
          */
         this._cgGraph = cgGraph;
-
-        /**
-         * Renderer configuration
-         * @type {{zoom: {min: Number, max: Number}}}
-         * @private
-         */
-        this._config = pandora.mergeObjects(data.config, DEFAULT_RENDERER_CONFIG, true, true);
-
-        /**
-         * The renderer groups
-         * @type {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
-         * @private
-         */
-        this._rendererGroups = data.groups;
 
         /**
          * The renderer blocks
@@ -2164,19 +2160,26 @@ cg.Renderer = (function () {
         this._rendererBlocks = data.blocks;
 
         /**
-         * Association map from id to renderer group
-         * @type {d3.map<String, {id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
+         * The renderer groups
+         * @type {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
+         * @private
          */
-        this._rendererGroupIds = d3.map(data.groups, function (group) {
-            return group.id;
-        });
+        this._rendererGroups = data.groups;
 
         /**
          * Association map from id to renderer block
          * @type {d3.map<String, {id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
          */
-        this._rendererBlockIds = d3.map(data.blocks, function (block) {
-            return block.id;
+        this._rendererBlockIds = d3.map(data.blocks, function (rendererBlock) {
+            return rendererBlock.id;
+        });
+
+        /**
+         * Association map from id to renderer group
+         * @type {d3.map<String, {id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
+         */
+        this._rendererGroupIds = d3.map(data.groups, function (rendererGroup) {
+            return rendererGroup.id;
         });
 
         /**
@@ -2228,6 +2231,8 @@ cg.Renderer = (function () {
         this._createZoomBehavior();
         this._createRendererBlocks();
         this._createRendererGroups();
+        // A second pass is needed
+        this._createRendererGroups();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             this._addCgBlock(cgBlock);
         }.bind(this));
@@ -2247,7 +2252,6 @@ cg.Renderer = (function () {
                 group.children = [];
             }
             if (child.children) {
-                // Check if the group is not a child of the child we want to add to this group
                 (function checkRecursiveChild(children) {
                     children.forEach(function (checkChild) {
                         if (checkChild === group) {
@@ -2350,10 +2354,21 @@ cg.Renderer.prototype._createDragBehavior = function () {
         })
         .on("drag", function () {
             var selection = renderer.groupedSelection;
-            selection.each(function(rendererNode) {
+            var parentsToUpdate = [];
+            selection.each(function (rendererNode) {
+                if (rendererNode.parent) {
+                    var parentRendererNode = rendererNode;
+                    while (parentRendererNode) {
+                        if (parentRendererNode.parent) {
+                            parentsToUpdate.push(parentRendererNode.parent);
+                        }
+                        parentRendererNode = parentRendererNode.parent;
+                    }
+                }
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
+            renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(parentsToUpdate));
             selection.attr("transform", function (rendererNode) {
                 return "translate(" + rendererNode.position + ")";
             });
@@ -2391,6 +2406,30 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
     var position = this._svgPoint.matrixTransform(this._rootSvg.node().getScreenCTM().inverse());
     return [position.x, position.y];
 };
+
+/**
+ * Returns the bounding box for all the given renderer nodes
+ * @param rendererNodes
+ * @returns {[[Number, Number], [Number, Number]]}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
+    var topLeft = null;
+    var bottomRight = null;
+    rendererNodes.forEach(function (rendererNode) {
+        if (!topLeft) {
+            topLeft = new pandora.Vec2(rendererNode.position);
+        }
+        if (!bottomRight) {
+            bottomRight = new pandora.Vec2(rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]);
+        }
+        topLeft.x = Math.min(rendererNode.position[0], topLeft.x);
+        topLeft.y = Math.min(rendererNode.position[1], topLeft.y);
+        bottomRight.x = Math.max(bottomRight.x, rendererNode.position[0] + rendererNode.size[0]);
+        bottomRight.y = Math.max(bottomRight.y, rendererNode.position[1] + rendererNode.size[1]);
+    });
+    return [topLeft.toArray(), bottomRight.toArray()];
+};
 /**
  * Creates renderer blocks
  * @private
@@ -2413,21 +2452,28 @@ cg.Renderer.prototype._createRendererBlocks = function () {
         .append("svg:rect");
     createdRendererBlocks
         .append("svg:text")
-            .attr("class", "cg-title")
-            .text(function (block) {
-                return this._cgGraph.blockById(block.id).cgName;
-            }.bind(this))
-            .attr("transform", "translate(" + [0, 15] + ")");
+        .attr("class", "cg-title")
+        .text(function (block) {
+            return this._cgGraph.blockById(block.id).cgName;
+        }.bind(this))
+        .attr("transform", "translate(" + [0, 15] + ")");
     this._updateRendererBlocks();
 };
 
 /**
- * Updates renderer blocks
+ * Updates all renderer blocks
  * @private
  */
 cg.Renderer.prototype._updateRendererBlocks = function () {
-    var updatedRendererBlocks = this._blocksSvg
-        .selectAll(".cg-block")
+    this._updateSelectedRendererBlocks(this._blocksSvg.selectAll(".cg-block"));
+};
+
+/**
+ * Updates selected renderer blocks
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererBlocks) {
+    updatedRendererBlocks
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
@@ -2493,7 +2539,6 @@ cg.Renderer.prototype._createRendererGroups = function () {
     var createdRendererGroups = this._groupsSvg
         .selectAll(".cg-group")
         .data(this._rendererGroups, function (rendererGroup) {
-            rendererGroup.size = rendererGroup.size || [100, 100];
             return rendererGroup.id;
         })
         .enter()
@@ -2515,9 +2560,24 @@ cg.Renderer.prototype._createRendererGroups = function () {
  * @private
  */
 cg.Renderer.prototype._updateRendererGroups = function () {
-    var updatedRendererGroups = this._groupsSvg
-        .selectAll(".cg-group");
+    this._updateSelectedRendererGroups(this._groupsSvg.selectAll(".cg-group"));
+};
+
+/**
+ * Updates the selected renderer groups
+ * @param updatedRendererGroups {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererGroups) {
+    var renderer = this;
     updatedRendererGroups
+        .each(function (rendererGroup) {
+            if (rendererGroup.children) {
+                var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
+                rendererGroup.position = [size[0][0] - renderer._config.group.margin, size[0][1] - renderer._config.group.margin];
+                rendererGroup.size = [size[1][0] - size[0][0] + renderer._config.group.margin * 2, size[1][1] - size[0][1] + renderer._config.group.margin * 2];
+            }
+        })
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
         });

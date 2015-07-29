@@ -53,6 +53,8 @@ methods and properties.
             this._renderer = new cg.Renderer(this.$.svg, this._graph, this.rendererData);
             this._graph.loader.load();
             this._renderer.initialize();
+            // TODO: Debug
+            window.renderer = this._renderer;
         }
     });
 </script>
