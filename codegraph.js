@@ -2413,6 +2413,7 @@ cg.Renderer.prototype._createRendererBlocks = function () {
         .append("svg:rect");
     createdRendererBlocks
         .append("svg:text")
+            .attr("class", "cg-title")
             .text(function (block) {
                 return this._cgGraph.blockById(block.id).cgName;
             }.bind(this))
@@ -2562,12 +2563,16 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
         .selectAll(".cg-point")
         .data(function (block) {
             var cgBlock = this._cgGraph.blockById(block.id);
-            return cgBlock.cgInputs.concat(cgBlock.cgOutputs);
+            return cgBlock.cgInputs; // TODO outputs
         }.bind(this))
         .enter()
         .append("svg:g")
             .attr("class", "cg-point")
             .append("svg:text")
+                .attr("transform", function (cgPoint, index) {
+                    console.log(index);
+                    return "translate(" + [0, index * 20 + 40] + ")";
+                })
                 .text(function (cgPoint) {
                     return cgPoint.cgName;
                 });
