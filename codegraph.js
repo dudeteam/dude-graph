@@ -2626,16 +2626,16 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
 };
 
 /**
- * Adds the given `node` to the current selection.
- * @param d3Node {d3.selection} The svg `node` to select
- * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
+ * Adds the given d3Nodes to the current selection
+ * @param d3Nodes {d3.selection} The d3Nodes to select
+ * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
  * @private
  */
-cg.Renderer.prototype._addToSelection = function (d3Node, clearSelection) {
+cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
     if (clearSelection) {
         this._clearSelection();
     }
-    d3Node.classed("selected", true);
+    d3Nodes.classed("selected", true);
 };
 
 /**
