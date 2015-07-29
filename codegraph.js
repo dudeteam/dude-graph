@@ -2107,10 +2107,16 @@ cg.Renderer = (function () {
         pandora.EventEmitter.call(this);
 
         /**
-         * Thr root SVG node of the renderer
+         * The root SVG node of the renderer
          * @type {d3.selection}
          */
         this._svg = d3.select(svg);
+
+        /**
+         * The SVG point used for matrix transformations
+         * @type {SVGPoint}
+         */
+        this._svgPoint = this._svg.node().createSVGPoint();
 
         /**
          * The root group node of the renderer
@@ -2174,6 +2180,13 @@ cg.Renderer = (function () {
         });
 
         /**
+         * The renderer nodes quadtree
+         * @type {d3.geom.quadtree}
+         * @private
+         */
+        this._rendererNodesQuadtree = null;
+
+        /**
          * Returns all groups and blocks currently selected.
          * @type {d3.selection}
          */
@@ -2190,11 +2203,10 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "groupedSelection", {
             get: function () {
-                var renderer = this;
-                var groupedSelection = d3.set();
+                var groupedSelection = [];
                 this.selection.each(function (rendererNode) {
                     (function handleGroupSelection(rendererNode) {
-                        groupedSelection.add(renderer._getUniqueElementId(rendererNode, true));
+                        groupedSelection.push(rendererNode);
                         if (rendererNode.type === "group") {
                             rendererNode.children.forEach(function (childNode) {
                                 handleGroupSelection(childNode);
@@ -2202,7 +2214,7 @@ cg.Renderer = (function () {
                         }
                     })(rendererNode);
                 });
-                return d3.selectAll(groupedSelection.values().join(", "));
+                return this._getD3NodesFromRendererNodes(groupedSelection);
             }.bind(this)
         });
     });
@@ -2212,27 +2224,16 @@ cg.Renderer = (function () {
      */
     Renderer.prototype.initialize = function () {
         this._initialize();
+        this._createSelectionBehavior();
         this._createZoomBehavior();
-        this._createRendererGroups();
         this._createRendererBlocks();
+        this._createRendererGroups();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             this._addCgBlock(cgBlock);
         }.bind(this));
         this._cgGraph.on("cg-block-remove", function (cgBlock) {
             this._removeCgBlock(cgBlock);
         }.bind(this));
-        // Helper to remove the selected blocks
-        window.removeSelectedBlocks = function () {
-            this.selection.each(function (node) {
-                if (node.type === "block") {
-                    this._cgGraph.removeBlock(node.cgBlock);
-                }
-            }.bind(this));
-        }.bind(this);
-        // Helper to add a new cgBlock
-        window.addBlock = function() {
-            this._cgGraph.addBlock(new cg.Block(this._cgGraph, {"cgId": cg.UUID.generate(), "cgName": "Unknown name"}));
-        }.bind(this);
     };
 
     /**
@@ -2260,17 +2261,6 @@ cg.Renderer = (function () {
             }
             group.children.push(child);
         };
-        this._rendererGroups.forEach(function (group) {
-            group.type = "group";
-            if (group.group) {
-                var parent = this._rendererGroupIds.get(group.group);
-                if (!parent) {
-                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", group.group, group.id);
-                }
-                group.parent = parent;
-                addChildToGroup(parent, group);
-            }
-        }.bind(this));
         this._rendererBlocks.forEach(function (block) {
             block.type = "block";
             if (block.group) {
@@ -2281,6 +2271,17 @@ cg.Renderer = (function () {
                 block.parent = parent;
                 block.cgBlock = this._cgGraph.blockById(block.id);
                 addChildToGroup(parent, block);
+            }
+        }.bind(this));
+        this._rendererGroups.forEach(function (group) {
+            group.type = "group";
+            if (group.group) {
+                var parent = this._rendererGroupIds.get(group.group);
+                if (!parent) {
+                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", group.group, group.id);
+                }
+                group.parent = parent;
+                addChildToGroup(parent, group);
             }
         }.bind(this));
         pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
@@ -2294,6 +2295,46 @@ cg.Renderer = (function () {
 
 })();
 
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+cg.Renderer.prototype._createRendererNodesCollisions = function () {
+    this._rendererNodesQuadtree = d3.geom.quadtree()
+        .x(function (rendererNode) {
+            return rendererNode.position[0];
+        })
+        .y(function (rendererNode) {
+            return rendererNode.position[1];
+        })
+    (this._rendererBlocks.concat(this._rendererGroups));
+};
+
+/**
+ * Returns all renderer nodes in the given area
+ * @param x0 {Number} Top left
+ * @param y0 {Number} Top left
+ * @param x3 {Number} Bottom right
+ * @param y3 {Number} Bottom right
+ * @return {Array<>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodesInArea = function (x0, y0, x3, y3) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererNodesCollisions();
+    var rendererNodes = [];
+    this._rendererNodesQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererNode = d3QuadtreeNode.point;
+        if (rendererNode) {
+            var bounds = [rendererNode.position[0], rendererNode.position[1], rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]];
+            if ((bounds[0] >= x0) && (bounds[1] >= y0) && (bounds[2] < x3) && (bounds[3] < y3)) {
+                rendererNodes.push(rendererNode);
+            }
+        }
+        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
+    });
+    return rendererNodes;
+};
 /**
  * Creates the drag and drop behavior
  * @returns {d3.behavior.drag}
@@ -2322,6 +2363,35 @@ cg.Renderer.prototype._createDragBehavior = function () {
         });
 };
 /**
+ * Returns an absolute position in the SVG from the relative position in the SVG container
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getAbsolutePosition(d3.mouse(this));
+ * @param point {[Number, Number]}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getAbsolutePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._rootSvg.node().getCTM().inverse());
+    return [position.x, position.y];
+};
+
+/**
+ * Returns a relative position in the SVG container from absolute position in the SVG
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getRelativePosition(d3.mouse(this));
+ * @param point {[Number, Number]}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getRelativePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._rootSvg.node().getScreenCTM().inverse());
+    return [position.x, position.y];
+};
+/**
  * Creates renderer blocks
  * @private
  */
@@ -2329,6 +2399,7 @@ cg.Renderer.prototype._createRendererBlocks = function () {
     var createdRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
         .data(this._rendererBlocks, function (rendererBlock) {
+            rendererBlock.size = rendererBlock.size || [100, 100];
             return rendererBlock.id;
         })
         .enter()
@@ -2396,7 +2467,8 @@ cg.Renderer.prototype._addCgBlock = function (cgBlock) {
         "type": "block",
         "cgBlock": cgBlock,
         "description": cgBlock.cgName,
-        "position": cgBlock.cgPosition || [0, 0]
+        "position": cgBlock.cgPosition || [0, 0],
+        "size": cgBlock.cgSize || [0, 0]
     });
     this._rendererBlockIds.set(cgBlock.cgId, this._rendererBlocks[this._rendererBlocks.length - 1]);
     this._createRendererBlocks();
@@ -2420,6 +2492,7 @@ cg.Renderer.prototype._createRendererGroups = function () {
     var createdRendererGroups = this._groupsSvg
         .selectAll(".cg-group")
         .data(this._rendererGroups, function (rendererGroup) {
+            rendererGroup.size = rendererGroup.size || [100, 100];
             return rendererGroup.id;
         })
         .enter()
@@ -2444,7 +2517,6 @@ cg.Renderer.prototype._updateRendererGroups = function () {
     var updatedRendererGroups = this._groupsSvg
         .selectAll(".cg-group");
     updatedRendererGroups
-        .select("g")
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
         });
@@ -2501,6 +2573,59 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
                 });
 };
 /**
+ * Creates the selection brush
+ * @private
+ */
+cg.Renderer.prototype._createSelectionBehavior = function () {
+    var renderer = this;
+    var selectionBrush = null;
+    this._svg.call(d3.behavior.drag()
+            .on("dragstart", function () {
+                if (d3.event.sourceEvent.shiftKey) {
+                    d3.event.sourceEvent.stopImmediatePropagation();
+                    selectionBrush = renderer._svg
+                        .append("svg:rect")
+                        .classed("cg-selection", true)
+                        .datum(d3.mouse(this));
+                }
+            })
+            .on("drag", function () {
+                if (selectionBrush) {
+                    var position = d3.mouse(this);
+                    selectionBrush.attr({
+                        "x": function (origin) {
+                            return Math.min(origin[0], position[0]);
+                        },
+                        "y": function (origin) {
+                            return Math.min(origin[1], position[1]);
+                        },
+                        "width": function (origin) {
+                            return Math.max(position[0] - origin[0], origin[0] - position[0]);
+                        },
+                        "height": function (origin) {
+                            return Math.max(position[1] - origin[1], origin[1] - position[1]);
+                        }
+                    });
+                }
+            })
+            .on("dragend", function () {
+                if (selectionBrush) {
+                    var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
+                    var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
+                    var selectedRendererNodes = renderer._getRendererNodesInArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    if (selectedRendererNodes.length > 0) {
+                        renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
+                    } else {
+                        renderer._clearSelection();
+                    }
+                    selectionBrush.remove();
+                    selectionBrush = null;
+                }
+            })
+    );
+};
+
+/**
  * Adds the given `node` to the current selection.
  * @param d3Node {d3.selection} The svg `node` to select
  * @param clearSelection {Boolean?} If true, everything but this `node` will be unselected
@@ -2523,12 +2648,26 @@ cg.Renderer.prototype._clearSelection = function () {
 /**
  * Returns an unique HTML usable id for the given rendererNode
  * @param rendererNode {{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}|{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}}
- * @param hashtag {Boolean?}
+ * @param hashtag {Boolean?} True to include the hashtag to select, False otherwise
  * @return {String}
  * @private
  */
 cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
     return pandora.formatString("{0}cg-{1}-{2}", hashtag ? "#" : "", rendererNode.type, rendererNode.id);
+};
+
+/**
+ * Returns a selection of d3Nodes from renderer nodes
+ * @param rendererNodes {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}|{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
+ * @returns {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
+    var groupedSelection = d3.set();
+    rendererNodes.forEach(function (rendererNode) {
+        groupedSelection.add(this._getUniqueElementId(rendererNode, true));
+    }.bind(this));
+    return d3.selectAll(groupedSelection.values().join(", "));
 };
 /**
  * Creates zoom and pan
