@@ -2325,15 +2325,15 @@ cg.Renderer.prototype._createRendererNodesCollisions = function () {
 };
 
 /**
- * Returns all renderer nodes in the given area
- * @param x0 {Number} Top left
- * @param y0 {Number} Top left
- * @param x3 {Number} Bottom right
- * @param y3 {Number} Bottom right
+ * Returns all renderer nodes overlapping the given area
+ * @param x0 {Number} Top left x
+ * @param y0 {Number} Top left y
+ * @param x3 {Number} Bottom right x
+ * @param y3 {Number} Bottom right y
  * @return {Array<>}
  * @private
  */
-cg.Renderer.prototype._getRendererNodesInArea = function (x0, y0, x3, y3) {
+cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y3) {
     // TODO: Update the quadtree only when needed
     this._createRendererNodesCollisions();
     var rendererNodes = [];
@@ -2348,6 +2348,16 @@ cg.Renderer.prototype._getRendererNodesInArea = function (x0, y0, x3, y3) {
         return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
     });
     return rendererNodes;
+};
+
+/**
+ * Returns the best rendererGroup capable of accepting this rendererNode
+ * @param rendererNode
+ * @private
+ */
+cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
+    this._createRendererNodesCollisions();
+    throw new cg.RendererError("Renderer::_getBestDropRendererGroupForRendererNode() Not yet implemented");
 };
 /**
  * Creates the drag and drop behavior
@@ -2693,7 +2703,7 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
                 if (selectionBrush) {
                     var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
                     var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
-                    var selectedRendererNodes = renderer._getRendererNodesInArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    var selectedRendererNodes = renderer._getRendererNodesOverlappingArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
                     if (selectedRendererNodes.length > 0) {
                         renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
                     } else {
