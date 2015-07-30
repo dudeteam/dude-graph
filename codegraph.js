@@ -2190,26 +2190,36 @@ cg.Renderer = (function () {
         this._rendererNodesQuadtree = null;
 
         /**
-         * Returns all groups and blocks currently selected.
+         * Returns all d3Blocks and d3Groups
          * @type {d3.selection}
          */
-        Object.defineProperty(this, "selection", {
+        Object.defineProperty(this, "d3Nodes", {
+            get: function () {
+                return this._rootSvg.selectAll(".cg-block, .cg-group");
+            }.bind(this)
+        });
+
+        /**
+         * Returns all d3Blocks and d3Groups selected
+         * @type {d3.selection}
+         */
+        Object.defineProperty(this, "d3Selection", {
             get: function () {
                 return this._rootSvg.selectAll(".selected");
             }.bind(this)
         });
 
         /**
-         * Returns all groups and blocks currently selected
+         * Returns all d3Blocks and d3Groups selected
          * Groups children are also added to selection even if they are not selected directly
          * @type {d3.selection}
          */
-        Object.defineProperty(this, "groupedSelection", {
+        Object.defineProperty(this, "d3GroupedSelection", {
             get: function () {
-                var groupedSelection = [];
-                this.selection.each(function (rendererNode) {
+                var selectedRendererNodes = [];
+                this.d3Selection.each(function (rendererNode) {
                     (function handleGroupSelection(rendererNode) {
-                        groupedSelection.push(rendererNode);
+                        selectedRendererNodes.push(rendererNode);
                         if (rendererNode.type === "group") {
                             rendererNode.children.forEach(function (childNode) {
                                 handleGroupSelection(childNode);
@@ -2217,7 +2227,7 @@ cg.Renderer = (function () {
                         }
                     })(rendererNode);
                 });
-                return this._getD3NodesFromRendererNodes(groupedSelection);
+                return this._getD3NodesFromRendererNodes(selectedRendererNodes);
             }.bind(this)
         });
     });
@@ -2353,7 +2363,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
             renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
         })
         .on("drag", function () {
-            var selection = renderer.groupedSelection;
+            var selection = renderer.d3GroupedSelection;
             var parentsToUpdate = [];
             selection.each(function (rendererNode) {
                 // TODO: Think of a better way to do this
@@ -2714,7 +2724,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
  * @private
  */
 cg.Renderer.prototype._clearSelection = function () {
-    this.selection.classed("selected", false);
+    this.d3Selection.classed("selected", false);
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
@@ -2734,11 +2744,11 @@ cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
  * @private
  */
 cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
-    var groupedSelection = d3.set();
+    var groupedSelectionIds = d3.set();
     rendererNodes.forEach(function (rendererNode) {
-        groupedSelection.add(this._getUniqueElementId(rendererNode, true));
+        groupedSelectionIds.add(this._getUniqueElementId(rendererNode, true));
     }.bind(this));
-    return d3.selectAll(groupedSelection.values().join(", "));
+    return d3.selectAll(groupedSelectionIds.values().join(", "));
 };
 /**
  * Creates zoom and pan
