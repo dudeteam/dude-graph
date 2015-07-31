@@ -2218,11 +2218,11 @@ cg.Renderer = (function () {
             get: function () {
                 var selectedRendererNodes = [];
                 this.d3Selection.each(function (rendererNode) {
-                    (function handleGroupSelection(rendererNode) {
+                    (function recurseGroupSelection(rendererNode) {
                         selectedRendererNodes.push(rendererNode);
                         if (rendererNode.type === "group") {
-                            rendererNode.children.forEach(function (childNode) {
-                                handleGroupSelection(childNode);
+                            pandora.forEach(rendererNode.children, function (childRendererNode) {
+                                recurseGroupSelection(childRendererNode);
                             });
                         }
                     })(rendererNode);
@@ -2263,7 +2263,7 @@ cg.Renderer = (function () {
             }
             if (child.children) {
                 (function checkRecursiveChild(children) {
-                    children.forEach(function (checkChild) {
+                    pandora.forEach(children, function (checkChild) {
                         if (checkChild === group) {
                             throw new cg.RendererError("Renderer::_initialize() Cannot have recursive children");
                         }
@@ -2275,7 +2275,7 @@ cg.Renderer = (function () {
             }
             group.children.push(child);
         };
-        this._rendererBlocks.forEach(function (block) {
+        pandora.forEach(this._rendererBlocks, function (block) {
             block.type = "block";
             if (block.group) {
                 var parent = this._rendererGroupIds.get(block.group);
@@ -2287,15 +2287,15 @@ cg.Renderer = (function () {
                 addChildToGroup(parent, block);
             }
         }.bind(this));
-        this._rendererGroups.forEach(function (group) {
-            group.type = "group";
-            if (group.group) {
-                var parent = this._rendererGroupIds.get(group.group);
+        pandora.forEach(this._rendererGroups, function (rendererGroup) {
+            rendererGroup.type = "group";
+            if (rendererGroup.group) {
+                var parent = this._rendererGroupIds.get(rendererGroup.group);
                 if (!parent) {
-                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", group.group, group.id);
+                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", rendererGroup.group, rendererGroup.id);
                 }
-                group.parent = parent;
-                addChildToGroup(parent, group);
+                rendererGroup.parent = parent;
+                addChildToGroup(parent, rendererGroup);
             }
         }.bind(this));
         pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
@@ -2376,16 +2376,12 @@ cg.Renderer.prototype._createDragBehavior = function () {
             var selection = renderer.d3GroupedSelection;
             var parentsToUpdate = [];
             selection.each(function (rendererNode) {
-                // TODO: Think of a better way to do this
-                if (rendererNode.parent) {
-                    var parentRendererNode = rendererNode;
-                    while (parentRendererNode) {
-                        if (parentRendererNode.parent) {
-                            parentsToUpdate.push(parentRendererNode.parent);
-                        }
-                        parentRendererNode = parentRendererNode.parent;
+                (function recurseParents(rendererChildNode) {
+                    if (rendererChildNode) {
+                        parentsToUpdate.push(rendererChildNode);
+                        recurseParents(rendererChildNode.parent);
                     }
-                }
+                })(rendererNode.parent);
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
@@ -2439,7 +2435,7 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
 cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
     var topLeft = null;
     var bottomRight = null;
-    rendererNodes.forEach(function (rendererNode) {
+    pandora.forEach(rendererNodes, function (rendererNode) {
         if (!topLeft) {
             topLeft = new pandora.Vec2(rendererNode.position);
         }
@@ -2651,15 +2647,15 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
         }.bind(this))
         .enter()
         .append("svg:g")
-            .attr("class", "cg-point")
-            .append("svg:text")
-                .attr("transform", function (cgPoint, index) {
-                    console.log(index);
-                    return "translate(" + [0, index * 20 + 40] + ")";
-                })
-                .text(function (cgPoint) {
-                    return cgPoint.cgName;
-                });
+        .attr("class", "cg-point")
+        .append("svg:text")
+        .attr("transform", function (cgPoint, index) {
+            console.log(index);
+            return "translate(" + [0, index * 20 + 40] + ")";
+        })
+        .text(function (cgPoint) {
+            return cgPoint.cgName;
+        });
 };
 /**
  * Creates the selection brush
@@ -2755,7 +2751,7 @@ cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
  */
 cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
     var groupedSelectionIds = d3.set();
-    rendererNodes.forEach(function (rendererNode) {
+    pandora.forEach(rendererNodes, function (rendererNode) {
         groupedSelectionIds.add(this._getUniqueElementId(rendererNode, true));
     }.bind(this));
     return d3.selectAll(groupedSelectionIds.values().join(", "));
