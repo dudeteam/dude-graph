@@ -2209,6 +2209,26 @@ cg.Renderer = (function () {
         });
 
         /**
+         * Returns all d3Blocks
+         * @type {d3.selection}
+         */
+        Object.defineProperty(this, "d3Blocks", {
+            get: function () {
+                return this._rootSvg.selectAll(".cg-block");
+            }.bind(this)
+        });
+
+        /**
+         * Returns all d3Groups
+         * @type {d3.selection}
+         */
+        Object.defineProperty(this, "d3Groups", {
+            get: function () {
+                return this._rootSvg.selectAll(".cg-group");
+            }.bind(this)
+        });
+
+        /**
          * Returns all d3Blocks and d3Groups selected
          * @type {d3.selection}
          */
@@ -2366,7 +2386,31 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
  */
 cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
     this._createRendererNodesCollisions();
-    throw new cg.RendererError("Renderer::_getBestDropRendererGroupForRendererNode() Not yet implemented");
+    var bestRendererGroups = [];
+    var x0 = rendererNode.position[0];
+    var y0 = rendererNode.position[1];
+    var x3 = rendererNode.position[0] + rendererNode.size[0];
+    var y3 = rendererNode.position[1] + rendererNode.size[1];
+    this._rendererNodesQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererGroup = d3QuadtreeNode.point;
+        if (rendererGroup && rendererGroup.type === "group" && rendererGroup !== rendererNode) {
+            var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
+            if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
+                bestRendererGroups.push(rendererGroup);
+            }
+        }
+        return false; // TODO: Optimize
+    });
+    var bestRendererGroup = null;
+    pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
+        if (bestRendererGroup === null) {
+            // TODO: Check if rendererNode is not a parent of bestRendererGroupPossible
+            bestRendererGroup = bestRendererGroupPossible;
+        } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
+            bestRendererGroup = bestRendererGroupPossible;
+        }
+    });
+    return bestRendererGroup;
 };
 /**
  * Creates the drag and drop behavior
@@ -2384,6 +2428,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
         .on("drag", function () {
             var selection = renderer.d3GroupedSelection;
             var parentsToUpdate = [];
+            renderer.d3Groups.classed("active", false);
             selection.each(function (rendererNode) {
                 (function recurseParents(rendererChildNode) {
                     if (rendererChildNode) {
@@ -2393,6 +2438,11 @@ cg.Renderer.prototype._createDragBehavior = function () {
                 })(rendererNode.parent);
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
+
+                var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(rendererNode);
+                if (rendererGroup) {
+                    renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("active", true);
+                }
             });
             if (parentsToUpdate.length > 0) {
                 renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(parentsToUpdate));
@@ -2402,7 +2452,23 @@ cg.Renderer.prototype._createDragBehavior = function () {
             });
         })
         .on("dragend", function () {
-
+            var selection = renderer.d3GroupedSelection;
+            selection.each(function (rendererNode) {
+                // TODO: Refactor this
+                // TODO: Add utils to add a block in a parent and updates automatically all positions and groups positioning
+                var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(rendererNode);
+                if (rendererGroup) {
+                    rendererNode.parent = rendererGroup;
+                    rendererGroup.children.push(rendererNode);
+                    renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes([rendererGroup]));
+                    (function recurseParents(rendererChildNode) {
+                        if (rendererChildNode) {
+                            renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes([rendererChildNode]));
+                            recurseParents(rendererChildNode.parent);
+                        }
+                    })(rendererGroup.parent);
+                }
+            });
         });
 };
 /**
