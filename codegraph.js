@@ -2163,21 +2163,21 @@ cg.Renderer = (function () {
 
         /**
          * The renderer blocks
-         * @type {Array<{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
+         * @type {Array<cg.RendererBlock>}
          * @private
          */
         this._rendererBlocks = data.blocks;
 
         /**
          * The renderer groups
-         * @type {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
+         * @type {Array<cg.RendererGroup>}
          * @private
          */
         this._rendererGroups = data.groups;
 
         /**
          * Association map from id to renderer block
-         * @type {d3.map<String, {id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
+         * @type {d3.map<String, cg.RendererBlock>}
          */
         this._rendererBlockIds = d3.map(data.blocks, function (rendererBlock) {
             return rendererBlock.id;
@@ -2185,7 +2185,7 @@ cg.Renderer = (function () {
 
         /**
          * Association map from id to renderer group
-         * @type {d3.map<String, {id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}>}
+         * @type {d3.map<String, cg.RendererGroup>}
          */
         this._rendererGroupIds = d3.map(data.groups, function (rendererGroup) {
             return rendererGroup.id;
@@ -2234,7 +2234,7 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "d3Selection", {
             get: function () {
-                return this._rootSvg.selectAll(".selected");
+                return this._rootSvg.selectAll(".cg-selected");
             }.bind(this)
         });
 
@@ -2359,7 +2359,7 @@ cg.Renderer.prototype._createRendererNodesCollisions = function () {
  * @param y0 {Number} Top left y
  * @param x3 {Number} Bottom right x
  * @param y3 {Number} Bottom right y
- * @return {Array<>}
+ * @return {Array<cg.RendererNode>}
  * @private
  */
 cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y3) {
@@ -2380,8 +2380,9 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
 };
 
 /**
- * Returns the best rendererGroup capable of accepting this rendererNode
- * @param rendererNode
+ *
+ * @param rendererNode {cg.RendererNode}
+ * @returns {cg.RendererGroup}
  * @private
  */
 cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
@@ -2404,7 +2405,6 @@ cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rende
     var bestRendererGroup = null;
     pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
         if (bestRendererGroup === null) {
-            // TODO: Check if rendererNode is not a parent of bestRendererGroupPossible
             bestRendererGroup = bestRendererGroupPossible;
         } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
             bestRendererGroup = bestRendererGroupPossible;
@@ -2427,49 +2427,80 @@ cg.Renderer.prototype._createDragBehavior = function () {
         })
         .on("drag", function () {
             var selection = renderer.d3GroupedSelection;
-            var parentsToUpdate = [];
+            var selectionParents = [];
             renderer.d3Groups.classed("active", false);
             selection.each(function (rendererNode) {
-                (function recurseParents(rendererChildNode) {
-                    if (rendererChildNode) {
-                        parentsToUpdate.push(rendererChildNode);
-                        recurseParents(rendererChildNode.parent);
-                    }
-                })(rendererNode.parent);
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
-
-                var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(rendererNode);
-                if (rendererGroup) {
-                    renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("active", true);
-                }
+                selectionParents = renderer._getRendererNodeParents(rendererNode).concat(selectionParents);
             });
-            if (parentsToUpdate.length > 0) {
-                renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(parentsToUpdate));
+            if (selectionParents.length > 0) {
+                renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(selectionParents));
             }
             selection.attr("transform", function (rendererNode) {
                 return "translate(" + rendererNode.position + ")";
             });
         })
         .on("dragend", function () {
-            var selection = renderer.d3GroupedSelection;
-            selection.each(function (rendererNode) {
-                // TODO: Refactor this
-                // TODO: Add utils to add a block in a parent and updates automatically all positions and groups positioning
-                var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(rendererNode);
-                if (rendererGroup) {
-                    rendererNode.parent = rendererGroup;
-                    rendererGroup.children.push(rendererNode);
-                    renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes([rendererGroup]));
-                    (function recurseParents(rendererChildNode) {
-                        if (rendererChildNode) {
-                            renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes([rendererChildNode]));
-                            recurseParents(rendererChildNode.parent);
-                        }
-                    })(rendererGroup.parent);
-                }
-            });
+
         });
+};
+/**
+ * Returns whether the given renderer group contains the given renderer node
+ * If recurse is set, this method will check recursively all parents
+ * @param rendererGroup {cg.RendererGroup}
+ * @param rendererNode {cg.RendererNode}
+ * @param recurse {Boolean?}
+ * @returns {Boolean}
+ * @private
+ */
+cg.Renderer.prototype._isRendererGroupParent = function (rendererGroup, rendererNode, recurse) {
+    var isParent = false;
+    (function isParentRecurse(parent) {
+        if (parent === rendererGroup) {
+            isParent = true;
+        }
+        else if (recurse && parent.parent) {
+            isParentRecurse(parent.parent);
+        }
+    })(rendererNode.parent);
+    return isParent;
+};
+
+/**
+ * Returns whether the given renderer node is contained by the given renderer group
+ * If recurse is set, this method will check recursively all children
+ * @param rendererNode {cg.RendererNode}
+ * @param rendererGroup {cg.RendererGroup}
+ * @param recurse {Boolean?}
+ * @returns {Boolean}
+ * @private
+ */
+cg.Renderer.prototype._isRendererNodeChild = function (rendererNode, rendererGroup, recurse) {
+    var isChild = false;
+    (function isChildRecurse(children) {
+        if (children.indexOf(rendererNode) !== -1) {
+            isChild = true;
+        } else if (recurse && children.children) {
+            pandora.forEach(children.children, isChildRecurse);
+        }
+    })(rendererGroup.children);
+    return isChild;
+};
+
+/**
+ * Returns all parents of the given renderer node
+ * @type {cg.RendererNode}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
+    var parents = [];
+    var parent = rendererNode.parent;
+    while (parent) {
+        parents.push(parent);
+        parent = parent.parent;
+    }
+    return parents;
 };
 /**
  * Returns an absolute position in the SVG from the relative position in the SVG container
@@ -2503,7 +2534,7 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
 
 /**
  * Returns the bounding box for all the given renderer nodes
- * @param rendererNodes
+ * @param rendererNodes {Array<cg.RendererNode>}
  * @returns {[[Number, Number], [Number, Number]]}
  * @private
  */
@@ -2525,7 +2556,7 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
     return [topLeft.toArray(), bottomRight.toArray()];
 };
 /**
- * Creates renderer blocks
+ * Creates renderer blocks and their svg blocks
  * @private
  */
 cg.Renderer.prototype._createRendererBlocks = function () {
@@ -2565,7 +2596,7 @@ cg.Renderer.prototype._createRendererBlocks = function () {
 };
 
 /**
- * Updates all renderer blocks
+ * Updates all renderer blocks and their svg blocks
  * @private
  */
 cg.Renderer.prototype._updateRendererBlocks = function () {
@@ -2573,7 +2604,7 @@ cg.Renderer.prototype._updateRendererBlocks = function () {
 };
 
 /**
- * Updates selected renderer blocks
+ * Updates selected renderer blocks and their svg blocks
  * @param updatedRendererBlocks {d3.selection}
  * @private
  */
@@ -2596,7 +2627,7 @@ cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererB
 };
 
 /**
- * Removes renderer blocks
+ * Removes renderer blocks and their svg blocks
  * @private
  */
 cg.Renderer.prototype._removeRendererBlocks = function () {
@@ -2638,7 +2669,7 @@ cg.Renderer.prototype._removeCgBlock = function (cgBlock) {
     this._removeRendererBlocks();
 };
 /**
- * Creates renderer groups
+ * Creates renderer groups and their svg groups
  * @private
  */
 cg.Renderer.prototype._createRendererGroups = function () {
@@ -2662,7 +2693,7 @@ cg.Renderer.prototype._createRendererGroups = function () {
 };
 
 /**
- * Updates renderer groups
+ * Updates renderer groups and their svg groups
  * @private
  */
 cg.Renderer.prototype._updateRendererGroups = function () {
@@ -2670,7 +2701,7 @@ cg.Renderer.prototype._updateRendererGroups = function () {
 };
 
 /**
- * Updates selected renderer groups
+ * Updates selected renderer groups and their svg groups
  * @param updatedRendererGroups {d3.selection}
  * @private
  */
@@ -2716,7 +2747,7 @@ cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererG
 };
 
 /**
- * Removes renderer groups
+ * Removes renderer groups and their svg groups
  * @private
  */
 cg.Renderer.prototype._removeRendererGroups = function () {
@@ -2871,7 +2902,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
     if (clearSelection) {
         this._clearSelection();
     }
-    d3Nodes.classed("selected", true);
+    d3Nodes.classed("cg-selected", true);
 };
 
 /**
@@ -2879,7 +2910,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
  * @private
  */
 cg.Renderer.prototype._clearSelection = function () {
-    this.d3Selection.classed("selected", false);
+    this.d3Selection.classed("cg-selected", false);
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
