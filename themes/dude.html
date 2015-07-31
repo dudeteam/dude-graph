@@ -8,16 +8,19 @@
     }
 
     /**
-    * Selection brush
-    */
+     * Selection brush
+     */
     .cg-selection {
         fill: hsla(0, 0%, 80%, 0.1);
         stroke: hsla(0, 0%, 80%, 0.2);
     }
 
     /**
-    * Blocks and groups
-    **/
+     * Groups
+     */
+    .cg-group {
+        cursor: move;
+    }
     .cg-group > rect {
         fill: hsla(0, 0%, 80%, 0.1);
     }
@@ -25,6 +28,12 @@
         fill: hsla(0, 0%, 95%, 0.2);
     }
 
+    /**
+     * Blocks
+     */
+    .cg-block {
+        cursor: move;
+    }
     .cg-block > rect {
         fill: hsla(0, 0%, 15%, .8);
     }
@@ -32,8 +41,15 @@
         fill: hsla(0, 0%, 10%, .9);
     }
 
-    .cg-input circle, .cg-output circle {
+    /**
+     * Points
+     */
+    .cg-input, .cg-output {
+        cursor: pointer;
+    }
+    .cg-input circle, .cg-output circle,
+    .cg-input path, .cg-output path {
         stroke: #aaa;
-        stroke-width: 2;
+        stroke-width: 1;
     }
 </style>
