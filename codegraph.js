@@ -2819,11 +2819,13 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
             var node = null;
             switch (pandora.typename(cgPoint)) {
                 case "Stream":
+                    var r = renderer._config.point.radius;
                     node = d3.select(this)
+                        .classed("cg-stream", true)
                         .append("svg:path")
                             .attr({
                                 "class": "circle",
-                                "d": "M -2 -5 L -2 5 L 3 0 Z"
+                                "d": ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"]
                             });
                     break;
                 default:

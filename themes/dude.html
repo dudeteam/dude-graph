@@ -41,7 +41,6 @@
     .cg-block > rect {
         fill: hsla(0, 0%, 15%, .8);
     }
-<<<<<<< HEAD
     .cg-block.selected > rect {
         fill: hsla(0, 0%, 10%, .9);
     }
@@ -56,9 +55,11 @@
     .cg-input path, .cg-output path {
         stroke: #aaa;
         stroke-width: 1;
-=======
-    .cg-block.cg-selected > rect {
-        fill: hsla(0, 0%, 10%, .8);
->>>>>>> Revert drop in, still needs thinking
+        stroke: #5990c7;
+        fill: transparent;
+    }
+    .cg-input.cg-stream circle, .cg-output.cg-stream circle,
+    .cg-input.cg-stream path, .cg-output.cg-stream path {
+        stroke: #888888;
     }
 </style>
