@@ -11,25 +11,29 @@
     * Selection brush
     */
     .cg-selection {
-        stroke: #fff;
-        fill-opacity: .125;
-        shape-rendering: crispEdges;
+        fill: hsla(0, 0%, 80%, 0.1);
+        stroke: hsla(0, 0%, 80%, 0.2);
     }
 
     /**
     * Blocks and groups
     **/
     .cg-group > rect {
-        fill: hsla(0, 0%, 80%, 0.2);
+        fill: hsla(0, 0%, 80%, 0.1);
     }
     .cg-group.selected > rect {
-        fill: hsla(0, 0%, 90%, 0.2);
+        fill: hsla(0, 0%, 95%, 0.2);
     }
 
     .cg-block > rect {
         fill: hsla(0, 0%, 15%, .8);
     }
     .cg-block.selected > rect {
-        fill: hsla(0, 0%, 10%, .8);
+        fill: hsla(0, 0%, 10%, .9);
+    }
+
+    .cg-input circle, .cg-output circle {
+        stroke: #aaa;
+        stroke-width: 2;
     }
 </style>

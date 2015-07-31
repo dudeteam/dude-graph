@@ -2094,7 +2094,15 @@ cg.Renderer = (function () {
             "max": 5
         },
         "group": {
-            "margin": 32
+            "padding": 20
+        },
+        "block": {
+            "padding": 10,
+            "header": 40
+        },
+        "point": {
+            "height": 20,
+            "radius": 3
         }
     };
 
@@ -2190,44 +2198,34 @@ cg.Renderer = (function () {
         this._rendererNodesQuadtree = null;
 
         /**
-         * Returns all d3Blocks and d3Groups
+         * Returns all groups and blocks currently selected.
          * @type {d3.selection}
          */
-        Object.defineProperty(this, "d3Nodes", {
-            get: function () {
-                return this._rootSvg.selectAll(".cg-block, .cg-group");
-            }.bind(this)
-        });
-
-        /**
-         * Returns all d3Blocks and d3Groups selected
-         * @type {d3.selection}
-         */
-        Object.defineProperty(this, "d3Selection", {
+        Object.defineProperty(this, "selection", {
             get: function () {
                 return this._rootSvg.selectAll(".selected");
             }.bind(this)
         });
 
         /**
-         * Returns all d3Blocks and d3Groups selected
+         * Returns all groups and blocks currently selected
          * Groups children are also added to selection even if they are not selected directly
          * @type {d3.selection}
          */
-        Object.defineProperty(this, "d3GroupedSelection", {
+        Object.defineProperty(this, "groupedSelection", {
             get: function () {
-                var selectedRendererNodes = [];
-                this.d3Selection.each(function (rendererNode) {
-                    (function recurseGroupSelection(rendererNode) {
-                        selectedRendererNodes.push(rendererNode);
+                var groupedSelection = [];
+                this.selection.each(function (rendererNode) {
+                    (function handleGroupSelection(rendererNode) {
+                        groupedSelection.push(rendererNode);
                         if (rendererNode.type === "group") {
-                            pandora.forEach(rendererNode.children, function (childRendererNode) {
-                                recurseGroupSelection(childRendererNode);
+                            rendererNode.children.forEach(function (childNode) {
+                                handleGroupSelection(childNode);
                             });
                         }
                     })(rendererNode);
                 });
-                return this._getD3NodesFromRendererNodes(selectedRendererNodes);
+                return this._getD3NodesFromRendererNodes(groupedSelection);
             }.bind(this)
         });
     });
@@ -2263,7 +2261,7 @@ cg.Renderer = (function () {
             }
             if (child.children) {
                 (function checkRecursiveChild(children) {
-                    pandora.forEach(children, function (checkChild) {
+                    children.forEach(function (checkChild) {
                         if (checkChild === group) {
                             throw new cg.RendererError("Renderer::_initialize() Cannot have recursive children");
                         }
@@ -2275,7 +2273,7 @@ cg.Renderer = (function () {
             }
             group.children.push(child);
         };
-        pandora.forEach(this._rendererBlocks, function (block) {
+        this._rendererBlocks.forEach(function (block) {
             block.type = "block";
             if (block.group) {
                 var parent = this._rendererGroupIds.get(block.group);
@@ -2287,15 +2285,15 @@ cg.Renderer = (function () {
                 addChildToGroup(parent, block);
             }
         }.bind(this));
-        pandora.forEach(this._rendererGroups, function (rendererGroup) {
-            rendererGroup.type = "group";
-            if (rendererGroup.group) {
-                var parent = this._rendererGroupIds.get(rendererGroup.group);
+        this._rendererGroups.forEach(function (group) {
+            group.type = "group";
+            if (group.group) {
+                var parent = this._rendererGroupIds.get(group.group);
                 if (!parent) {
-                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", rendererGroup.group, rendererGroup.id);
+                    throw new cg.RendererError("Renderer::_initialize() Cannot find parent `{0}` for group `{1}`", group.group, group.id);
                 }
-                rendererGroup.parent = parent;
-                addChildToGroup(parent, rendererGroup);
+                group.parent = parent;
+                addChildToGroup(parent, group);
             }
         }.bind(this));
         pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
@@ -2325,15 +2323,15 @@ cg.Renderer.prototype._createRendererNodesCollisions = function () {
 };
 
 /**
- * Returns all renderer nodes overlapping the given area
- * @param x0 {Number} Top left x
- * @param y0 {Number} Top left y
- * @param x3 {Number} Bottom right x
- * @param y3 {Number} Bottom right y
+ * Returns all renderer nodes in the given area
+ * @param x0 {Number} Top left
+ * @param y0 {Number} Top left
+ * @param x3 {Number} Bottom right
+ * @param y3 {Number} Bottom right
  * @return {Array<>}
  * @private
  */
-cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y3) {
+cg.Renderer.prototype._getRendererNodesInArea = function (x0, y0, x3, y3) {
     // TODO: Update the quadtree only when needed
     this._createRendererNodesCollisions();
     var rendererNodes = [];
@@ -2341,23 +2339,13 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
         var rendererNode = d3QuadtreeNode.point;
         if (rendererNode) {
             var bounds = [rendererNode.position[0], rendererNode.position[1], rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]];
-            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
+            if ((bounds[0] >= x0) && (bounds[1] >= y0) && (bounds[2] < x3) && (bounds[3] < y3)) {
                 rendererNodes.push(rendererNode);
             }
         }
         return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
     });
     return rendererNodes;
-};
-
-/**
- * Returns the best rendererGroup capable of accepting this rendererNode
- * @param rendererNode
- * @private
- */
-cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
-    this._createRendererNodesCollisions();
-    throw new cg.RendererError("Renderer::_getBestDropRendererGroupForRendererNode() Not yet implemented");
 };
 /**
  * Creates the drag and drop behavior
@@ -2373,15 +2361,19 @@ cg.Renderer.prototype._createDragBehavior = function () {
             renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
         })
         .on("drag", function () {
-            var selection = renderer.d3GroupedSelection;
+            var selection = renderer.groupedSelection;
             var parentsToUpdate = [];
             selection.each(function (rendererNode) {
-                (function recurseParents(rendererChildNode) {
-                    if (rendererChildNode) {
-                        parentsToUpdate.push(rendererChildNode);
-                        recurseParents(rendererChildNode.parent);
+                // TODO: Think of a better way to do this
+                if (rendererNode.parent) {
+                    var parentRendererNode = rendererNode;
+                    while (parentRendererNode) {
+                        if (parentRendererNode.parent) {
+                            parentsToUpdate.push(parentRendererNode.parent);
+                        }
+                        parentRendererNode = parentRendererNode.parent;
                     }
-                })(rendererNode.parent);
+                }
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
@@ -2435,7 +2427,7 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
 cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
     var topLeft = null;
     var bottomRight = null;
-    pandora.forEach(rendererNodes, function (rendererNode) {
+    rendererNodes.forEach(function (rendererNode) {
         if (!topLeft) {
             topLeft = new pandora.Vec2(rendererNode.position);
         }
@@ -2454,28 +2446,33 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
  * @private
  */
 cg.Renderer.prototype._createRendererBlocks = function () {
+    var renderer = this;
     var createdRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
         .data(this._rendererBlocks, function (rendererBlock) {
-            rendererBlock.size = rendererBlock.size || [100, 100];
+            rendererBlock.size = [200, 100];
             return rendererBlock.id;
         })
         .enter()
         .append("svg:g")
-        .attr("id", function (rendererBlock) {
-            return this._getUniqueElementId(rendererBlock);
-        }.bind(this))
-        .attr("class", "cg-block")
-        .call(this._createDragBehavior());
+            .attr("id", function (rendererBlock) {
+                return this._getUniqueElementId(rendererBlock);
+            }.bind(this))
+            .attr("class", "cg-block")
+            .call(this._createDragBehavior());
     createdRendererBlocks
         .append("svg:rect");
     createdRendererBlocks
         .append("svg:text")
-        .attr("class", "cg-title")
-        .text(function (block) {
-            return this._cgGraph.blockById(block.id).cgName;
-        }.bind(this))
-        .attr("transform", "translate(" + [0, 15] + ")");
+            .text(function (block) {
+                return renderer._cgGraph.blockById(block.id).cgName;
+            })
+            .attr("class", "cg-title")
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "text-before-edge")
+            .attr("transform", function (block) {
+                return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
+            });
     this._updateRendererBlocks();
 };
 
@@ -2501,11 +2498,12 @@ cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererB
     updatedRendererBlocks
         .select("rect")
         .attr("rx", 5)
-        .attr("ry", 5).attr("width", function () {
-            return 100;
+        .attr("ry", 5)
+        .attr("width", function (rendererBlock) {
+            return rendererBlock.size[0];
         })
-        .attr("height", function () {
-            return 100;
+        .attr("height", function (rendererBlock) {
+            return rendererBlock.size[1];
         });
 };
 
@@ -2516,11 +2514,11 @@ cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererB
 cg.Renderer.prototype._removeRendererBlocks = function () {
     var removedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
-        .data(this._rendererBlocks, function (rendererBlock) {
-            return rendererBlock.id;
-        })
-        .exit()
-        .remove();
+            .data(this._rendererBlocks, function (rendererBlock) {
+                return rendererBlock.id;
+            })
+            .exit()
+            .remove();
 };
 
 /**
@@ -2594,8 +2592,8 @@ cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererG
         .each(function (rendererGroup) {
             if (rendererGroup.children) {
                 var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
-                rendererGroup.position = [size[0][0] - renderer._config.group.margin, size[0][1] - renderer._config.group.margin];
-                rendererGroup.size = [size[1][0] - size[0][0] + renderer._config.group.margin * 2, size[1][1] - size[0][1] + renderer._config.group.margin * 2];
+                rendererGroup.position = [size[0][0] - renderer._config.group.padding, size[0][1] - renderer._config.group.padding];
+                rendererGroup.size = [size[1][0] - size[0][0] + renderer._config.group.padding * 2, size[1][1] - size[0][1] + renderer._config.group.padding * 2];
             }
         })
         .attr("transform", function (rendererGroup) {
@@ -2639,23 +2637,60 @@ cg.Renderer.prototype._removeRendererGroups = function () {
  * @private
  */
 cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
-    parentSvg
-        .selectAll(".cg-point")
+    var renderer = this;
+    var inputs = parentSvg
+        .selectAll(".cg-input")
         .data(function (block) {
             var cgBlock = this._cgGraph.blockById(block.id);
-            return cgBlock.cgInputs; // TODO outputs
+            return cgBlock.cgInputs;
         }.bind(this))
         .enter()
         .append("svg:g")
-        .attr("class", "cg-point")
+            .attr("transform", function (cgPoint, index) {
+                return "translate(" + [
+                        renderer._config.block.padding,
+                        index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            })
+            .attr("class", "cg-input");
+    inputs
         .append("svg:text")
-        .attr("transform", function (cgPoint, index) {
-            console.log(index);
-            return "translate(" + [0, index * 20 + 40] + ")";
-        })
-        .text(function (cgPoint) {
-            return cgPoint.cgName;
-        });
+            .attr("alignment-baseline", "middle")
+            .attr("transform", "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")")
+            .text(function (cgPoint) {
+                return cgPoint.cgName;
+            });
+    inputs
+        .append("svg:circle")
+        .attr("r", renderer._config.point.radius)
+        .attr("transform", "translate(" + [renderer._config.point.radius, 0] + ")");
+    var outputs = parentSvg
+        .selectAll(".cg-output")
+        .data(function (block) {
+            var cgBlock = this._cgGraph.blockById(block.id);
+            return cgBlock.cgOutputs;
+        }.bind(this))
+        .enter()
+        .append("svg:g")
+            .attr("class", "cg-output")
+            .attr("text-anchor", "end")
+            .attr("transform", function (cgPoint, index) {
+                return "translate(" + [
+                        d3.select(this.parentNode.parentNode).datum().size[0] - renderer._config.block.padding,
+                        index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            });
+    outputs
+        .append("svg:text")
+            .attr("alignment-baseline", "middle")
+            .attr("transform", "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")")
+            .text(function (cgPoint) {
+                return cgPoint.cgName;
+            });
+    outputs
+        .append("svg:circle")
+            .attr("r", renderer._config.point.radius)
+            .attr("transform", "translate(" + [-renderer._config.point.radius, 0] + ")");
 };
 /**
  * Creates the selection brush
@@ -2699,7 +2734,7 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
                 if (selectionBrush) {
                     var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
                     var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
-                    var selectedRendererNodes = renderer._getRendererNodesOverlappingArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    var selectedRendererNodes = renderer._getRendererNodesInArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
                     if (selectedRendererNodes.length > 0) {
                         renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
                     } else {
@@ -2730,7 +2765,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
  * @private
  */
 cg.Renderer.prototype._clearSelection = function () {
-    this.d3Selection.classed("selected", false);
+    this.selection.classed("selected", false);
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
@@ -2750,11 +2785,11 @@ cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
  * @private
  */
 cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
-    var groupedSelectionIds = d3.set();
-    pandora.forEach(rendererNodes, function (rendererNode) {
-        groupedSelectionIds.add(this._getUniqueElementId(rendererNode, true));
+    var groupedSelection = d3.set();
+    rendererNodes.forEach(function (rendererNode) {
+        groupedSelection.add(this._getUniqueElementId(rendererNode, true));
     }.bind(this));
-    return d3.selectAll(groupedSelectionIds.values().join(", "));
+    return d3.selectAll(groupedSelection.values().join(", "));
 };
 /**
  * Creates zoom and pan
