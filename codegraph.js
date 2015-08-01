@@ -2132,28 +2132,28 @@ cg.Renderer = (function () {
         this._svg = d3.select(svg);
 
         /**
-         * The root group node of the renderer
-         * @type {d3.selection}
-         */
-        this._rootSvg = this._svg.append("svg:g").attr("id", "cgRoot");
-
-        /**
-         * The SVG group for the cgGroups
-         * @type {d3.selection}
-         */
-        this._groupsSvg = this._rootSvg.append("svg:g").attr("id", "cgGroups");
-
-        /**
-         * The SVG group for the cgBlocks
-         * @type {d3.selection}
-         */
-        this._blocksSvg = this._rootSvg.append("svg:g").attr("id", "cgBlocks");
-
-        /**
          * The SVG point used for matrix transformations
          * @type {SVGPoint}
          */
         this._svgPoint = this._svg.node().createSVGPoint();
+
+        /**
+         * The root group node of the renderer
+         * @type {d3.selection}
+         */
+        this._rootSvg = this._svg.append("svg:g").attr("id", "cg-root");
+
+        /**
+         * The SVG group for the d3Groups
+         * @type {d3.selection}
+         */
+        this._groupsSvg = this._rootSvg.append("svg:g").attr("id", "cg-groups");
+
+        /**
+         * The SVG group for the d3Blocks
+         * @type {d3.selection}
+         */
+        this._blocksSvg = this._rootSvg.append("svg:g").attr("id", "cg-blocks");
 
         /**
          * The cgGraph to render
@@ -2199,7 +2199,7 @@ cg.Renderer = (function () {
         this._rendererNodesQuadtree = null;
 
         /**
-         * Returns all d3Blocks and d3Groups
+         * Returns all d3Nodes (d3Blocks and d3Groups)
          * @type {d3.selection}
          */
         Object.defineProperty(this, "d3Nodes", {
@@ -2268,10 +2268,10 @@ cg.Renderer = (function () {
         this._initialize();
         this._createSelectionBehavior();
         this._createZoomBehavior();
-        this._createRendererBlocks();
-        this._createRendererGroups();
+        this._createD3Blocks();
+        this._createD3Groups();
         // TODO: Order groups to eliminate this second call
-        this._createRendererGroups();
+        this._createD3Groups();
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             this._addCgBlock(cgBlock);
         }.bind(this));
@@ -2281,7 +2281,7 @@ cg.Renderer = (function () {
     };
 
     /**
-     * Initialize renderer groups and blocks
+     * Initialize rendererGroups and rendererBlocks
      * Add parent and children references, and also cgBlocks references to renderer blocks
      * @private
      */
@@ -2354,7 +2354,7 @@ cg.Renderer.prototype._createRendererNodesCollisions = function () {
 };
 
 /**
- * Returns all renderer nodes overlapping the given area
+ * Returns all RendererNodes overlapping the given area
  * @param x0 {Number} Top left x
  * @param y0 {Number} Top left y
  * @param x3 {Number} Bottom right x
@@ -2380,7 +2380,7 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
 };
 
 /**
- *
+ * Get the best rendererGroup that can accept the given rendererNode
  * @param rendererNode {cg.RendererNode}
  * @returns {cg.RendererGroup}
  * @private
@@ -2413,7 +2413,7 @@ cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rende
     return bestRendererGroup;
 };
 /**
- * Creates the drag and drop behavior
+ * Creates the drag and drop behavior on a d3Node
  * @returns {d3.behavior.drag}
  * @private
  */
@@ -2427,18 +2427,9 @@ cg.Renderer.prototype._createDragBehavior = function () {
         })
         .on("drag", function () {
             var selection = renderer.d3GroupedSelection;
-            var selectionParents = [];
-            renderer.d3Groups.classed("active", false);
             selection.each(function (rendererNode) {
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
-                selectionParents = renderer._getRendererNodeParents(rendererNode).concat(selectionParents);
-            });
-            if (selectionParents.length > 0) {
-                renderer._updateSelectedRendererGroups(renderer._getD3NodesFromRendererNodes(selectionParents));
-            }
-            selection.attr("transform", function (rendererNode) {
-                return "translate(" + rendererNode.position + ")";
             });
         })
         .on("dragend", function () {
@@ -2446,7 +2437,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
         });
 };
 /**
- * Returns whether the given renderer group contains the given renderer node
+ * Returns whether the given rendererGroup contains the given rendererNode
  * If recurse is set, this method will check recursively all parents
  * @param rendererGroup {cg.RendererGroup}
  * @param rendererNode {cg.RendererNode}
@@ -2468,7 +2459,7 @@ cg.Renderer.prototype._isRendererGroupParent = function (rendererGroup, renderer
 };
 
 /**
- * Returns whether the given renderer node is contained by the given renderer group
+ * Returns whether the given rendererNode is contained in the given rendererGroup
  * If recurse is set, this method will check recursively all children
  * @param rendererNode {cg.RendererNode}
  * @param rendererGroup {cg.RendererGroup}
@@ -2489,7 +2480,7 @@ cg.Renderer.prototype._isRendererNodeChild = function (rendererNode, rendererGro
 };
 
 /**
- * Returns all parents of the given renderer node
+ * Returns the parent hierarchy of the given rendererNode
  * @type {cg.RendererNode}
  * @private
  */
@@ -2533,7 +2524,7 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
 };
 
 /**
- * Returns the bounding box for all the given renderer nodes
+ * Returns the bounding box for all the given rendererNodes
  * @param rendererNodes {Array<cg.RendererNode>}
  * @returns {[[Number, Number], [Number, Number]]}
  * @private
@@ -2556,12 +2547,12 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
     return [topLeft.toArray(), bottomRight.toArray()];
 };
 /**
- * Creates renderer blocks and their svg blocks
+ * Creates d3Blocks with the existing rendererBlocks
  * @private
  */
-cg.Renderer.prototype._createRendererBlocks = function () {
+cg.Renderer.prototype._createD3Blocks = function () {
     var renderer = this;
-    var createdRendererBlocks = this._blocksSvg
+    var createdD3Blocks = this._blocksSvg
         .selectAll(".cg-block")
         .data(this._rendererBlocks, function (rendererBlock) {
             var cgBlock = renderer._cgGraph.blockById(rendererBlock.id);
@@ -2579,9 +2570,9 @@ cg.Renderer.prototype._createRendererBlocks = function () {
             }.bind(this))
             .attr("class", "cg-block")
             .call(this._createDragBehavior());
-    createdRendererBlocks
+    createdD3Blocks
         .append("svg:rect");
-    createdRendererBlocks
+    createdD3Blocks
         .append("svg:text")
             .text(function (block) {
                 return renderer._cgGraph.blockById(block.id).cgName;
@@ -2592,29 +2583,29 @@ cg.Renderer.prototype._createRendererBlocks = function () {
             .attr("transform", function (block) {
                 return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
             });
-    this._updateRendererBlocks();
+    this._updateD3Blocks();
 };
 
 /**
- * Updates all renderer blocks and their svg blocks
+ * Updates all d3Blocks
  * @private
  */
-cg.Renderer.prototype._updateRendererBlocks = function () {
-    this._updateSelectedRendererBlocks(this._blocksSvg.selectAll(".cg-block"));
+cg.Renderer.prototype._updateD3Blocks = function () {
+    this._updateSelectedD3Blocks(this._blocksSvg.selectAll(".cg-block"));
 };
 
 /**
- * Updates selected renderer blocks and their svg blocks
- * @param updatedRendererBlocks {d3.selection}
+ * Updates selected d3Blocks
+ * @param updatedD3Blocks {d3.selection}
  * @private
  */
-cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererBlocks) {
-    updatedRendererBlocks
+cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
+    updatedD3Blocks
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
-    this._createRendererPoints(updatedRendererBlocks.append("svg:g"));
-    updatedRendererBlocks
+    this._createRendererPoints(updatedD3Blocks.append("svg:g"));
+    updatedD3Blocks
         .select("rect")
         .attr("rx", 5)
         .attr("ry", 5)
@@ -2627,10 +2618,10 @@ cg.Renderer.prototype._updateSelectedRendererBlocks = function (updatedRendererB
 };
 
 /**
- * Removes renderer blocks and their svg blocks
+ * Removes d3Blocks when rendererBlocks are removed
  * @private
  */
-cg.Renderer.prototype._removeRendererBlocks = function () {
+cg.Renderer.prototype._removeD3Blocks = function () {
     var removedRendererBlocks = this._blocksSvg
         .selectAll(".cg-block")
             .data(this._rendererBlocks, function (rendererBlock) {
@@ -2655,25 +2646,25 @@ cg.Renderer.prototype._addCgBlock = function (cgBlock) {
         "size": cgBlock.cgSize || [0, 0]
     });
     this._rendererBlockIds.set(cgBlock.cgId, this._rendererBlocks[this._rendererBlocks.length - 1]);
-    this._createRendererBlocks();
+    this._createD3Blocks();
 };
 
 /**
- * Removes the renderer block linked with the given cgBlock
+ * Removes the d3Block and the renderer block linked with the given cgBlock
  * @param cgBlock {cg.cgBlock}
  * @private
  */
 cg.Renderer.prototype._removeCgBlock = function (cgBlock) {
     this._rendererBlocks.splice(this._rendererBlocks.indexOf(this._rendererBlockIds.get(cgBlock.cgId)), 1);
     this._rendererBlockIds.remove(cgBlock.cgId);
-    this._removeRendererBlocks();
+    this._removeD3Blocks();
 };
 /**
- * Creates renderer groups and their svg groups
+ * Creates d3Groups with the existing rendererGroups
  * @private
  */
-cg.Renderer.prototype._createRendererGroups = function () {
-    var createdRendererGroups = this._groupsSvg
+cg.Renderer.prototype._createD3Groups = function () {
+    var createdD3Groups = this._groupsSvg
         .selectAll(".cg-group")
         .data(this._rendererGroups, function (rendererGroup) {
             return rendererGroup.id;
@@ -2685,29 +2676,29 @@ cg.Renderer.prototype._createRendererGroups = function () {
         }.bind(this))
         .attr("class", "cg-group")
         .call(this._createDragBehavior());
-    createdRendererGroups
+    createdD3Groups
         .append("svg:rect");
-    createdRendererGroups
+    createdD3Groups
         .append("svg:text");
-    this._updateRendererGroups();
+    this._updateD3Groups();
 };
 
 /**
- * Updates renderer groups and their svg groups
+ * Updates all d3Groups
  * @private
  */
-cg.Renderer.prototype._updateRendererGroups = function () {
-    this._updateSelectedRendererGroups(this._groupsSvg.selectAll(".cg-group"));
+cg.Renderer.prototype._updateD3Groups = function () {
+    this._updateSelectedD3Groups(this._groupsSvg.selectAll(".cg-group"));
 };
 
 /**
- * Updates selected renderer groups and their svg groups
- * @param updatedRendererGroups {d3.selection}
+ * Updates selected d3Groups
+ * @param updatedD3Groups {d3.selection}
  * @private
  */
-cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererGroups) {
+cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
     var renderer = this;
-    updatedRendererGroups
+    updatedD3Groups
         .each(function (rendererGroup) {
             if (rendererGroup.children) {
                 var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
@@ -2723,7 +2714,7 @@ cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererG
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
         });
-    updatedRendererGroups
+    updatedD3Groups
         .select("rect")
         .attr("rx", 5)
         .attr("ry", 5)
@@ -2733,7 +2724,7 @@ cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererG
         .attr("height", function (rendererGroup) {
             return rendererGroup.size[1];
         });
-    updatedRendererGroups
+    updatedD3Groups
         .select("text")
         .text(function (rendererGroup) {
             return rendererGroup.description;
@@ -2747,18 +2738,26 @@ cg.Renderer.prototype._updateSelectedRendererGroups = function (updatedRendererG
 };
 
 /**
- * Removes renderer groups and their svg groups
+ * Removes d3Groups when rendererGroups are removed
  * @private
  */
-cg.Renderer.prototype._removeRendererGroups = function () {
-    var removedRendererGroups = this._groupsSvg
+cg.Renderer.prototype._removeD3Groups = function () {
+    var removedD3Groups = this._groupsSvg
         .selectAll(".cg-group")
         .exit()
         .remove();
 };
 /**
- * Creates renderer points.
- * @param parentSvg The svg group which will contains the renderer points of the current block
+ * This method will update all nodes and their parents if needed
+ * @param d3Nodes {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
+
+};
+/**
+ * Creates d3Points
+ * @param parentSvg The svg group which will contains the d3Points of the current block
  * @private
  */
 cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
@@ -2771,20 +2770,20 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
         }.bind(this))
         .enter()
         .append("svg:g")
-            .attr("transform", function (cgPoint, index) {
-                return "translate(" + [
-                        renderer._config.block.padding,
-                        index * renderer._config.point.height + renderer._config.block.header
-                    ] + ")";
-            })
-            .attr("class", "cg-input");
+        .attr("transform", function (cgPoint, index) {
+            return "translate(" + [
+                    renderer._config.block.padding,
+                    index * renderer._config.point.height + renderer._config.block.header
+                ] + ")";
+        })
+        .attr("class", "cg-input");
     inputs
         .append("svg:text")
-            .attr("alignment-baseline", "middle")
-            .attr("transform", "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")")
-            .text(function (cgPoint) {
-                return cgPoint.cgName;
-            });
+        .attr("alignment-baseline", "middle")
+        .attr("transform", "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")")
+        .text(function (cgPoint) {
+            return cgPoint.cgName;
+        });
     this._createRendererPointsCircle(inputs);
     var outputs = parentSvg
         .selectAll(".cg-output")
@@ -2794,24 +2793,30 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
         }.bind(this))
         .enter()
         .append("svg:g")
-            .attr("class", "cg-output")
-            .attr("text-anchor", "end")
-            .attr("transform", function (cgPoint, index) {
-                return "translate(" + [
-                        d3.select(this.parentNode.parentNode).datum().size[0] - renderer._config.block.padding,
-                        index * renderer._config.point.height + renderer._config.block.header
-                    ] + ")";
-            });
+        .attr("class", "cg-output")
+        .attr("text-anchor", "end")
+        .attr("transform", function (cgPoint, index) {
+            return "translate(" + [
+                    d3.select(this.parentNode.parentNode).datum().size[0] - renderer._config.block.padding,
+                    index * renderer._config.point.height + renderer._config.block.header
+                ] + ")";
+        });
     outputs
         .append("svg:text")
-            .attr("alignment-baseline", "middle")
-            .attr("transform", "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")")
-            .text(function (cgPoint) {
-                return cgPoint.cgName;
-            });
+        .attr("alignment-baseline", "middle")
+        .attr("transform", "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")")
+        .text(function (cgPoint) {
+            return cgPoint.cgName;
+        });
     this._createRendererPointsCircle(outputs);
 };
 
+/**
+ *
+ * @param point
+ * @returns {*|{pattern, lookbehind, inside}|Array|Object|string}
+ * @private
+ */
 cg.Renderer.prototype._createRendererPointsCircle = function (point) {
     var renderer = this;
     return point
@@ -2823,10 +2828,10 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
                     node = d3.select(this)
                         .classed("cg-stream", true)
                         .append("svg:path")
-                            .attr({
-                                "class": "circle",
-                                "d": ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"]
-                            });
+                        .attr({
+                            "class": "circle",
+                            "d": ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"]
+                        });
                     break;
                 default:
                     node = d3.select(this)
@@ -2835,8 +2840,8 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
             }
             node.attr("transform", function () {
                 return "translate(" + [
-                    (cgPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
-                });
+                        (cgPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
+            });
         });
 };
 /**
@@ -2916,7 +2921,7 @@ cg.Renderer.prototype._clearSelection = function () {
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
- * @param rendererNode {{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}|{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}}
+ * @param rendererNode {cg.RendererNode}
  * @param hashtag {Boolean?} True to include the hashtag to select, False otherwise
  * @return {String}
  * @private
@@ -2926,8 +2931,8 @@ cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
 };
 
 /**
- * Returns a selection of d3Nodes from renderer nodes
- * @param rendererNodes {Array<{id: String, type: "group", parent: {type: "group"}|null, position: [Number, Number]}|{id: String, type: "block", parent: {type: "group"}|null, cgBlock: cg.Block, position: [Number, Number]}>}
+ * Returns a selection of d3Nodes from rendererNodes
+ * @param rendererNodes {Array<cg.RendererNode>}
  * @returns {d3.selection}
  * @private
  */
