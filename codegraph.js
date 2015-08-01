@@ -2431,9 +2431,21 @@ cg.Renderer.prototype._createDragBehavior = function () {
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
+            renderer._updateSelectedD3Nodes(selection);
+            var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(d3.select(this).datum());
+            renderer.d3Nodes.classed("cg-active", false);
+            if (rendererGroup) {
+                renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("cg-active", true);
+            }
         })
         .on("dragend", function () {
-
+            var selection = renderer.d3GroupedSelection;
+            var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(d3.select(this).datum());
+            renderer.d3Nodes.classed("cg-active", false);
+            if (rendererGroup) {
+                // TODO: Add the selection to the rendererGroup
+            }
+            renderer._updateSelectedD3Nodes(selection);
         });
 };
 /**
@@ -2753,7 +2765,17 @@ cg.Renderer.prototype._removeD3Groups = function () {
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
-
+    var renderer = this;
+    var updateParents = [];
+    d3Nodes.each(function (rendererNode) {
+        updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
+    });
+    d3Nodes.attr("transform", function (rendererNode) {
+        return "translate(" + rendererNode.position + ")";
+    });
+    if (updateParents.length > 0) {
+        this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
+    }
 };
 /**
  * Creates d3Points
