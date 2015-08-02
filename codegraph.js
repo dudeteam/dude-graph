@@ -2424,6 +2424,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
             var d3Node = d3.select(this);
             d3.event.sourceEvent.stopPropagation();
             renderer._addToSelection(d3Node, !d3.event.sourceEvent.shiftKey);
+            renderer._d3MoveToFront(renderer.d3GroupedSelection);
         })
         .on("drag", function () {
             var selection = renderer.d3GroupedSelection;
@@ -2964,6 +2965,18 @@ cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
         groupedSelectionIds.add(this._getUniqueElementId(rendererNode, true));
     }.bind(this));
     return d3.selectAll(groupedSelectionIds.values().join(", "));
+};
+
+/**
+ * Moves the d3 selection nodes to the top front of their respective parents
+ * @param d3Selection {d3.selection}
+ * @returns {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._d3MoveToFront = function (d3Selection) {
+    return d3Selection.each(function () {
+        this.parentNode.appendChild(this);
+    });
 };
 /**
  * Creates zoom and pan
