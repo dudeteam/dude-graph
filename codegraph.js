@@ -2438,6 +2438,131 @@ cg.Renderer.prototype._createDragBehavior = function () {
         });
 };
 /**
+ * Returns the rendererNode associated with the given id
+ * @param id
+ * @returns {cg.RendererBlock|null}
+ * @private
+ */
+cg.Renderer.prototype._getRendererBlockById = function (id) {
+    return this._rendererBlockIds.get(id);
+};
+
+/**
+ * Returns the rendererGroup associated with the given id
+ * @param id
+ * @returns {cg.RendererGroup|null}
+ * @private
+ */
+cg.Renderer.prototype._getRendererGroupById = function (id) {
+    return this._rendererGroupIds.get(id);
+};
+
+/**
+ * Creates a renderer block
+ * @param rendererBlockData
+ * @returns {cg.RendererBlock}
+ * @private
+
+ */
+cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
+    if (!rendererBlockData.id) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
+    }
+    if (this._getRendererBlockById(rendererBlockData.id)) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Duplicate rendererBlock for id {0}", rendererBlockData.id);
+    }
+    var cgBlock = this._cgGraph.blockById(rendererBlockData.id);
+    if (!cgBlock) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock to rendererBlock {0}", rendererBlockData.id);
+    }
+    var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
+    rendererBlock.type = "block";
+    rendererBlock.parent = null;
+    rendererBlock.cgBlock = cgBlock;
+    rendererBlock.id = rendererBlockData.id;
+    rendererBlock.position = rendererBlockData.position || [0, 0];
+    rendererBlock.size = rendererBlockData.size || [100, 100];
+    this._rendererBlocks.push(rendererBlock);
+    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
+    return rendererBlock;
+};
+
+/**
+ * Creates a rendererGroup
+ * @param rendererGroupData
+ * @returns {cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
+    if (!rendererGroupData.id) {
+        throw new cg.RendererError("Renderer::_createRendererGroup() Cannot create a rendererGroup without an id");
+    }
+    if (this._getRendererGroupById(rendererGroupData.id)) {
+        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id {0}", rendererGroupData.id);
+    }
+    var rendererGroup = pandora.mergeObjects({}, rendererGroupData, true, true);
+    rendererGroup.type = "group";
+    rendererGroup.id = rendererGroupData.id;
+    rendererGroup.parent = null;
+    rendererGroup.children = [];
+    rendererGroup.position = rendererGroupData.position || [0, 0];
+    rendererGroup.size = rendererGroupData.size || [100, 100];
+    this._rendererGroups.push(rendererGroup);
+    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
+    return rendererGroup;
+};
+
+/**
+ * Removes the rendererNode from his parent
+ * @param rendererNode {cg.RendererNode}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
+    if (rendererNode.parent) {
+        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
+        rendererNode.parent = null;
+    }
+};
+
+/**
+ * Adds the given rendererNode in the rendererGroupParent
+ * @param rendererNode {cg.RendererNode}
+ * @param rendererGroupParent{cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
+    if (rendererNode.parent === rendererGroupParent) {
+        return;
+    }
+    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
+        if (checkRendererGroupParent === rendererNode) {
+            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add {0} as a child of {1}, because {0} is equal or is a parent of {1}", rendererNode.id, rendererGroupParent.id);
+        }
+        if (checkRendererGroupParent.parent) {
+            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
+        }
+    })(rendererGroupParent);
+    this._removeRendererNodeParent(rendererNode);
+    rendererGroupParent.children.push(rendererNode);
+    rendererNode.parent = rendererGroupParent;
+};
+
+/**
+ * Returns the parent hierarchy of the given rendererNode
+ * @type {cg.RendererNode}
+ * @returns {Array<cg.RendererGroup>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
+    var parents = [];
+    var parent = rendererNode.parent;
+    while (parent) {
+        parents.push(parent);
+        parent = parent.parent;
+    }
+    return parents;
+};
+/**
  * Returns an absolute position in the SVG from the relative position in the SVG container
  * It takes into account all transformations applied to the SVG
  * Example: renderer._getAbsolutePosition(d3.mouse(this));
@@ -2544,7 +2669,7 @@ cg.Renderer.prototype._createD3Blocks = function () {
         .enter()
         .append("svg:g")
         .attr("id", function (rendererBlock) {
-            return this._getUniqueElementId(rendererBlock);
+            return this._getRendererNodeUniqueID(rendererBlock);
         }.bind(this))
         .attr("class", "cg-block")
         .call(this._createDragBehavior());
@@ -2619,7 +2744,7 @@ cg.Renderer.prototype._createD3Groups = function () {
         .enter()
         .append("svg:g")
         .attr("id", function (rendererGroup) {
-            return this._getUniqueElementId(rendererGroup);
+            return this._getRendererNodeUniqueID(rendererGroup);
         }.bind(this))
         .attr("class", "cg-group")
         .call(this._createDragBehavior());
@@ -2686,7 +2811,6 @@ cg.Renderer.prototype._removeD3Groups = function () {
  * @param d3Nodes {d3.selection}
  * @private
  */
-// TODO: Refactor
 cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
     var renderer = this;
     var updateParents = [];
@@ -2788,131 +2912,6 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
         });
 };
 /**
- *
- * @param id
- * @returns {cg.RendererBlock|null}
- * @private
- */
-cg.Renderer.prototype._getRendererBlockById = function (id) {
-    return this._rendererBlockIds.get(id);
-};
-
-/**
- *
- * @param id
- * @returns {cg.RendererGroup|null}
- * @private
- */
-cg.Renderer.prototype._getRendererGroupById = function (id) {
-    return this._rendererGroupIds.get(id);
-};
-
-/**
- * Creates a renderer block
- * @param rendererBlockData
- * @returns {cg.RendererBlock}
- * @private
-
- */
-cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
-    if (!rendererBlockData.id) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
-    }
-    if (this._getRendererBlockById(rendererBlockData.id)) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Duplicate rendererBlock for id {0}", rendererBlockData.id);
-    }
-    var cgBlock = this._cgGraph.blockById(rendererBlockData.id);
-    if (!cgBlock) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock to rendererBlock {0}", rendererBlockData.id);
-    }
-    var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
-    rendererBlock.type = "block";
-    rendererBlock.parent = null;
-    rendererBlock.cgBlock = cgBlock;
-    rendererBlock.id = rendererBlockData.id;
-    rendererBlock.position = rendererBlockData.position || [0, 0];
-    rendererBlock.size = rendererBlockData.size || [100, 100];
-    this._rendererBlocks.push(rendererBlock);
-    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
-    return rendererBlock;
-};
-
-/**
- * Creates a rendererGroup
- * @param rendererGroupData
- * @returns {cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
-    if (!rendererGroupData.id) {
-        throw new cg.RendererError("Renderer::_createRendererGroup() Cannot create a rendererGroup without an id");
-    }
-    if (this._getRendererGroupById(rendererGroupData.id)) {
-        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id {0}", rendererGroupData.id);
-    }
-    var rendererGroup = pandora.mergeObjects({}, rendererGroupData, true, true);
-    rendererGroup.type = "group";
-    rendererGroup.id = rendererGroupData.id;
-    rendererGroup.parent = null;
-    rendererGroup.children = [];
-    rendererGroup.position = rendererGroupData.position || [0, 0];
-    rendererGroup.size = rendererGroupData.size || [100, 100];
-    this._rendererGroups.push(rendererGroup);
-    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
-    return rendererGroup;
-};
-
-/**
- *
- * @param rendererNode {cg.RendererNode}
- * @private
- */
-cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
-    if (rendererNode.parent) {
-        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
-        rendererNode.parent = null;
-    }
-};
-
-/**
- *
- * @param rendererNode {cg.RendererNode}
- * @param rendererGroupParent{cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
-    if (rendererNode.parent === rendererGroupParent) {
-        return;
-    }
-    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
-        if (checkRendererGroupParent === rendererNode) {
-            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add {0} as a child of {1}, because {0} is equal or is a parent of {1}", rendererNode.id, rendererGroupParent.id);
-        }
-        if (checkRendererGroupParent.parent) {
-            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
-        }
-    })(rendererGroupParent);
-    this._removeRendererNodeParent(rendererNode);
-    rendererGroupParent.children.push(rendererNode);
-    rendererNode.parent = rendererGroupParent;
-};
-
-/**
- * Returns the parent hierarchy of the given rendererNode
- * @type {cg.RendererNode}
- * @returns {Array<cg.RendererGroup>}
- * @private
- */
-cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
-    var parents = [];
-    var parent = rendererNode.parent;
-    while (parent) {
-        parents.push(parent);
-        parent = parent.parent;
-    }
-    return parents;
-};
-/**
  * Creates the selection brush
  * @private
  */
@@ -2991,12 +2990,12 @@ cg.Renderer.prototype._clearSelection = function () {
 /**
  * Returns an unique HTML usable id for the given rendererNode
  * @param rendererNode {cg.RendererNode}
- * @param hashtag {Boolean?} True to include the hashtag to select, False otherwise
+ * @param sharp {Boolean?} True to include the sharp to select, False otherwise
  * @return {String}
  * @private
  */
-cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
-    return pandora.formatString("{0}cg-{1}-{2}", hashtag ? "#" : "", rendererNode.type, rendererNode.id);
+cg.Renderer.prototype._getRendererNodeUniqueID = function (rendererNode, sharp) {
+    return pandora.formatString("{0}cg-{1}-{2}", sharp ? "#" : "", rendererNode.type, rendererNode.id);
 };
 
 /**
@@ -3008,7 +3007,7 @@ cg.Renderer.prototype._getUniqueElementId = function (rendererNode, hashtag) {
 cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
     var groupedSelectionIds = d3.set();
     pandora.forEach(rendererNodes, function (rendererNode) {
-        groupedSelectionIds.add(this._getUniqueElementId(rendererNode, true));
+        groupedSelectionIds.add(this._getRendererNodeUniqueID(rendererNode, true));
     }.bind(this));
     return d3.selectAll(groupedSelectionIds.values().join(", "));
 };
