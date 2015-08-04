@@ -54,7 +54,8 @@ methods and properties.
             this._graph.loader.load();
             this._renderer.initialize();
             // TODO: Debug
-            window.renderer = this._renderer;
+            window.cgRenderer = this._renderer;
+            window.cgGraph = this._graph;
         }
     });
 </script>

@@ -2020,6 +2020,25 @@ cg.JSONLoader = (function () {
         }
     };
 
+    JSONLoader.prototype.loadBlock = function (cgBlockData) {
+        if (!cgBlockData.hasOwnProperty("cgId")) {
+            throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
+        }
+        if (cgBlockData.cgModel) {
+            if (this._models[cgBlockData.cgModel] === undefined) {
+                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Model `{0}` not found",
+                    cgBlockData.cgModel);
+            }
+            pandora.mergeObjects(cgBlockData, this._models[cgBlockData.cgModel]);
+        }
+        var cgBlockType = cgBlockData.cgType || "Block";
+        var cgBlockDeserializer = this._blockTypes[cgBlockType];
+        if (!cgBlockDeserializer) {
+            throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Type `{0}` not added to the loader", cgBlockType);
+        }
+        cgBlockDeserializer.call(this, this._cgGraph, cgBlockData);
+    };
+
     /**
      *
      * @param cgGraph
@@ -2027,24 +2046,7 @@ cg.JSONLoader = (function () {
      * @private
      */
     JSONLoader.prototype._loadBlocks = function (cgGraph, cgBlocksData) {
-        pandora.forEach(cgBlocksData, function (cgBlockData) {
-            if (!cgBlockData.hasOwnProperty("cgId")) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
-            }
-            if (cgBlockData.cgModel) {
-                if (this._models[cgBlockData.cgModel] === undefined) {
-                    throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Model `{0}` not found",
-                        cgBlockData.cgModel);
-                }
-                pandora.mergeObjects(cgBlockData, this._models[cgBlockData.cgModel]);
-            }
-            var cgBlockType = cgBlockData.cgType || "Block";
-            var cgBlockDeserializer = this._blockTypes[cgBlockType];
-            if (!cgBlockDeserializer) {
-                throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Type `{0}` not added to the loader", cgBlockType);
-            }
-            cgBlockDeserializer.call(this, cgGraph, cgBlockData);
-        }.bind(this));
+        pandora.forEach(cgBlocksData, this.loadBlock.bind(this));
     };
 
     /**
