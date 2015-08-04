@@ -2273,6 +2273,7 @@ cg.Renderer = (function () {
         this._createD3Blocks();
         this._computeRendererGroupsPositionAndSize();
         this._createD3Groups();
+        this._initializeListeners();
     };
 
     /**
@@ -2319,10 +2320,23 @@ cg.Renderer = (function () {
         });
     };
 
+    Renderer.prototype._initializeListeners = function () {
+        var renderer = this;
+        this._cgGraph.on("cg-block-create", function (cgBlock) {
+            var rendererBlock = renderer._createRendererBlock({
+                "id": cgBlock.cgId,
+                "position": [100, 100],
+                "size": [100, 100]
+            });
+            renderer._createD3Blocks();
+            var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
+            renderer._createPlacementBehavior(d3Block);
+        });
+    };
+
     return Renderer;
 
 })();
-
 /**
  * Creates the collision quadtree
  * @private
@@ -2436,6 +2450,28 @@ cg.Renderer.prototype._createDragBehavior = function () {
             }
             renderer._updateSelectedD3Nodes(selection);
         });
+};
+
+/**
+ * Creates the placement behavior when a new rendererBlock is added
+ * @param d3Block {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
+    var renderer = this;
+    var namespace = ".placement-behavior";
+    var disablePlacement = function () {
+        renderer._svg.on("mousemove" + namespace, null);
+        renderer._svg.on("mousedown" + namespace, null);
+    };
+    disablePlacement();
+    this._svg.on("mousemove" + namespace, function () {
+        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
+        renderer._updateSelectedD3Nodes(d3Block);
+    });
+    this._svg.on("mousedown" + namespace, function () {
+       disablePlacement();
+    });
 };
 /**
  * Returns the rendererNode associated with the given id
