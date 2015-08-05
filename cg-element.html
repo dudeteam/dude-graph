@@ -2,6 +2,8 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
 
 <!--
 `cg-element` is a Polymer element which creates a codegraph svg renderer which can be manipulated using several
@@ -12,17 +14,21 @@ methods and properties.
 -->
 <dom-module id="cg-element">
     <style>
-        :host {
-            --cg-background: #333333;
-        }
         #svg {
             width: 100%;
             height: 100%;
             background: var(--cg-background);
         }
+        #add {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            --paper-fab-background: var(--cg-primary-color);
+        }
     </style>
     <template>
         <svg id="svg"></svg>
+        <paper-fab id="add" icon="add" title="Add"></paper-fab>
     </template>
 </dom-module>
 <script src="../d3/d3.js"></script>
@@ -48,7 +54,12 @@ methods and properties.
             modelsData: Object
 
         },
+        _currentId: 0,
         ready: function () {
+            this._initialize();
+            this._createPopup();
+        },
+        _initialize: function () {
             this._graph = new cg.Graph(this.graphData, this.modelsData);
             this._renderer = new cg.Renderer(this.$.svg, this._graph, this.rendererData);
             this._graph.loader.load();
@@ -56,6 +67,9 @@ methods and properties.
             // TODO: Debug
             window.cgRenderer = this._renderer;
             window.cgGraph = this._graph;
+        },
+        _createPopup: function () {
+
         }
     });
 </script>

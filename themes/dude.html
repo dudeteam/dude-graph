@@ -1,6 +1,23 @@
+<link href='http://fonts.googleapis.com/css?family=Oxygen:300' rel='stylesheet' type='text/css'>
 <style is="custom-style">
+
+    /**
+     * Config
+     */
+    :root {
+        --cg-primary-color: #5990c7;
+        --cg-background: #333333;
+        --cg-primary-text: {
+             font-family: "Oxygen", sans-serif;
+             font-weight: 300;
+        };
+    }
+
+    /**
+     * Typography
+     */
     text {
-        font-family: sans-serif;
+        @apply(--cg-primary-text);
         fill: hsla(0, 0%, 60%, 1);
     }
     .cg-title {
@@ -18,32 +35,47 @@
     /**
      * Groups
      */
-    .cg-group {
-        cursor: move;
-    }
     .cg-group > rect {
-        fill: hsla(0, 0%, 80%, 0.1);
+        fill: #fff;
+        stroke: #fff;
+        opacity: 0.1;
     }
     .cg-group.cg-selected > rect {
-            fill: hsla(0, 0%, 90%, 0.2);
+        opacity: 0.15;
     }
     .cg-group.cg-active > rect {
-        stroke: #5990c7;
-        stroke-width: 1px;
+        stroke-width: 10px;
     }
 
     /**
      * Blocks
      */
-    .cg-block {
-        cursor: move;
-    }
     .cg-block > rect {
-        fill: hsla(0, 0%, 15%, .8);
+        fill: #222;
+        stroke: #222;
+        opacity: 0.8;
     }
     .cg-block.cg-selected > rect {
-        fill: hsla(0, 0%, 10%, .9);
+        opacity: 1;
     }
+
+    /**
+     * Blocks and groups
+     */
+    .cg-block, .cg-group {
+        cursor: move;
+    }
+    .cg-block > rect, .cg-group > rect {
+        transition-duration: .2s;
+        transition-property: stroke-width;
+    }
+    .cg-block:hover > rect, .cg-group:hover > rect {
+        stroke-width: 8px;
+    }
+    .cg-block.cg-selected > rect, .cg-group.cg-selected > rect {
+        stroke-width: 8px;
+    }
+
 
     /**
      * Points
@@ -54,11 +86,12 @@
     .cg-input circle, .cg-output circle,
     .cg-input path, .cg-output path {
         stroke-width: 1;
-        stroke: #5990c7;
+        stroke: var(--cg-primary-color);
         fill: transparent;
     }
     .cg-input.cg-stream circle, .cg-output.cg-stream circle,
     .cg-input.cg-stream path, .cg-output.cg-stream path {
         stroke: #888888;
     }
+
 </style>
