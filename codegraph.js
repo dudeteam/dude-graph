@@ -2319,7 +2319,8 @@ cg.Renderer = (function () {
          * @type {d3.geom.quadtree}
          * @private
          */
-        this._rendererNodesQuadtree = null;
+        this._rendererBlocksQuadtree = null;
+        this._rendererGroupsQuadtree = null;
 
         /**
          * Returns all d3Nodes (d3Blocks and d3Groups)
@@ -2470,15 +2471,30 @@ cg.Renderer = (function () {
  * Creates the collision quadtree
  * @private
  */
-cg.Renderer.prototype._createRendererNodesCollisions = function () {
-    this._rendererNodesQuadtree = d3.geom.quadtree()
-        .x(function (rendererNode) {
-            return rendererNode.position[0];
+cg.Renderer.prototype._createRendererBlocksCollisions = function () {
+    this._rendererBlocksQuadtree = d3.geom.quadtree()
+        .x(function (rendererBlock) {
+            return rendererBlock.position[0];
         })
-        .y(function (rendererNode) {
-            return rendererNode.position[1];
+        .y(function (rendererBlock) {
+            return rendererBlock.position[1];
         })
-    (this._rendererBlocks.concat(this._rendererGroups));
+    (this._rendererBlocks);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+cg.Renderer.prototype._createRendererGroupsCollisions = function () {
+    this._rendererGroupsQuadtree = d3.geom.quadtree()
+        .x(function (rendererBlock) {
+            return rendererBlock.position[0];
+        })
+        .y(function (rendererBlock) {
+            return rendererBlock.position[1];
+        })
+    (this._rendererGroups);
 };
 
 /**
@@ -2492,19 +2508,19 @@ cg.Renderer.prototype._createRendererNodesCollisions = function () {
  */
 cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y3) {
     // TODO: Update the quadtree only when needed
-    this._createRendererNodesCollisions();
-    var rendererNodes = [];
-    this._rendererNodesQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
-        var rendererNode = d3QuadtreeNode.point;
-        if (rendererNode) {
-            var bounds = [rendererNode.position[0], rendererNode.position[1], rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]];
+    this._createRendererBlocksCollisions();
+    var rendererBlocks = [];
+    this._rendererBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererBlock = d3QuadtreeNode.point;
+        if (rendererBlock) {
+            var bounds = [rendererBlock.position[0], rendererBlock.position[1], rendererBlock.position[0] + rendererBlock.size[0], rendererBlock.position[1] + rendererBlock.size[1]];
             if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
-                rendererNodes.push(rendererNode);
+                rendererBlocks.push(rendererBlock);
             }
         }
         return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
     });
-    return rendererNodes;
+    return rendererBlocks;
 };
 
 /**
@@ -2514,15 +2530,16 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
  * @private
  */
 cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
-    this._createRendererNodesCollisions();
+    // TODO: Update the quadtree only when needed
+    this._createRendererGroupsCollisions();
     var bestRendererGroups = [];
     var x0 = rendererNode.position[0];
     var y0 = rendererNode.position[1];
     var x3 = rendererNode.position[0] + rendererNode.size[0];
     var y3 = rendererNode.position[1] + rendererNode.size[1];
-    this._rendererNodesQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+    this._rendererGroupsQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
         var rendererGroup = d3QuadtreeNode.point;
-        if (rendererGroup && rendererGroup.type === "group" && rendererGroup !== rendererNode) {
+        if (rendererGroup && rendererGroup !== rendererNode) {
             var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
             if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
                 bestRendererGroups.push(rendererGroup);
