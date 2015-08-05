@@ -1556,6 +1556,45 @@ cg.Connection = (function () {
     return Connection;
 
 })();
+cg.Assignation = (function () {
+
+    /**
+     * This is like function however, it takes a stream in input and output. In code it would represent function
+     * separated by semicolons.
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Assignation = pandora.class_("Assignation", cg.Block, function (cgGraph, data) {
+        data.cgInputs = [
+            {
+                "cgName": "in",
+                "cgType": "Stream"
+            },
+            {
+                "cgName": "this",
+                "cgType": "Point",
+                "cgValueType": data.cgValueType
+            },
+            {
+                "cgName": "other",
+                "cgType": "Point",
+                "cgValueType": data.cgValueType
+            }
+        ];
+        data.cgOutputs = [
+            {
+                "cgName": "out",
+                "cgType": "Stream"
+            }
+        ];
+        cg.Block.call(this, cgGraph, data);
+    });
+
+    return Assignation;
+
+})();
 cg.Condition = (function () {
 
     /**
@@ -1610,6 +1649,7 @@ cg.Delegate = (function () {
         if (data.cgInputs) {
             throw new cg.GraphError("Delegate `{0}` shouldn't specify inputs", data.cgId);
         }
+        data.cgOutputs = data.cgOutputs || [];
         data.cgOutputs.unshift({
             "cgName": "out",
             "cgType": "Stream"
@@ -1999,6 +2039,7 @@ cg.JSONLoader = (function () {
         this.addBlockType(cg.Function);
         this.addBlockType(cg.Instruction);
         this.addBlockType(cg.Delegate);
+        this.addBlockType(cg.Assignation);
         this.addBlockType(cg.Variable);
         this.addBlockType(cg.Value);
         this.addBlockType(cg.Each);
@@ -2575,8 +2616,11 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     if (!rendererBlockData.id) {
         throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
     }
+    // This code adds a '+' at the end of the renderer block id, so it can be used several time on the same cgBlock.
+    // For example, if there is a cgBlock `10` used 3 times into the renderer, the ids will be 10, 10+, and 10++.
+    var id = rendererBlockData.id;
     if (this._getRendererBlockById(rendererBlockData.id)) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Duplicate rendererBlock for id {0}", rendererBlockData.id);
+        id = rendererBlockData.id + "+";
     }
     var cgBlock = this._cgGraph.blockById(rendererBlockData.id);
     if (!cgBlock) {
@@ -2586,7 +2630,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     rendererBlock.type = "block";
     rendererBlock.parent = null;
     rendererBlock.cgBlock = cgBlock;
-    rendererBlock.id = rendererBlockData.id;
+    rendererBlock.id = id;
     rendererBlock.position = rendererBlockData.position || [0, 0];
     rendererBlock.size = rendererBlockData.size || [100, 100];
     this._rendererBlocks.push(rendererBlock);

@@ -39,6 +39,15 @@ var TEST_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Value",
             "cgValueType": "String",
             "cgValue": "bullet"
+        },
+        {
+            "cgId": "8",
+            "cgModel": "on_start"
+        },
+        {
+            "cgId": "9",
+            "cgType": "Assignation",
+            "cgValueType": "Number"
         }
     ],
     "connections": [
@@ -56,8 +65,7 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "0",
             "type": "group",
-            "description": "Shoots if enough bullets",
-            "position": [50, 50]
+            "description": "Shoots if enough bullets"
         }
     ],
     "blocks": [
@@ -101,13 +109,33 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
             "type": "block",
             "id": "6",
             "position": [500, 280],
-            "parent": 0
+            "parent": "0"
         },
         {
             "type": "block",
             "id": "7",
             "position": [500, 360],
-            "parent": 0
+            "parent": "0"
+        },
+        {
+            "type": "block",
+            "id": "8",
+            "position": [100, 500]
+        },
+        {
+            "type": "block",
+            "id": "9",
+            "position": [300, 480]
+        },
+        {
+            "type": "block",
+            "id": "4",
+            "position": [300, 600]
+        },
+        {
+            "type": "block",
+            "id": "5",
+            "position": [300, 680]
         }
     ]
 };
