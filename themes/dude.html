@@ -6,6 +6,7 @@
      */
     :root {
         --cg-primary-color: #5990c7;
+        --cg-stream-color: #888888;
         --cg-background: #333333;
         --cg-primary-text: {
              font-family: "Inconsolata", monospace;
@@ -91,7 +92,18 @@
     }
     .cg-input.cg-stream circle, .cg-output.cg-stream circle,
     .cg-input.cg-stream path, .cg-output.cg-stream path {
-        stroke: #888888;
+        stroke: var(--cg-stream-color);
     }
 
+    /**
+     * Connections
+     */
+    .cg-connection {
+        stroke-width: 2px;
+        stroke: var(--cg-primary-color);
+        fill: transparent;
+    }
+    .cg-connection.cg-stream {
+        stroke: var(--cg-stream-color);
+    }
 </style>
