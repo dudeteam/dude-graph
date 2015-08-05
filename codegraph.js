@@ -2324,6 +2324,9 @@ cg.Renderer = (function () {
 
     Renderer.prototype._initializeListeners = function () {
         var renderer = this;
+        this._cgGraph.on("cg-connection-add", function (cgConnection) {
+            console.log(cgConnection);
+        });
         this._cgGraph.on("cg-block-create", function (cgBlock) {
             var rendererBlock = renderer._createRendererBlock({
                 "id": cgBlock.cgId,
