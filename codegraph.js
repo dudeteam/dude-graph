@@ -2315,12 +2315,25 @@ cg.Renderer = (function () {
         this._rendererGroupIds = d3.map();
 
         /**
-         * The renderer nodes quadtree
+         * The rendererBlocks quadtree
          * @type {d3.geom.quadtree}
          * @private
          */
         this._rendererBlocksQuadtree = null;
+
+        /**
+         * The rendererGroups quadtree
+         * @type {d3.geom.quadtree}
+         * @private
+         */
         this._rendererGroupsQuadtree = null;
+
+        /**
+         * The rendererPoints quadtree
+         * @type {d3.geom.quadtree}
+         * @private
+         */
+        this._cgPointsQuadtree = null;
 
         /**
          * Returns all d3Nodes (d3Blocks and d3Groups)
@@ -2478,8 +2491,7 @@ cg.Renderer.prototype._createRendererBlocksCollisions = function () {
         })
         .y(function (rendererBlock) {
             return rendererBlock.position[1];
-        })
-    (this._rendererBlocks);
+        })(this._rendererBlocks);
 };
 
 /**
@@ -2493,8 +2505,26 @@ cg.Renderer.prototype._createRendererGroupsCollisions = function () {
         })
         .y(function (rendererBlock) {
             return rendererBlock.position[1];
+        })(this._rendererGroups);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+cg.Renderer.prototype._createCgPointsCollisions = function () {
+    var renderer = this;
+    var cgPoints = [];
+    pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
+        cgPoints = cgPoints.concat(cgBlock.cgOutputs, cgBlock.cgInputs);
+    });
+    this._cgPointsQuadtree = d3.geom.quadtree()
+        .x(function (cgPoint) {
+            return renderer._getCgPointPosition(cgPoint)[0];
         })
-    (this._rendererGroups);
+        .y(function (cgPoint) {
+            return renderer._getCgPointPosition(cgPoint)[0];
+        })(cgPoints);
 };
 
 /**
@@ -2506,7 +2536,7 @@ cg.Renderer.prototype._createRendererGroupsCollisions = function () {
  * @return {Array<cg.RendererNode>}
  * @private
  */
-cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y3) {
+cg.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
     // TODO: Update the quadtree only when needed
     this._createRendererBlocksCollisions();
     var rendererBlocks = [];
@@ -2526,10 +2556,10 @@ cg.Renderer.prototype._getRendererNodesOverlappingArea = function (x0, y0, x3, y
 /**
  * Get the best rendererGroup that can accept the given rendererNode
  * @param rendererNode {cg.RendererNode}
- * @returns {cg.RendererGroup}
+ * @returns {cg.RendererGroup|null}
  * @private
  */
-cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rendererNode) {
+cg.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
     // TODO: Update the quadtree only when needed
     this._createRendererGroupsCollisions();
     var bestRendererGroups = [];
@@ -2557,6 +2587,27 @@ cg.Renderer.prototype._getBestDropRendererGroupForRendererNode = function (rende
     });
     return bestRendererGroup;
 };
+
+/**
+ * Returns
+ * @param position {[Number, Number]}
+ * @return {cg.Point|null}
+ * @private
+ */
+cg.Renderer.prototype._getNearestCgPoint = function (position) {
+    // TODO: Update the quadtree only when needed
+    this._createCgPointsCollisions();
+    var r = 125;
+    var cgPoint = this._cgPointsQuadtree.find(position);
+    if (cgPoint) {
+        var cgPointPosition = this._getCgPointPosition(cgPoint);
+        if (cgPointPosition[0] > position[0] - r && cgPointPosition[0] < position[0] + r &&
+            cgPointPosition[1] > position[1] - r && cgPointPosition[1] < position[1] + r) {
+            return cgPoint;
+        }
+    }
+    return null;
+};
 /**
  * Creates the drag and drop behavior on a d3Node
  * @returns {d3.behavior.drag}
@@ -2578,7 +2629,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
             });
             renderer._computeRendererGroupsPositionAndSize();
             renderer._updateSelectedD3Nodes(selection);
-            var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(d3.select(this).datum());
+            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             renderer.d3Nodes.classed("cg-active", false);
             if (rendererGroup) {
                 renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("cg-active", true);
@@ -2586,7 +2637,7 @@ cg.Renderer.prototype._createDragBehavior = function () {
         })
         .on("dragend", function () {
             var selection = renderer.d3Selection;
-            var rendererGroup = renderer._getBestDropRendererGroupForRendererNode(d3.select(this).datum());
+            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             renderer.d3Nodes.classed("cg-active", false);
             if (rendererGroup) {
                 selection.each(function (rendererNode) {
@@ -2956,8 +3007,8 @@ cg.Renderer.prototype._updatedD3Connections = function () {
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
     updatedD3Connections
         .attr("d", function (cgConnection) {
-            var p1 = this._getOutputPosition(cgConnection.cgOutputPoint);
-            var p2 = this._getInputPosition(cgConnection.cgInputPoint);
+            var p1 = this._getCgPointPosition(cgConnection.cgOutputPoint);
+            var p2 = this._getCgPointPosition(cgConnection.cgInputPoint);
             var step = Math.max(0.5 * (p1[0] - p2[1]) + 100, 50);
             return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
                 x: p1[0], y: p1[1],
@@ -2966,36 +3017,6 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
                 x3: p2[0], y3: p2[1]
             });
         }.bind(this));
-};
-
-/**
- *
- * @param cgPoint {cg.Point}
- * @returns {[Number, Number]}
- * @private
- */
-cg.Renderer.prototype._getOutputPosition = function (cgPoint) {
-    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
-    var index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
-    return [
-        rendererBlock.position[0] + rendererBlock.size[0] - this._config.block.padding,
-        rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-    ];
-};
-
-/**
- *
- * @param cgPoint {cg.Point}
- * @returns {[Number, Number]}
- * @private
- */
-cg.Renderer.prototype._getInputPosition = function (cgPoint) {
-    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
-    var index = cgPoint.cgBlock.cgInputs.indexOf(cgPoint.cgBlock.inputByName(cgPoint.cgName));
-    return [
-        rendererBlock.position[0] + this._config.block.padding,
-        rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-    ];
 };
 /**
  * Creates d3Groups with the existing rendererGroups
@@ -3183,6 +3204,30 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
                 });
         });
 };
+
+/**
+ * Returns the cgPoint position
+ * @param cgPoint
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getCgPointPosition = function (cgPoint) {
+    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
+    var index = 0;
+    if (cgPoint.isOutput) {
+        index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
+        return [
+            rendererBlock.position[0] + rendererBlock.size[0] - this._config.block.padding,
+            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
+        ];
+    } else {
+        index = cgPoint.cgBlock.cgInputs.indexOf(cgPoint.cgBlock.inputByName(cgPoint.cgName));
+        return [
+            rendererBlock.position[0] + this._config.block.padding,
+            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
+        ];
+    }
+};
 /**
  * Creates the selection brush
  * @private
@@ -3226,7 +3271,7 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
                 if (selectionBrush) {
                     var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
                     var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
-                    var selectedRendererNodes = renderer._getRendererNodesOverlappingArea(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    var selectedRendererNodes = renderer._getNearestRendererBlocks(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
                     if (selectedRendererNodes.length > 0) {
                         renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
                     } else {
