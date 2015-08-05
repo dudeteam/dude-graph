@@ -572,6 +572,11 @@ describe("Graph", function () {
                     "cgId": "7",
                     "cgType": "Variable",
                     "cgName": "size",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgId": "8",
+                    "cgType": "Value",
                     "cgValueType": "Number",
                     "cgValue": 10
                 }
@@ -591,7 +596,7 @@ describe("Graph", function () {
         expect(graph.blockById("7").cgOutputs[0].cgValueType).to.be.equal("Number");
         expect(graph.blockById("7").cgName).to.be.equal("size");
         expect(graph.blockById("7").cgValueType).to.be.equal("Number");
-        expect(graph.blockById("7").cgValue).to.be.equal(10);
+        expect(graph.blockById("8").cgValue).to.be.equal(10);
     });
     it("should test models", function () {
         var graph = new cg.Graph({
