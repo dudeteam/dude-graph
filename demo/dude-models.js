@@ -1,6 +1,6 @@
 var DUDE_MODELS = {
 
-    // Operators
+    // operators
 
     "greater_than": {
         "cgType": "Operator",
@@ -108,20 +108,13 @@ var DUDE_MODELS = {
         "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
     },
 
-    // Delegates
+    // delegates
 
     "on_start": {
         "cgType": "Delegate"
     },
     "on_update": {
-        "cgType": "Delegate",
-        "cgOutputs": [
-            {
-                "cgType": "Point",
-                "cgName": "delta_time",
-                "cgValueType": "Number"
-            }
-        ]
+        "cgType": "Delegate"
     },
     "on_destroy": {
         "cgType": "Delegate"
@@ -137,7 +130,7 @@ var DUDE_MODELS = {
         ]
     },
 
-    // Utils
+    // utilities
 
     "info": {
         "cgType": "Instruction",
@@ -166,7 +159,65 @@ var DUDE_MODELS = {
         }
     },
 
-    // Objects/Entity
+    // system/Timer
+
+    "Timer.start": {
+        "cgType": "Instruction",
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "this",
+                "cgValueType": "Timer"
+            }
+        ]
+    },
+    "Timer.pause": {
+        "cgType": "Instruction",
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "this",
+                "cgValueType": "Timer"
+            }
+        ]
+    },
+    "Timer.resume": {
+        "cgType": "Instruction",
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "this",
+                "cgValueType": "Timer"
+            }
+        ]
+    },
+    "Timer.tick": {
+        "cgType": "Instruction",
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "this",
+                "cgValueType": "Timer"
+            }
+        ]
+    },
+    "Timer.fps": {
+        "cgType": "Getter",
+        "cgClassType": "Timer",
+        "cgValueType": "Number"
+    },
+    "Timer.elapsed_time": {
+        "cgType": "Getter",
+        "cgClassType": "Timer",
+        "cgValueType": "Number"
+    },
+    "Timer.delta_time": {
+        "cgType": "Getter",
+        "cgClassType": "Timer",
+        "cgValueType": "Number"
+    },
+
+    // objects/Entity
 
     "Entity.destroy": {
         "cgType": "Instruction",

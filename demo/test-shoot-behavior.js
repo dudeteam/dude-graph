@@ -60,6 +60,21 @@ var TEST_SHOOT_BEHAVIOR_GRAPH_DATA = {
         {
             "cgId": "12",
             "cgModel": "to_string"
+        },
+        {
+            "cgId": "13",
+            "cgModel": "substract"
+        },
+        {
+            "cgId": "14",
+            "cgType": "Assignation",
+            "cgValueType": "Number"
+        },
+        {
+            "cgId": "15",
+            "cgType": "Value",
+            "cgValueType": "Number",
+            "cgValue": 50
         }
     ],
     "connections": [
@@ -87,7 +102,7 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "2",
             "type": "group",
-            "description": "Show the current number of FPS"
+            "description": "Shows the current number of FPS"
         }
     ],
     "blocks": [
@@ -158,7 +173,7 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
         },
         {
             "type": "block",
-            "id": "5",
+            "id": "15",
             "position": [300, 680]
         },
         {
@@ -178,6 +193,21 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
             "id": "12",
             "position": [700, 600],
             "parent": "2"
+        },
+        {
+            "type": "block",
+            "id": "14",
+            "position": [700, 30]
+        },
+        {
+            "type": "block",
+            "id": "4",
+            "position": [0, 0]
+        },
+        {
+            "type": "block",
+            "id": "13",
+            "position": [700, 220]
         }
     ]
 };

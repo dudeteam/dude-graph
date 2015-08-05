@@ -2611,18 +2611,18 @@ cg.Renderer.prototype._getRendererGroupById = function (id) {
  * @param rendererBlockData
  * @returns {cg.RendererBlock}
  * @private
-
  */
 cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     if (!rendererBlockData.id) {
         throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
     }
-    // This code adds a '+' at the end of the renderer block id, so it can be used several time on the same cgBlock.
-    // For example, if there is a cgBlock `10` used 3 times into the renderer, the ids will be 10, 10+, and 10++.
+    // This code adds a '-' at the end of the renderer block id, so it can be used several time on the same cgBlock.
+    // For example, if there is a cgBlock `10` used 3 times into the renderer, the ids will be 10, 10-, and 10--.
     // TODO: Handle parent properly, for now it attaches the parent on the first rendererBlock created
     var id = rendererBlockData.id;
-    if (this._getRendererBlockById(rendererBlockData.id)) {
-        id = rendererBlockData.id + "+";
+    var otherBlock = this._getRendererBlockById(rendererBlockData.id);
+    if (otherBlock) {
+        id = otherBlock.id + "-";
     }
     var cgBlock = this._cgGraph.blockById(rendererBlockData.id);
     if (!cgBlock) {
