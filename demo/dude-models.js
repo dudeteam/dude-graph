@@ -137,7 +137,36 @@ var DUDE_MODELS = {
         ]
     },
 
-    // Methods/Entity
+    // Utils
+
+    "info": {
+        "cgType": "Instruction",
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "message",
+                "cgValueType": "String"
+            }
+        ]
+    },
+    "to_string": {
+        "cgType": "Function",
+        "cgTemplates": ["Number", "Boolean", "String", "Entity"],
+        "cgInputs": [
+            {
+                "cgType": "Point",
+                "cgName": "data",
+                "cgValueType": "Number",
+                "cgTemplate": "TValue"
+            }
+        ],
+        "cgReturn": {
+            "cgType": "Point",
+            "cgValueType": "String"
+        }
+    },
+
+    // Objects/Entity
 
     "Entity.destroy": {
         "cgType": "Instruction",
@@ -223,4 +252,5 @@ var DUDE_MODELS = {
         "cgClassType": "Entity",
         "cgValueType": "Entity"
     }
+
 };

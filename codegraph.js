@@ -1718,6 +1718,7 @@ cg.Function = (function () {
         cg.Block.call(this, cgGraph, {
             cgId: data.cgId,
             cgName: data.cgName,
+            cgModel: data.cgModel,
             cgInputs: data.cgInputs,
             cgOutputs: data.cgReturn ? [{
                 cgType: "Point",
@@ -2618,6 +2619,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     }
     // This code adds a '+' at the end of the renderer block id, so it can be used several time on the same cgBlock.
     // For example, if there is a cgBlock `10` used 3 times into the renderer, the ids will be 10, 10+, and 10++.
+    // TODO: Handle parent properly, for now it attaches the parent on the first rendererBlock created
     var id = rendererBlockData.id;
     if (this._getRendererBlockById(rendererBlockData.id)) {
         id = rendererBlockData.id + "+";
