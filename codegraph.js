@@ -1595,6 +1595,30 @@ cg.Condition = (function () {
     return Condition;
 
 })();
+cg.Delegate = (function () {
+
+    /**
+     * This is like function however, it takes a stream in input and output. In code it would represent function
+     * separated by semicolons.
+     * @extends {cg.Block}
+     * @param cgGraph {cg.Graph}
+     * @param data {Object}
+     * @constructor
+     */
+    var Delegate = pandora.class_("Delegate", cg.Block, function (cgGraph, data) {
+        if (data.cgInputs) {
+            throw new cg.GraphError("Delegate `{0}` shouldn't specify inputs", data.cgId);
+        }
+        data.cgOutputs.unshift({
+            "cgName": "out",
+            "cgType": "Stream"
+        });
+        cg.Block.call(this, cgGraph, data);
+    });
+
+    return Delegate;
+
+})();
 cg.Each = (function () {
 
     /**
@@ -1677,10 +1701,10 @@ cg.Getter = (function () {
      */
     var Getter = pandora.class_("Getter", cg.Block, function (cgGraph, data) {
         if (data.cgClassType === undefined) {
-            throw new cg.GraphError("Getter `{0}` should specify a class type");
+            throw new cg.GraphError("Getter `{0}` should specify a class type", data.cgId);
         }
         if (data.cgValueType === undefined) {
-            throw new cg.GraphError("Getter `{0}` should specify a value type");
+            throw new cg.GraphError("Getter `{0}` should specify a value type", data.cgId);
         }
         cg.Block.call(this, cgGraph, {
             cgId: data.cgId,
@@ -1934,6 +1958,7 @@ cg.JSONLoader = (function () {
         this.addBlockType(cg.Block);
         this.addBlockType(cg.Function);
         this.addBlockType(cg.Instruction);
+        this.addBlockType(cg.Delegate);
         this.addBlockType(cg.Variable);
         this.addBlockType(cg.Each);
         this.addBlockType(cg.Range);
