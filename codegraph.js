@@ -2948,7 +2948,7 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
                 x2: p2[0] - step, y2: p2[1],
                 x3: p2[0], y3: p2[1]
             });
-        }.bind(this))
+        }.bind(this));
 };
 
 /**
@@ -3071,6 +3071,8 @@ cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
     if (updateParents.length > 0) {
         this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
     }
+    // TODO: Optimize this to only update the needed connections
+    this._updatedD3Connections();
 };
 /**
  * Creates d3Points
