@@ -7,10 +7,12 @@
     :root {
         --cg-primary-color: #5990c7;
         --cg-stream-color: #888888;
-        --cg-background: #333333;
+        --cg-background-color: #333333;
         --cg-primary-text: {
              font-family: "Inconsolata", monospace;
              font-weight: 300;
+             fill: hsla(0, 0%, 60%, 1);
+             color: hsla(0, 0%, 60%, 1);
         };
     }
 
@@ -19,7 +21,6 @@
      */
     text {
         @apply(--cg-primary-text);
-        fill: hsla(0, 0%, 60%, 1);
     }
     .cg-title {
         fill: hsla(0, 0%, 80%, 1);

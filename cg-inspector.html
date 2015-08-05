@@ -1,0 +1,52 @@
+<link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
+
+<!--
+`cg-inspector` is a Polymer element which creates the inspector for codegraph. In other words, it creates the sidebar
+that will be used 
+methods and properties.
+@group Codegraph
+@element cg-inspector
+@demo demo/index.html
+-->
+<dom-module id="cg-inspector">
+    <style>
+        :host {
+            background: var(--cg-background-color);
+        }
+        div {
+            @apply(--cg-primary-text);
+        }
+    </style>
+    <template>
+        <div class="layout vertical">
+            <div>Inspector</div>
+            <magnet-hierarchy id="blocks"></magnet-hierarchy>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: "cg-inspector",
+            _models: [
+                {item: {name: "item1", data: "item1"}},
+                {item: {name: "item2", data: "item2"}},
+                {item: {name: "item3", data: "item3"}},
+                {item: {name: "item4", data: "item4"}},
+                {group: {name: "item5", data: "item5", items: [
+                    {item: {name: "item5.1", data: "item5.1"}},
+                    {item: {name: "item5.2", data: "item5.2"}},
+                    {item: {name: "item5.3", data: "item5.3"}},
+                    {item: {name: "item5.4", data: "item5.4"}},
+                    {group: {name: "item5.5", data: "item5.5", items: [
+                        {item: {name: "item5.5.1", data: "item5.5.1"}},
+                        {item: {name: "item5.5.2", data: "item5.5.2"}}
+                    ]}}
+                ]}},
+                {item: {name: "item6", data: "item6"}},
+                {item: {name: "item7", data: "item7"}}
+            ],
+            ready: function () {
+                this.$.blocks.loadItems(this._models);
+            }
+        });
+    </script>
+</dom-module>
