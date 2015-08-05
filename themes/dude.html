@@ -88,11 +88,16 @@
     .cg-input path, .cg-output path {
         stroke-width: 1;
         stroke: var(--cg-primary-color);
-        fill: transparent;
+        fill: var(--cg-primary-color);
     }
     .cg-input.cg-stream circle, .cg-output.cg-stream circle,
     .cg-input.cg-stream path, .cg-output.cg-stream path {
         stroke: var(--cg-stream-color);
+        fill: var(--cg-stream-color);
+    }
+    .cg-input.cg-empty circle, .cg-output.cg-empty circle,
+    .cg-input.cg-empty path, .cg-output.cg-empty path {
+        fill: transparent;
     }
 
     /**

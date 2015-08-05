@@ -1457,6 +1457,10 @@ cg.Point = (function () {
 
     });
 
+    Point.prototype.empty = function () {
+        return this._cgConnections.length === 0 && this._cgValue === undefined;
+    };
+
     /**
      * Adds a connection from this inbound point to an outbound point
      * @param {cg.Point} cgPoint
@@ -3132,6 +3136,10 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
     var renderer = this;
     return point
         .each(function (cgPoint) {
+            d3.select(this)
+                .classed("cg-empty", function (cgPoint) {
+                    return cgPoint.empty();
+                });
             var node = null;
             switch (pandora.typename(cgPoint)) {
                 case "Stream":
@@ -3149,10 +3157,11 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
                         .append("svg:circle")
                         .attr("r", renderer._config.point.radius);
             }
-            node.attr("transform", function () {
-                return "translate(" + [
+            node
+                .attr("transform", function () {
+                    return "translate(" + [
                         (cgPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
-            });
+                });
         });
 };
 /**
