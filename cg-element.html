@@ -28,7 +28,7 @@ methods and properties.
     </style>
     <template>
         <svg id="svg"></svg>
-        <paper-fab id="add" icon="add" title="Add"></paper-fab>
+        <paper-fab id="add" icon="add" title="Add" on-click="_createBlock"></paper-fab>
     </template>
 </dom-module>
 <script src="../d3/d3.js"></script>
@@ -56,20 +56,23 @@ methods and properties.
         },
         _currentId: 0,
         ready: function () {
-            this._initialize();
-            this._createPopup();
-        },
-        _initialize: function () {
             this._graph = new cg.Graph(this.graphData, this.modelsData);
             this._renderer = new cg.Renderer(this.$.svg, this._graph, this.rendererData);
             this._graph.loader.load();
             this._renderer.initialize();
-            // TODO: Debug
+
+            // for debug
             window.cgRenderer = this._renderer;
             window.cgGraph = this._graph;
         },
-        _createPopup: function () {
-
+        _createBlock: function () {
+            var model = prompt("Model name:");
+            if (model) {
+                this._graph.loader.loadBlock({
+                    "cgId": "generated_" + this._currentId++,
+                    "cgModel": model
+                });
+            }
         }
     });
 </script>
