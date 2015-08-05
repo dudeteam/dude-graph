@@ -63,7 +63,7 @@ var TEST_SHOOT_BEHAVIOR_GRAPH_DATA = {
         },
         {
             "cgId": "13",
-            "cgModel": "substract"
+            "cgModel": "subtract"
         },
         {
             "cgId": "14",
@@ -94,123 +94,121 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
     "groups": [
         {
             "id": "0",
-            "type": "group",
             "description": "Shoots if enough bullets"
         },
         {
             "id": "1",
-            "type": "group",
             "description": "Initializes the number of bullets"
         },
         {
             "id": "2",
-            "type": "group",
             "description": "Shows the current number of FPS"
         }
     ],
     "blocks": [
         {
-            "type": "block",
+
             "id": "0",
+            "cgBlock": "0",
             "position": [100, 100],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "1",
+            "cgBlock": "1",
             "position": [300, 50],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "2",
+            "cgBlock": "2",
             "position": [300, 150],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "3",
+            "cgBlock": "3",
             "position": [500, 100],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "4",
+            "cgBlock": "4",
             "position": [300, 250],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "5",
+            "cgBlock": "5",
             "position": [300, 330],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "6",
+            "cgBlock": "6",
             "position": [500, 230],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "7",
+            "cgBlock": "7",
             "position": [500, 310],
             "parent": "0"
         },
         {
-            "type": "block",
             "id": "8",
+            "cgBlock": "8",
             "position": [100, 500],
             "parent": "1"
         },
         {
-            "type": "block",
             "id": "9",
+            "cgBlock": "9",
             "position": [300, 480],
             "parent": "1"
         },
         {
-            "type": "block",
-            "id": "4",
+            "id": "10",
+            "cgBlock": "4",
             "position": [300, 600]
         },
         {
-            "type": "block",
-            "id": "15",
+            "id": "11",
+            "cgBlock": "15",
             "position": [300, 680]
         },
         {
-            "type": "block",
-            "id": "10",
+            "id": "12",
+            "cgBlock": "10",
             "position": [500, 500],
             "parent": "2"
         },
         {
-            "type": "block",
-            "id": "11",
+            "id": "13",
+            "cgBlock": "11",
             "position": [700, 500],
             "parent": "2"
         },
         {
-            "type": "block",
-            "id": "12",
+            "id": "14",
+            "cgBlock": "12",
             "position": [700, 600],
             "parent": "2"
         },
         {
-            "type": "block",
-            "id": "14",
+            "id": "15",
+            "cgBlock": "13",
+            "position": [700, 220]
+        },
+        {
+            "id": "16",
+            "cgBlock": "14",
             "position": [700, 30]
         },
         {
-            "type": "block",
-            "id": "4",
+            "id": "17",
+            "cgBlock": "4",
             "position": [0, 0]
-        },
-        {
-            "type": "block",
-            "id": "13",
-            "position": [700, 220]
         }
     ]
 };

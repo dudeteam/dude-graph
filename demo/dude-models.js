@@ -44,7 +44,7 @@ var DUDE_MODELS = {
         ],
         "cgReturn": {"cgValueType": "Number", "cgTemplate": "TValue"}
     },
-    "substract": {
+    "subtract": {
         "cgType": "Operator",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]

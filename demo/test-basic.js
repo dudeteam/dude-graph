@@ -51,13 +51,11 @@ var TEST_BASIC_RENDERER_DATA = {
     "groups": [
         {
             "id": "0",
-            "type": "group",
             "description": "Something interesting",
             "position": [10, 20]
         },
         {
             "id": "Koala",
-            "type": "group",
             "description": "Child",
             "position": [10, 20],
             "parent": "0"
@@ -66,40 +64,40 @@ var TEST_BASIC_RENDERER_DATA = {
     "blocks": [
         {
             "id": "0",
-            "type": "block",
+            "cgBlock": "0",
             "position": [120, 40],
             "parent": "0"
         },
         {
             "id": "1",
-            "type": "block",
+            "cgBlock": "1",
             "position": [240, 240],
             "parent": "Koala"
         },
         {
             "id": "2",
-            "type": "block",
+            "cgBlock": "2",
             "position": [400, 240],
             "parent": "Koala"
         },
         {
             "id": "3",
-            "type": "block",
+            "cgBlock": "3",
             "position": [600, 600]
         },
         {
             "id": "4",
-            "type": "block",
+            "cgBlock": "4",
             "position": [100, 500]
         },
         {
             "id": "5",
-            "type": "block",
+            "cgBlock": "5",
             "position": [200, 400]
         },
         {
             "id": "6",
-            "type": "block",
+            "cgBlock": "6",
             "position": [300, 300]
         }
     ]

@@ -2202,13 +2202,15 @@ cg.Renderer = (function () {
             "min": 0.25,
             "max": 5
         },
-        "group": {
-            "padding": 10,
-            "header": 30
-        },
         "block": {
             "padding": 10,
-            "header": 40
+            "header": 40,
+            "size": [150, 100]
+        },
+        "group": {
+            "padding": 10,
+            "header": 30,
+            "size": [200, 150]
         },
         "point": {
             "height": 20,
@@ -2436,6 +2438,10 @@ cg.Renderer = (function () {
         });
     };
 
+    /**
+     * Initialize the listeners to dynamically creates the rendererBlocks when a cgBlock is added
+     * @private
+     */
     Renderer.prototype._initializeListeners = function () {
         var renderer = this;
         this._cgGraph.on("cg-connection-create", function (cgConnection) {
@@ -2589,6 +2595,8 @@ cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
         renderer._updateSelectedD3Nodes(d3Block);
     });
     this._svg.on("mousedown" + namespace, function () {
+        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
+        renderer._updateSelectedD3Nodes(d3Block);
         disablePlacement();
     });
 };
@@ -2599,7 +2607,7 @@ cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
  * @private
  */
 cg.Renderer.prototype._getRendererBlockById = function (id) {
-    return this._rendererBlockIds.get(id);
+    return this._rendererBlockIds.get(id) || null;
 };
 
 /**
@@ -2609,7 +2617,7 @@ cg.Renderer.prototype._getRendererBlockById = function (id) {
  * @private
  */
 cg.Renderer.prototype._getRendererGroupById = function (id) {
-    return this._rendererGroupIds.get(id);
+    return this._rendererGroupIds.get(id) || null;
 };
 
 /**
@@ -2622,25 +2630,20 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     if (!rendererBlockData.id) {
         throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
     }
-    // This code adds a '-' at the end of the renderer block id, so it can be used several time on the same cgBlock.
-    // For example, if there is a cgBlock `10` used 3 times into the renderer, the ids will be 10, 10-, and 10--.
-    // TODO: Handle parent properly, for now it attaches the parent on the first rendererBlock created
-    var id = rendererBlockData.id;
-    var otherBlock = this._getRendererBlockById(rendererBlockData.id);
-    if (otherBlock) {
-        id = otherBlock.id + "-";
+    if (this._getRendererBlockById(rendererBlockData.id) !== null) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Multiple rendererBlocks for id `{0}`", rendererBlockData.id);
     }
-    var cgBlock = this._cgGraph.blockById(rendererBlockData.id);
+    var cgBlock = this._cgGraph.blockById(rendererBlockData.cgBlock);
     if (!cgBlock) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock to rendererBlock {0}", rendererBlockData.id);
+        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock `{0}` to rendererBlock `{1}`", rendererBlockData.cgBlock, rendererBlockData.id);
     }
     var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
     rendererBlock.type = "block";
     rendererBlock.parent = null;
     rendererBlock.cgBlock = cgBlock;
-    rendererBlock.id = id;
+    rendererBlock.id = rendererBlockData.id;
     rendererBlock.position = rendererBlockData.position || [0, 0];
-    rendererBlock.size = rendererBlockData.size || [100, 100];
+    rendererBlock.size = rendererBlockData.size || this._config.block.size;
     this._rendererBlocks.push(rendererBlock);
     this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
     return rendererBlock;
@@ -2665,7 +2668,7 @@ cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
     rendererGroup.parent = null;
     rendererGroup.children = [];
     rendererGroup.position = rendererGroupData.position || [0, 0];
-    rendererGroup.size = rendererGroupData.size || [100, 100];
+    rendererGroup.size = rendererGroupData.size || this._config.group.size;
     this._rendererGroups.push(rendererGroup);
     this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
     return rendererGroup;
@@ -2792,6 +2795,15 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
             size[1][1] - size[0][1] + renderer._config.group.padding * 2 + renderer._config.group.header
         ];
     }
+    rendererGroup.size = [
+        Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
+        Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
+    ];
+    var d3Groups = this._getD3NodesFromRendererNodes([rendererGroup]);
+    var d3Text = d3Groups.select("text");
+    if (d3Text.node()) {
+        rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Text.node().getBBox().width + renderer._config.group.padding * 2);
+    }
     (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
         if (rendererGroupParent) {
             renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
@@ -2806,7 +2818,7 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
  */
 cg.Renderer.prototype._computeRendererGroupsPositionAndSize = function () {
     var renderer = this;
-    pandora.forEach(this._rendererGroups, function(rendererGroup) {
+    pandora.forEach(this._rendererGroups, function (rendererGroup) {
         renderer._computeRendererGroupPositionAndSize(rendererGroup);
     });
 };
@@ -2820,7 +2832,7 @@ cg.Renderer.prototype._createD3Blocks = function () {
         .data(this._rendererBlocks, function (rendererBlock) {
             var nbPoints = Math.max(rendererBlock.cgBlock.cgInputs.length, rendererBlock.cgBlock.cgOutputs.length);
             rendererBlock.size = [
-                150,
+                renderer._config.block.size[0],
                 nbPoints * renderer._config.point.height + renderer._config.block.header
             ];
             return rendererBlock.id;
@@ -3211,7 +3223,7 @@ cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
     pandora.forEach(rendererNodes, function (rendererNode) {
         groupedSelectionIds.add(this._getRendererNodeUniqueID(rendererNode, true));
     }.bind(this));
-    return d3.selectAll(groupedSelectionIds.values().join(", "));
+    return this._rootSvg.selectAll(groupedSelectionIds.values().join(", "));
 };
 
 /**
