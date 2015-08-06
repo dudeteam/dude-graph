@@ -1,4 +1,5 @@
 <link href='//fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css'>
 <style is="custom-style">
 
     /**
@@ -8,29 +9,20 @@
         --cg-primary-color: #5990c7;
         --cg-stream-color: #888888;
         --cg-background-color: #333333;
-
-        --cg-title-text: {
-            font-family: "Inconsolata", monospace;
-            font-weight: 300;
-            fill: hsla(0, 0%, 80%, 1);
-            color: hsla(0, 0%, 80%, 1);
-        };
-        --cg-primary-text: {
-             font-family: "Inconsolata", monospace;
-             font-weight: 300;
-             fill: hsla(0, 0%, 60%, 1);
-             color: hsla(0, 0%, 60%, 1);
-        };
+        --cg-title-color: hsla(0, 0%, 90%, 1);
+        --cg-text-color: hsla(0, 0%, 60%, 1);
+        --cg-display-font: "Dosis", monospace;
     }
 
     /**
      * Typography
      */
     text {
-        @apply(--cg-primary-text);
+        fill: var(--cg-text-color);
+        font-family: var(--cg-display-font);
     }
     .cg-title {
-        fill: hsla(0, 0%, 80%, 1);
+        fill: var(--cg-title-color);
     }
 
     /**

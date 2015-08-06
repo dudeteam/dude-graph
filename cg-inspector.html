@@ -12,12 +12,14 @@ methods and properties.
     <style>
         :host {
             background: var(--cg-background-color);
+            overflow: auto;
         }
         div {
-            @apply(--cg-primary-text);
+            font-family: var(--cg-display-font);
+            color: var(--cg-text-color);
         }
         .title {
-            @apply(--cg-title-text);
+            color: var(--cg-title-color);
             padding-bottom: 10px;
         }
         .box {
@@ -45,6 +47,17 @@ methods and properties.
         }
         input[type="text"]:focus {
             background: rgba(255, 255, 255, 0.4);
+        }
+        button {
+            padding: 5px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: var(--cg-primary-color);
+            font-family: var(--cg-display-font);
+            font-size: 1em;
+            outline: none;
+            cursor: pointer;
         }
     </style>
     <template>
