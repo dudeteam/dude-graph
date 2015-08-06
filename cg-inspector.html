@@ -12,22 +12,79 @@ methods and properties.
     <style>
         :host {
             background: var(--cg-background-color);
-            padding: 10px;
         }
         div {
             @apply(--cg-primary-text);
         }
         .title {
             @apply(--cg-title-text);
-            font-size: 1.5em;
+            padding-bottom: 10px;
+        }
+        .box {
             padding: 10px;
-            text-align: center;
+            border-bottom: 3px solid #222222;
+        }
+        .row {
+            padding: 5px;
+        }
+        label {
+            width: 30%;
+            display: inline-block;
+        }
+        input, select {
+            width: 50%;
+            display: inline-block;
+        }
+        input[type="text"] {
+            padding: 5px;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.4);
         }
     </style>
     <template>
         <div class="layout vertical flex">
-            <div class="title">Inspector</div>
-            <magnet-hierarchy id="blocks"></magnet-hierarchy>
+            <div class="box">
+                <div class="title">Add block</div>
+                <magnet-hierarchy id="blocks"></magnet-hierarchy>
+            </div> <!-- .box -->
+            <div class="box">
+                <div class="title">Create variable</div>
+                <div class="row">
+                    <label>Type: </label>
+                    <select>
+                        <option>boolean</option>
+                        <option>number</option>
+                        <option>string</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <label>Name: </label>
+                    <input type="text">
+                </div>
+                <div class="row">
+                    <label>Value: </label>
+                    <input type="checkbox">
+                </div>
+                <div class="row">
+                    <label>Folder: </label>
+                    <input type="text">
+                </div>
+                <button>Create</button>
+            </div> <!-- .box -->
+            <div class="box">
+                <div class="title">Create behavior</div>
+                <div class="row">
+                    <label>Name: </label>
+                    <input type="text">
+                </div>
+                <button>Create</button>
+            </div> <!-- .box -->
         </div>
     </template>
     <script>
@@ -37,15 +94,20 @@ methods and properties.
                 models: {
                     type: Object,
                     value: {}
+                },
+                element: {
+                    type: CgElement
                 }
             },
+            behaviors: [Polymer.IronA11yKeysBehavior],
             ready: function () {
+                this._currentId = 0;
                 this._models = [];
                 this._folders = {};
                 pandora.forEach(this.models, function (value, key) {
                     if (value.cgFolder) {
                         if (this._folders[value.cgFolder] === undefined) {
-                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, data: "item5", items: []}};
+                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, items: []}};
                             this._models.push(this._folders[value.cgFolder]);
                         }
                         this._folders[value.cgFolder].group.items.push({item: {name: key, data: value}});
@@ -54,6 +116,14 @@ methods and properties.
                     }
                 }.bind(this));
                 this.$.blocks.loadItems(this._models);
+                this.addOwnKeyBinding("enter", "_createBlock");
+            },
+            _createBlock: function () {
+                if (this.$.blocks.selectItem !== null) {
+                    var data = Object.create(this.$.blocks.selectItem.data);
+                    data.cgId = "gen_" + this._currentId++;
+                    this.element.graph.loader.loadBlock(data);
+                }
             }
         });
     </script>

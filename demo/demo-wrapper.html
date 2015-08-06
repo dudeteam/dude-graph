@@ -1,0 +1,51 @@
+<link rel="import" href="../themes/dude.html">
+<link rel="import" href="../cg-element.html">
+<link rel="import" href="../cg-inspector.html">
+<dom-module id="demo-wrapper">
+    <style>
+        #wrapper {
+            border: 4px solid #242424;
+        }
+        .panel {
+            border: 4px solid #242424;
+        }
+    </style>
+    <template>
+        <div id="wrapper" class="layout horizontal fit">
+            <cg-element id="element"
+                        class="panel layout horizontal flex-2"
+                        graph-data="{{graphData}}"
+                        renderer-data="{{rendererData}}"
+                        models-data="{{modelsData}}">
+            </cg-element>
+            <cg-inspector id="inspector"
+                          class="panel layout horizontal flex"
+                          models="{{modelsData}}"></cg-inspector>
+        </div>
+    </template>
+    <script src="dude-models.js"></script>
+    <script src="demo-basic.js"></script>
+    <script src="demo-shoot-behavior.js"></script>
+    <script>
+        Polymer({
+            is: "demo-wrapper",
+            properties: {
+                modelsData: {
+                    type: Object,
+                    value: DUDE_MODELS
+                },
+                graphData: {
+                    type: Object,
+                    value: DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
+                },
+                rendererData: {
+                    type: Object,
+                    value: DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
+                }
+            },
+            ready: function () {
+                this.$.inspector.element = this.$.element;
+            }
+        });
+    </script>
+</dom-module>

@@ -4,38 +4,9 @@
     <meta charset="utf-8">
     <title>Codegraph - Demo</title>
     <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
-    <style>
-        #wrapper {
-            border: 4px solid #242424;
-        }
-        .panel {
-            border: 4px solid #242424;
-        }
-    </style>
-    <link rel="import" href="../themes/dude.html">
-    <link rel="import" href="../cg-element.html">
-    <link rel="import" href="../cg-inspector.html">
+    <link rel="import" href="demo-wrapper.html">
 </head>
 <body class="fullbleed">
-<template id="demo" is="dom-bind">
-    <div id="wrapper" class="layout horizontal fit">
-        <cg-element class="panel layout horizontal flex-2"
-                    graph-data="{{graphData}}"
-                    renderer-data="{{rendererData}}"
-                    models-data="{{modelsData}}">
-        </cg-element>
-        <cg-inspector class="panel layout horizontal flex"
-                      models="{{modelsData}}"></cg-inspector>
-    </div>
-</template>
-<script src="dude-models.js"></script>
-<script src="demo-basic.js"></script>
-<script src="demo-shoot-behavior.js"></script>
-<script>
-    var demo = document.querySelector("#demo");
-    demo.modelsData = DUDE_MODELS;
-    demo.graphData = DEMO_SHOOT_BEHAVIOR_GRAPH_DATA;
-    demo.rendererData = DEMO_SHOOT_BEHAVIOR_RENDERER_DATA;
-</script>
+    <demo-wrapper></demo-wrapper>
 </body>
 </html>
