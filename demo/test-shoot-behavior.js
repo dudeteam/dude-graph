@@ -172,12 +172,14 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "10",
             "cgBlock": "4",
-            "position": [300, 600]
+            "position": [300, 600],
+            "parent": "1"
         },
         {
             "id": "11",
             "cgBlock": "15",
-            "position": [300, 680]
+            "position": [300, 680],
+            "parent": "1"
         },
         {
             "id": "12",
@@ -200,17 +202,20 @@ var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "15",
             "cgBlock": "13",
-            "position": [700, 220]
+            "position": [700, 220],
+            "parent": "0"
         },
         {
             "id": "16",
             "cgBlock": "14",
-            "position": [700, 30]
+            "position": [700, 30],
+            "parent": "0"
         },
         {
             "id": "17",
             "cgBlock": "4",
-            "position": [700, 150]
+            "position": [700, 150],
+            "parent": "0"
         }
     ]
 };

@@ -12,39 +12,47 @@ methods and properties.
     <style>
         :host {
             background: var(--cg-background-color);
+            padding: 10px;
         }
         div {
             @apply(--cg-primary-text);
         }
+        .title {
+            @apply(--cg-title-text);
+            font-size: 1.5em;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
     <template>
-        <div class="layout vertical">
-            <div>Inspector</div>
+        <div class="layout vertical flex">
+            <div class="title">Inspector</div>
             <magnet-hierarchy id="blocks"></magnet-hierarchy>
         </div>
     </template>
     <script>
         Polymer({
             is: "cg-inspector",
-            _models: [
-                {item: {name: "item1", data: "item1"}},
-                {item: {name: "item2", data: "item2"}},
-                {item: {name: "item3", data: "item3"}},
-                {item: {name: "item4", data: "item4"}},
-                {group: {name: "item5", data: "item5", items: [
-                    {item: {name: "item5.1", data: "item5.1"}},
-                    {item: {name: "item5.2", data: "item5.2"}},
-                    {item: {name: "item5.3", data: "item5.3"}},
-                    {item: {name: "item5.4", data: "item5.4"}},
-                    {group: {name: "item5.5", data: "item5.5", items: [
-                        {item: {name: "item5.5.1", data: "item5.5.1"}},
-                        {item: {name: "item5.5.2", data: "item5.5.2"}}
-                    ]}}
-                ]}},
-                {item: {name: "item6", data: "item6"}},
-                {item: {name: "item7", data: "item7"}}
-            ],
+            properties: {
+                models: {
+                    type: Object,
+                    value: {}
+                }
+            },
             ready: function () {
+                this._models = [];
+                this._folders = {};
+                pandora.forEach(this.models, function (value, key) {
+                    if (value.cgFolder) {
+                        if (this._folders[value.cgFolder] === undefined) {
+                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, data: "item5", items: []}};
+                            this._models.push(this._folders[value.cgFolder]);
+                        }
+                        this._folders[value.cgFolder].group.items.push({item: {name: key, data: value}});
+                    } else {
+                        this._models.push({item: {name: key, data: value}});
+                    }
+                }.bind(this));
                 this.$.blocks.loadItems(this._models);
             }
         });

@@ -4,6 +4,7 @@ var DUDE_MODELS = {
 
     "greater_than": {
         "cgType": "Operator",
+        "cgFolder": "operators",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
         },
@@ -25,6 +26,7 @@ var DUDE_MODELS = {
     },
     "add": {
         "cgType": "Operator",
+        "cgFolder": "operators",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
         },
@@ -46,6 +48,7 @@ var DUDE_MODELS = {
     },
     "subtract": {
         "cgType": "Operator",
+        "cgFolder": "operators",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
         },
@@ -67,6 +70,7 @@ var DUDE_MODELS = {
     },
     "multiply": {
         "cgType": "Operator",
+        "cgFolder": "operators",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
         },
@@ -88,6 +92,7 @@ var DUDE_MODELS = {
     },
     "divide": {
         "cgType": "Operator",
+        "cgFolder": "operators",
         "cgTemplates": {
             "TValue": ["Number", "Vec2", "Vec3", "Vec4"]
         },
@@ -111,16 +116,20 @@ var DUDE_MODELS = {
     // delegates
 
     "on_start": {
-        "cgType": "Delegate"
+        "cgType": "Delegate",
+        "cgFolder": "delegates"
     },
     "on_update": {
-        "cgType": "Delegate"
+        "cgType": "Delegate",
+        "cgFolder": "delegates"
     },
     "on_destroy": {
-        "cgType": "Delegate"
+        "cgType": "Delegate",
+        "cgFolder": "delegates"
     },
     "on_key_down": {
         "cgType": "Delegate",
+        "cgFolder": "delegates",
         "cgOutputs": [
             {
                 "cgType": "Point",
