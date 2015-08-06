@@ -1,4 +1,5 @@
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
 
 <!--
@@ -33,6 +34,7 @@ methods and properties.
         label {
             width: 30%;
             display: inline-block;
+            padding: 5px;
         }
         input, select {
             width: 50%;
@@ -42,26 +44,26 @@ methods and properties.
             padding: 5px;
             outline: none;
             border: none;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: transparent;
+            border-bottom: 2px solid #555555;
+            color: var(--cg-text-color);
+            font-family: var(--cg-display-font);
+            font-size: 1em;
         }
         input[type="text"]:focus {
-            background: rgba(255, 255, 255, 0.4);
+            border-bottom: 2px solid var(--cg-primary-color);
         }
     </style>
     <template>
         <div class="layout vertical flex">
             <div class="box">
+                <div class="title">Add block</div>
+                <magnet-hierarchy id="blocks"></magnet-hierarchy>
+            </div> <!-- .box -->
+            <div class="box">
                 <div class="title">Tools</div>
                 <paper-button class="primary">Add group</paper-button>
                 <paper-button class="primary">Remove selection</paper-button>
-                <paper-button class="primary">Undo</paper-button>
-                <paper-button class="primary">Redo</paper-button>
-            </div>
-            <div class="box">
-                <div class="title">Add block</div>
-                <magnet-hierarchy id="blocks"></magnet-hierarchy>
             </div> <!-- .box -->
             <div class="box">
                 <div class="title">Create variable</div>
@@ -75,23 +77,23 @@ methods and properties.
                 </div>
                 <div class="row">
                     <label>Name: </label>
-                    <input type="text">
+                    <input is="iron-input" bind-value="{{_name}}" placeholder="my_custom_variable" type="text">
                 </div>
                 <div class="row">
                     <label>Value: </label>
-                    <input type="checkbox">
+                    <input is="iron-input" bind-value="{{_value}}" type="text">
                 </div>
                 <div class="row">
                     <label>Folder: </label>
-                    <input type="text">
+                    <input is="iron-input" bind-value="{{_folder}}" placeholder="my_custom_folder" type="text">
                 </div>
-                <paper-button class="primary">Create</paper-button>
+                <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
             </div> <!-- .box -->
             <div class="box">
                 <div class="title">Create behavior</div>
                 <div class="row">
                     <label>Name: </label>
-                    <input type="text">
+                    <input is="iron-input" bind-value="{{}}" placeholder="MyCustomBehavior" type="text">
                 </div>
                 <paper-button class="primary">Create</paper-button>
             </div> <!-- .box -->
@@ -134,6 +136,11 @@ methods and properties.
                     data.cgId = "gen_" + this._currentId++;
                     this.element.graph.loader.loadBlock(data);
                 }
+            },
+            _createVariableClicked: function () {
+                console.log(this._name);
+                console.log(this._value);
+                console.log(this._folder);
             }
         });
     </script>
