@@ -1,4 +1,4 @@
-var TEST_SHOOT_BEHAVIOR_GRAPH_DATA = {
+var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
     "blocks": [
         {
             "cgId": "0",
@@ -86,7 +86,7 @@ var TEST_SHOOT_BEHAVIOR_GRAPH_DATA = {
         {"cgOutputBlockId": "5", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "second"}
     ]
 };
-var TEST_SHOOT_BEHAVIOR_RENDERER_DATA = {
+var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
     "config": {
         "zoom": {
             "translate": [0, 0],

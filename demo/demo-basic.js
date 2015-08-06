@@ -1,4 +1,4 @@
-var TEST_BASIC_GRAPH_DATA = {
+var DEMO_BASIC_GRAPH_DATA = {
     "blocks": [
         {
             "cgId": "0",
@@ -41,7 +41,7 @@ var TEST_BASIC_GRAPH_DATA = {
         {"cgOutputBlockId": "1", "cgOutputName": "out", "cgInputBlockId": "0", "cgInputName": "in"}
     ]
 };
-var TEST_BASIC_RENDERER_DATA = {
+var DEMO_BASIC_RENDERER_DATA = {
     "config": {
         "zoom": {
             "translate": [0, 0],
