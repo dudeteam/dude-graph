@@ -1,3 +1,4 @@
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
 
 <!--
@@ -48,20 +49,16 @@ methods and properties.
         input[type="text"]:focus {
             background: rgba(255, 255, 255, 0.4);
         }
-        button {
-            padding: 5px 15px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            background: var(--cg-primary-color);
-            font-family: var(--cg-display-font);
-            font-size: 1em;
-            outline: none;
-            cursor: pointer;
-        }
     </style>
     <template>
         <div class="layout vertical flex">
+            <div class="box">
+                <div class="title">Tools</div>
+                <paper-button class="primary">Add group</paper-button>
+                <paper-button class="primary">Remove selection</paper-button>
+                <paper-button class="primary">Undo</paper-button>
+                <paper-button class="primary">Redo</paper-button>
+            </div>
             <div class="box">
                 <div class="title">Add block</div>
                 <magnet-hierarchy id="blocks"></magnet-hierarchy>
@@ -88,7 +85,7 @@ methods and properties.
                     <label>Folder: </label>
                     <input type="text">
                 </div>
-                <button>Create</button>
+                <paper-button class="primary">Create</paper-button>
             </div> <!-- .box -->
             <div class="box">
                 <div class="title">Create behavior</div>
@@ -96,7 +93,7 @@ methods and properties.
                     <label>Name: </label>
                     <input type="text">
                 </div>
-                <button>Create</button>
+                <paper-button class="primary">Create</paper-button>
             </div> <!-- .box -->
         </div>
     </template>
