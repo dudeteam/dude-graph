@@ -75,6 +75,12 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Value",
             "cgValueType": "Number",
             "cgValue": 50
+        },
+        {
+            "cgId": "16",
+            "cgType": "Value",
+            "cgValueType": "Number",
+            "cgValue": 1
         }
     ],
     "connections": [
@@ -136,25 +142,25 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "4",
             "cgBlock": "4",
-            "position": [300, 250],
+            "position": [300, 240],
             "parent": "0"
         },
         {
             "id": "5",
             "cgBlock": "5",
-            "position": [300, 330],
+            "position": [300, 310],
             "parent": "0"
         },
         {
             "id": "6",
             "cgBlock": "6",
-            "position": [500, 230],
+            "position": [500, 210],
             "parent": "0"
         },
         {
             "id": "7",
             "cgBlock": "7",
-            "position": [500, 310],
+            "position": [500, 280],
             "parent": "0"
         },
         {
@@ -166,13 +172,13 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "9",
             "cgBlock": "9",
-            "position": [300, 480],
+            "position": [300, 500],
             "parent": "1"
         },
         {
             "id": "10",
             "cgBlock": "4",
-            "position": [300, 600],
+            "position": [300, 610],
             "parent": "1"
         },
         {
@@ -214,7 +220,19 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {
             "id": "17",
             "cgBlock": "4",
-            "position": [700, 150],
+            "position": [700, 140],
+            "parent": "0"
+        },
+        {
+            "id": "18",
+            "cgBlock": "4",
+            "position": [700, 310],
+            "parent": "0"
+        },
+        {
+            "id": "19",
+            "cgBlock": "16",
+            "position": [700, 380],
             "parent": "0"
         }
     ]
