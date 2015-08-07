@@ -2617,7 +2617,12 @@ function d3_dispatch_event(dispatch) {
 
     function event() {
         var z = listeners, i = -1, n = z.length, l;
-        while (++i < n) if (l = z[i].on) l.apply(this, arguments);
+        while (++i < n) {
+            l = z[i].on;
+            if (l) {
+                l.apply(this, arguments);
+            }
+        }
         return dispatch;
     }
 
@@ -2644,8 +2649,9 @@ function d3_eventDispatch(target) {
     while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
     dispatch.of = function (thiz, argumentz) {
         return function (e1) {
+            var e0;
             try {
-                var e0 = e1.sourceEvent = d3.event;
+                e0 = e1.sourceEvent = d3.event;
                 e1.target = target;
                 d3.event = e1;
                 dispatch[e1.type].apply(thiz, argumentz);
@@ -2662,6 +2668,7 @@ function d3_eventDispatch(target) {
  */
 d3.behavior.doubleClick = function () {
     var event = d3_eventDispatch(strangeBehavior, "dblclick");
+
     function strangeBehavior(selection) {
         selection.each(function (i) {
             var dispatch = event.of(this, arguments);
@@ -2673,6 +2680,7 @@ d3.behavior.doubleClick = function () {
             }
         });
     }
+
     return d3.rebind(strangeBehavior, event, "on");
 };
 /**
