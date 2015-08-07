@@ -2262,25 +2262,25 @@ cg.Renderer = (function () {
          * The root group node of the renderer
          * @type {d3.selection}
          */
-        this._rootSvg = this._svg.append("svg:g").attr("id", "cg-root");
+        this._d3Root = this._svg.append("svg:g").attr("id", "cg-root");
 
         /**
          * The SVG group for the d3Groups
          * @type {d3.selection}
          */
-        this._groupsSvg = this._rootSvg.append("svg:g").attr("id", "cg-groups");
+        this._d3Groups = this._d3Root.append("svg:g").attr("id", "cg-groups");
 
         /**
          * The SVG connection for the d3Connections
          * @type {d3.selection}
          */
-        this._connectionsSvg = this._rootSvg.append("svg:g").attr("id", "cg-connections");
+        this._d3Connections = this._d3Root.append("svg:g").attr("id", "cg-connections");
 
         /**
          * The SVG group for the d3Blocks
          * @type {d3.selection}
          */
-        this._blocksSvg = this._rootSvg.append("svg:g").attr("id", "cg-blocks");
+        this._d3Block = this._d3Root.append("svg:g").attr("id", "cg-blocks");
 
         /**
          * The cgGraph to render
@@ -2341,7 +2341,7 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "d3Nodes", {
             get: function () {
-                return this._rootSvg.selectAll(".cg-block, .cg-group");
+                return this._d3Root.selectAll(".cg-block, .cg-group");
             }.bind(this)
         });
 
@@ -2351,7 +2351,7 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "d3Blocks", {
             get: function () {
-                return this._blocksSvg.selectAll(".cg-block");
+                return this._d3Block.selectAll(".cg-block");
             }.bind(this)
         });
 
@@ -2361,7 +2361,7 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "d3Groups", {
             get: function () {
-                return this._groupsSvg.selectAll(".cg-group");
+                return this._d3Groups.selectAll(".cg-group");
             }.bind(this)
         });
 
@@ -2371,7 +2371,7 @@ cg.Renderer = (function () {
          */
         Object.defineProperty(this, "d3Selection", {
             get: function () {
-                return this._rootSvg.selectAll(".cg-selected");
+                return this._d3Root.selectAll(".cg-selected");
             }.bind(this)
         });
 
@@ -2667,9 +2667,9 @@ function d3_eventDispatch(target) {
  * Double click behavior
  */
 d3.behavior.doubleClick = function () {
-    var event = d3_eventDispatch(strangeBehavior, "dblclick");
+    var event = d3_eventDispatch(doubleClick, "dblclick");
 
-    function strangeBehavior(selection) {
+    function doubleClick(selection) {
         selection.each(function (i) {
             var dispatch = event.of(this, arguments);
             d3.select(this).on("dblclick", clicked);
@@ -2681,7 +2681,7 @@ d3.behavior.doubleClick = function () {
         });
     }
 
-    return d3.rebind(strangeBehavior, event, "on");
+    return d3.rebind(doubleClick, event, "on");
 };
 /**
  * Creates the drag and drop behavior on a d3Node
@@ -2814,11 +2814,40 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     rendererBlock.parent = null;
     rendererBlock.cgBlock = cgBlock;
     rendererBlock.id = rendererBlockData.id;
+    rendererBlock.rendererPoints = [];
     rendererBlock.position = rendererBlockData.position || [0, 0];
     rendererBlock.size = rendererBlockData.size || this._config.block.size;
+    this._assignRendererPoints(rendererBlock);
     this._rendererBlocks.push(rendererBlock);
     this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
     return rendererBlock;
+};
+
+/**
+ *
+ * @param rendererBlock {cg.RendererBlock}
+ * @private
+ */
+cg.Renderer.prototype._assignRendererPoints = function (rendererBlock) {
+    rendererBlock.rendererPoints = [];
+    pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
+            "cgPoint": cgOutput,
+            "isOutput": true
+        });
+    });
+    pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
+            "cgPoint": cgInput,
+            "isOutput": false
+        });
+    });
 };
 
 /**
@@ -2907,7 +2936,7 @@ cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
 cg.Renderer.prototype._getAbsolutePosition = function (point) {
     this._svgPoint.x = point[0];
     this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._rootSvg.node().getCTM().inverse());
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
     return [position.x, position.y];
 };
 
@@ -2922,7 +2951,7 @@ cg.Renderer.prototype._getAbsolutePosition = function (point) {
 cg.Renderer.prototype._getRelativePosition = function (point) {
     this._svgPoint.x = point[0];
     this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._rootSvg.node().getScreenCTM().inverse());
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getScreenCTM().inverse());
     return [position.x, position.y];
 };
 
@@ -3051,7 +3080,7 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
-    this._createRendererPoints(updatedD3Blocks.append("svg:g"));
+    this._createD3Points(updatedD3Blocks.append("svg:g"));
     updatedD3Blocks
         .select("rect")
         .attr("rx", 5)
@@ -3081,7 +3110,7 @@ cg.Renderer.prototype._removeD3Blocks = function () {
  * @private
  */
 cg.Renderer.prototype._createD3Connections = function () {
-    var createdD3Connections = this._connectionsSvg.selectAll(".cg-connection")
+    var createdD3Connections = this._d3Connections.selectAll(".cg-connection")
         .data(this._cgGraph.cgConnections)
         .enter()
         .append("svg:path")
@@ -3097,7 +3126,7 @@ cg.Renderer.prototype._createD3Connections = function () {
  * @private
  */
 cg.Renderer.prototype._updatedD3Connections = function () {
-    this._updateSelectedD3Connections(this._connectionsSvg.selectAll(".cg-connection"));
+    this._updateSelectedD3Connections(this._d3Connections.selectAll(".cg-connection"));
 };
 
 /**
@@ -3217,56 +3246,51 @@ cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
 };
 /**
  * Creates d3Points
- * @param parentSvg The svg group which will contains the d3Points of the current block
+ * @param d3Block The svg group which will contains the d3Points of the current block
  * @private
  */
-cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
+cg.Renderer.prototype._createD3Points = function (d3Block) {
     var renderer = this;
-    var inputs = parentSvg
+    var d3Points = d3Block
         .selectAll(".cg-input")
         .data(function (rendererBlock) {
-            return rendererBlock.cgBlock.cgInputs;
+            return rendererBlock.rendererPoints;
         }.bind(this))
         .enter()
         .append("svg:g")
-        .attr("transform", function (cgPoint, index) {
-            return "translate(" + [
-                    renderer._config.block.padding,
-                    index * renderer._config.point.height + renderer._config.block.header
-                ] + ")";
+        .attr("transform", function (rendererPoint) {
+            if (rendererPoint.isOutput) {
+                return "translate(" + [
+                        rendererPoint.rendererBlock.size[0] - renderer._config.block.padding,
+                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            } else {
+                return "translate(" + [
+                        renderer._config.block.padding,
+                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            }
         })
-        .attr("class", "cg-input");
-    inputs
+        .attr("class", function (rendererPoint) {
+            return "cg-" + (rendererPoint.isOutput ? "output" : "input");
+        });
+    d3Points
         .append("svg:text")
         .attr("alignment-baseline", "middle")
-        .attr("transform", "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")")
-        .text(function (cgPoint) {
-            return cgPoint.cgName;
+        .attr("text-anchor", function (rendererPoint) {
+            return rendererPoint.isOutput ? "end" : "start";
+        })
+        .attr("transform", function (rendererPoint) {
+            if (rendererPoint.isOutput) {
+                return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
+            } else {
+                return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
+            }
+        })
+        .text(function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
         });
-    this._createRendererPointsCircle(inputs);
-    var outputs = parentSvg
-        .selectAll(".cg-output")
-        .data(function (rendererBlock) {
-            return rendererBlock.cgBlock.cgOutputs;
-        }.bind(this))
-        .enter()
-        .append("svg:g")
-        .attr("class", "cg-output")
-        .attr("text-anchor", "end")
-        .attr("transform", function (cgPoint, index) {
-            return "translate(" + [
-                    d3.select(this.parentNode.parentNode).datum().size[0] - renderer._config.block.padding,
-                    index * renderer._config.point.height + renderer._config.block.header
-                ] + ")";
-        });
-    outputs
-        .append("svg:text")
-        .attr("alignment-baseline", "middle")
-        .attr("transform", "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")")
-        .text(function (cgPoint) {
-            return cgPoint.cgName;
-        });
-    this._createRendererPointsCircle(outputs);
+    this._createD3PointsCircle(d3Points);
 };
 
 /**
@@ -3275,16 +3299,16 @@ cg.Renderer.prototype._createRendererPoints = function (parentSvg) {
  * @returns {*|{pattern, lookbehind, inside}|Array|Object|string}
  * @private
  */
-cg.Renderer.prototype._createRendererPointsCircle = function (point) {
+cg.Renderer.prototype._createD3PointsCircle = function (point) {
     var renderer = this;
     return point
-        .each(function (cgPoint) {
+        .each(function (rendererPoint) {
             d3.select(this)
-                .classed("cg-empty", function (cgPoint) {
-                    return cgPoint.empty();
+                .classed("cg-empty", function (rendererPoint) {
+                    return rendererPoint.cgPoint.empty();
                 });
             var node = null;
-            switch (pandora.typename(cgPoint)) {
+            switch (pandora.typename(rendererPoint.cgPoint)) {
                 case "Stream":
                     var r = renderer._config.point.radius;
                     node = d3.select(this)
@@ -3303,9 +3327,29 @@ cg.Renderer.prototype._createRendererPointsCircle = function (point) {
             node
                 .attr("transform", function () {
                     return "translate(" + [
-                        (cgPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
+                            (rendererPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
                 });
         });
+};
+
+/**
+ * Returns the cgPoint position
+ * @param rendererPoint {cg.RendererPoint}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
+    if (rendererPoint.isOutput) {
+        return [
+            rendererPoint.rendererBlock.position[0] + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    } else {
+        return [
+            rendererPoint.rendererBlock.position[0] + this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    }
 };
 
 /**
@@ -3429,7 +3473,7 @@ cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
     pandora.forEach(rendererNodes, function (rendererNode) {
         groupedSelectionIds.add(this._getRendererNodeUniqueID(rendererNode, true));
     }.bind(this));
-    return this._rootSvg.selectAll(groupedSelectionIds.values().join(", "));
+    return this._d3Root.selectAll(groupedSelectionIds.values().join(", "));
 };
 
 /**
@@ -3455,7 +3499,7 @@ cg.Renderer.prototype._createZoomBehavior = function () {
             if (d3.event.sourceEvent) {
                 pandora.preventCallback(d3.event.sourceEvent);
             }
-            renderer._rootSvg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
             renderer._config.zoom.translate = renderer._zoom.translate();
             renderer._config.zoom.scale = renderer._zoom.scale();
         }.bind(this));
