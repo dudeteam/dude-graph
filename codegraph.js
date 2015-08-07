@@ -2626,23 +2626,21 @@ cg.Renderer.prototype._createDragBehavior = function () {
                 rendererNode.position[0] += d3.event.dx;
                 rendererNode.position[1] += d3.event.dy;
             });
-            renderer._computeRendererGroupsPositionAndSize();
             renderer._updateSelectedD3Nodes(selection);
-            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             renderer.d3Nodes.classed("cg-active", false);
+            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             if (rendererGroup) {
                 renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("cg-active", true);
             }
         })
         .on("dragend", function () {
+            renderer.d3Nodes.classed("cg-active", false);
             var selection = renderer.d3Selection;
             var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
-            renderer.d3Nodes.classed("cg-active", false);
             if (rendererGroup) {
                 selection.each(function (rendererNode) {
                     renderer._addRendererNodeParent(rendererNode, rendererGroup);
                 });
-                renderer._computeRendererGroupPositionAndSize(rendererGroup);
             }
             renderer._updateSelectedD3Nodes(selection);
         });
@@ -3099,12 +3097,13 @@ cg.Renderer.prototype._removeD3Groups = function () {
 cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
     var renderer = this;
     var updateParents = [];
-    d3Nodes.each(function (rendererNode) {
-        updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
-    });
-    d3Nodes.attr("transform", function (rendererNode) {
-        return "translate(" + rendererNode.position + ")";
-    });
+    // TODO: Optimize this to only compute needed groups position and size
+    this._computeRendererGroupsPositionAndSize();
+    d3Nodes
+        .attr("transform", function (rendererNode) {
+            updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
+            return "translate(" + rendererNode.position + ")";
+        });
     if (updateParents.length > 0) {
         this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
     }
