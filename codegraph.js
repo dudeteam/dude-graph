@@ -2250,19 +2250,19 @@ cg.Renderer = (function () {
          * The root SVG node of the renderer
          * @type {d3.selection}
          */
-        this._svg = d3.select(svg);
+        this._d3Svg = d3.select(svg);
 
         /**
          * The SVG point used for matrix transformations
          * @type {SVGPoint}
          */
-        this._svgPoint = this._svg.node().createSVGPoint();
+        this._svgPoint = this._d3Svg.node().createSVGPoint();
 
         /**
          * The root group node of the renderer
          * @type {d3.selection}
          */
-        this._d3Root = this._svg.append("svg:g").attr("id", "cg-root");
+        this._d3Root = this._d3Svg.append("svg:g").attr("id", "cg-root");
 
         /**
          * The SVG group for the d3Groups
@@ -2439,7 +2439,7 @@ cg.Renderer = (function () {
             if (rendererBlockData.parent) {
                 var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
                 if (!rendererGroupParent) {
-                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererBlock parent id {0}", rendererBlockData.parent);
+                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
                 }
                 renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
             }
@@ -2449,7 +2449,7 @@ cg.Renderer = (function () {
             if (rendererGroupData.parent) {
                 var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
                 if (!rendererGroupParent) {
-                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererGroup parent id {0}", rendererGroupData.parent);
+                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
                 }
                 renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
             }
@@ -2755,16 +2755,16 @@ cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
     var renderer = this;
     var namespace = ".placement-behavior";
     var disablePlacement = function () {
-        renderer._svg.on("mousemove" + namespace, null);
-        renderer._svg.on("mousedown" + namespace, null);
+        renderer._d3Svg.on("mousemove" + namespace, null);
+        renderer._d3Svg.on("mousedown" + namespace, null);
     };
     disablePlacement();
-    this._svg.on("mousemove" + namespace, function () {
+    this._d3Svg.on("mousemove" + namespace, function () {
         d3.event.sourceEvent.preventDefault();
         d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
         renderer._updateSelectedD3Nodes(d3Block);
     });
-    this._svg.on("mousedown" + namespace, function () {
+    this._d3Svg.on("mousedown" + namespace, function () {
         d3.event.sourceEvent.preventDefault();
         d3.event.sourceEvent.stopPropagation();
         d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
@@ -2861,7 +2861,7 @@ cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
         throw new cg.RendererError("Renderer::_createRendererGroup() Cannot create a rendererGroup without an id");
     }
     if (this._getRendererGroupById(rendererGroupData.id)) {
-        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id {0}", rendererGroupData.id);
+        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id `{0}`", rendererGroupData.id);
     }
     var rendererGroup = pandora.mergeObjects({}, rendererGroupData, true, true);
     rendererGroup.type = "group";
@@ -2899,7 +2899,7 @@ cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererG
     }
     (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
         if (checkRendererGroupParent === rendererNode) {
-            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add {0} as a child of {1}, because {0} is equal or is a parent of {1}", rendererNode.id, rendererGroupParent.id);
+            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add `{0}` as a child of `{1}`, because `{0}` is equal or is a parent of `{1}`", rendererNode.id, rendererGroupParent.id);
         }
         if (checkRendererGroupParent.parent) {
             checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
@@ -3383,11 +3383,11 @@ cg.Renderer.prototype._getCgPointPosition = function (cgPoint) {
 cg.Renderer.prototype._createSelectionBehavior = function () {
     var renderer = this;
     var selectionBrush = null;
-    this._svg.call(d3.behavior.drag()
+    this._d3Svg.call(d3.behavior.drag()
             .on("dragstart", function () {
                 if (d3.event.sourceEvent.shiftKey) {
                     d3.event.sourceEvent.stopImmediatePropagation();
-                    selectionBrush = renderer._svg
+                    selectionBrush = renderer._d3Svg
                         .append("svg:rect")
                         .classed("cg-selection", true)
                         .datum(d3.mouse(this));
@@ -3503,5 +3503,5 @@ cg.Renderer.prototype._createZoomBehavior = function () {
             renderer._config.zoom.translate = renderer._zoom.translate();
             renderer._config.zoom.scale = renderer._zoom.scale();
         }.bind(this));
-    this._svg.call(this._zoom);
+    this._d3Svg.call(this._zoom);
 };
