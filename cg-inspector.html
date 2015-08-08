@@ -1,6 +1,7 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
+<link rel="import" href="../magnet-state/magnet-state.html">
 
 <!--
 `cg-inspector` is a Polymer element which creates the inspector for codegraph. In other words, it creates the sidebar
@@ -53,50 +54,54 @@ methods and properties.
         input[type="text"]:focus {
             border-bottom: 2px solid var(--cg-primary-color);
         }
+        #state :not(.active-state) {
+            display: none;
+        }
     </style>
     <template>
         <div class="layout vertical flex">
-            <div class="box">
-                <div class="title">Add block</div>
-                <magnet-hierarchy id="blocks"></magnet-hierarchy>
-            </div> <!-- .box -->
-            <div class="box">
-                <div class="title">Tools</div>
-                <paper-button class="primary">Add group</paper-button>
-                <paper-button class="primary">Remove selection</paper-button>
-            </div> <!-- .box -->
-            <div class="box">
-                <div class="title">Create variable</div>
-                <div class="row">
-                    <label>Type: </label>
-                    <select>
-                        <option>boolean</option>
-                        <option>number</option>
-                        <option>string</option>
-                    </select>
+            <magnet-state id="state" root-state="root" current-state="{{_currentState}}">
+                <div data-state="root">
+                    coucou
                 </div>
-                <div class="row">
-                    <label>Name: </label>
-                    <input is="iron-input" bind-value="{{_name}}" placeholder="my_custom_variable" type="text">
-                </div>
-                <div class="row">
-                    <label>Value: </label>
-                    <input is="iron-input" bind-value="{{_value}}" type="text">
-                </div>
-                <div class="row">
-                    <label>Folder: </label>
-                    <input is="iron-input" bind-value="{{_folder}}" placeholder="my_custom_folder" type="text">
-                </div>
-                <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
-            </div> <!-- .box -->
-            <div class="box">
-                <div class="title">Create behavior</div>
-                <div class="row">
-                    <label>Name: </label>
-                    <input is="iron-input" bind-value="{{}}" placeholder="MyCustomBehavior" type="text">
-                </div>
-                <paper-button class="primary">Create</paper-button>
-            </div> <!-- .box -->
+                <div data-state="editGroup">Edit group</div>
+                <div data-state="editBlock">Edit variable</div>
+            </magnet-state>
+            <div>
+                <div class="box">
+                    <div class="title">Add block</div>
+                    <magnet-hierarchy id="blocks"></magnet-hierarchy>
+                </div> <!-- .box -->
+                <div class="box">
+                    <div class="title">Tools</div>
+                    <paper-button class="primary">Add group</paper-button>
+                    <paper-button class="primary">Remove selection</paper-button>
+                </div> <!-- .box -->
+                <div class="box">
+                    <div class="title">Create variable</div>
+                    <div class="row">
+                        <label>Type: </label>
+                        <select>
+                            <option>boolean</option>
+                            <option>number</option>
+                            <option>string</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Name: </label>
+                        <input is="iron-input" bind-value="{{_name}}" placeholder="my_custom_variable" type="text">
+                    </div>
+                    <div class="row">
+                        <label>Value: </label>
+                        <input is="iron-input" bind-value="{{_value}}" type="text">
+                    </div>
+                    <div class="row">
+                        <label>Folder: </label>
+                        <input is="iron-input" bind-value="{{_folder}}" placeholder="my_custom_folder" type="text">
+                    </div>
+                    <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
+                </div> <!-- .box -->
+            </div>
         </div>
     </template>
     <script>
@@ -116,6 +121,7 @@ methods and properties.
                 this._currentId = 0;
                 this._models = [];
                 this._folders = {};
+                this._currentState = "root";
                 pandora.forEach(this.models, function (value, key) {
                     if (value.cgFolder) {
                         if (this._folders[value.cgFolder] === undefined) {
@@ -129,6 +135,19 @@ methods and properties.
                 }.bind(this));
                 this.$.blocks.loadItems(this._models);
                 this.addOwnKeyBinding("enter", "_createBlock");
+            },
+            bindElement: function (element) {
+                this.element = element;
+                this.element.renderer.on("cg-select", function (node) {
+                    if (node.type === "block") {
+                        this._currentState = "editBlock";
+                    } else if (node.type === "group") {
+                        this._currentState = "editGroup";
+                    }
+                }.bind(this));
+                this.element.renderer.on("cg-unselect", function () {
+                    this._currentState = "root";
+                }.bind(this));
             },
             _createBlock: function () {
                 if (this.$.blocks.selectItem !== null) {
