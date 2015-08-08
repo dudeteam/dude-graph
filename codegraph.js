@@ -2333,7 +2333,7 @@ cg.Renderer = (function () {
          * @type {d3.geom.quadtree}
          * @private
          */
-        this._cgPointsQuadtree = null;
+        this._rendererPointsQuadtree = null;
 
         /**
          * Returns all d3Nodes (d3Blocks and d3Groups)
@@ -2512,19 +2512,19 @@ cg.Renderer.prototype._createRendererGroupsCollisions = function () {
  * Creates the collision quadtree
  * @private
  */
-cg.Renderer.prototype._createCgPointsCollisions = function () {
+cg.Renderer.prototype._createRendererPointsCollisions = function () {
     var renderer = this;
-    var cgPoints = [];
-    pandora.forEach(this._cgGraph.cgBlocks, function (cgBlock) {
-        cgPoints = cgPoints.concat(cgBlock.cgOutputs, cgBlock.cgInputs);
+    var rendererPoints = [];
+    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
+        rendererPoints = rendererPoints.concat(rendererBlock.rendererPoints);
     });
-    this._cgPointsQuadtree = d3.geom.quadtree()
-        .x(function (cgPoint) {
-            return renderer._getCgPointPosition(cgPoint)[0];
+    this._rendererPointsQuadtree = d3.geom.quadtree()
+        .x(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[0];
         })
-        .y(function (cgPoint) {
-            return renderer._getCgPointPosition(cgPoint)[0];
-        })(cgPoints);
+        .y(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[1];
+        })(rendererPoints);
 };
 
 /**
@@ -2594,15 +2594,15 @@ cg.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
  * @return {cg.Point|null}
  * @private
  */
-cg.Renderer.prototype._getNearestCgPoint = function (position) {
+cg.Renderer.prototype._getNearestRendererPoint = function (position) {
     // TODO: Update the quadtree only when needed
-    this._createCgPointsCollisions();
-    var cgPoint = this._cgPointsQuadtree.find(position);
-    if (cgPoint) {
-        var cgPointPosition = this._getCgPointPosition(cgPoint);
-        if (cgPointPosition[0] > position[0] - this._config.point.height && cgPointPosition[0] < position[0] + this._config.point.height &&
-            cgPointPosition[1] > position[1] - this._config.point.height && cgPointPosition[1] < position[1] + this._config.point.height) {
-            return cgPoint;
+    this._createRendererPointsCollisions();
+    var rendererPoint = this._rendererPointsQuadtree.find(position);
+    if (rendererPoint) {
+        var rendererPointPosition = this._getRendererPointPosition(rendererPoint);
+        if (rendererPointPosition[0] > position[0] - this._config.point.height && rendererPointPosition[0] < position[0] + this._config.point.height &&
+            rendererPointPosition[1] > position[1] - this._config.point.height && rendererPointPosition[1] < position[1] + this._config.point.height) {
+            return rendererPoint;
         }
     }
     return null;
@@ -3023,6 +3023,51 @@ cg.Renderer.prototype._computeRendererGroupsPositionAndSize = function () {
         renderer._computeRendererGroupPositionAndSize(rendererGroup);
     });
 };
+
+/**
+ * Returns the rendererPoint position
+ * @param rendererPoint {cg.RendererPoint}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
+    if (rendererPoint.isOutput) {
+        return [
+            rendererPoint.rendererBlock.position[0] + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    } else {
+        return [
+            rendererPoint.rendererBlock.position[0] + this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    }
+};
+
+/**
+ * Returns the cgPoint position
+ * @param cgPoint
+ * @return {[Number, Number]}
+ * @private
+ */
+// TODO: Remove this in favor of getRendererPointPosition
+cg.Renderer.prototype._getCgPointPosition = function (cgPoint) {
+    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
+    var index = 0;
+    if (cgPoint.isOutput) {
+        index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
+        return [
+            rendererBlock.position[0] + rendererBlock.size[0] - this._config.block.padding,
+            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
+        ];
+    } else {
+        index = cgPoint.cgBlock.cgInputs.indexOf(cgPoint.cgBlock.inputByName(cgPoint.cgName));
+        return [
+            rendererBlock.position[0] + this._config.block.padding,
+            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
+        ];
+    }
+};
 /**
  * Creates d3Blocks with the existing rendererBlocks
  * @private
@@ -3137,6 +3182,7 @@ cg.Renderer.prototype._updatedD3Connections = function () {
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
     updatedD3Connections
         .attr("d", function (cgConnection) {
+            // TODO: Use getRendererPointPosition
             var p1 = this._getCgPointPosition(cgConnection.cgOutputPoint);
             var p2 = this._getCgPointPosition(cgConnection.cgInputPoint);
             var step = Math.max(0.5 * (p1[0] - p2[1]) + 100, 50);
@@ -3330,50 +3376,6 @@ cg.Renderer.prototype._createD3PointsCircle = function (point) {
                             (rendererPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
                 });
         });
-};
-
-/**
- * Returns the cgPoint position
- * @param rendererPoint {cg.RendererPoint}
- * @return {[Number, Number]}
- * @private
- */
-cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
-    if (rendererPoint.isOutput) {
-        return [
-            rendererPoint.rendererBlock.position[0] + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
-            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
-        ];
-    } else {
-        return [
-            rendererPoint.rendererBlock.position[0] + this._config.block.padding,
-            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
-        ];
-    }
-};
-
-/**
- * Returns the cgPoint position
- * @param cgPoint
- * @return {[Number, Number]}
- * @private
- */
-cg.Renderer.prototype._getCgPointPosition = function (cgPoint) {
-    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
-    var index = 0;
-    if (cgPoint.isOutput) {
-        index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
-        return [
-            rendererBlock.position[0] + rendererBlock.size[0] - this._config.block.padding,
-            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-        ];
-    } else {
-        index = cgPoint.cgBlock.cgInputs.indexOf(cgPoint.cgBlock.inputByName(cgPoint.cgName));
-        return [
-            rendererBlock.position[0] + this._config.block.padding,
-            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-        ];
-    }
 };
 /**
  * Creates the selection brush
