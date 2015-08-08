@@ -2500,11 +2500,11 @@ cg.Renderer.prototype._createRendererBlocksCollisions = function () {
  */
 cg.Renderer.prototype._createRendererGroupsCollisions = function () {
     this._rendererGroupsQuadtree = d3.geom.quadtree()
-        .x(function (rendererBlock) {
-            return rendererBlock.position[0];
+        .x(function (rendererGroup) {
+            return rendererGroup.position[0];
         })
-        .y(function (rendererBlock) {
-            return rendererBlock.position[1];
+        .y(function (rendererGroup) {
+            return rendererGroup.position[1];
         })(this._rendererGroups);
 };
 
@@ -3435,7 +3435,7 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
 
 /**
  * Adds the given d3Nodes to the current selection
- * @param d3Nodes {Object} The d3Nodes to select
+ * @param d3Nodes {d3.selection} The d3Nodes to select
  * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
  * @private
  */
