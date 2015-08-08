@@ -3100,7 +3100,7 @@ cg.Renderer.prototype._createD3Blocks = function () {
         })
         .attr("class", "cg-title")
         .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "text-before-edge")
+        .attr("dominant-baseline", "text-before-edge")
         .attr("transform", function (block) {
             return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
         });
@@ -3254,7 +3254,7 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
         })
         .attr("class", "cg-title")
         .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "text-before-edge")
+        .attr("dominant-baseline", "text-before-edge")
         .attr("transform", function (rendererGroup) {
             return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
         });
@@ -3435,7 +3435,7 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
 
 /**
  * Adds the given d3Nodes to the current selection
- * @param d3Nodes {d3.selection} The d3Nodes to select
+ * @param d3Nodes {Object} The d3Nodes to select
  * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
  * @private
  */
@@ -3444,6 +3444,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
         this._clearSelection();
     }
     d3Nodes.classed("cg-selected", true);
+    this.emit("cg-select", d3Nodes.data()[d3Nodes.data().length - 1]);
 };
 
 /**
@@ -3452,6 +3453,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
  */
 cg.Renderer.prototype._clearSelection = function () {
     this.d3Selection.classed("cg-selected", false);
+    this.emit("cg-unselect");
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
