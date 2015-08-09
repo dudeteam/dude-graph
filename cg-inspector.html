@@ -60,22 +60,23 @@ methods and properties.
     </style>
     <template>
         <div class="layout vertical flex">
-            <magnet-state id="state" root-state="root" current-state="{{_currentState}}">
-                <div data-state="root">
-                    coucou
-                </div>
-                <div data-state="editGroup">Edit group</div>
-                <div data-state="editBlock">Edit variable</div>
-            </magnet-state>
+            <!--<magnet-state id="state" root-state="root" current-state="{{_currentState}}">-->
+                <!--<div data-state="root">-->
+                    <!--coucou-->
+                <!--</div>-->
+                <!--<div data-state="editGroup">Edit group</div>-->
+                <!--<div data-state="editBlock">Edit variable</div>-->
+            <!--</magnet-state>-->
             <div>
+                <div class="box">
+                    <div class="title">Tools</div>
+                    <paper-button class="primary" on-click="_compile">Compile</paper-button>
+                    <paper-button class="primary">Add group</paper-button>
+                    <paper-button class="primary">Remove selection</paper-button>
+                </div> <!-- .box -->
                 <div class="box">
                     <div class="title">Add block</div>
                     <magnet-hierarchy id="blocks"></magnet-hierarchy>
-                </div> <!-- .box -->
-                <div class="box">
-                    <div class="title">Tools</div>
-                    <paper-button class="primary">Add group</paper-button>
-                    <paper-button class="primary">Remove selection</paper-button>
                 </div> <!-- .box -->
                 <div class="box">
                     <div class="title">Create variable</div>
@@ -136,6 +137,9 @@ methods and properties.
                 this.$.blocks.loadItems(this._models);
                 this.addOwnKeyBinding("enter", "_createBlock");
             },
+            bindBuilder: function (builder) {
+                this._builder = builder;
+            },
             bindElement: function (element) {
                 this.element = element;
                 this.element.renderer.on("cg-select", function (node) {
@@ -160,6 +164,9 @@ methods and properties.
                 console.log(this._name);
                 console.log(this._value);
                 console.log(this._folder);
+            },
+            _compile: function () {
+                console.log(this._builder.save(this.element.graph));
             }
         });
     </script>

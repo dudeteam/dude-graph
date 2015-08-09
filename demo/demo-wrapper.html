@@ -26,6 +26,7 @@
     <script src="dude-models.js"></script>
     <script src="demo-basic.js"></script>
     <script src="demo-shoot-behavior.js"></script>
+    <script src="dude-saver.js"></script>
     <script>
         Polymer({
             is: "demo-wrapper",
@@ -45,6 +46,7 @@
             },
             ready: function () {
                 this.$.inspector.bindElement(this.$.element);
+                this.$.inspector.bindBuilder(new DudeSaver());
             }
         });
     </script>

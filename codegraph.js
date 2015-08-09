@@ -993,6 +993,21 @@ cg.Graph = (function () {
     };
 
     /**
+     * Returns an array of blocks which have the given type.
+     * @param cgBlockType
+     * @returns {Array}
+     */
+    Graph.prototype.blocksByType = function (cgBlockType) {
+        var blocks = [];
+        pandora.forEach(this.cgBlocks, function (cgBlock) {
+            if (pandora.typename(cgBlock) === cgBlockType) {
+                blocks.push(cgBlock);
+            }
+        });
+        return blocks;
+    };
+
+    /**
      * Returns the next unique block id
      * @returns {String}
      */
