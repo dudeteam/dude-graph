@@ -2481,8 +2481,10 @@ cg.Renderer = (function () {
             renderer._createD3Connections();
         });
         this._cgGraph.on("cg-block-create", function (cgBlock) {
+            console.log(cgBlock);
             var rendererBlock = renderer._createRendererBlock({
-                "id": cgBlock.cgId,
+                "id": cg.UUID.generate(),
+                "cgBlock": cgBlock.cgId,
                 "position": [100, 100],
                 "size": [100, 100]
             });
@@ -2775,13 +2777,14 @@ cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
     };
     disablePlacement();
     this._d3Svg.on("mousemove" + namespace, function () {
-        d3.event.sourceEvent.preventDefault();
+        d3.event.preventDefault();
+        d3.event.stopPropagation();
         d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
         renderer._updateSelectedD3Nodes(d3Block);
     });
     this._d3Svg.on("mousedown" + namespace, function () {
-        d3.event.sourceEvent.preventDefault();
-        d3.event.sourceEvent.stopPropagation();
+        // d3.event.sourceEvent.preventDefault();
+        // d3.event.sourceEvent.stopPropagation();
         d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
         renderer._updateSelectedD3Nodes(d3Block);
         disablePlacement();
@@ -3307,7 +3310,7 @@ cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
 };
 /**
  * Creates d3Points
- * @param d3Block The svg group which will contains the d3Points of the current block
+ * @param d3Block {d3.selection} The svg group which will contains the d3Points of the current block
  * @private
  */
 cg.Renderer.prototype._createD3Points = function (d3Block) {
@@ -3355,9 +3358,9 @@ cg.Renderer.prototype._createD3Points = function (d3Block) {
 };
 
 /**
- *
+ * Creates the input/output shapes
  * @param point
- * @returns {*|{pattern, lookbehind, inside}|Array|Object|string}
+ * @returns {d3.selection}
  * @private
  */
 cg.Renderer.prototype._createD3PointsShapes = function (point) {
@@ -3397,7 +3400,7 @@ cg.Renderer.prototype._createD3PointsShapes = function (point) {
                         d3.event.sourceEvent.stopPropagation();
                     })
                     .on("dragend", function () {
-                        var position = renderer._getRelativePosition([d3.event.sourceEvent.x, d3.event.sourceEvent.y]);
+                        var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
                         var rendererPoint = renderer._getNearestRendererPoint(position);
                         console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
                     })
