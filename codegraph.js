@@ -3351,7 +3351,7 @@ cg.Renderer.prototype._createD3Points = function (d3Block) {
         .text(function (rendererPoint) {
             return rendererPoint.cgPoint.cgName;
         });
-    this._createD3PointsCircle(d3Points);
+    this._createD3PointsShapes(d3Points);
 };
 
 /**
@@ -3360,7 +3360,7 @@ cg.Renderer.prototype._createD3Points = function (d3Block) {
  * @returns {*|{pattern, lookbehind, inside}|Array|Object|string}
  * @private
  */
-cg.Renderer.prototype._createD3PointsCircle = function (point) {
+cg.Renderer.prototype._createD3PointsShapes = function (point) {
     var renderer = this;
     return point
         .each(function (rendererPoint) {
