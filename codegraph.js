@@ -638,7 +638,7 @@ pandora.Vec2 = (function () {
 })();
 
 /**
- * @namespace pandora
+ * @namespace cg
  * @type {Object}
  */
 var cg = (function() {
