@@ -3389,7 +3389,19 @@ cg.Renderer.prototype._createD3PointsCircle = function (point) {
                 .attr("transform", function () {
                     return "translate(" + [
                             (rendererPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
-                });
+                })
+                .call(
+                d3.behavior.drag()
+                    .on("dragstart", function () {
+                        d3.event.sourceEvent.preventDefault();
+                        d3.event.sourceEvent.stopPropagation();
+                    })
+                    .on("dragend", function () {
+                        var position = renderer._getRelativePosition([d3.event.sourceEvent.x, d3.event.sourceEvent.y]);
+                        var rendererPoint = renderer._getNearestRendererPoint(position);
+                        console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
+                    })
+            );
         });
 };
 /**
