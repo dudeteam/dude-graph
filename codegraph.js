@@ -2312,7 +2312,7 @@ cg.Renderer = (function () {
 
         /**
          * The renderer connections
-         * @type {Array}
+         * @type {Array<cg.RendererConnection>}
          * @private
          */
         this._rendererConnections = [];
@@ -2872,8 +2872,8 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
 cg.Renderer.prototype._createRendererConnection = function (data) {
     // TODO find where to create the graph connection as well
     this._rendererConnections.push({
-        inputPoint: this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName),
-        outputPoint: this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName)
+        "outputPoint": this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName),
+        "inputPoint": this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName)
     });
 };
 
