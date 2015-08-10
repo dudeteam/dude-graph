@@ -2821,19 +2821,16 @@ cg.Renderer.prototype._getRendererGroupById = function (id) {
 
 /**
  * Returns the rendererPoint associated with the given name
- * @param block
- * @param name
- * @returns {*}
+ * @param rendererBlock {cg.RendererBlock}
+ * @param rendererPointName {String}
+ * @returns {cg.RendererPoint|null}
  * @private
  */
-cg.Renderer.prototype._getRendererPointByName = function (block, name) {
-    var point = null;
-    pandora.forEach(block.rendererPoints, function (rendererPoint) {
-        if (rendererPoint.cgPoint.cgName === name) {
-            point = rendererPoint;
+cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
+    return pandora.findIf(rendererBlock.rendererPoints, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName === rendererPointName;
         }
-    });
-    return point;
+    );
 };
 
 /**
