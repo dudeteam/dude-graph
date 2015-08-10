@@ -2311,18 +2311,18 @@ cg.Renderer = (function () {
         this._rendererBlocks = [];
 
         /**
-         * The renderer connections
-         * @type {Array<cg.RendererConnection>}
-         * @private
-         */
-        this._rendererConnections = [];
-
-        /**
          * The renderer groups
          * @type {Array<cg.RendererGroup>}
          * @private
          */
         this._rendererGroups = [];
+
+        /**
+         * The renderer connections
+         * @type {Array<cg.RendererConnection>}
+         * @private
+         */
+        this._rendererConnections = [];
 
         /**
          * Association map from id to renderer block
@@ -3097,6 +3097,26 @@ cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
         ];
     }
 };
+
+/**
+ * Computes the connection path between two points
+ * @param point1 {[Number, Number]}
+ * @param point2 {[Number, Number]}
+ * @returns {String}
+ * @private
+ */
+cg.Renderer.prototype._computeConnectionPath = function (point1, point2) {
+    var step = 150;
+    if (point1[0] - point2[0] < 0) {
+        step += Math.max(-100, point1[0] - point2[0]);
+    }
+    return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
+        x: point1[0], y: point1[1],
+        x1: point1[0] + step, y1: point1[1],
+        x2: point2[0] - step, y2: point2[1],
+        x3: point2[0], y3: point2[1]
+    });
+};
 /**
  * Creates d3Blocks with the existing rendererBlocks
  * @private
@@ -3209,20 +3229,12 @@ cg.Renderer.prototype._updatedD3Connections = function () {
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
+    var renderer = this;
     updatedD3Connections
         .attr("d", function (rendererConnection) {
-            var p1 = this._getRendererPointPosition(rendererConnection.outputPoint);
-            var p2 = this._getRendererPointPosition(rendererConnection.inputPoint);
-            var step = 150;
-            if (p1[0] - p2[0] < 0) {
-                step += Math.max(-100, p1[0] - p2[0]);
-            }
-            return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
-                x: p1[0], y: p1[1],
-                x1: p1[0] + step, y1: p1[1],
-                x2: p2[0] - step, y2: p2[1],
-                x3: p2[0], y3: p2[1]
-            });
+            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputPoint);
+            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputPoint);
+            return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
         }.bind(this));
 };
 /**
@@ -3411,14 +3423,34 @@ cg.Renderer.prototype._createD3PointsShapes = function (point) {
                 })
                 .call(
                 d3.behavior.drag()
-                    .on("dragstart", function () {
+                    .on("dragstart", function (rendererPoint) {
                         d3.event.sourceEvent.preventDefault();
                         d3.event.sourceEvent.stopPropagation();
+                        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+                        renderer.__draggingConnection = renderer._d3Connections
+                            .append("svg:path")
+                            .classed("cg-connection", true)
+                            .classed("cg-stream", function () {
+                                return pandora.typename(rendererPoint.cgPoint) === "Stream";
+                            })
+                            .attr("d", function () {
+                                return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                            });
+                    })
+                    .on("drag", function (rendererPoint) {
+                        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+                        renderer.__draggingConnection
+                            .attr("d", function () {
+                                return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                            });
                     })
                     .on("dragend", function () {
                         var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
                         var rendererPoint = renderer._getNearestRendererPoint(position);
+                        // TODO: Add the connection to the graph
                         console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
+                        renderer.__draggingConnection.remove();
+                        delete renderer.__draggingConnection;
                     })
             );
         });
