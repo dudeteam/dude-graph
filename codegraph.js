@@ -2311,6 +2311,13 @@ cg.Renderer = (function () {
         this._rendererBlocks = [];
 
         /**
+         * The renderer connections
+         * @type {Array}
+         * @private
+         */
+        this._rendererConnections = [];
+
+        /**
          * The renderer groups
          * @type {Array<cg.RendererGroup>}
          * @private
@@ -2434,11 +2441,14 @@ cg.Renderer = (function () {
      */
     Renderer.prototype._initialize = function () {
         var renderer = this;
-        pandora.forEach(this._data.blocks, function (rendererBlockData) {
-            var rendererBlock = renderer._createRendererBlock(rendererBlockData);
+        pandora.forEach(this._data.blocks, function (blockData) {
+            renderer._createRendererBlock(blockData);
         });
-        pandora.forEach(this._data.groups, function (rendererGroupData) {
-            renderer._createRendererGroup(rendererGroupData);
+        pandora.forEach(this._data.connections, function (connectionData) {
+            renderer._createRendererConnection(connectionData);
+        });
+        pandora.forEach(this._data.groups, function (groupData) {
+            renderer._createRendererGroup(groupData);
         });
         this._initializeParents();
     };
@@ -2810,6 +2820,23 @@ cg.Renderer.prototype._getRendererGroupById = function (id) {
 };
 
 /**
+ * Returns the rendererPoint associated with the given name
+ * @param block
+ * @param name
+ * @returns {*}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointByName = function (block, name) {
+    var point = null;
+    pandora.forEach(block.rendererPoints, function (rendererPoint) {
+        if (rendererPoint.cgPoint.cgName === name) {
+            point = rendererPoint;
+        }
+    });
+    return point;
+};
+
+/**
  * Creates a renderer block
  * @param rendererBlockData
  * @returns {cg.RendererBlock}
@@ -2838,6 +2865,19 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     this._rendererBlocks.push(rendererBlock);
     this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
     return rendererBlock;
+};
+
+/**
+ * Creates a renderer connection
+ * @param data
+ * @private
+ */
+cg.Renderer.prototype._createRendererConnection = function (data) {
+    // TODO find where to create the graph connection as well
+    this._rendererConnections.push({
+        inputPoint: this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName),
+        outputPoint: this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName)
+    });
 };
 
 /**
@@ -3062,14 +3102,15 @@ cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
 };
 
 /**
- * Returns the cgPoint position
- * @param cgPoint
+ * Returns the point position
+ * @param rendererPoint {Object}
  * @return {[Number, Number]}
  * @private
  */
 // TODO: Remove this in favor of getRendererPointPosition
-cg.Renderer.prototype._getCgPointPosition = function (cgPoint) {
-    var rendererBlock = this._getRendererBlockById(cgPoint.cgBlock.cgId);
+cg.Renderer.prototype._getPointPosition = function (rendererPoint) {
+    var rendererBlock = rendererPoint.rendererBlock;
+    var cgPoint = rendererPoint.cgPoint;
     var index = 0;
     if (cgPoint.isOutput) {
         index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
@@ -3173,12 +3214,12 @@ cg.Renderer.prototype._removeD3Blocks = function () {
  */
 cg.Renderer.prototype._createD3Connections = function () {
     var createdD3Connections = this._d3Connections.selectAll(".cg-connection")
-        .data(this._cgGraph.cgConnections)
+        .data(this._rendererConnections)
         .enter()
         .append("svg:path")
         .attr("class", "cg-connection")
-        .classed("cg-stream", function (cgConnection) {
-            return pandora.typename(cgConnection.cgInputPoint) === "Stream";
+        .classed("cg-stream", function (rendererConnection) {
+            return pandora.typename(rendererConnection.inputPoint.cgPoint) === "Stream";
         });
     this._updateSelectedD3Connections(createdD3Connections);
 };
@@ -3198,10 +3239,10 @@ cg.Renderer.prototype._updatedD3Connections = function () {
  */
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
     updatedD3Connections
-        .attr("d", function (cgConnection) {
+        .attr("d", function (rendererConnection) {
             // TODO: Use getRendererPointPosition
-            var p1 = this._getCgPointPosition(cgConnection.cgOutputPoint);
-            var p2 = this._getCgPointPosition(cgConnection.cgInputPoint);
+            var p1 = this._getPointPosition(rendererConnection.outputPoint);
+            var p2 = this._getPointPosition(rendererConnection.inputPoint);
             var step = Math.max(0.5 * (p1[0] - p2[1]) + 100, 50);
             return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
                 x: p1[0], y: p1[1],

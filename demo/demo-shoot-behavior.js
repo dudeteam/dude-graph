@@ -235,5 +235,13 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
             "position": [700, 380],
             "parent": "0"
         }
+    ],
+    "connections": [
+        {"outputBlockId": "0", "outputName": "out", "inputBlockId": "1", "inputName": "in"},
+        {"outputBlockId": "2", "outputName": "value", "inputBlockId": "1", "inputName": "test"},
+        {"outputBlockId": "4", "outputName": "value", "inputBlockId": "2", "inputName": "first"},
+        {"outputBlockId": "10", "outputName": "value", "inputBlockId": "9", "inputName": "this"},
+        {"outputBlockId": "17", "outputName": "value", "inputBlockId": "16", "inputName": "this"},
+        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"}
     ]
 };
