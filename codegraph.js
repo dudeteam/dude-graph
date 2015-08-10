@@ -3100,32 +3100,6 @@ cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
         ];
     }
 };
-
-/**
- * Returns the point position
- * @param rendererPoint {Object}
- * @return {[Number, Number]}
- * @private
- */
-// TODO: Remove this in favor of getRendererPointPosition
-cg.Renderer.prototype._getPointPosition = function (rendererPoint) {
-    var rendererBlock = rendererPoint.rendererBlock;
-    var cgPoint = rendererPoint.cgPoint;
-    var index = 0;
-    if (cgPoint.isOutput) {
-        index = cgPoint.cgBlock.cgOutputs.indexOf(cgPoint.cgBlock.outputByName(cgPoint.cgName));
-        return [
-            rendererBlock.position[0] + rendererBlock.size[0] - this._config.block.padding,
-            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-        ];
-    } else {
-        index = cgPoint.cgBlock.cgInputs.indexOf(cgPoint.cgBlock.inputByName(cgPoint.cgName));
-        return [
-            rendererBlock.position[0] + this._config.block.padding,
-            rendererBlock.position[1] + this._config.block.header + this._config.point.height * index
-        ];
-    }
-};
 /**
  * Creates d3Blocks with the existing rendererBlocks
  * @private
@@ -3240,10 +3214,12 @@ cg.Renderer.prototype._updatedD3Connections = function () {
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
     updatedD3Connections
         .attr("d", function (rendererConnection) {
-            // TODO: Use getRendererPointPosition
-            var p1 = this._getPointPosition(rendererConnection.outputPoint);
-            var p2 = this._getPointPosition(rendererConnection.inputPoint);
-            var step = Math.max(0.5 * (p1[0] - p2[1]) + 100, 50);
+            var p1 = this._getRendererPointPosition(rendererConnection.outputPoint);
+            var p2 = this._getRendererPointPosition(rendererConnection.inputPoint);
+            var step = 150;
+            if (p1[0] - p2[0] < 0) {
+                step = 50;
+            }
             return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
                 x: p1[0], y: p1[1],
                 x1: p1[0] + step, y1: p1[1],
@@ -3409,6 +3385,9 @@ cg.Renderer.prototype._createD3PointsShapes = function (point) {
         .each(function (rendererPoint) {
             d3.select(this)
                 .classed("cg-empty", function (rendererPoint) {
+                    if (rendererPoint.cgPoint.cgName === "this") {
+                        console.log(rendererPoint);
+                    }
                     return rendererPoint.cgPoint.empty();
                 });
             var node = null;
