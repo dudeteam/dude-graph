@@ -3218,7 +3218,7 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
             var p2 = this._getRendererPointPosition(rendererConnection.inputPoint);
             var step = 150;
             if (p1[0] - p2[0] < 0) {
-                step = 50;
+                step += Math.max(-100, p1[0] - p2[0]);
             }
             return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
                 x: p1[0], y: p1[1],
