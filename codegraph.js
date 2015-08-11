@@ -2871,11 +2871,13 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
  * @private
  */
 cg.Renderer.prototype._createRendererConnection = function (data) {
-    // TODO find where to create the graph connection as well
-    this._rendererConnections.push({
+    var rendererConnection = {
         "outputPoint": this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName),
         "inputPoint": this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName)
-    });
+    };
+    this._rendererConnections.push(rendererConnection);
+    rendererConnection.inputPoint.connections.push(rendererConnection);
+    rendererConnection.outputPoint.connections.push(rendererConnection);
 };
 
 /**
@@ -2891,7 +2893,8 @@ cg.Renderer.prototype._assignRendererPoints = function (rendererBlock) {
             "rendererBlock": rendererBlock,
             "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
             "cgPoint": cgOutput,
-            "isOutput": true
+            "isOutput": true,
+            "connections": []
         });
     });
     pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
@@ -2900,7 +2903,8 @@ cg.Renderer.prototype._assignRendererPoints = function (rendererBlock) {
             "rendererBlock": rendererBlock,
             "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
             "cgPoint": cgInput,
-            "isOutput": false
+            "isOutput": false,
+            "connections": []
         });
     });
 };
@@ -3395,10 +3399,7 @@ cg.Renderer.prototype._createD3PointsShapes = function (point) {
         .each(function (rendererPoint) {
             d3.select(this)
                 .classed("cg-empty", function (rendererPoint) {
-                    if (rendererPoint.cgPoint.cgName === "this") {
-                        console.log(rendererPoint);
-                    }
-                    return rendererPoint.cgPoint.empty();
+                    return rendererPoint.connections.length === 0;
                 });
             var node = null;
             switch (pandora.typename(rendererPoint.cgPoint)) {
