@@ -89,7 +89,10 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
         {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "first"},
         {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "9", "cgInputName": "this"},
         {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "14", "cgInputName": "this"},
-        {"cgOutputBlockId": "5", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "second"}
+        {"cgOutputBlockId": "5", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "second"},
+        {"cgOutputBlockId": "1", "cgOutputName": "true", "cgInputBlockId": "3", "cgInputName": "in"},
+        {"cgOutputBlockId": "6", "cgOutputName": "value", "cgInputBlockId": "3", "cgInputName": "this"},
+        {"cgOutputBlockId": "7", "cgOutputName": "value", "cgInputBlockId": "3", "cgInputName": "name"}
     ]
 };
 var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
@@ -242,6 +245,10 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {"outputBlockId": "4", "outputName": "value", "inputBlockId": "2", "inputName": "first"},
         {"outputBlockId": "10", "outputName": "value", "inputBlockId": "9", "inputName": "this"},
         {"outputBlockId": "17", "outputName": "value", "inputBlockId": "16", "inputName": "this"},
-        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"}
+        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"},
+        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"},
+        {"outputBlockId": "1", "outputName": "true", "inputBlockId": "3", "inputName": "in"},
+        {"outputBlockId": "6", "outputName": "value", "inputBlockId": "3", "inputName": "this"},
+        {"outputBlockId": "7", "outputName": "value", "inputBlockId": "3", "inputName": "name"}
     ]
 };

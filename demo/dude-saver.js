@@ -14,7 +14,7 @@ var DudeSaver = (function() {
             "subtract": "-",
             "multiply": "*",
             "divide": "/"
-        }
+        };
         this._delegateSignatures = {
             "on_start": "on_start() -> void",
             "on_update": "on_update() -> void",
@@ -92,11 +92,45 @@ var DudeSaver = (function() {
         return result;
     };
 
+    DudeSaver.prototype._saveInstruction = function (instruction, tabs) {
+        var result = "";
+        result += this._indent(tabs);
+        if (instruction.inputByName("this")) { // method
+            var obj = instruction.inputByName("this").cgConnections[0].cgOutputPoint.cgBlock;
+            if (pandora.typename(obj) !== "Variable") {
+                throw new Error("`this` should always be a variable in block `" + obj.cgId + "`");
+            }
+            result += obj.cgName + "()->" + instruction.cgName.substr(instruction.cgName.lastIndexOf(".") + 1);
+            result += this._saveFunctionArguments(instruction.cgInputs.slice(2));
+        } else { // function
+            result += instruction.cgName;
+            result += this._saveFunctionArguments(instruction.cgInputs.slice(1));
+        }
+        result += ";\n";
+        return result;
+    };
+
+    DudeSaver.prototype._saveFunctionArguments = function (args) {
+        var result = "";
+        result += "(";
+        pandora.forEach(args, function (arg, index) {
+            if (index !== 0) {
+                result += ", ";
+            }
+            result += this.save(arg.cgConnections[0].cgOutputPoint.cgBlock);
+        }.bind(this));
+        result += ")";
+        return result;
+    };
+
     DudeSaver.prototype._saveVariable = function (variable) {
         return "*_" + variable.cgName;
     };
 
     DudeSaver.prototype._saveValue = function (value) {
+        if (value.cgValueType === "String") {
+            return "\"" + value.cgName + "\"";
+        }
         return value.cgName;
     };
 
