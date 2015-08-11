@@ -787,7 +787,9 @@ cg.Graph = (function () {
             "Vec2": ["Vec2"],
             "Vec3": ["Vec3"],
             "Vec4": ["Vec4"],
-            "Color": ["Color", "Vec4"]
+            "Color": ["Color", "Vec4"],
+            "Texture2D": ["Texture2D"],
+            "Entity": ["Entity"]
         };
 
         /**
@@ -994,9 +996,24 @@ cg.Graph = (function () {
     };
 
     /**
+     * Returns the first block with the given name.
+     * @param cgBlockName
+     * @returns {cg.Block}
+     */
+    Graph.prototype.blockByName = function (cgBlockName) {
+        var block = null;
+        pandora.forEach(this.cgBlocks, function (cgBlock) {
+            if (cgBlock.cgName === cgBlockName) {
+                block = cgBlock;
+            }
+        });
+        return block;
+    };
+
+    /**
      * Returns an array of blocks which have the given type.
      * @param cgBlockType
-     * @returns {Array}
+     * @returns {Array<cg.Block>}
      */
     Graph.prototype.blocksByType = function (cgBlockType) {
         var blocks = [];
@@ -1255,7 +1272,8 @@ cg.Block = (function () {
      * @returns {boolean}
      */
     Block.prototype.updateTemplate = function (point, type) {
-        if (point.cgTemplate === null || this.cgTemplates[point.cgTemplate].indexOf(type) === -1) {
+        if (point.cgTemplate === null || !this.cgTemplates[point.cgTemplate] ||
+            this.cgTemplates[point.cgTemplate].indexOf(type) === -1) {
             return false;
         }
         point.cgValueType = type;
@@ -1738,6 +1756,7 @@ cg.Function = (function () {
             cgId: data.cgId,
             cgName: data.cgName,
             cgModel: data.cgModel,
+            cgTemplates: data.cgTemplates,
             cgInputs: data.cgInputs,
             cgOutputs: data.cgReturn ? [{
                 cgType: "Point",

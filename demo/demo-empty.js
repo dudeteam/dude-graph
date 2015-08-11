@@ -9,5 +9,6 @@ var DEMO_EMPTY_RENDERER_DATA = {
         }
     },
     "blocks": [],
-    "groups": []
+    "groups": [],
+    "connections": []
 };

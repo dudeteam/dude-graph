@@ -24,29 +24,32 @@
         </div>
     </template>
     <script src="dude-models.js"></script>
+    <script src="shader-graph-models.js"></script>
+    <script src="demo-shader.js"></script>
     <script src="demo-basic.js"></script>
     <script src="demo-shoot-behavior.js"></script>
     <script src="dude-saver.js"></script>
+    <script src="shader-saver.js"></script>
     <script>
         Polymer({
             is: "demo-wrapper",
             properties: {
                 modelsData: {
                     type: Object,
-                    value: DUDE_MODELS
+                    value: SHADER_GRAPH_MODELS
                 },
                 graphData: {
                     type: Object,
-                    value: DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
+                    value: DEMO_SHADER_GRAPH_DATA
                 },
                 rendererData: {
                     type: Object,
-                    value: DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
+                    value: DEMO_SHADER_RENDERER_DATA
                 }
             },
             ready: function () {
                 this.$.inspector.bindElement(this.$.element);
-                this.$.inspector.bindBuilder(new DudeSaver());
+                this.$.inspector.bindBuilder(new ShaderSaver());
             }
         });
     </script>

@@ -1,11 +1,11 @@
-@import url(//fonts.googleapis.com/css?family=Dosis);
+@import url(//fonts.googleapis.com/css?family=Nunito:300);
 
 /**
  * Typography
  */
 text {
     fill: hsla(0, 0%, 60%, 1);
-    font-family: "Dosis", monospace;
+    font-family: "Nunito", monospace;
 }
 .cg-title {
     fill: hsla(0, 0%, 90%, 1);
