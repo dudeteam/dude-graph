@@ -16,7 +16,8 @@ var CG_SOURCES = [
     "lib/graph/points/*.js",
     "lib/serialization/*.js",
     "lib/renderer/renderer.js",
-    "lib/renderer/*.js"
+    "lib/renderer/*.js",
+    "lib/renderer/**/*.js"
 ];
 
 gulp.task("jshint", function () {

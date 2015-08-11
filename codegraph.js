@@ -1267,23 +1267,23 @@ cg.Block = (function () {
 
     /**
      * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
-     * @param point The point on which the connection will be created
-     * @param type The type of the connection that we try to attach
+     * @param cgPoint {cg.Point} The point on which the connection will be created
+     * @param type {String} The type of the connection that we try to attach
      * @returns {boolean}
      */
-    Block.prototype.updateTemplate = function (point, type) {
-        if (point.cgTemplate === null || !this.cgTemplates[point.cgTemplate] ||
-            this.cgTemplates[point.cgTemplate].indexOf(type) === -1) {
+    Block.prototype.updateTemplate = function (cgPoint, type) {
+        if (cgPoint.cgTemplate === null || !this.cgTemplates[cgPoint.cgTemplate] ||
+            this.cgTemplates[cgPoint.cgTemplate].indexOf(type) === -1) {
             return false;
         }
-        point.cgValueType = type;
+        cgPoint.cgValueType = type;
         var failToInfer = false;
         var updateValueType = function (currentPoint) {
             if (failToInfer) {
                 return true;
             }
-            if (currentPoint.cgTemplate === point.cgTemplate) {
-                if (point.cgConnections.length === 0) {
+            if (currentPoint.cgTemplate === cgPoint.cgTemplate) {
+                if (cgPoint.cgConnections.length === 0) {
                     currentPoint.cgValueType = type;
                 } else {
                     failToInfer = true;
@@ -2598,209 +2598,6 @@ cg.Renderer = (function () {
 
 })();
 /**
- * Creates the collision quadtree
- * @private
- */
-cg.Renderer.prototype._createRendererBlocksCollisions = function () {
-    this._rendererBlocksQuadtree = d3.geom.quadtree()
-        .x(function (rendererBlock) {
-            return rendererBlock.position[0];
-        })
-        .y(function (rendererBlock) {
-            return rendererBlock.position[1];
-        })(this._rendererBlocks);
-};
-
-/**
- * Creates the collision quadtree
- * @private
- */
-cg.Renderer.prototype._createRendererGroupsCollisions = function () {
-    this._rendererGroupsQuadtree = d3.geom.quadtree()
-        .x(function (rendererGroup) {
-            return rendererGroup.position[0];
-        })
-        .y(function (rendererGroup) {
-            return rendererGroup.position[1];
-        })(this._rendererGroups);
-};
-
-/**
- * Creates the collision quadtree
- * @private
- */
-cg.Renderer.prototype._createRendererPointsCollisions = function () {
-    var renderer = this;
-    var rendererPoints = [];
-    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
-        rendererPoints = rendererPoints.concat(rendererBlock.rendererPoints);
-    });
-    this._rendererPointsQuadtree = d3.geom.quadtree()
-        .x(function (rendererPoint) {
-            return renderer._getRendererPointPosition(rendererPoint)[0];
-        })
-        .y(function (rendererPoint) {
-            return renderer._getRendererPointPosition(rendererPoint)[1];
-        })(rendererPoints);
-};
-
-/**
- * Returns all RendererNodes overlapping the given area
- * @param x0 {Number} Top left x
- * @param y0 {Number} Top left y
- * @param x3 {Number} Bottom right x
- * @param y3 {Number} Bottom right y
- * @return {Array<cg.RendererNode>}
- * @private
- */
-cg.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererBlocksCollisions();
-    var rendererBlocks = [];
-    this._rendererBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
-        var rendererBlock = d3QuadtreeNode.point;
-        if (rendererBlock) {
-            var bounds = [rendererBlock.position[0], rendererBlock.position[1], rendererBlock.position[0] + rendererBlock.size[0], rendererBlock.position[1] + rendererBlock.size[1]];
-            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
-                rendererBlocks.push(rendererBlock);
-            }
-        }
-        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
-    });
-    return rendererBlocks;
-};
-
-/**
- * Get the best rendererGroup that can accept the given rendererNode
- * @param rendererNode {cg.RendererNode}
- * @returns {cg.RendererGroup|null}
- * @private
- */
-cg.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererGroupsCollisions();
-    var bestRendererGroups = [];
-    var x0 = rendererNode.position[0];
-    var y0 = rendererNode.position[1];
-    var x3 = rendererNode.position[0] + rendererNode.size[0];
-    var y3 = rendererNode.position[1] + rendererNode.size[1];
-    this._rendererGroupsQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
-        var rendererGroup = d3QuadtreeNode.point;
-        if (rendererGroup && rendererGroup !== rendererNode) {
-            var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
-            if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
-                bestRendererGroups.push(rendererGroup);
-            }
-        }
-        return false; // TODO: Optimize
-    });
-    var bestRendererGroup = null;
-    pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
-        if (bestRendererGroup === null) {
-            bestRendererGroup = bestRendererGroupPossible;
-        } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
-            bestRendererGroup = bestRendererGroupPossible;
-        }
-    });
-    return bestRendererGroup;
-};
-
-/**
- * Returns
- * @param position {[Number, Number]}
- * @return {cg.Point|null}
- * @private
- */
-cg.Renderer.prototype._getNearestRendererPoint = function (position) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererPointsCollisions();
-    var rendererPoint = this._rendererPointsQuadtree.find(position);
-    if (rendererPoint) {
-        var rendererPointPosition = this._getRendererPointPosition(rendererPoint);
-        if (rendererPointPosition[0] > position[0] - this._config.point.height && rendererPointPosition[0] < position[0] + this._config.point.height &&
-            rendererPointPosition[1] > position[1] - this._config.point.height && rendererPointPosition[1] < position[1] + this._config.point.height) {
-            return rendererPoint;
-        }
-    }
-    return null;
-};
-/**
- * Internal function of d3
- * @param dispatch
- * @returns {event}
- */
-function d3_dispatch_event(dispatch) {
-    var listeners = [], listenerByName = d3.map();
-
-    function event() {
-        var z = listeners, i = -1, n = z.length, l;
-        while (++i < n) {
-            l = z[i].on;
-            if (l) {
-                l.apply(this, arguments);
-            }
-        }
-        return dispatch;
-    }
-
-    event.on = function (name, listener) {
-        var l = listenerByName.get(name), i;
-        if (arguments.length < 2) return l && l.on;
-        if (l) {
-            l.on = null;
-            listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
-            listenerByName.remove(name);
-        }
-        if (listener) listeners.push(listenerByName.set(name, {on: listener}));
-        return dispatch;
-    };
-    return event;
-}
-
-/**
- * Internal function of d3
- * @param target
- */
-function d3_eventDispatch(target) {
-    var dispatch = d3.dispatch(), i = 0, n = arguments.length;
-    while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
-    dispatch.of = function (thiz, argumentz) {
-        return function (e1) {
-            var e0;
-            try {
-                e0 = e1.sourceEvent = d3.event;
-                e1.target = target;
-                d3.event = e1;
-                dispatch[e1.type].apply(thiz, argumentz);
-            } finally {
-                d3.event = e0;
-            }
-        };
-    };
-    return dispatch;
-}
-
-/**
- * Double click behavior
- */
-d3.behavior.doubleClick = function () {
-    var event = d3_eventDispatch(doubleClick, "dblclick");
-
-    function doubleClick(selection) {
-        selection.each(function (i) {
-            var dispatch = event.of(this, arguments);
-            d3.select(this).on("dblclick", clicked);
-            function clicked() {
-                dispatch({
-                    "type": "dblclick"
-                });
-            }
-        });
-    }
-
-    return d3.rebind(doubleClick, event, "on");
-};
-/**
  * Creates the drag and drop behavior on a d3Node
  * @returns {d3.behavior.drag}
  * @private
@@ -2856,8 +2653,8 @@ cg.Renderer.prototype._createRemoveParentBehavior = function () {
                 d3.event.sourceEvent.preventDefault();
                 d3.event.sourceEvent.stopPropagation();
                 renderer._removeRendererNodeParent(rendererNode);
-                // renderer._updateSelectedD3Nodes(renderer._getD3NodesFromRendererNodes([rendererNode, rendererGroupParent]));
                 // TODO: Optimize
+                // renderer._updateSelectedD3Nodes(renderer._getD3NodesFromRendererNodes([rendererNode, rendererGroupParent]));
                 renderer._updateSelectedD3Nodes(renderer.d3Nodes);
             }
         });
@@ -2891,6 +2688,129 @@ cg.Renderer.prototype._createPlacementBehavior = function (d3Block) {
     });
 };
 /**
+ * Creates the selection brush
+ * @private
+ */
+cg.Renderer.prototype._createSelectionBehavior = function () {
+    var renderer = this;
+    var selectionBrush = null;
+    this._d3Svg.call(d3.behavior.drag()
+            .on("dragstart", function () {
+                if (d3.event.sourceEvent.shiftKey) {
+                    d3.event.sourceEvent.stopImmediatePropagation();
+                    selectionBrush = renderer._d3Svg
+                        .append("svg:rect")
+                        .classed("cg-selection", true)
+                        .datum(d3.mouse(this));
+                } else {
+                    renderer._clearSelection();
+                }
+            })
+            .on("drag", function () {
+                if (selectionBrush) {
+                    var position = d3.mouse(this);
+                    selectionBrush.attr({
+                        "x": function (origin) {
+                            return Math.min(origin[0], position[0]);
+                        },
+                        "y": function (origin) {
+                            return Math.min(origin[1], position[1]);
+                        },
+                        "width": function (origin) {
+                            return Math.max(position[0] - origin[0], origin[0] - position[0]);
+                        },
+                        "height": function (origin) {
+                            return Math.max(position[1] - origin[1], origin[1] - position[1]);
+                        }
+                    });
+                }
+            })
+            .on("dragend", function () {
+                if (selectionBrush) {
+                    var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
+                    var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
+                    var selectedRendererNodes = renderer._getNearestRendererBlocks(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    if (selectedRendererNodes.length > 0) {
+                        renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
+                    } else {
+                        renderer._clearSelection();
+                    }
+                    selectionBrush.remove();
+                    selectionBrush = null;
+                }
+            })
+    );
+};
+
+/**
+ * Adds the given d3Nodes to the current selection
+ * @param d3Nodes {d3.selection} The d3Nodes to select
+ * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
+ * @private
+ */
+cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
+    if (clearSelection) {
+        this._clearSelection(true);
+    }
+    d3Nodes.classed("cg-selected", true);
+    this.emit("cg-select", d3Nodes.data()[d3Nodes.data().length - 1]);
+};
+
+/**
+ * Clears the selection
+ * @param ignoreEmit {Boolean?} If true, the unselect event will not be emitted
+ * @private
+ */
+cg.Renderer.prototype._clearSelection = function (ignoreEmit) {
+    this.d3Selection.classed("cg-selected", false);
+    if (!ignoreEmit) {
+        this.emit("cg-unselect");
+    }
+};
+/**
+ * Creates zoom and pan
+ * @private
+ */
+cg.Renderer.prototype._createZoomBehavior = function () {
+    var renderer = this;
+    this._zoom = d3.behavior.zoom()
+        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
+        .on("zoom", function () {
+            if (d3.event.sourceEvent) {
+                pandora.preventCallback(d3.event.sourceEvent);
+            }
+            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._config.zoom.translate = renderer._zoom.translate();
+            renderer._config.zoom.scale = renderer._zoom.scale();
+        }.bind(this));
+    this._d3Svg.call(this._zoom);
+};
+/**
+ * Creates a renderer connection
+ * @param data
+ * @private
+ */
+cg.Renderer.prototype._createRendererConnection = function (data) {
+    var outputRendererPoint = data.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName);
+    var inputRendererPoint = data.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName);
+    if (!outputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the outputRendererPoint");
+    }
+    if (!inputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the inputRendererPoint");
+    }
+    if (!this._cgGraph.connectionByPoints(outputRendererPoint.cgPoint, inputRendererPoint.cgPoint)) {
+        outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
+    }
+    var rendererConnection = {
+        "outputPoint": outputRendererPoint,
+        "inputPoint": inputRendererPoint
+    };
+    this._rendererConnections.push(rendererConnection);
+    outputRendererPoint.connections.push(rendererConnection);
+    inputRendererPoint.connections.push(rendererConnection);
+};
+/**
  * Returns the rendererNode associated with the given id
  * @param id
  * @returns {cg.RendererBlock|null}
@@ -2908,20 +2828,6 @@ cg.Renderer.prototype._getRendererBlockById = function (id) {
  */
 cg.Renderer.prototype._getRendererGroupById = function (id) {
     return this._rendererGroupIds.get(id) || null;
-};
-
-/**
- * Returns the rendererPoint associated with the given name
- * @param rendererBlock {cg.RendererBlock}
- * @param rendererPointName {String}
- * @returns {cg.RendererPoint|null}
- * @private
- */
-cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
-    return pandora.findIf(rendererBlock.rendererPoints, function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName === rendererPointName;
-        }
-    );
 };
 
 /**
@@ -2949,66 +2855,10 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     rendererBlock.rendererPoints = [];
     rendererBlock.position = rendererBlockData.position || [0, 0];
     rendererBlock.size = rendererBlockData.size || this._config.block.size;
-    this._assignRendererPoints(rendererBlock);
+    this._createsRendererPoints(rendererBlock);
     this._rendererBlocks.push(rendererBlock);
     this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
     return rendererBlock;
-};
-
-/**
- * Creates the rendererPoints for a given rendererBlock
- * @param rendererBlock {cg.RendererBlock}
- * @private
- */
-cg.Renderer.prototype._assignRendererPoints = function (rendererBlock) {
-    rendererBlock.rendererPoints = [];
-    pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
-            "cgPoint": cgOutput,
-            "isOutput": true,
-            "connections": []
-        });
-    });
-    pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
-            "cgPoint": cgInput,
-            "isOutput": false,
-            "connections": []
-        });
-    });
-};
-
-/**
- * Creates a renderer connection
- * @param data
- * @private
- */
-cg.Renderer.prototype._createRendererConnection = function (data) {
-    var outputRendererPoint = data.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName);
-    var inputRendererPoint = data.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName);
-    if (!outputRendererPoint) {
-        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the outputRendererPoint");
-    }
-    if (!inputRendererPoint) {
-        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the inputRendererPoint");
-    }
-    if (!this._cgGraph.connectionByPoints(outputRendererPoint.cgPoint, inputRendererPoint.cgPoint)) {
-        // TODO: If connection does not exist in graph, just add a new one here
-        // outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
-    }
-    var rendererConnection = {
-        "outputPoint": outputRendererPoint,
-        "inputPoint": inputRendererPoint
-    };
-    this._rendererConnections.push(rendererConnection);
-    outputRendererPoint.connections.push(rendererConnection);
-    inputRendererPoint.connections.push(rendererConnection);
 };
 
 /**
@@ -3087,141 +2937,45 @@ cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
     return parents;
 };
 /**
- * Returns an absolute position in the SVG from the relative position in the SVG container
- * It takes into account all transformations applied to the SVG
- * Example: renderer._getAbsolutePosition(d3.mouse(this));
- * @param point {[Number, Number]}
- * @return {[Number, Number]}
+ * Returns the rendererPoint associated with the given name
+ * @param rendererBlock {cg.RendererBlock}
+ * @param rendererPointName {String}
+ * @returns {cg.RendererPoint|null}
  * @private
  */
-cg.Renderer.prototype._getAbsolutePosition = function (point) {
-    this._svgPoint.x = point[0];
-    this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
-    return [position.x, position.y];
+cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
+    return pandora.findIf(rendererBlock.rendererPoints, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName === rendererPointName;
+        }
+    );
 };
 
 /**
- * Returns a relative position in the SVG container from absolute position in the SVG
- * It takes into account all transformations applied to the SVG
- * Example: renderer._getRelativePosition(d3.mouse(this));
- * @param point {[Number, Number]}
- * @return {[Number, Number]}
+ * Creates the rendererPoints for a given rendererBlock
+ * @param rendererBlock {cg.RendererBlock}
  * @private
  */
-cg.Renderer.prototype._getRelativePosition = function (point) {
-    this._svgPoint.x = point[0];
-    this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._d3Root.node().getScreenCTM().inverse());
-    return [position.x, position.y];
-};
-
-/**
- * Returns the bounding box for all the given rendererNodes
- * @param rendererNodes {Array<cg.RendererNode>}
- * @returns {[[Number, Number], [Number, Number]]}
- * @private
- */
-cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
-    var topLeft = null;
-    var bottomRight = null;
-    pandora.forEach(rendererNodes, function (rendererNode) {
-        if (!topLeft) {
-            topLeft = new pandora.Vec2(rendererNode.position);
-        }
-        if (!bottomRight) {
-            bottomRight = new pandora.Vec2(rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]);
-        }
-        topLeft.x = Math.min(rendererNode.position[0], topLeft.x);
-        topLeft.y = Math.min(rendererNode.position[1], topLeft.y);
-        bottomRight.x = Math.max(bottomRight.x, rendererNode.position[0] + rendererNode.size[0]);
-        bottomRight.y = Math.max(bottomRight.y, rendererNode.position[1] + rendererNode.size[1]);
+cg.Renderer.prototype._createsRendererPoints = function (rendererBlock) {
+    rendererBlock.rendererPoints = [];
+    pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
+            "cgPoint": cgOutput,
+            "isOutput": true,
+            "connections": []
+        });
     });
-    return [topLeft.toArray(), bottomRight.toArray()];
-};
-
-/**
- * Computes the position and the size of the given rendererGroup depending of its children
- * @param rendererGroup {cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererGroup) {
-    var renderer = this;
-    if (rendererGroup.children.length > 0) {
-        var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
-        rendererGroup.position = [
-            size[0][0] - renderer._config.group.padding,
-            size[0][1] - renderer._config.group.padding - renderer._config.group.header];
-        rendererGroup.size = [
-            size[1][0] - size[0][0] + renderer._config.group.padding * 2,
-            size[1][1] - size[0][1] + renderer._config.group.padding * 2 + renderer._config.group.header
-        ];
-    }
-    rendererGroup.size = [
-        Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
-        Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
-    ];
-    var d3Groups = this._getD3NodesFromRendererNodes([rendererGroup]);
-    var d3Text = d3Groups.select("text");
-    if (d3Text.node()) {
-        rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Text.node().getBBox().width + renderer._config.group.padding * 2);
-    }
-    (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
-        if (rendererGroupParent) {
-            renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
-            computeRendererGroupParentPositionAndSize(rendererGroupParent.parent);
-        }
-    })(rendererGroup.parent);
-};
-
-/**
- * Computes the position and the size of all the rendererGroups depending of their children
- * @private
- */
-cg.Renderer.prototype._computeRendererGroupsPositionAndSize = function () {
-    var renderer = this;
-    pandora.forEach(this._rendererGroups, function (rendererGroup) {
-        renderer._computeRendererGroupPositionAndSize(rendererGroup);
-    });
-};
-
-/**
- * Returns the rendererPoint position
- * @param rendererPoint {cg.RendererPoint}
- * @return {[Number, Number]}
- * @private
- */
-cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
-    if (rendererPoint.isOutput) {
-        return [
-            rendererPoint.rendererBlock.position[0] + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
-            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
-        ];
-    } else {
-        return [
-            rendererPoint.rendererBlock.position[0] + this._config.block.padding,
-            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
-        ];
-    }
-};
-
-/**
- * Computes the connection path between two points
- * @param point1 {[Number, Number]}
- * @param point2 {[Number, Number]}
- * @returns {String}
- * @private
- */
-cg.Renderer.prototype._computeConnectionPath = function (point1, point2) {
-    var step = 150;
-    if (point1[0] - point2[0] < 0) {
-        step += Math.max(-100, point1[0] - point2[0]);
-    }
-    return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
-        x: point1[0], y: point1[1],
-        x1: point1[0] + step, y1: point1[1],
-        x2: point2[0] - step, y2: point2[1],
-        x3: point2[0], y3: point2[1]
+    pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
+            "cgPoint": cgInput,
+            "isOutput": false,
+            "connections": []
+        });
     });
 };
 /**
@@ -3329,7 +3083,8 @@ cg.Renderer.prototype._createD3Connections = function () {
     var createdD3Connections = this.d3Connections
         .data(this._rendererConnections, function (rendererConnection) {
             if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.rendererBlock.id;
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
             }
         })
         .enter()
@@ -3372,7 +3127,8 @@ cg.Renderer.prototype._removeD3Connections = function () {
     var removedRendererConnections = this.d3Connections
         .data(this._rendererConnections, function (rendererConnection) {
             if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.rendererBlock.id;
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
             }
         })
         .exit()
@@ -3624,82 +3380,345 @@ cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
     );
 };
 /**
- * Creates the selection brush
+ * Creates the collision quadtree
  * @private
  */
-// TODO: Refactor
-cg.Renderer.prototype._createSelectionBehavior = function () {
+cg.Renderer.prototype._createRendererBlocksCollisions = function () {
+    this._rendererBlocksQuadtree = d3.geom.quadtree()
+        .x(function (rendererBlock) {
+            return rendererBlock.position[0];
+        })
+        .y(function (rendererBlock) {
+            return rendererBlock.position[1];
+        })(this._rendererBlocks);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+cg.Renderer.prototype._createRendererGroupsCollisions = function () {
+    this._rendererGroupsQuadtree = d3.geom.quadtree()
+        .x(function (rendererGroup) {
+            return rendererGroup.position[0];
+        })
+        .y(function (rendererGroup) {
+            return rendererGroup.position[1];
+        })(this._rendererGroups);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+cg.Renderer.prototype._createRendererPointsCollisions = function () {
     var renderer = this;
-    var selectionBrush = null;
-    this._d3Svg.call(d3.behavior.drag()
-            .on("dragstart", function () {
-                if (d3.event.sourceEvent.shiftKey) {
-                    d3.event.sourceEvent.stopImmediatePropagation();
-                    selectionBrush = renderer._d3Svg
-                        .append("svg:rect")
-                        .classed("cg-selection", true)
-                        .datum(d3.mouse(this));
-                } else {
-                    renderer._clearSelection();
-                }
-            })
-            .on("drag", function () {
-                if (selectionBrush) {
-                    var position = d3.mouse(this);
-                    selectionBrush.attr({
-                        "x": function (origin) {
-                            return Math.min(origin[0], position[0]);
-                        },
-                        "y": function (origin) {
-                            return Math.min(origin[1], position[1]);
-                        },
-                        "width": function (origin) {
-                            return Math.max(position[0] - origin[0], origin[0] - position[0]);
-                        },
-                        "height": function (origin) {
-                            return Math.max(position[1] - origin[1], origin[1] - position[1]);
-                        }
-                    });
-                }
-            })
-            .on("dragend", function () {
-                if (selectionBrush) {
-                    var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
-                    var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
-                    var selectedRendererNodes = renderer._getNearestRendererBlocks(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
-                    if (selectedRendererNodes.length > 0) {
-                        renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
-                    } else {
-                        renderer._clearSelection();
-                    }
-                    selectionBrush.remove();
-                    selectionBrush = null;
-                }
-            })
-    );
+    var rendererPoints = [];
+    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
+        rendererPoints = rendererPoints.concat(rendererBlock.rendererPoints);
+    });
+    this._rendererPointsQuadtree = d3.geom.quadtree()
+        .x(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[0];
+        })
+        .y(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[1];
+        })(rendererPoints);
 };
 
 /**
- * Adds the given d3Nodes to the current selection
- * @param d3Nodes {d3.selection} The d3Nodes to select
- * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
+ * Returns all RendererNodes overlapping the given area
+ * @param x0 {Number} Top left x
+ * @param y0 {Number} Top left y
+ * @param x3 {Number} Bottom right x
+ * @param y3 {Number} Bottom right y
+ * @return {Array<cg.RendererNode>}
  * @private
  */
-cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
-    if (clearSelection) {
-        this._clearSelection();
+cg.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererBlocksCollisions();
+    var rendererBlocks = [];
+    this._rendererBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererBlock = d3QuadtreeNode.point;
+        if (rendererBlock) {
+            var bounds = [rendererBlock.position[0], rendererBlock.position[1], rendererBlock.position[0] + rendererBlock.size[0], rendererBlock.position[1] + rendererBlock.size[1]];
+            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
+                rendererBlocks.push(rendererBlock);
+            }
+        }
+        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
+    });
+    return rendererBlocks;
+};
+
+/**
+ * Get the best rendererGroup that can accept the given rendererNode
+ * @param rendererNode {cg.RendererNode}
+ * @returns {cg.RendererGroup|null}
+ * @private
+ */
+cg.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererGroupsCollisions();
+    var bestRendererGroups = [];
+    var x0 = rendererNode.position[0];
+    var y0 = rendererNode.position[1];
+    var x3 = rendererNode.position[0] + rendererNode.size[0];
+    var y3 = rendererNode.position[1] + rendererNode.size[1];
+    this._rendererGroupsQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererGroup = d3QuadtreeNode.point;
+        if (rendererGroup && rendererGroup !== rendererNode) {
+            var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
+            if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
+                bestRendererGroups.push(rendererGroup);
+            }
+        }
+        return false; // TODO: Optimize
+    });
+    var bestRendererGroup = null;
+    pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
+        if (bestRendererGroup === null) {
+            bestRendererGroup = bestRendererGroupPossible;
+        } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
+            bestRendererGroup = bestRendererGroupPossible;
+        }
+    });
+    return bestRendererGroup;
+};
+
+/**
+ * Returns
+ * @param position {[Number, Number]}
+ * @return {cg.Point|null}
+ * @private
+ */
+cg.Renderer.prototype._getNearestRendererPoint = function (position) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererPointsCollisions();
+    var rendererPoint = this._rendererPointsQuadtree.find(position);
+    if (rendererPoint) {
+        var rendererPointPosition = this._getRendererPointPosition(rendererPoint);
+        if (rendererPointPosition[0] > position[0] - this._config.point.height && rendererPointPosition[0] < position[0] + this._config.point.height &&
+            rendererPointPosition[1] > position[1] - this._config.point.height && rendererPointPosition[1] < position[1] + this._config.point.height) {
+            return rendererPoint;
+        }
     }
-    d3Nodes.classed("cg-selected", true);
-    this.emit("cg-select", d3Nodes.data()[d3Nodes.data().length - 1]);
+    return null;
+};
+/**
+ * Internal function of d3
+ * @param dispatch
+ * @returns {event}
+ */
+function d3_dispatch_event(dispatch) {
+    var listeners = [], listenerByName = d3.map();
+
+    function event() {
+        var z = listeners, i = -1, n = z.length, l;
+        while (++i < n) {
+            l = z[i].on;
+            if (l) {
+                l.apply(this, arguments);
+            }
+        }
+        return dispatch;
+    }
+
+    event.on = function (name, listener) {
+        var l = listenerByName.get(name), i;
+        if (arguments.length < 2) return l && l.on;
+        if (l) {
+            l.on = null;
+            listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
+            listenerByName.remove(name);
+        }
+        if (listener) listeners.push(listenerByName.set(name, {on: listener}));
+        return dispatch;
+    };
+    return event;
+}
+
+/**
+ * Internal function of d3
+ * @param target
+ */
+function d3_eventDispatch(target) {
+    var dispatch = d3.dispatch(), i = 0, n = arguments.length;
+    while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
+    dispatch.of = function (thiz, argumentz) {
+        return function (e1) {
+            var e0;
+            try {
+                e0 = e1.sourceEvent = d3.event;
+                e1.target = target;
+                d3.event = e1;
+                dispatch[e1.type].apply(thiz, argumentz);
+            } finally {
+                d3.event = e0;
+            }
+        };
+    };
+    return dispatch;
+}
+
+/**
+ * Double click behavior
+ */
+d3.behavior.doubleClick = function () {
+    var event = d3_eventDispatch(doubleClick, "dblclick");
+
+    function doubleClick(selection) {
+        selection.each(function (i) {
+            var dispatch = event.of(this, arguments);
+            d3.select(this).on("dblclick", clicked);
+            function clicked() {
+                dispatch({
+                    "type": "dblclick"
+                });
+            }
+        });
+    }
+
+    return d3.rebind(doubleClick, event, "on");
+};
+/**
+ * Returns an absolute position in the SVG from the relative position in the SVG container
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getAbsolutePosition(d3.mouse(this));
+ * @param point {[Number, Number]}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getAbsolutePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
+    return [position.x, position.y];
 };
 
 /**
- * Clears the selection
+ * Returns a relative position in the SVG container from absolute position in the SVG
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getRelativePosition(d3.mouse(this));
+ * @param point {[Number, Number]}
+ * @return {[Number, Number]}
  * @private
  */
-cg.Renderer.prototype._clearSelection = function () {
-    this.d3Selection.classed("cg-selected", false);
-    this.emit("cg-unselect");
+cg.Renderer.prototype._getRelativePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getScreenCTM().inverse());
+    return [position.x, position.y];
+};
+
+/**
+ * Returns the bounding box for all the given rendererNodes
+ * @param rendererNodes {Array<cg.RendererNode>}
+ * @returns {[[Number, Number], [Number, Number]]}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
+    var topLeft = null;
+    var bottomRight = null;
+    pandora.forEach(rendererNodes, function (rendererNode) {
+        if (!topLeft) {
+            topLeft = new pandora.Vec2(rendererNode.position);
+        }
+        if (!bottomRight) {
+            bottomRight = new pandora.Vec2(rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]);
+        }
+        topLeft.x = Math.min(rendererNode.position[0], topLeft.x);
+        topLeft.y = Math.min(rendererNode.position[1], topLeft.y);
+        bottomRight.x = Math.max(bottomRight.x, rendererNode.position[0] + rendererNode.size[0]);
+        bottomRight.y = Math.max(bottomRight.y, rendererNode.position[1] + rendererNode.size[1]);
+    });
+    return [topLeft.toArray(), bottomRight.toArray()];
+};
+
+/**
+ * Computes the position and the size of the given rendererGroup depending of its children
+ * @param rendererGroup {cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererGroup) {
+    var renderer = this;
+    if (rendererGroup.children.length > 0) {
+        var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
+        rendererGroup.position = [
+            size[0][0] - renderer._config.group.padding,
+            size[0][1] - renderer._config.group.padding - renderer._config.group.header];
+        rendererGroup.size = [
+            size[1][0] - size[0][0] + renderer._config.group.padding * 2,
+            size[1][1] - size[0][1] + renderer._config.group.padding * 2 + renderer._config.group.header
+        ];
+    }
+    rendererGroup.size = [
+        Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
+        Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
+    ];
+    var d3Groups = this._getD3NodesFromRendererNodes([rendererGroup]);
+    var d3Text = d3Groups.select("text");
+    if (d3Text.node()) {
+        rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Text.node().getBBox().width + renderer._config.group.padding * 2);
+    }
+    (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
+        if (rendererGroupParent) {
+            renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
+            computeRendererGroupParentPositionAndSize(rendererGroupParent.parent);
+        }
+    })(rendererGroup.parent);
+};
+
+/**
+ * Computes the position and the size of all the rendererGroups depending of their children
+ * @private
+ */
+cg.Renderer.prototype._computeRendererGroupsPositionAndSize = function () {
+    var renderer = this;
+    pandora.forEach(this._rendererGroups, function (rendererGroup) {
+        renderer._computeRendererGroupPositionAndSize(rendererGroup);
+    });
+};
+
+/**
+ * Returns the rendererPoint position
+ * @param rendererPoint {cg.RendererPoint}
+ * @return {[Number, Number]}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
+    if (rendererPoint.isOutput) {
+        return [
+            rendererPoint.rendererBlock.position[0] + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    } else {
+        return [
+            rendererPoint.rendererBlock.position[0] + this._config.block.padding,
+            rendererPoint.rendererBlock.position[1] + this._config.block.header + this._config.point.height * rendererPoint.index
+        ];
+    }
+};
+
+/**
+ * Computes the connection path between two points
+ * @param point1 {[Number, Number]}
+ * @param point2 {[Number, Number]}
+ * @returns {String}
+ * @private
+ */
+cg.Renderer.prototype._computeConnectionPath = function (point1, point2) {
+    var step = 150;
+    if (point1[0] - point2[0] < 0) {
+        step += Math.max(-100, point1[0] - point2[0]);
+    }
+    return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
+        x: point1[0], y: point1[1],
+        x1: point1[0] + step, y1: point1[1],
+        x2: point2[0] - step, y2: point2[1],
+        x3: point2[0], y3: point2[1]
+    });
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
@@ -3736,22 +3755,4 @@ cg.Renderer.prototype._d3MoveToFront = function (d3Selection) {
     return d3Selection.each(function () {
         this.parentNode.appendChild(this);
     });
-};
-/**
- * Creates zoom and pan
- * @private
- */
-cg.Renderer.prototype._createZoomBehavior = function () {
-    var renderer = this;
-    this._zoom = d3.behavior.zoom()
-        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
-        .on("zoom", function () {
-            if (d3.event.sourceEvent) {
-                pandora.preventCallback(d3.event.sourceEvent);
-            }
-            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            renderer._config.zoom.translate = renderer._zoom.translate();
-            renderer._config.zoom.scale = renderer._zoom.scale();
-        }.bind(this));
-    this._d3Svg.call(this._zoom);
 };
