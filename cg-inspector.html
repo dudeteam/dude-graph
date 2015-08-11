@@ -166,6 +166,7 @@ methods and properties.
             _createBlock: function () {
                 if (this.$.blocks.selectItem !== null) {
                     var data = Object.create(this.$.blocks.selectItem.data);
+                    data.cgName = this.$.blocks.selectItem.name;
                     data.cgId = cg.UUID.generate();
                     this.element.graph.loader.loadBlock(data);
                 }
