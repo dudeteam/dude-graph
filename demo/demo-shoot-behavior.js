@@ -87,8 +87,8 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
         {"cgOutputBlockId": "0", "cgOutputName": "out", "cgInputBlockId": "1", "cgInputName": "in"},
         {"cgOutputBlockId": "2", "cgOutputName": "value", "cgInputBlockId": "1", "cgInputName": "test"},
         {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "first"},
-        //{"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "9", "cgInputName": "this"},
-        //{"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "14", "cgInputName": "this"},
+        {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "9", "cgInputName": "this"},
+        {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "14", "cgInputName": "this"},
         {"cgOutputBlockId": "5", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "second"}
     ]
 };

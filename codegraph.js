@@ -1395,7 +1395,7 @@ cg.Point = (function () {
          * @type {Number}
          * @private
          */
-        this._cgMaxConnections = 1;
+        this._cgMaxConnections = data.cgMaxConnections || 1;
         Object.defineProperty(this, "cgMaxConnections", {
             get: function () {
                 return this._cgMaxConnections;
@@ -1981,7 +1981,8 @@ cg.Variable = (function () {
                 {
                     "cgType": "Point",
                     "cgName": "value",
-                    "cgValueType": data.cgValueType
+                    "cgValueType": data.cgValueType,
+                    "cgMaxConnections": Infinity
                 }
             ]
         });
