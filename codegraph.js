@@ -2397,6 +2397,16 @@ cg.Renderer = (function () {
         });
 
         /**
+         * Returns all d3Connections (d3Blocks and d3Groups)
+         * @type {d3.selection}
+         */
+        Object.defineProperty(this, "d3Connections", {
+            get: function () {
+                return this._d3Connections.selectAll(".cg-connection");
+            }.bind(this)
+        });
+
+        /**
          * Returns all d3Blocks and d3Groups selected
          * @type {d3.selection}
          */
@@ -2408,7 +2418,7 @@ cg.Renderer = (function () {
 
         /**
          * Returns all d3Blocks and d3Groups selected
-         * Groups children are also added to selection even if they are not selected directly
+         * Children are also added to selection even if they are not selected directly
          * @type {d3.selection}
          */
         Object.defineProperty(this, "d3GroupedSelection", {
@@ -2558,6 +2568,10 @@ cg.Renderer = (function () {
             renderer._createD3Blocks();
             var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
             renderer._createPlacementBehavior(d3Block);
+        });
+        this._cgGraph.on("cg-block-remove", function (cgBlock) {
+            // TODO: Remove the rendererBlocks having a reference to the cgBlock
+            // TODO: Remove as well all connections having a reference to the rendererBlocks removed this way
         });
     };
 
@@ -3277,15 +3291,15 @@ cg.Renderer.prototype._removeD3Blocks = function () {
         .remove();
 };
 /**
- * Creates d3Connections with the existing cgConnections
+ * Creates d3Connections with the existing rendererConnections
  * @private
  */
 cg.Renderer.prototype._createD3Connections = function () {
-    var createdD3Connections = this._d3Connections.selectAll(".cg-connection")
+    var createdD3Connections = this.d3Connections
         .data(this._rendererConnections)
         .enter()
         .append("svg:path")
-        .attr("class", "cg-connection")
+        .classed("cg-connection", true)
         .classed("cg-stream", function (rendererConnection) {
             return pandora.typename(rendererConnection.inputPoint.cgPoint) === "Stream";
         });
@@ -3297,7 +3311,7 @@ cg.Renderer.prototype._createD3Connections = function () {
  * @private
  */
 cg.Renderer.prototype._updatedD3Connections = function () {
-    this._updateSelectedD3Connections(this._d3Connections.selectAll(".cg-connection"));
+    this._updateSelectedD3Connections(this.d3Connections);
 };
 
 /**
@@ -3313,6 +3327,17 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
             var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputPoint);
             return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
         }.bind(this));
+};
+
+/**
+ * Removes d3Connections when rendererConnections are removed
+ * @private
+ */
+cg.Renderer.prototype._removeD3Blocks = function () {
+    var removedRendererConnections = this.d3Connections
+        .data(this._rendererConnections)
+        .exit()
+        .remove();
 };
 /**
  * Creates d3Groups with the existing rendererGroups
@@ -3386,6 +3411,9 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
  */
 cg.Renderer.prototype._removeD3Groups = function () {
     var removedD3Groups = this.d3Groups
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
+        })
         .exit()
         .remove();
 };
@@ -3417,13 +3445,47 @@ cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
  */
 cg.Renderer.prototype._createD3Points = function (d3Block) {
     var renderer = this;
-    var d3Points = d3Block
-        .selectAll(".cg-input")
+    var createdD3Points = d3Block
+        .selectAll(".cg-output, .cg-input")
         .data(function (rendererBlock) {
             return rendererBlock.rendererPoints;
-        }.bind(this))
+        }, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
         .enter()
         .append("svg:g")
+        .attr("class", function (rendererPoint) {
+            return "cg-" + (rendererPoint.isOutput ? "output" : "input");
+        })
+        .each(function () {
+            renderer._createD3PointShapes(d3.select(this));
+        });
+    createdD3Points
+        .append("svg:text")
+        .attr("alignment-baseline", "middle")
+        .attr("text-anchor", function (rendererPoint) {
+            return rendererPoint.isOutput ? "end" : "start";
+        })
+        .text(function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        });
+    this._updateSelected3DPoints(createdD3Points);
+};
+
+/**
+ * Updates the selected d3Points
+ * @param updatedD3Points
+ * @private
+ */
+cg.Renderer.prototype._updateSelected3DPoints = function (updatedD3Points) {
+    var renderer = this;
+    updatedD3Points
+        .classed("cg-empty", function (rendererPoint) {
+            return rendererPoint.connections.length === 0;
+        })
+        .classed("cg-stream", function (rendererPoint) {
+            return pandora.typename(rendererPoint.cgPoint) === "Stream";
+        })
         .attr("transform", function (rendererPoint) {
             if (rendererPoint.isOutput) {
                 return "translate(" + [
@@ -3436,95 +3498,70 @@ cg.Renderer.prototype._createD3Points = function (d3Block) {
                         rendererPoint.index * renderer._config.point.height + renderer._config.block.header
                     ] + ")";
             }
-        })
-        .attr("class", function (rendererPoint) {
-            return "cg-" + (rendererPoint.isOutput ? "output" : "input");
         });
-    d3Points
-        .append("svg:text")
-        .attr("alignment-baseline", "middle")
-        .attr("text-anchor", function (rendererPoint) {
-            return rendererPoint.isOutput ? "end" : "start";
-        })
+    updatedD3Points
+        .select("text")
         .attr("transform", function (rendererPoint) {
             if (rendererPoint.isOutput) {
                 return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
             } else {
                 return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
             }
-        })
-        .text(function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
         });
-    this._createD3PointsShapes(d3Points);
 };
 
 /**
- * Creates the input/output shapes
- * @param point
+ * Creates the d3PointShapes
+ * @param d3Point {d3.selection}
  * @returns {d3.selection}
  * @private
  */
-cg.Renderer.prototype._createD3PointsShapes = function (point) {
+cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
     var renderer = this;
-    return point
-        .each(function (rendererPoint) {
-            d3.select(this)
-                .classed("cg-empty", function (rendererPoint) {
-                    return rendererPoint.connections.length === 0;
-                });
-            var node = null;
-            switch (pandora.typename(rendererPoint.cgPoint)) {
-                case "Stream":
-                    var r = renderer._config.point.radius;
-                    node = d3.select(this)
-                        .classed("cg-stream", true)
-                        .append("svg:path")
-                        .attr("d", ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"]);
-                    break;
-                default:
-                    node = d3.select(this)
-                        .append("svg:circle")
-                        .attr("r", renderer._config.point.radius);
+    d3Point
+        .selectAll(".cg-point-shape")
+        .data(d3Point.data(), function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
+        .enter()
+        .append("svg:path")
+        .classed("cg-point-shape", true)
+        .attr("d", function (rendererPoint) {
+            var r = renderer._config.point.radius;
+            if (pandora.typename(rendererPoint.cgPoint) === "Stream") {
+                return ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"];
+            } else {
+                return ["M 0, 0", "m " + -r + ", 0", "a " + [r, r] + " 0 1,0 " + r * 2 + ",0", "a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0"];
             }
-            node
-                .attr("transform", function () {
-                    return "translate(" + [
-                            (rendererPoint.isOutput ? -1 : 1) * renderer._config.point.radius, 0] + ")";
-                })
-                .call(
-                d3.behavior.drag()
-                    .on("dragstart", function (rendererPoint) {
-                        d3.event.sourceEvent.preventDefault();
-                        d3.event.sourceEvent.stopPropagation();
-                        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
-                        renderer.__draggingConnection = renderer._d3Connections
-                            .append("svg:path")
-                            .classed("cg-connection", true)
-                            .classed("cg-stream", function () {
-                                return pandora.typename(rendererPoint.cgPoint) === "Stream";
-                            })
-                            .attr("d", function () {
-                                return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
-                            });
-                    })
-                    .on("drag", function (rendererPoint) {
-                        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
-                        renderer.__draggingConnection
-                            .attr("d", function () {
-                                return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
-                            });
-                    })
-                    .on("dragend", function () {
-                        var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
-                        var rendererPoint = renderer._getNearestRendererPoint(position);
-                        // TODO: Add the connection to the graph
-                        console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
-                        renderer.__draggingConnection.remove();
-                        delete renderer.__draggingConnection;
-                    })
-            );
-        });
+        })
+        .call(d3.behavior.drag()
+            .on("dragstart", function (rendererPoint) {
+                d3.event.sourceEvent.preventDefault();
+                d3.event.sourceEvent.stopPropagation();
+                var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+                renderer.__draggingConnection = renderer._d3Connections
+                    .append("svg:path")
+                    .classed("cg-connection", true)
+                    .attr("d", function () {
+                        return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                    });
+            })
+            .on("drag", function (rendererPoint) {
+                var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+                renderer.__draggingConnection
+                    .attr("d", function () {
+                        return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                    });
+            })
+            .on("dragend", function () {
+                var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
+                var rendererPoint = renderer._getNearestRendererPoint(position);
+                // TODO: Add the connection to the graph
+                console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
+                renderer.__draggingConnection.remove();
+                delete renderer.__draggingConnection;
+            })
+    );
 };
 /**
  * Creates the selection brush
