@@ -2264,6 +2264,13 @@ cg.Renderer = (function () {
         this._config = pandora.mergeObjects(data.config, DEFAULT_RENDERER_CONFIG, true, true);
 
         /**
+         * Stores custom functions to render block from their type
+         * @type {Object<String, Function>}
+         * @private
+         */
+        this._renderBlockFunctions = {};
+
+        /**
          * The root SVG node of the renderer
          * @type {d3.selection}
          */
@@ -2426,6 +2433,40 @@ cg.Renderer = (function () {
      * Creates the svg nodes and listen the graph's events in order to update the rendered svg graph.
      */
     Renderer.prototype.initialize = function () {
+        var renderer = this;
+        var renderGetter = {
+            create: function () {
+                d3.select(this)
+                    .append("svg:rect");
+                d3.select(this)
+                    .append("svg:text")
+                    .text(function (rendererBlock) {
+                        return rendererBlock.cgBlock.cgName;
+                    })
+                    .attr("class", "cg-title")
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "text-before-edge")
+                    .attr("transform", function (block) {
+                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
+                    });
+            },
+            update: function () {
+                var d3Block = d3.select(this);
+                renderer._createD3Points(d3Block.append("svg:g"));
+                d3Block
+                    .select("rect")
+                    .attr("rx", 30)
+                    .attr("ry", 30)
+                    .attr("width", function (rendererBlock) {
+                        return rendererBlock.size[0];
+                    })
+                    .attr("height", function (rendererBlock) {
+                        return rendererBlock.size[1];
+                    });
+            }
+        };
+        this.addRenderBlock("Variable", renderGetter);
+        this.addRenderBlock("Value", renderGetter);
         this._initialize();
         this._createSelectionBehavior();
         this._createZoomBehavior();
@@ -2434,6 +2475,15 @@ cg.Renderer = (function () {
         this._computeRendererGroupsPositionAndSize();
         this._createD3Groups();
         this._initializeListeners();
+    };
+
+    /**
+     * Adds a custom function to renderer a specify type of block.
+     * @param type {String}
+     * @param fn {Function}
+     */
+    Renderer.prototype.addRenderBlock = function (type, fn) {
+        this._renderBlockFunctions[type] = fn;
     };
 
     /**
@@ -3146,19 +3196,25 @@ cg.Renderer.prototype._createD3Blocks = function () {
         .attr("class", "cg-block")
         .call(this._createDragBehavior())
         .call(this._createRemoveParentBehavior());
-    createdD3Blocks
-        .append("svg:rect");
-    createdD3Blocks
-        .append("svg:text")
-        .text(function (rendererBlock) {
-            return rendererBlock.cgBlock.cgName;
-        })
-        .attr("class", "cg-title")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge")
-        .attr("transform", function (block) {
-            return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
-        });
+    createdD3Blocks.each(function (rendererBlock) {
+        if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
+            renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].create.call(this, rendererBlock);
+        } else {
+            d3.select(this)
+                .append("svg:rect");
+            d3.select(this)
+                .append("svg:text")
+                .text(function () {
+                    return rendererBlock.cgBlock.cgName;
+                })
+                .attr("class", "cg-title")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "text-before-edge")
+                .attr("transform", function (block) {
+                    return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
+                });
+        }
+    });
     this._updateD3Blocks();
 };
 
@@ -3176,20 +3232,29 @@ cg.Renderer.prototype._updateD3Blocks = function () {
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
+    var renderer = this;
     updatedD3Blocks
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
-    this._createD3Points(updatedD3Blocks.append("svg:g"));
     updatedD3Blocks
-        .select("rect")
-        .attr("rx", 5)
-        .attr("ry", 5)
-        .attr("width", function (rendererBlock) {
-            return rendererBlock.size[0];
-        })
-        .attr("height", function (rendererBlock) {
-            return rendererBlock.size[1];
+        .each(function (rendererBlock) {
+            if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
+                renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].update.call(this, rendererBlock);
+            } else {
+                var d3Block = d3.select(this);
+                renderer._createD3Points(d3Block.append("svg:g"));
+                d3Block
+                    .select("rect")
+                    .attr("rx", 5)
+                    .attr("ry", 5)
+                    .attr("width", function () {
+                        return rendererBlock.size[0];
+                    })
+                    .attr("height", function () {
+                        return rendererBlock.size[1];
+                    });
+            }
         });
 };
 
