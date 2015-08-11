@@ -75,8 +75,8 @@ methods and properties.
                 <div class="box">
                     <div class="title">Tools</div>
                     <paper-button class="primary" on-click="_compile">Compile</paper-button>
-                    <paper-button class="primary">Add group</paper-button>
-                    <paper-button class="primary">Remove selection</paper-button>
+                    <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
+                    <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
                 </div> <!-- .box -->
                 <div class="box">
                     <div class="title">Add block</div>
@@ -179,6 +179,12 @@ methods and properties.
             _compile: function () {
                 this._compiledCode = this._builder.save(this.element.graph);
                 this.$.compileResult.open();
+            },
+            _addGroup: function () {
+                this.element.renderer.createGroupFromSelection(prompt("Group name:"));
+            },
+            _removeSelection: function () {
+                this.element.renderer.removeSelection();
             }
         });
     </script>
