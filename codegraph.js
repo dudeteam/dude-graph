@@ -2494,7 +2494,7 @@ cg.Renderer = (function () {
     };
 
     /**
-     * Adds a custom function to renderer a specify type of block.
+     * Adds a custom function to render a specify type of block.
      * @param type {String}
      * @param fn {Function}
      */
@@ -2937,22 +2937,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
 };
 
 /**
- * Creates a renderer connection
- * @param data
- * @private
- */
-cg.Renderer.prototype._createRendererConnection = function (data) {
-    var rendererConnection = {
-        "outputPoint": this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName),
-        "inputPoint": this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName)
-    };
-    this._rendererConnections.push(rendererConnection);
-    rendererConnection.inputPoint.connections.push(rendererConnection);
-    rendererConnection.outputPoint.connections.push(rendererConnection);
-};
-
-/**
- *
+ * Creates the rendererPoints for a given rendererBlock
  * @param rendererBlock {cg.RendererBlock}
  * @private
  */
@@ -2978,6 +2963,33 @@ cg.Renderer.prototype._assignRendererPoints = function (rendererBlock) {
             "connections": []
         });
     });
+};
+
+/**
+ * Creates a renderer connection
+ * @param data
+ * @private
+ */
+cg.Renderer.prototype._createRendererConnection = function (data) {
+    var outputRendererPoint = data.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.outputBlockId), data.outputName);
+    var inputRendererPoint = data.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(data.inputBlockId), data.inputName);
+    if (!outputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the outputRendererPoint");
+    }
+    if (!inputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the inputRendererPoint");
+    }
+    if (!this._cgGraph.connectionByPoints(outputRendererPoint.cgPoint, inputRendererPoint.cgPoint)) {
+        // TODO: If connection does not exist in graph, just add a new one here
+        // outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
+    }
+    var rendererConnection = {
+        "outputPoint": outputRendererPoint,
+        "inputPoint": inputRendererPoint
+    };
+    this._rendererConnections.push(rendererConnection);
+    outputRendererPoint.connections.push(rendererConnection);
+    inputRendererPoint.connections.push(rendererConnection);
 };
 
 /**
@@ -3296,7 +3308,11 @@ cg.Renderer.prototype._removeD3Blocks = function () {
  */
 cg.Renderer.prototype._createD3Connections = function () {
     var createdD3Connections = this.d3Connections
-        .data(this._rendererConnections)
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.rendererBlock.id;
+            }
+        })
         .enter()
         .append("svg:path")
         .classed("cg-connection", true)
@@ -3333,9 +3349,13 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
  * Removes d3Connections when rendererConnections are removed
  * @private
  */
-cg.Renderer.prototype._removeD3Blocks = function () {
+cg.Renderer.prototype._removeD3Connections = function () {
     var removedRendererConnections = this.d3Connections
-        .data(this._rendererConnections)
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.rendererBlock.id;
+            }
+        })
         .exit()
         .remove();
 };
@@ -3518,6 +3538,13 @@ cg.Renderer.prototype._updateSelected3DPoints = function (updatedD3Points) {
  */
 cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
     var renderer = this;
+    var computeConnectionPath = function (rendererPoint) {
+        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+        if (rendererPoint.isOutput) {
+            return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+        }
+        return renderer._computeConnectionPath(renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]), rendererPointPosition);
+    };
     d3Point
         .selectAll(".cg-point-shape")
         .data(d3Point.data(), function (rendererPoint) {
@@ -3538,26 +3565,40 @@ cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
             .on("dragstart", function (rendererPoint) {
                 d3.event.sourceEvent.preventDefault();
                 d3.event.sourceEvent.stopPropagation();
-                var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
                 renderer.__draggingConnection = renderer._d3Connections
                     .append("svg:path")
                     .classed("cg-connection", true)
                     .attr("d", function () {
-                        return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                        return computeConnectionPath(rendererPoint);
                     });
             })
             .on("drag", function (rendererPoint) {
-                var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
                 renderer.__draggingConnection
                     .attr("d", function () {
-                        return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+                        return computeConnectionPath(rendererPoint);
                     });
             })
-            .on("dragend", function () {
+            .on("dragend", function (rendererPoint) {
                 var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
-                var rendererPoint = renderer._getNearestRendererPoint(position);
-                // TODO: Add the connection to the graph
-                console.log(position, rendererPoint ? rendererPoint.cgPoint.cgName : null);
+                var nearestRendererPoint = renderer._getNearestRendererPoint(position);
+                if (nearestRendererPoint) {
+                    if (rendererPoint.isOutput) {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": rendererPoint,
+                            "inputRendererPoint": nearestRendererPoint
+                        });
+                    } else {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": nearestRendererPoint,
+                            "inputRendererPoint": rendererPoint
+                        });
+                    }
+                    renderer._createD3Connections();
+                    // TODO: Optimize
+                    renderer._updateD3Blocks();
+                } else {
+                    console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
+                }
                 renderer.__draggingConnection.remove();
                 delete renderer.__draggingConnection;
             })
