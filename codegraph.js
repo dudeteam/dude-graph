@@ -2709,7 +2709,7 @@ cg.Renderer.prototype._createConnectionBehavior = function () {
             }
             renderer.__draggingConnection.remove();
             delete renderer.__draggingConnection;
-        })
+        });
 };
 
 /**
