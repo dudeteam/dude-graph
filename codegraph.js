@@ -2652,7 +2652,68 @@ cg.Renderer.prototype._createDragBehavior = function () {
 };
 
 /**
- * Creates the remove parent behavior on double click
+ * Creates the drag connection behavior on a d3Point
+ * @returns {d3.behavior.drag}
+ * @private
+ */
+cg.Renderer.prototype._createConnectionBehavior = function () {
+    var renderer = this;
+    var computeConnectionPath = function (rendererPoint) {
+        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
+        if (rendererPoint.isOutput) {
+            return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
+        }
+        return renderer._computeConnectionPath(renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]), rendererPointPosition);
+    };
+    return d3.behavior.drag()
+        .on("dragstart", function (rendererPoint) {
+            d3.event.sourceEvent.preventDefault();
+            d3.event.sourceEvent.stopPropagation();
+            renderer.__draggingConnection = renderer._d3Connections
+                .append("svg:path")
+                .classed("cg-connection", true)
+                .attr("d", function () {
+                    return computeConnectionPath(rendererPoint);
+                });
+        })
+        .on("drag", function (rendererPoint) {
+            renderer.__draggingConnection
+                .attr("d", function () {
+                    return computeConnectionPath(rendererPoint);
+                });
+        })
+        .on("dragend", function (rendererPoint) {
+            var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
+            var nearestRendererPoint = renderer._getNearestRendererPoint(position);
+            if (nearestRendererPoint) {
+                try {
+                    if (rendererPoint.isOutput) {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": rendererPoint,
+                            "inputRendererPoint": nearestRendererPoint
+                        });
+                    } else {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": nearestRendererPoint,
+                            "inputRendererPoint": rendererPoint
+                        });
+                    }
+                    renderer._createD3Connections();
+                    // TODO: Optimize
+                    renderer._updateD3Blocks();
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
+            }
+            renderer.__draggingConnection.remove();
+            delete renderer.__draggingConnection;
+        })
+};
+
+/**
+ * Creates the remove parent behavior on double click on a d3Node
  * @returns {d3.behavior.doubleClick}
  * @private
  */
@@ -2675,7 +2736,7 @@ cg.Renderer.prototype._createRemoveParentBehavior = function () {
 };
 
 /**
- * Creates the placement behavior when a new rendererBlock is added
+ * Creates the placement behavior when a new rendererBlock/d3Block is added
  * @param d3Block {d3.selection}
  * @private
  */
@@ -3327,13 +3388,6 @@ cg.Renderer.prototype._updateSelected3DPoints = function (updatedD3Points) {
  */
 cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
     var renderer = this;
-    var computeConnectionPath = function (rendererPoint) {
-        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
-        if (rendererPoint.isOutput) {
-            return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
-        }
-        return renderer._computeConnectionPath(renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]), rendererPointPosition);
-    };
     d3Point
         .selectAll(".cg-point-shape")
         .data(d3Point.data(), function (rendererPoint) {
@@ -3350,48 +3404,7 @@ cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
                 return ["M 0, 0", "m " + -r + ", 0", "a " + [r, r] + " 0 1,0 " + r * 2 + ",0", "a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0"];
             }
         })
-        .call(d3.behavior.drag()
-            .on("dragstart", function (rendererPoint) {
-                d3.event.sourceEvent.preventDefault();
-                d3.event.sourceEvent.stopPropagation();
-                renderer.__draggingConnection = renderer._d3Connections
-                    .append("svg:path")
-                    .classed("cg-connection", true)
-                    .attr("d", function () {
-                        return computeConnectionPath(rendererPoint);
-                    });
-            })
-            .on("drag", function (rendererPoint) {
-                renderer.__draggingConnection
-                    .attr("d", function () {
-                        return computeConnectionPath(rendererPoint);
-                    });
-            })
-            .on("dragend", function (rendererPoint) {
-                var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
-                var nearestRendererPoint = renderer._getNearestRendererPoint(position);
-                if (nearestRendererPoint) {
-                    if (rendererPoint.isOutput) {
-                        renderer._createRendererConnection({
-                            "outputRendererPoint": rendererPoint,
-                            "inputRendererPoint": nearestRendererPoint
-                        });
-                    } else {
-                        renderer._createRendererConnection({
-                            "outputRendererPoint": nearestRendererPoint,
-                            "inputRendererPoint": rendererPoint
-                        });
-                    }
-                    renderer._createD3Connections();
-                    // TODO: Optimize
-                    renderer._updateD3Blocks();
-                } else {
-                    console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
-                }
-                renderer.__draggingConnection.remove();
-                delete renderer.__draggingConnection;
-            })
-    );
+        .call(renderer._createConnectionBehavior());
 };
 /**
  * Creates the collision quadtree
