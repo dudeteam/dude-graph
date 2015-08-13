@@ -2701,8 +2701,8 @@ cg.Renderer.prototype._createConnectionBehavior = function () {
                     renderer._createD3Connections();
                     // TODO: Optimize
                     renderer._updateD3Blocks();
-                } catch (e) {
-                    console.error(e);
+                } catch (connectionException) {
+                    console.error(connectionException);
                 }
             } else {
                 console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
