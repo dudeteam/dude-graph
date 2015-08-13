@@ -1,5 +1,6 @@
 var expect = require("chai").expect;
 var pandora = require('../../bower_components/pandora/lib/pandora');
+var d3 = require('../../bower_components/d3/d3');
 var cg = require("../../codegraph");
 
 describe("Graph", function () {
