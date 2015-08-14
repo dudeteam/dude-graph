@@ -84,7 +84,7 @@ methods and properties.
                 </div> <!-- .box -->
                 <div class="box">
                     <div class="title">Add block</div>
-                    <magnet-hierarchy id="blocks"></magnet-hierarchy>
+                    <magnet-hierarchy id="blocks" on-submit="_createBlock"></magnet-hierarchy>
                 </div> <!-- .box -->
                 <div class="box">
                     <div class="title">Create variable</div>
@@ -131,7 +131,6 @@ methods and properties.
                     type: CgElement
                 }
             },
-            behaviors: [Polymer.IronA11yKeysBehavior],
             ready: function () {
                 this._models = [];
                 this._folders = {};
@@ -150,7 +149,6 @@ methods and properties.
                     }
                 }.bind(this));
                 this.$.blocks.loadItems(this._models);
-                this.addOwnKeyBinding("enter", "_createBlock");
             },
             bindBuilder: function (builder) {
                 this._builder = builder;
@@ -168,10 +166,13 @@ methods and properties.
                     this._currentState = "root";
                 }.bind(this));
             },
-            _createBlock: function () {
-                if (this.$.blocks.selectItem !== null) {
-                    var data = Object.create(this.$.blocks.selectItem.data);
-                    data.cgName = this.$.blocks.selectItem.name;
+            _createBlock: function (e) {
+                if (e.detail.item.group) {
+                    return;
+                }
+                if (e.detail.item !== null) {
+                    var data = Object.create(e.detail.item.data);
+                    data.cgName = e.detail.item.name;
                     data.cgId = cg.UUID.generate();
                     this.element.graph.loader.loadBlock(data);
                 }
