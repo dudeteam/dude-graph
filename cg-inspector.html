@@ -138,14 +138,15 @@ methods and properties.
                 this._currentState = "root";
                 this._compiledCode = "";
                 pandora.forEach(this.models, function (value, key) {
+                    var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
                     if (value.cgFolder) {
                         if (this._folders[value.cgFolder] === undefined) {
-                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, items: []}};
+                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, icon: "fa fa-folder", items: []}};
                             this._models.push(this._folders[value.cgFolder]);
                         }
-                        this._folders[value.cgFolder].group.items.push({item: {name: key, data: value}});
+                        this._folders[value.cgFolder].group.items.push({item: {name: key, icon: icon, data: value}});
                     } else {
-                        this._models.push({item: {name: key, data: value}});
+                        this._models.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
                 this.$.blocks.loadItems(this._models);

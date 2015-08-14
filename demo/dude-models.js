@@ -1,5 +1,15 @@
 var DUDE_MODELS = {
 
+    // globals
+    "entity": {
+        "cgType": "Variable",
+        "cgValueType": "Entity"
+    },
+    "game": {
+        "cgType": "Variable",
+        "cgValueType": "Game"
+    },
+
     // operators
 
     "greater_than": {
