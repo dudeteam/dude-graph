@@ -3,6 +3,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 
 <!--
@@ -24,8 +25,13 @@ methods and properties.
             --paper-fab-background: var(--cg-primary-color);
             --paper-fab-keyboard-focus-background: var(--cg-primary-color);
         }
+        #errorToast {
+            background: var(--cg-error-color);
+            font-family: var(--cg-display-font);
+        }
     </style>
     <template>
+        <paper-toast id="errorToast"></paper-toast>
         <div class="layout flex horizontal">
             <svg id="svg" class="flex"></svg>
         </div>
@@ -70,6 +76,11 @@ methods and properties.
             this.renderer = new cg.Renderer(this.$.svg, this.graph, this.rendererData);
             this.graph.loader.load();
             this.renderer.initialize();
+
+            this.renderer.on("error", function (error) {
+                this.$.errorToast.text = error.message;
+                this.$.errorToast.show();
+            }.bind(this));
 
             // for debug
             window.cgRenderer = this.renderer;
