@@ -36,20 +36,20 @@
             properties: {
                 modelsData: {
                     type: Object,
-                    value: SHADER_GRAPH_MODELS
+                    value: DUDE_MODELS
                 },
                 graphData: {
                     type: Object,
-                    value: DEMO_SHADER_GRAPH_DATA
+                    value: DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
                 },
                 rendererData: {
                     type: Object,
-                    value: DEMO_SHADER_RENDERER_DATA
+                    value: DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
                 }
             },
             ready: function () {
                 this.$.inspector.bindElement(this.$.element);
-                this.$.inspector.bindBuilder(new ShaderSaver());
+                this.$.inspector.bindBuilder(new DudeSaver());
             }
         });
     </script>

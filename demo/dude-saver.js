@@ -92,6 +92,25 @@ var DudeSaver = (function() {
         return result;
     };
 
+    DudeSaver.prototype._saveAssignation = function (assignation, tabs) {
+        var result = "";
+        var inputThis = assignation.inputByName("this").cgConnections[0];
+        var inputOther = assignation.inputByName("other").cgConnections[0];
+        if (!inputThis || !inputOther) {
+            throw new Error("`this` and `other` should be specified");
+        }
+        if (pandora.typename(inputThis.cgOutputPoint.cgBlock) !== "Variable") {
+            throw new Error("`this` should always be a variable");
+        }
+        result += this._indent(tabs) + this.save(inputThis.cgOutputPoint.cgBlock);
+        result += " = " + this.save(inputOther.cgOutputPoint.cgBlock) + ";\n";
+        var outputOut = assignation.outputByName("out").cgConnections[0];
+        if (outputOut) {
+            result += this.save(outputOut.cgInputPoint.cgBlock, tabs);
+        }
+        return result;
+    };
+
     DudeSaver.prototype._saveInstruction = function (instruction, tabs) {
         var result = "";
         result += this._indent(tabs);
@@ -107,6 +126,26 @@ var DudeSaver = (function() {
             result += this._saveFunctionArguments(instruction.cgInputs.slice(1));
         }
         result += ";\n";
+        var outputOut = instruction.outputByName("out").cgConnections[0];
+        if (outputOut) {
+            result += this.save(outputOut.cgInputPoint.cgBlock, tabs);
+        }
+        return result;
+    };
+
+    DudeSaver.prototype._saveFunction = function (func) {
+        var result = "";
+        if (func.inputByName("this")) { // method
+            var obj = func.inputByName("this").cgConnections[0].cgOutputPoint.cgBlock;
+            if (pandora.typename(obj) !== "Variable") {
+                throw new Error("`this` should always be a variable in block `" + obj.cgId + "`");
+            }
+            result += obj.cgName + "()->" + func.cgName.substr(func.cgName.lastIndexOf(".") + 1);
+            result += this._saveFunctionArguments(func.cgInputs.slice(1));
+        } else { // function
+            result += func.cgName;
+            result += this._saveFunctionArguments(func.cgInputs);
+        }
         return result;
     };
 
@@ -114,6 +153,9 @@ var DudeSaver = (function() {
         var result = "";
         result += "(";
         pandora.forEach(args, function (arg, index) {
+            if (!arg.cgConnections[0]) {
+                throw new Error("Missing argument `" + arg.cgName + "`");
+            }
             if (index !== 0) {
                 result += ", ";
             }
