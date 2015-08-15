@@ -3,6 +3,9 @@
 <link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
 <link rel="import" href="../magnet-state/magnet-state.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-item/paper-item.html">
 
 <!--
 `cg-inspector` is a Polymer element which creates the inspector for codegraph. In other words, it creates the sidebar
@@ -90,23 +93,25 @@ methods and properties.
                     <div class="title">Create variable</div>
                     <div class="row">
                         <label>Type: </label>
-                        <select>
-                            <option>boolean</option>
-                            <option>number</option>
-                            <option>string</option>
-                        </select>
+                        <paper-dropdown-menu label="Select a type..." selected-item-label="{{_varType}}" no-label-float>
+                            <paper-menu class="dropdown-content">
+                                <paper-item>Boolean</paper-item>
+                                <paper-item>Number</paper-item>
+                                <paper-item>String</paper-item>
+                            </paper-menu>
+                        </paper-dropdown-menu>
                     </div>
                     <div class="row">
                         <label>Name: </label>
-                        <input is="iron-input" bind-value="{{_name}}" placeholder="my_custom_variable" type="text">
+                        <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
                     </div>
                     <div class="row">
                         <label>Value: </label>
-                        <input is="iron-input" bind-value="{{_value}}" type="text">
+                        <input is="iron-input" bind-value="{{_varValue}}" type="text">
                     </div>
                     <div class="row">
                         <label>Folder: </label>
-                        <input is="iron-input" bind-value="{{_folder}}" placeholder="my_custom_folder" type="text">
+                        <input is="iron-input" bind-value="{{_varFolder}}" placeholder="my_custom_folder" type="text">
                     </div>
                     <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
                 </div> <!-- .box -->
@@ -114,9 +119,7 @@ methods and properties.
         </div>
         <paper-dialog id="compileResult">
             <h2>Code</h2>
-            <paper-dialog-scrollable>
-                <pre><code>{{_compiledCode}}</code></pre>
-            </paper-dialog-scrollable>
+            <pre><code>{{_compiledCode}}</code></pre>
         </paper-dialog>
     </template>
     <script>
@@ -136,6 +139,10 @@ methods and properties.
                 this._folders = {};
                 this._currentState = "root";
                 this._compiledCode = "";
+                this._varType = "";
+                this._varName = "";
+                this._varValue = "";
+                this._varFolder = "";
                 pandora.forEach(this.models, function (value, key) {
                     var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
                     if (value.cgFolder) {
@@ -178,9 +185,10 @@ methods and properties.
                 }
             },
             _createVariableClicked: function () {
-                console.log(this._name);
-                console.log(this._value);
-                console.log(this._folder);
+                console.log("Name: " + this._varName);
+                console.log("Value: " + this._varValue);
+                console.log("Folder: " + this._varFolder);
+                console.log("Type: " + this._varType);
             },
             _compile: function () {
                 this._compiledCode = this._builder.save(this.element.graph);
