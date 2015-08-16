@@ -3183,7 +3183,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     rendererBlock.rendererPoints = [];
     rendererBlock.position = rendererBlockData.position || [0, 0];
     rendererBlock.size = rendererBlockData.size || this._config.block.size;
-    this._createsRendererPoints(rendererBlock);
+    this._createRendererPoints(rendererBlock);
     this._rendererBlocks.push(rendererBlock);
     this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
     return rendererBlock;
@@ -3264,6 +3264,29 @@ cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
     }
     return parents;
 };
+
+/**
+ * Removes the given rendererNode from the renderer
+ * Also removes the cgBlock if it is the rendererNode was the last reference on it
+ * @param rendererNode
+ * @private
+ */
+cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
+    this._removeRendererNodeParent(rendererNode);
+    if (rendererNode.type === "group") {
+        var rendererGroupFound = this._rendererGroups.indexOf(rendererNode);
+        if (rendererGroupFound === -1) {
+            throw new cg.RendererError("Renderer::_removeRendererNode() Cannot remove not found rendererGroup");
+        }
+        this._rendererGroups.splice(rendererGroupFound, 1);
+    } else {
+        var rendererBlockFound = this._rendererBlocks.indexOf(rendererNode);
+        if (rendererBlockFound === -1) {
+            throw new cg.RendererError("Renderer::_removeRendererNode() Cannot remove not found rendererBlock");
+        }
+        this._rendererBlocks.splice(rendererBlockFound, 1);
+    }
+};
 /**
  * Returns the rendererPoint associated with the given name
  * @param rendererBlock {cg.RendererBlock}
@@ -3283,7 +3306,7 @@ cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendere
  * @param rendererBlock {cg.RendererBlock}
  * @private
  */
-cg.Renderer.prototype._createsRendererPoints = function (rendererBlock) {
+cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
     rendererBlock.rendererPoints = [];
     pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
         rendererBlock.rendererPoints.push({
