@@ -38,12 +38,13 @@ methods and properties.
             padding: 5px;
         }
         label {
-            width: 30%;
+            width: 20%;
             display: inline-block;
             padding: 5px;
+            text-align: right;
         }
         input, paper-dropdown-menu {
-            width: 50%;
+            width: 70%;
             display: inline-block;
         }
         input[type="text"] {
@@ -59,7 +60,7 @@ methods and properties.
         input[type="text"]:focus {
             border-bottom: 2px solid var(--cg-primary-color);
         }
-        #state :not(.active-state) {
+        #state > div:not(.active-state) {
             display: none;
         }
         #compileResult > div {
@@ -76,48 +77,95 @@ methods and properties.
     <template>
         <paper-toast id="errorToast"></paper-toast>
         <div class="layout vertical flex">
-            <!--<magnet-state id="state" root-state="root" current-state="{{_currentState}}">-->
-                <!--<div data-state="root">-->
-                    <!--coucou-->
-                <!--</div>-->
-                <!--<div data-state="editGroup">Edit group</div>-->
-                <!--<div data-state="editBlock">Edit variable</div>-->
-            <!--</magnet-state>-->
-            <div>
-                <div class="box">
-                    <div class="title">Tools</div>
-                    <paper-button class="primary" on-click="_compile">Compile</paper-button>
-                    <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
-                    <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
-                    <paper-button class="primary" on-click="_save">Save</paper-button>
-                </div> <!-- .box -->
-                <div class="box">
-                    <div class="title">Add block</div>
-                    <magnet-hierarchy id="blocks" on-submit="_createBlock"></magnet-hierarchy>
-                </div> <!-- .box -->
-                <div class="box">
-                    <div class="title">Create variable</div>
-                    <div class="row">
-                        <label>Type: </label>
-                        <paper-dropdown-menu label="Choose..." selected-item-label="{{_varType}}" no-label-float>
-                            <paper-menu class="dropdown-content">
-                                <paper-item>Boolean</paper-item>
-                                <paper-item>Number</paper-item>
-                                <paper-item>String</paper-item>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                    </div>
-                    <div class="row">
-                        <label>Name: </label>
-                        <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
-                    </div>
-                    <div class="row">
-                        <label>Value: </label>
-                        <input is="iron-input" bind-value="{{_varValue}}" type="text">
-                    </div>
-                    <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
-                </div> <!-- .box -->
-            </div>
+            <magnet-state id="state" class="layout vertical flex" root-state="root" current-state="{{_currentState}}">
+                <div class="layout vertical flex" data-state="root">
+                    <div class="box">
+                        <div class="title">Tools</div>
+                        <paper-button class="primary" on-click="_compile">Compile</paper-button>
+                        <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
+                        <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
+                        <paper-button class="primary" on-click="_save">Save</paper-button>
+                    </div> <!-- .box -->
+                    <div class="box">
+                        <div class="title">Add block</div>
+                        <magnet-hierarchy id="blocks" on-submit="_createBlock"></magnet-hierarchy>
+                    </div> <!-- .box -->
+                    <div class="box">
+                        <div class="title">Create variable</div>
+                        <div class="row">
+                            <label>type</label>
+                            <paper-dropdown-menu label="Choose..." selected-item-label="{{_varType}}" no-label-float>
+                                <paper-menu class="dropdown-content">
+                                    <paper-item>Boolean</paper-item>
+                                    <paper-item>Number</paper-item>
+                                    <paper-item>String</paper-item>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                        </div>
+                        <div class="row">
+                            <label>name</label>
+                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
+                        </div>
+                        <div class="row">
+                            <label>value</label>
+                            <input is="iron-input" bind-value="{{_varValue}}" type="text">
+                        </div>
+                        <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
+                    </div> <!-- .box -->
+                </div> <!-- root -->
+                <div data-state="editGroup">
+                    <div class="box">
+                        <div class="title">Edit group</div>
+                        <div class="row">
+                            <label>description</label>
+                            <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..." type="text">
+                        </div>
+                        <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
+                    </div> <!-- .box -->
+
+                </div> <!-- Edit group -->
+                <div data-state="editBlock">
+                    <div class="box">
+                        <div class="title">Edit block</div>
+                        <div class="row">
+                            <label>name</label>
+                            <input is="iron-input" bind-value="{{_blockName}}" placeholder="my_custom_variable" type="text">
+                        </div>
+                        <div class="title" hidden$="{{_blockNoInput}}">Inputs</div>
+                        <div class="row">
+                            <template is="dom-repeat" id="menu" items="{{_blockInputs}}">
+                                <label>{{item.cgName}}</label>
+                                <input is="iron-input" bind-value="{{item.value}}" type="text">
+                            </template>
+                        </div>
+                        <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
+                    </div> <!-- .box -->
+                </div> <!-- Edit block -->
+                <div data-state="editValue">
+                    <div class="box">
+                        <div class="title">Edit value</div>
+                        <div class="row">
+                            <label>value</label>
+                            <input is="iron-input" bind-value="{{_value}}" type="text">
+                        </div>
+                        <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
+                    </div> <!-- .box -->
+                </div> <!-- Edit value -->
+                <div data-state="editVariable">
+                    <div class="box">
+                        <div class="title">Edit variable</div>
+                        <div class="row">
+                            <label>name</label>
+                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
+                        </div>
+                        <div class="row">
+                            <label>value</label>
+                            <input is="iron-input" bind-value="{{_varValue}}" type="text">
+                        </div>
+                        <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
+                    </div> <!-- .box -->
+                </div> <!-- Edit variable -->
+            </magnet-state>
         </div>
         <paper-dialog id="compileResult">
             <h2>Code</h2>
@@ -168,9 +216,27 @@ methods and properties.
                 this.element = element;
                 this.element.renderer.on("cg-select", function (node) {
                     if (node.type === "block") {
-                        this._currentState = "editBlock";
+                        switch (pandora.typename(node.cgBlock)) {
+                            case "Variable":
+                                this._currentState = "editVariable";
+                                this._varName = node.cgBlock.cgName;
+                                this._varValue = node.cgBlock.cgValue;
+                                break;
+                            case "Value":
+                                this._currentState = "editValue";
+                                this._value = node.cgBlock.cgValue;
+                                break;
+                            default:
+                                this._currentState = "editBlock";
+                                this._blockName = node.cgBlock.cgName;
+                                this._blockInputs = node.cgBlock.cgInputs.filter(function (point) {
+                                    return pandora.typename(point) === "Point";
+                                });
+                                this._blockNoInput = this._blockInputs.length === 0;
+                        }
                     } else if (node.type === "group") {
                         this._currentState = "editGroup";
+                        this._groupDescription = node.description;
                     }
                 }.bind(this));
                 this.element.renderer.on("cg-unselect", function () {
