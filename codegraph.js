@@ -3390,15 +3390,17 @@ cg.Renderer.prototype._createD3Blocks = function () {
         if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
             renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].create.call(this, rendererBlock);
         } else {
-            d3.select(this)
+            var d3Block = d3.select(this);
+            d3Block
                 .append("svg:rect")
                 .attr("rx", 5)
                 .attr("ry", 5);
-            d3.select(this)
+            d3Block
                 .append("svg:text")
                 .attr("class", "cg-title")
                 .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "text-before-edge");
+            renderer._createD3Points(d3Block.append("svg:g"));
         }
     });
     this._updateD3Blocks();
@@ -3429,7 +3431,6 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
                 renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].update.call(this, rendererBlock);
             } else {
                 var d3Block = d3.select(this);
-                renderer._createD3Points(d3Block.append("svg:g"));
                 d3Block
                     .select("rect")
                     .attr("width", function () {
