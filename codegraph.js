@@ -2732,9 +2732,8 @@ cg.Renderer = (function () {
             renderer._removeRendererNodeParent(rendererNode);
             renderer._addRendererNodeParent(rendererNode, rendererGroup);
         });
-        // TODO: Optimize
-        this._createD3Groups();
         this._computeRendererGroupsPositionAndSize();
+        this._createD3Groups();
         this._updateD3Blocks();
         this._updateD3Groups();
     };
@@ -2743,7 +2742,16 @@ cg.Renderer = (function () {
      * Remove the current selection.
      */
     Renderer.prototype.removeSelection = function () {
-        console.log("remove selection !");
+        var renderer = this;
+        pandora.forEach(this.d3Selection.data(), function (rendererNode) {
+            renderer._removeRendererNode(rendererNode);
+        });
+        this._removeD3Blocks();
+        this._removeD3Groups();
+        this._removeD3Connections();
+        this._computeRendererGroupsPositionAndSize();
+        this._updateD3Blocks();
+        this._updateD3Groups();
     };
 
     /**
@@ -2867,10 +2875,17 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
  * @private
  */
 cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
+    var renderer = this;
     var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
     if (rendererBlockFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererBlock() RendererBlock not found and thus cannot be removed");
     }
+    pandora.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
+        while (rendererPoint.connections.length > 0) {
+            renderer._removeRendererConnection(rendererPoint.connections[0]);
+        }
+    });
+    this._removeRendererNodeParent(rendererBlock);
     this._rendererBlocks.splice(rendererBlockFound, 1);
 };
 /**
@@ -2963,6 +2978,7 @@ cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
     if (rendererGroupFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererGroup() RendererGroup not found and thus cannot be removed");
     }
+    this._removeRendererNodeParent(rendererGroup);
     this._rendererGroups.splice(rendererGroupFound, 1);
 };
 /**
@@ -2974,8 +2990,9 @@ cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
 cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
     if (rendererNode.type === "block") {
         this._removeRendererBlock(rendererNode);
+    } else {
+        this._removeRendererGroup(rendererNode);
     }
-    this._removeRendererGroup(rendererNode);
 };
 
 /**
