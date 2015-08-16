@@ -135,7 +135,7 @@ methods and properties.
                         <div class="row">
                             <template is="dom-repeat" id="menu" items="{{_blockInputs}}">
                                 <label>{{item.cgName}}</label>
-                                <input is="iron-input" bind-value="{{item.value}}" type="text">
+                                <input is="iron-input" bind-value="{{item.cgValue}}" type="text">
                             </template>
                         </div>
                         <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
@@ -255,9 +255,6 @@ methods and properties.
                 }
             },
             _createVariableClicked: function () {
-                console.log("Name: " + this._varName);
-                console.log("Value: " + this._varValue);
-                console.log("Type: " + this._varType);
                 if (!this._varType) {
                     this.$.errorToast.text = "A `type` is required to create a variable";
                     this.$.errorToast.show();
@@ -277,6 +274,24 @@ methods and properties.
                     }
                 }});
                 this.$.blocks.loadItems(this._models); // Refresh the list
+            },
+            _editVariableClicked: function () {
+                console.log("_editVariableClicked");
+                console.log(this._varName);
+                console.log(this._varValue);
+            },
+            _editValueClicked: function () {
+                console.log("_editValueClicked");
+                console.log(this._value);
+            },
+            _editBlockClicked: function () {
+                console.log("_editBlockClicked");
+                console.log(this._blockName);
+                console.log(this._blockInputs);
+            },
+            _editGroupClicked: function () {
+                console.log("_editGroupClicked");
+                console.log(this._groupDescription);
             },
             _compile: function () {
                 this._compiledCode = this._builder.save(this.element.graph);
