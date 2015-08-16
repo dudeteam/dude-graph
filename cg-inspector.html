@@ -250,8 +250,8 @@ methods and properties.
             bindElement: function (element) {
                 this.element = element;
                 this.element.renderer.on("cg-select", function (node) {
+                    this._selectedNode = node;
                     if (node.type === "block") {
-                        this._selectedNode = node;
                         switch (pandora.typename(node.cgBlock)) {
                             case "Variable":
                                 this._currentState = "editVariable";
@@ -315,10 +315,10 @@ methods and properties.
             },
             _editVariableClicked: function () {
                 console.log("_editVariableClicked");
-                this._selectedNode.cgBlock.cgName = this._varName;
                 console.log(this._selectedNode);
                 console.log(this._varName);
                 console.log(this._varValue);
+                this._selectedNode.cgBlock.cgName = this._varName;
             },
             _editValueClicked: function () {
                 console.log("_editValueClicked");
@@ -328,10 +328,13 @@ methods and properties.
                 console.log("_editBlockClicked");
                 console.log(this._blockName);
                 console.log(this._blockInputs);
+                this._selectedNode.cgBlock.cgName = this._blockName;
             },
             _editGroupClicked: function () {
                 console.log("_editGroupClicked");
                 console.log(this._groupDescription);
+                this._selectedNode.description = this._groupDescription;
+                this.element.renderer._updateD3Groups(); // TODO: Public API
             },
             _compile: function () {
                 this._compiledCode = this._builder.save(this.element.graph);

@@ -2693,7 +2693,7 @@ cg.Renderer = (function () {
                 d3Block
                     .select("text")
                     .text(function () {
-                        return rendererBlock.description;
+                        return rendererBlock.cgBlock.cgName;
                     })
                     .attr("transform", function (block) {
                         return "translate(" + [block.size[0] / 2, renderer._config.block.padding * 1.5] + ")";
@@ -2817,6 +2817,9 @@ cg.Renderer = (function () {
             renderer._createD3Blocks();
             var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
             renderer._positionRendererBlockBehavior(d3Block);
+        });
+        this._cgGraph.on("cg-block-name-changed", function () {
+            renderer._updateD3Blocks();
         });
         this._cgGraph.on("cg-block-remove", function (cgBlock) {
             // TODO: Remove the rendererBlocks having a reference to the cgBlock
@@ -3133,7 +3136,6 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
     rendererBlock.type = "block";
     rendererBlock.parent = null;
-    rendererBlock.description = rendererBlockData.description || cgBlock.cgName;
     rendererBlock.cgBlock = cgBlock;
     rendererBlock.id = rendererBlockData.id;
     rendererBlock.rendererPoints = [];
@@ -3442,7 +3444,7 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
                 d3Block
                     .select("text")
                     .text(function () {
-                        return rendererBlock.description;
+                        return rendererBlock.cgBlock.cgName;
                     })
                     .attr("transform", function (block) {
                         return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
