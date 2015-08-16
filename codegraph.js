@@ -2671,10 +2671,7 @@ cg.Renderer = (function () {
                     .append("svg:text")
                     .attr("class", "cg-title")
                     .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "text-before-edge")
-                    .attr("transform", function (block) {
-                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding * 1.5] + ")";
-                    });
+                    .attr("dominant-baseline", "text-before-edge");
             },
             update: function (rendererBlock) {
                 var d3Block = d3.select(this);
@@ -2697,6 +2694,9 @@ cg.Renderer = (function () {
                     .select("text")
                     .text(function () {
                         return rendererBlock.description;
+                    })
+                    .attr("transform", function (block) {
+                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding * 1.5] + ")";
                     });
             }
         };
@@ -3391,18 +3391,14 @@ cg.Renderer.prototype._createD3Blocks = function () {
             renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].create.call(this, rendererBlock);
         } else {
             d3.select(this)
-                .append("svg:rect");
+                .append("svg:rect")
+                .attr("rx", 5)
+                .attr("ry", 5);
             d3.select(this)
                 .append("svg:text")
-                .text(function () {
-                    return rendererBlock.description || rendererBlock.cgBlock.cgName;
-                })
                 .attr("class", "cg-title")
                 .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "text-before-edge")
-                .attr("transform", function (block) {
-                    return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
-                });
+                .attr("dominant-baseline", "text-before-edge");
         }
     });
     this._updateD3Blocks();
@@ -3436,8 +3432,6 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
                 renderer._createD3Points(d3Block.append("svg:g"));
                 d3Block
                     .select("rect")
-                    .attr("rx", 5)
-                    .attr("ry", 5)
                     .attr("width", function () {
                         return rendererBlock.size[0];
                     })
@@ -3448,6 +3442,9 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
                     .select("text")
                     .text(function () {
                         return rendererBlock.description;
+                    })
+                    .attr("transform", function (block) {
+                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
                     });
             }
         });
@@ -3542,9 +3539,14 @@ cg.Renderer.prototype._createD3Groups = function () {
         .call(this._dragRendererNodeBehavior())
         .call(this._removeRendererNodeFromParentBehavior());
     createdD3Groups
-        .append("svg:rect");
+        .append("svg:rect")
+        .attr("rx", 5)
+        .attr("ry", 5);
     createdD3Groups
-        .append("svg:text");
+        .append("svg:text")
+        .attr("class", "cg-title")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
     this._updateD3Groups();
 };
 
@@ -3572,8 +3574,6 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
         });
     updatedD3Groups
         .select("rect")
-        .attr("rx", 5)
-        .attr("ry", 5)
         .attr("width", function (rendererGroup) {
             return rendererGroup.size[0];
         })
@@ -3585,9 +3585,6 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
         .text(function (rendererGroup) {
             return rendererGroup.description;
         })
-        .attr("class", "cg-title")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge")
         .attr("transform", function (rendererGroup) {
             return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
         });

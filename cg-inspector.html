@@ -22,31 +22,38 @@ methods and properties.
             background: var(--cg-background-color);
             overflow: auto;
         }
+
         div {
             font-family: var(--cg-display-font);
             color: var(--cg-text-color);
         }
+
         .title {
             color: var(--cg-title-color);
             padding-bottom: 10px;
         }
+
         .box {
             padding: 10px;
             border-bottom: 3px solid #222222;
         }
+
         .row {
             padding: 5px;
         }
+
         label {
             width: 20%;
             display: inline-block;
             padding: 5px;
             text-align: right;
         }
+
         input, paper-dropdown-menu {
             width: 70%;
             display: inline-block;
         }
+
         input[type="text"] {
             padding: 5px;
             outline: none;
@@ -57,18 +64,23 @@ methods and properties.
             font-family: var(--cg-display-font);
             font-size: 1em;
         }
+
         input[type="text"]:focus {
             border-bottom: 2px solid var(--cg-primary-color);
         }
+
         #state > div:not(.active-state) {
             display: none;
         }
+
         #compileResult > div {
             width: 800px;
         }
+
         paper-button {
             margin: 2px 0;
         }
+
         #errorToast {
             background: var(--cg-error-color);
             font-family: var(--cg-display-font);
@@ -83,13 +95,15 @@ methods and properties.
                 <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
                 <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
                 <paper-button class="primary" on-click="_save">Save</paper-button>
-            </div> <!-- .box -->
+            </div>
+            <!-- .box -->
             <magnet-state id="state" class="layout vertical flex" root-state="root" current-state="{{_currentState}}">
                 <div class="layout vertical flex" data-state="root">
                     <div class="box">
                         <div class="title">Add block</div>
                         <magnet-hierarchy id="blocks" on-submit="_createBlock"></magnet-hierarchy>
-                    </div> <!-- .box -->
+                    </div>
+                    <!-- .box -->
                     <div class="box">
                         <div class="title">Create variable</div>
                         <div class="row">
@@ -104,32 +118,39 @@ methods and properties.
                         </div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
+                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable"
+                                   type="text">
                         </div>
                         <div class="row">
                             <label>value</label>
                             <input is="iron-input" bind-value="{{_varValue}}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
-                    </div> <!-- .box -->
-                </div> <!-- root -->
+                    </div>
+                    <!-- .box -->
+                </div>
+                <!-- root -->
                 <div data-state="editGroup">
                     <div class="box">
                         <div class="title">Edit group</div>
                         <div class="row">
                             <label>description</label>
-                            <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..." type="text">
+                            <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..."
+                                   type="text">
                         </div>
                         <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
-                    </div> <!-- .box -->
+                    </div>
+                    <!-- .box -->
 
-                </div> <!-- Edit group -->
+                </div>
+                <!-- Edit group -->
                 <div data-state="editBlock">
                     <div class="box">
                         <div class="title">Edit block</div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_blockName}}" placeholder="my_custom_variable" type="text">
+                            <input is="iron-input" bind-value="{{_blockName}}" placeholder="my_custom_variable"
+                                   type="text">
                         </div>
                         <div class="title" hidden$="{{_blockNoInput}}">Inputs</div>
                         <div class="row">
@@ -139,8 +160,10 @@ methods and properties.
                             </template>
                         </div>
                         <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
-                    </div> <!-- .box -->
-                </div> <!-- Edit block -->
+                    </div>
+                    <!-- .box -->
+                </div>
+                <!-- Edit block -->
                 <div data-state="editValue">
                     <div class="box">
                         <div class="title">Edit value</div>
@@ -149,22 +172,27 @@ methods and properties.
                             <input is="iron-input" bind-value="{{_value}}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
-                    </div> <!-- .box -->
-                </div> <!-- Edit value -->
+                    </div>
+                    <!-- .box -->
+                </div>
+                <!-- Edit value -->
                 <div data-state="editVariable">
                     <div class="box">
                         <div class="title">Edit variable</div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable" type="text">
+                            <input is="iron-input" bind-value="{{_varName}}" placeholder="my_custom_variable"
+                                   type="text">
                         </div>
                         <div class="row">
                             <label>value</label>
                             <input is="iron-input" bind-value="{{_varValue}}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
-                    </div> <!-- .box -->
-                </div> <!-- Edit variable -->
+                    </div>
+                    <!-- .box -->
+                </div>
+                <!-- Edit variable -->
             </magnet-state>
         </div>
         <paper-dialog id="compileResult">
@@ -187,6 +215,7 @@ methods and properties.
             ready: function () {
                 this._models = [];
                 this._folders = {};
+                this._selectedNode = null;
                 this._currentState = "root";
                 this._compiledCode = "";
                 this._varType = "";
@@ -197,7 +226,13 @@ methods and properties.
                     var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
                     if (value.cgFolder) {
                         if (this._folders[value.cgFolder] === undefined) {
-                            this._folders[value.cgFolder] = {group: {name: value.cgFolder, icon: "fa fa-folder", items: []}};
+                            this._folders[value.cgFolder] = {
+                                group: {
+                                    name: value.cgFolder,
+                                    icon: "fa fa-folder",
+                                    items: []
+                                }
+                            };
                             this._models.push(this._folders[value.cgFolder]);
                         }
                         this._folders[value.cgFolder].group.items.push({item: {name: key, icon: icon, data: value}});
@@ -216,6 +251,7 @@ methods and properties.
                 this.element = element;
                 this.element.renderer.on("cg-select", function (node) {
                     if (node.type === "block") {
+                        this._selectedNode = node;
                         switch (pandora.typename(node.cgBlock)) {
                             case "Variable":
                                 this._currentState = "editVariable";
@@ -265,18 +301,22 @@ methods and properties.
                     this.$.errorToast.show();
                     return;
                 }
-                this._customProperties.group.items.push({item: {
-                    name: this._varName, icon: "fa fa-circle",
-                    data: {
-                        cgType: "Variable",
-                        cgValueType: this._varType,
-                        cgValue: this._varValue
+                this._customProperties.group.items.push({
+                    item: {
+                        name: this._varName, icon: "fa fa-circle",
+                        data: {
+                            cgType: "Variable",
+                            cgValueType: this._varType,
+                            cgValue: this._varValue
+                        }
                     }
-                }});
+                });
                 this.$.blocks.loadItems(this._models); // Refresh the list
             },
             _editVariableClicked: function () {
                 console.log("_editVariableClicked");
+                this._selectedNode.cgBlock.cgName = this._varName;
+                console.log(this._selectedNode);
                 console.log(this._varName);
                 console.log(this._varValue);
             },
