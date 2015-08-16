@@ -3,11 +3,13 @@ var DUDE_MODELS = {
     // globals
     "entity": {
         "cgType": "Variable",
-        "cgValueType": "Entity"
+        "cgValueType": "Entity",
+        "cgFolder": "globals"
     },
     "game": {
         "cgType": "Variable",
-        "cgValueType": "Game"
+        "cgValueType": "Game",
+        "cgFolder": "globals"
     },
 
     // operators
@@ -153,6 +155,7 @@ var DUDE_MODELS = {
 
     "info": {
         "cgType": "Instruction",
+        "cgFolder": "utilities",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -163,6 +166,7 @@ var DUDE_MODELS = {
     },
     "to_string": {
         "cgType": "Function",
+        "cgFolder": "utilities",
         "cgTemplates": ["Number", "Boolean", "String", "Entity"],
         "cgInputs": [
             {
@@ -182,6 +186,7 @@ var DUDE_MODELS = {
 
     "Timer.start": {
         "cgType": "Instruction",
+        "cgFolder": "system",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -192,6 +197,7 @@ var DUDE_MODELS = {
     },
     "Timer.pause": {
         "cgType": "Instruction",
+        "cgFolder": "system",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -202,6 +208,7 @@ var DUDE_MODELS = {
     },
     "Timer.resume": {
         "cgType": "Instruction",
+        "cgFolder": "system",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -212,6 +219,7 @@ var DUDE_MODELS = {
     },
     "Timer.tick": {
         "cgType": "Instruction",
+        "cgFolder": "system",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -222,16 +230,19 @@ var DUDE_MODELS = {
     },
     "Timer.fps": {
         "cgType": "Getter",
+        "cgFolder": "system",
         "cgClassType": "Timer",
         "cgValueType": "Number"
     },
     "Timer.elapsed_time": {
         "cgType": "Getter",
+        "cgFolder": "system",
         "cgClassType": "Timer",
         "cgValueType": "Number"
     },
     "Timer.delta_time": {
         "cgType": "Getter",
+        "cgFolder": "system",
         "cgClassType": "Timer",
         "cgValueType": "Number"
     },
@@ -240,6 +251,7 @@ var DUDE_MODELS = {
 
     "Entity.destroy": {
         "cgType": "Instruction",
+        "cgFolder": "objects",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -250,6 +262,7 @@ var DUDE_MODELS = {
     },
     "Entity.add_entity": {
         "cgType": "Instruction",
+        "cgFolder": "objects",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -266,6 +279,7 @@ var DUDE_MODELS = {
     },
     "Entity.has_behavior": {
         "cgType": "Function",
+        "cgFolder": "objects",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -282,6 +296,7 @@ var DUDE_MODELS = {
     },
     "Entity.add_behavior": {
         "cgType": "Instruction",
+        "cgFolder": "objects",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -298,6 +313,7 @@ var DUDE_MODELS = {
     },
     "Entity.behavior": {
         "cgType": "Instruction",
+        "cgFolder": "objects",
         "cgInputs": [
             {
                 "cgType": "Point",
@@ -314,11 +330,13 @@ var DUDE_MODELS = {
     },
     "Entity.name": {
         "cgType": "Getter",
+        "cgFolder": "objects",
         "cgClassType": "Entity",
         "cgValueType": "String"
     },
     "Entity.parent": {
         "cgType": "Getter",
+        "cgFolder": "objects",
         "cgClassType": "Entity",
         "cgValueType": "Entity"
     }
