@@ -2895,9 +2895,11 @@ cg.Renderer.prototype._positionRendererBlockBehavior = function (d3Block) {
         renderer._d3Svg.on("mousemove" + namespace, null);
         renderer._d3Svg.on("mousedown" + namespace, null);
         renderer.d3Blocks.classed("cg-non-clickable", false);
+        renderer.d3Groups.classed("cg-non-clickable", false);
     };
     disablePlacement();
     this.d3Blocks.classed("cg-non-clickable", true);
+    this.d3Groups.classed("cg-non-clickable", true);
     this._d3Svg.on("mousemove" + namespace, function () {
         d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
         renderer._updateSelectedD3Nodes(d3Block);
