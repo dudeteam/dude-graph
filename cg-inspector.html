@@ -6,6 +6,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 
 <!--
 `cg-inspector` is a Polymer element which creates the inspector for codegraph. In other words, it creates the sidebar
@@ -41,7 +42,7 @@ methods and properties.
             display: inline-block;
             padding: 5px;
         }
-        input, select {
+        input, paper-dropdown-menu {
             width: 50%;
             display: inline-block;
         }
@@ -67,8 +68,13 @@ methods and properties.
         paper-button {
             margin: 2px 0;
         }
+        #errorToast {
+            background: var(--cg-error-color);
+            font-family: var(--cg-display-font);
+        }
     </style>
     <template>
+        <paper-toast id="errorToast"></paper-toast>
         <div class="layout vertical flex">
             <!--<magnet-state id="state" root-state="root" current-state="{{_currentState}}">-->
                 <!--<div data-state="root">-->
@@ -93,7 +99,7 @@ methods and properties.
                     <div class="title">Create variable</div>
                     <div class="row">
                         <label>Type: </label>
-                        <paper-dropdown-menu label="Select a type..." selected-item-label="{{_varType}}" no-label-float>
+                        <paper-dropdown-menu label="Choose..." selected-item-label="{{_varType}}" no-label-float>
                             <paper-menu class="dropdown-content">
                                 <paper-item>Boolean</paper-item>
                                 <paper-item>Number</paper-item>
@@ -108,10 +114,6 @@ methods and properties.
                     <div class="row">
                         <label>Value: </label>
                         <input is="iron-input" bind-value="{{_varValue}}" type="text">
-                    </div>
-                    <div class="row">
-                        <label>Folder: </label>
-                        <input is="iron-input" bind-value="{{_varFolder}}" placeholder="my_custom_folder" type="text">
                     </div>
                     <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
                 </div> <!-- .box -->
@@ -155,6 +157,8 @@ methods and properties.
                         this._models.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
+                this._customProperties = {group: {name: "custom properties", icon: "fa fa-folder", items: []}};
+                this._models.unshift(this._customProperties);
                 this.$.blocks.loadItems(this._models);
             },
             bindBuilder: function (builder) {
@@ -187,8 +191,26 @@ methods and properties.
             _createVariableClicked: function () {
                 console.log("Name: " + this._varName);
                 console.log("Value: " + this._varValue);
-                console.log("Folder: " + this._varFolder);
                 console.log("Type: " + this._varType);
+                if (!this._varType) {
+                    this.$.errorToast.text = "A `type` is required to create a variable";
+                    this.$.errorToast.show();
+                    return;
+                }
+                if (!this._varName) {
+                    this.$.errorToast.text = "A `name` is required to create a variable";
+                    this.$.errorToast.show();
+                    return;
+                }
+                this._customProperties.group.items.push({item: {
+                    name: this._varName, icon: "fa fa-circle",
+                    data: {
+                        cgType: "Variable",
+                        cgValueType: this._varType,
+                        cgValue: this._varValue
+                    }
+                }});
+                this.$.blocks.loadItems(this._models); // Refresh the list
             },
             _compile: function () {
                 this._compiledCode = this._builder.save(this.element.graph);
