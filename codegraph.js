@@ -2669,9 +2669,6 @@ cg.Renderer = (function () {
                     .append("svg:rect");
                 d3Block
                     .append("svg:text")
-                    .text(function () {
-                        return rendererBlock.cgBlock.cgName;
-                    })
                     .attr("class", "cg-title")
                     .attr("text-anchor", "middle")
                     .attr("dominant-baseline", "text-before-edge")
@@ -2695,6 +2692,12 @@ cg.Renderer = (function () {
                     .attr("height", function () {
                         return rendererBlock.size[1];
                     });
+
+                d3Block
+                    .select("text")
+                    .text(function () {
+                        return rendererBlock.description;
+                    });
             }
         };
         this.addRenderBlock("Variable", renderGetter);
@@ -2704,7 +2707,6 @@ cg.Renderer = (function () {
         this._createZoomBehavior();
         this._createD3Blocks();
         this._createD3Connections();
-        this._computeRendererGroupsPositionAndSize();
         this._createD3Groups();
         this._initializeListeners();
     };
@@ -2712,7 +2714,7 @@ cg.Renderer = (function () {
     /**
      * Adds a custom function to render a specify type of block.
      * @param type {String}
-     * @param fn {Function}
+     * @param fn {{create: Function, update: Function}}
      */
     Renderer.prototype.addRenderBlock = function (type, fn) {
         this._renderBlockFunctions[type] = fn;
@@ -2732,10 +2734,7 @@ cg.Renderer = (function () {
             renderer._removeRendererNodeParent(rendererNode);
             renderer._addRendererNodeParent(rendererNode, rendererGroup);
         });
-        // TODO: Optimize
         this._createD3Groups();
-        this._computeRendererGroupsPositionAndSize();
-        this._updateD3Blocks();
         this._updateD3Groups();
     };
 
@@ -2743,7 +2742,15 @@ cg.Renderer = (function () {
      * Remove the current selection.
      */
     Renderer.prototype.removeSelection = function () {
-        console.log("remove selection !");
+        var renderer = this;
+        pandora.forEach(this.d3Selection.data(), function (rendererNode) {
+            renderer._removeRendererNode(rendererNode);
+        });
+        this._removeD3Blocks();
+        this._removeD3Groups();
+        this._removeD3Connections();
+        this._updateD3Blocks();
+        this._updateD3Groups();
     };
 
     /**
@@ -2795,7 +2802,7 @@ cg.Renderer = (function () {
     };
 
     /**
-     * Initialize the listeners to dynamically creates the rendererBlocks when a cgBlock is added
+     * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
      * @private
      */
     Renderer.prototype._initializeListeners = function () {
@@ -2954,6 +2961,9 @@ cg.Renderer.prototype._dragRendererConnectionBehavior = function () {
             renderer.__draggingConnection = renderer._d3Connections
                 .append("svg:path")
                 .classed("cg-connection", true)
+                .classed("cg-stream", function () {
+                    return pandora.typename(rendererPoint.cgPoint) === "Stream";
+                })
                 .attr("d", function () {
                     return computeConnectionPath(rendererPoint);
                 });
@@ -3123,6 +3133,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
     var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
     rendererBlock.type = "block";
     rendererBlock.parent = null;
+    rendererBlock.description = rendererBlockData.description || cgBlock.cgName;
     rendererBlock.cgBlock = cgBlock;
     rendererBlock.id = rendererBlockData.id;
     rendererBlock.rendererPoints = [];
@@ -3140,10 +3151,17 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
  * @private
  */
 cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
+    var renderer = this;
     var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
     if (rendererBlockFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererBlock() RendererBlock not found and thus cannot be removed");
     }
+    pandora.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
+        while (rendererPoint.connections.length > 0) {
+            renderer._removeRendererConnection(rendererPoint.connections[0]);
+        }
+    });
+    this._removeRendererNodeParent(rendererBlock);
     this._rendererBlocks.splice(rendererBlockFound, 1);
 };
 /**
@@ -3236,6 +3254,7 @@ cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
     if (rendererGroupFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererGroup() RendererGroup not found and thus cannot be removed");
     }
+    this._removeRendererNodeParent(rendererGroup);
     this._rendererGroups.splice(rendererGroupFound, 1);
 };
 /**
@@ -3247,8 +3266,9 @@ cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
 cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
     if (rendererNode.type === "block") {
         this._removeRendererBlock(rendererNode);
+    } else {
+        this._removeRendererGroup(rendererNode);
     }
-    this._removeRendererGroup(rendererNode);
 };
 
 /**
@@ -3375,7 +3395,7 @@ cg.Renderer.prototype._createD3Blocks = function () {
             d3.select(this)
                 .append("svg:text")
                 .text(function () {
-                    return rendererBlock.cgBlock.cgName;
+                    return rendererBlock.description || rendererBlock.cgBlock.cgName;
                 })
                 .attr("class", "cg-title")
                 .attr("text-anchor", "middle")
@@ -3423,6 +3443,11 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
                     })
                     .attr("height", function () {
                         return rendererBlock.size[1];
+                    });
+                d3Block
+                    .select("text")
+                    .text(function () {
+                        return rendererBlock.description;
                     });
             }
         });
@@ -3539,6 +3564,9 @@ cg.Renderer.prototype._updateD3Groups = function () {
 cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
     var renderer = this;
     updatedD3Groups
+        .each(function (rendererGroup) {
+            renderer._computeRendererGroupPositionAndSize(rendererGroup);
+        })
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
         });
@@ -3585,8 +3613,6 @@ cg.Renderer.prototype._removeD3Groups = function () {
 cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
     var renderer = this;
     var updateParents = [];
-    // TODO: Optimize this to only compute needed groups position and size
-    this._computeRendererGroupsPositionAndSize();
     d3Nodes
         .attr("transform", function (rendererNode) {
             updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
@@ -4003,17 +4029,6 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
             computeRendererGroupParentPositionAndSize(rendererGroupParent.parent);
         }
     })(rendererGroup.parent);
-};
-
-/**
- * Computes the position and the size of all the rendererGroups depending of their children
- * @private
- */
-cg.Renderer.prototype._computeRendererGroupsPositionAndSize = function () {
-    var renderer = this;
-    pandora.forEach(this._rendererGroups, function (rendererGroup) {
-        renderer._computeRendererGroupPositionAndSize(rendererGroup);
-    });
 };
 
 /**
