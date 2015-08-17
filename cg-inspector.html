@@ -319,10 +319,12 @@ methods and properties.
                 console.log(this._varName);
                 console.log(this._varValue);
                 this._selectedNode.cgBlock.cgName = this._varName;
+                this._selectedNode.cgBlock.cgValue = this._varValue;
             },
             _editValueClicked: function () {
                 console.log("_editValueClicked");
                 console.log(this._value);
+                this._selectedNode.cgBlock.cgValue = this._varValue;
             },
             _editBlockClicked: function () {
                 console.log("_editBlockClicked");
