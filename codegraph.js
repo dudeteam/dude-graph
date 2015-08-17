@@ -3107,364 +3107,6 @@ cg.Renderer.prototype._createZoomBehavior = function () {
     this._d3Svg.call(this._zoom);
 };
 /**
- * Creates d3Blocks with the existing rendererBlocks
- * @private
- */
-cg.Renderer.prototype._createD3Blocks = function () {
-    var renderer = this;
-    var createdD3Blocks = this.d3Blocks
-        .data(this._rendererBlocks, function (rendererBlock) {
-            var nbPoints = Math.max(rendererBlock.cgBlock.cgInputs.length, rendererBlock.cgBlock.cgOutputs.length);
-            rendererBlock.size = [
-                renderer._config.block.size[0],
-                nbPoints * renderer._config.point.height + renderer._config.block.header
-            ];
-            return rendererBlock.id;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("id", function (rendererBlock) {
-            return this._getRendererNodeUniqueID(rendererBlock);
-        }.bind(this))
-        .attr("class", "cg-block")
-        .call(this._dragRendererNodeBehavior())
-        .call(this._removeRendererNodeFromParentBehavior());
-    createdD3Blocks.each(function (rendererBlock) {
-        if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
-            renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].create.call(this, rendererBlock);
-        } else {
-            var d3Block = d3.select(this);
-            d3Block
-                .append("svg:rect")
-                .attr("rx", 5)
-                .attr("ry", 5);
-            d3Block
-                .append("svg:text")
-                .attr("class", "cg-title")
-                .attr("text-anchor", "middle")
-                .attr("dominant-baseline", "text-before-edge");
-            renderer._createD3Points(d3Block.append("svg:g"));
-        }
-    });
-    this._updateD3Blocks();
-};
-
-/**
- * Updates all d3Blocks
- * @private
- */
-cg.Renderer.prototype._updateD3Blocks = function () {
-    this._updateSelectedD3Blocks(this.d3Blocks);
-};
-
-/**
- * Updates selected d3Blocks
- * @param updatedD3Blocks {d3.selection}
- * @private
- */
-cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
-    var renderer = this;
-    updatedD3Blocks
-        .attr("transform", function (rendererBlock) {
-            return "translate(" + rendererBlock.position + ")";
-        });
-    updatedD3Blocks
-        .each(function (rendererBlock) {
-            if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
-                renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].update.call(this, rendererBlock);
-            } else {
-                var d3Block = d3.select(this);
-                d3Block
-                    .select("rect")
-                    .attr("width", function () {
-                        return rendererBlock.size[0];
-                    })
-                    .attr("height", function () {
-                        return rendererBlock.size[1];
-                    });
-                d3Block
-                    .select("text")
-                    .text(function () {
-                        return rendererBlock.cgBlock.cgName;
-                    })
-                    .attr("transform", function (block) {
-                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
-                    });
-            }
-        });
-};
-
-/**
- * Removes d3Blocks when rendererBlocks are removed
- * @private
- */
-cg.Renderer.prototype._removeD3Blocks = function () {
-    var removedRendererBlocks = this.d3Blocks
-        .data(this._rendererBlocks, function (rendererBlock) {
-            return rendererBlock.id;
-        })
-        .exit()
-        .remove();
-};
-/**
- * Creates d3Connections with the existing rendererConnections
- * @private
- */
-cg.Renderer.prototype._createD3Connections = function () {
-    var createdD3Connections = this.d3Connections
-        .data(this._rendererConnections, function (rendererConnection) {
-            if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
-            }
-        })
-        .enter()
-        .append("svg:path")
-        .classed("cg-connection", true)
-        .classed("cg-stream", function (rendererConnection) {
-            return pandora.typename(rendererConnection.inputPoint.cgPoint) === "Stream";
-        });
-    this._updateSelectedD3Connections(createdD3Connections);
-};
-
-/**
- * Updates all d3Connections
- * @private
- */
-cg.Renderer.prototype._updatedD3Connections = function () {
-    this._updateSelectedD3Connections(this.d3Connections);
-};
-
-/**
- * Updates selected d3Connections
- * @param updatedD3Connections
- * @private
- */
-cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
-    var renderer = this;
-    updatedD3Connections
-        .attr("d", function (rendererConnection) {
-            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputPoint);
-            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputPoint);
-            return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
-        }.bind(this));
-};
-
-/**
- * Removes d3Connections when rendererConnections are removed
- * @private
- */
-cg.Renderer.prototype._removeD3Connections = function () {
-    var removedRendererConnections = this.d3Connections
-        .data(this._rendererConnections, function (rendererConnection) {
-            if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
-            }
-        })
-        .exit()
-        .remove();
-};
-/**
- * Creates d3Groups with the existing rendererGroups
- * @private
- */
-cg.Renderer.prototype._createD3Groups = function () {
-    var createdD3Groups = this.d3Groups
-        .data(this._rendererGroups, function (rendererGroup) {
-            return rendererGroup.id;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("id", function (rendererGroup) {
-            return this._getRendererNodeUniqueID(rendererGroup);
-        }.bind(this))
-        .attr("class", "cg-group")
-        .call(this._dragRendererNodeBehavior())
-        .call(this._removeRendererNodeFromParentBehavior());
-    createdD3Groups
-        .append("svg:rect")
-        .attr("rx", 5)
-        .attr("ry", 5);
-    createdD3Groups
-        .append("svg:text")
-        .attr("class", "cg-title")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge");
-    this._updateD3Groups();
-};
-
-/**
- * Updates all d3Groups
- * @private
- */
-cg.Renderer.prototype._updateD3Groups = function () {
-    this._updateSelectedD3Groups(this.d3Groups);
-};
-
-/**
- * Updates selected d3Groups
- * @param updatedD3Groups {d3.selection}
- * @private
- */
-cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
-    var renderer = this;
-    updatedD3Groups
-        .each(function (rendererGroup) {
-            renderer._computeRendererGroupPositionAndSize(rendererGroup);
-        })
-        .attr("transform", function (rendererGroup) {
-            return "translate(" + rendererGroup.position + ")";
-        });
-    updatedD3Groups
-        .select("rect")
-        .attr("width", function (rendererGroup) {
-            return rendererGroup.size[0];
-        })
-        .attr("height", function (rendererGroup) {
-            return rendererGroup.size[1];
-        });
-    updatedD3Groups
-        .select("text")
-        .text(function (rendererGroup) {
-            return rendererGroup.description;
-        })
-        .attr("transform", function (rendererGroup) {
-            return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
-        });
-};
-
-/**
- * Removes d3Groups when rendererGroups are removed
- * @private
- */
-cg.Renderer.prototype._removeD3Groups = function () {
-    var removedD3Groups = this.d3Groups
-        .data(this._rendererGroups, function (rendererGroup) {
-            return rendererGroup.id;
-        })
-        .exit()
-        .remove();
-};
-/**
- * This method will update all nodes and their parents if needed
- * @param d3Nodes {d3.selection}
- * @private
- */
-cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
-    var renderer = this;
-    var updateParents = [];
-    d3Nodes
-        .attr("transform", function (rendererNode) {
-            updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
-            return "translate(" + rendererNode.position + ")";
-        });
-    if (updateParents.length > 0) {
-        this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
-    }
-    // TODO: Optimize this to only update the needed connections
-    this._updatedD3Connections();
-};
-/**
- * Creates d3Points
- * @param d3Block {d3.selection} The svg group which will contains the d3Points of the current block
- * @private
- */
-cg.Renderer.prototype._createD3Points = function (d3Block) {
-    var renderer = this;
-    var createdD3Points = d3Block
-        .selectAll(".cg-output, .cg-input")
-        .data(function (rendererBlock) {
-            return rendererBlock.rendererPoints;
-        }, function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("class", function (rendererPoint) {
-            return "cg-" + (rendererPoint.isOutput ? "output" : "input");
-        })
-        .each(function () {
-            renderer._createD3PointShapes(d3.select(this));
-        });
-    createdD3Points
-        .append("svg:text")
-        .attr("alignment-baseline", "middle")
-        .attr("text-anchor", function (rendererPoint) {
-            return rendererPoint.isOutput ? "end" : "start";
-        })
-        .text(function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        });
-    this._updateSelected3DPoints(createdD3Points);
-};
-
-/**
- * Updates the selected d3Points
- * @param updatedD3Points
- * @private
- */
-cg.Renderer.prototype._updateSelected3DPoints = function (updatedD3Points) {
-    var renderer = this;
-    updatedD3Points
-        .classed("cg-empty", function (rendererPoint) {
-            return rendererPoint.connections.length === 0;
-        })
-        .classed("cg-stream", function (rendererPoint) {
-            return pandora.typename(rendererPoint.cgPoint) === "Stream";
-        })
-        .attr("transform", function (rendererPoint) {
-            if (rendererPoint.isOutput) {
-                return "translate(" + [
-                        rendererPoint.rendererBlock.size[0] - renderer._config.block.padding,
-                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
-                    ] + ")";
-            } else {
-                return "translate(" + [
-                        renderer._config.block.padding,
-                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
-                    ] + ")";
-            }
-        });
-    updatedD3Points
-        .select("text")
-        .attr("transform", function (rendererPoint) {
-            if (rendererPoint.isOutput) {
-                return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
-            } else {
-                return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
-            }
-        });
-};
-
-/**
- * Creates the d3PointShapes
- * @param d3Point {d3.selection}
- * @returns {d3.selection}
- * @private
- */
-cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
-    var renderer = this;
-    d3Point
-        .selectAll(".cg-point-shape")
-        .data(d3Point.data(), function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        })
-        .enter()
-        .append("svg:path")
-        .classed("cg-point-shape", true)
-        .attr("d", function (rendererPoint) {
-            var r = renderer._config.point.radius;
-            if (pandora.typename(rendererPoint.cgPoint) === "Stream") {
-                return ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"];
-            } else {
-                return ["M 0, 0", "m " + -r + ", 0", "a " + [r, r] + " 0 1,0 " + r * 2 + ",0", "a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0"];
-            }
-        })
-        .call(renderer._removeRendererConnectionBehavior())
-        .call(renderer._dragRendererConnectionBehavior());
-};
-/**
  * Returns the rendererNode associated with the given id
  * @param id
  * @returns {cg.RendererBlock|null}
@@ -3472,6 +3114,22 @@ cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
  */
 cg.Renderer.prototype._getRendererBlockById = function (id) {
     return this._rendererBlockIds.get(id) || null;
+};
+
+/**
+ * Returns the rendererBlocks bound to the given cgBlock
+ * @param cgBlock {cg.Block}
+ * @returns {Array<cg.RendererBlock>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
+    var rendererBlocks = [];
+    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
+        if (rendererBlock.cgBlock === cgBlock) {
+            rendererBlocks.push(rendererBlock);
+        }
+    });
+    return rendererBlocks;
 };
 
 /**
@@ -3507,6 +3165,7 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
 
 /**
  * Removes the rendererBlock
+ * Also removes the cgBlock from the cgGraph if it is the last reference
  * @param rendererBlock {cg.RendererBlock}
  * @private
  */
@@ -3523,6 +3182,9 @@ cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
     });
     this._removeRendererNodeParent(rendererBlock);
     this._rendererBlocks.splice(rendererBlockFound, 1);
+    if (this._getRendererBlocksByCgBlock(rendererBlock.cgBlock).length === 1) {
+        this._cgGraph.removeBlock(rendererBlock.cgBlock);
+    }
 };
 /**
  * Creates a rendererConnection
@@ -4105,4 +3767,362 @@ cg.Renderer.prototype._d3MoveToFront = function (d3Selection) {
     return d3Selection.each(function () {
         this.parentNode.appendChild(this);
     });
+};
+/**
+ * Creates d3Blocks with the existing rendererBlocks
+ * @private
+ */
+cg.Renderer.prototype._createD3Blocks = function () {
+    var renderer = this;
+    var createdD3Blocks = this.d3Blocks
+        .data(this._rendererBlocks, function (rendererBlock) {
+            var nbPoints = Math.max(rendererBlock.cgBlock.cgInputs.length, rendererBlock.cgBlock.cgOutputs.length);
+            rendererBlock.size = [
+                renderer._config.block.size[0],
+                nbPoints * renderer._config.point.height + renderer._config.block.header
+            ];
+            return rendererBlock.id;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (rendererBlock) {
+            return this._getRendererNodeUniqueID(rendererBlock);
+        }.bind(this))
+        .attr("class", "cg-block")
+        .call(this._dragRendererNodeBehavior())
+        .call(this._removeRendererNodeFromParentBehavior());
+    createdD3Blocks.each(function (rendererBlock) {
+        if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
+            renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].create.call(this, rendererBlock);
+        } else {
+            var d3Block = d3.select(this);
+            d3Block
+                .append("svg:rect")
+                .attr("rx", 5)
+                .attr("ry", 5);
+            d3Block
+                .append("svg:text")
+                .attr("class", "cg-title")
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "text-before-edge");
+            renderer._createD3Points(d3Block.append("svg:g"));
+        }
+    });
+    this._updateD3Blocks();
+};
+
+/**
+ * Updates all d3Blocks
+ * @private
+ */
+cg.Renderer.prototype._updateD3Blocks = function () {
+    this._updateSelectedD3Blocks(this.d3Blocks);
+};
+
+/**
+ * Updates selected d3Blocks
+ * @param updatedD3Blocks {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
+    var renderer = this;
+    updatedD3Blocks
+        .attr("transform", function (rendererBlock) {
+            return "translate(" + rendererBlock.position + ")";
+        });
+    updatedD3Blocks
+        .each(function (rendererBlock) {
+            if (renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)]) {
+                renderer._renderBlockFunctions[pandora.typename(rendererBlock.cgBlock)].update.call(this, rendererBlock);
+            } else {
+                var d3Block = d3.select(this);
+                d3Block
+                    .select("rect")
+                    .attr("width", function () {
+                        return rendererBlock.size[0];
+                    })
+                    .attr("height", function () {
+                        return rendererBlock.size[1];
+                    });
+                d3Block
+                    .select("text")
+                    .text(function () {
+                        return rendererBlock.cgBlock.cgName;
+                    })
+                    .attr("transform", function (block) {
+                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
+                    });
+            }
+        });
+};
+
+/**
+ * Removes d3Blocks when rendererBlocks are removed
+ * @private
+ */
+cg.Renderer.prototype._removeD3Blocks = function () {
+    var removedRendererBlocks = this.d3Blocks
+        .data(this._rendererBlocks, function (rendererBlock) {
+            return rendererBlock.id;
+        })
+        .exit()
+        .remove();
+};
+/**
+ * Creates d3Connections with the existing rendererConnections
+ * @private
+ */
+cg.Renderer.prototype._createD3Connections = function () {
+    var createdD3Connections = this.d3Connections
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
+            }
+        })
+        .enter()
+        .append("svg:path")
+        .classed("cg-connection", true)
+        .classed("cg-stream", function (rendererConnection) {
+            return pandora.typename(rendererConnection.inputPoint.cgPoint) === "Stream";
+        });
+    this._updateSelectedD3Connections(createdD3Connections);
+};
+
+/**
+ * Updates all d3Connections
+ * @private
+ */
+cg.Renderer.prototype._updatedD3Connections = function () {
+    this._updateSelectedD3Connections(this.d3Connections);
+};
+
+/**
+ * Updates selected d3Connections
+ * @param updatedD3Connections
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
+    var renderer = this;
+    updatedD3Connections
+        .attr("d", function (rendererConnection) {
+            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputPoint);
+            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputPoint);
+            return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
+        }.bind(this));
+};
+
+/**
+ * Removes d3Connections when rendererConnections are removed
+ * @private
+ */
+cg.Renderer.prototype._removeD3Connections = function () {
+    var removedRendererConnections = this.d3Connections
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
+            }
+        })
+        .exit()
+        .remove();
+};
+/**
+ * Creates d3Groups with the existing rendererGroups
+ * @private
+ */
+cg.Renderer.prototype._createD3Groups = function () {
+    var createdD3Groups = this.d3Groups
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (rendererGroup) {
+            return this._getRendererNodeUniqueID(rendererGroup);
+        }.bind(this))
+        .attr("class", "cg-group")
+        .call(this._dragRendererNodeBehavior())
+        .call(this._removeRendererNodeFromParentBehavior());
+    createdD3Groups
+        .append("svg:rect")
+        .attr("rx", 5)
+        .attr("ry", 5);
+    createdD3Groups
+        .append("svg:text")
+        .attr("class", "cg-title")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
+    this._updateD3Groups();
+};
+
+/**
+ * Updates all d3Groups
+ * @private
+ */
+cg.Renderer.prototype._updateD3Groups = function () {
+    this._updateSelectedD3Groups(this.d3Groups);
+};
+
+/**
+ * Updates selected d3Groups
+ * @param updatedD3Groups {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
+    var renderer = this;
+    updatedD3Groups
+        .each(function (rendererGroup) {
+            renderer._computeRendererGroupPositionAndSize(rendererGroup);
+        })
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + rendererGroup.position + ")";
+        });
+    updatedD3Groups
+        .select("rect")
+        .attr("width", function (rendererGroup) {
+            return rendererGroup.size[0];
+        })
+        .attr("height", function (rendererGroup) {
+            return rendererGroup.size[1];
+        });
+    updatedD3Groups
+        .select("text")
+        .text(function (rendererGroup) {
+            return rendererGroup.description;
+        })
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
+        });
+};
+
+/**
+ * Removes d3Groups when rendererGroups are removed
+ * @private
+ */
+cg.Renderer.prototype._removeD3Groups = function () {
+    var removedD3Groups = this.d3Groups
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
+        })
+        .exit()
+        .remove();
+};
+/**
+ * This method will update all nodes and their parents if needed
+ * @param d3Nodes {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
+    var renderer = this;
+    var updateParents = [];
+    d3Nodes
+        .attr("transform", function (rendererNode) {
+            updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
+            return "translate(" + rendererNode.position + ")";
+        });
+    if (updateParents.length > 0) {
+        this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
+    }
+    // TODO: Optimize this to only update the needed connections
+    this._updatedD3Connections();
+};
+/**
+ * Creates d3Points
+ * @param d3Block {d3.selection} The svg group which will contains the d3Points of the current block
+ * @private
+ */
+cg.Renderer.prototype._createD3Points = function (d3Block) {
+    var renderer = this;
+    var createdD3Points = d3Block
+        .selectAll(".cg-output, .cg-input")
+        .data(function (rendererBlock) {
+            return rendererBlock.rendererPoints;
+        }, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("class", function (rendererPoint) {
+            return "cg-" + (rendererPoint.isOutput ? "output" : "input");
+        })
+        .each(function () {
+            renderer._createD3PointShapes(d3.select(this));
+        });
+    createdD3Points
+        .append("svg:text")
+        .attr("alignment-baseline", "middle")
+        .attr("text-anchor", function (rendererPoint) {
+            return rendererPoint.isOutput ? "end" : "start";
+        })
+        .text(function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        });
+    this._updateSelected3DPoints(createdD3Points);
+};
+
+/**
+ * Updates the selected d3Points
+ * @param updatedD3Points
+ * @private
+ */
+cg.Renderer.prototype._updateSelected3DPoints = function (updatedD3Points) {
+    var renderer = this;
+    updatedD3Points
+        .classed("cg-empty", function (rendererPoint) {
+            return rendererPoint.connections.length === 0;
+        })
+        .classed("cg-stream", function (rendererPoint) {
+            return pandora.typename(rendererPoint.cgPoint) === "Stream";
+        })
+        .attr("transform", function (rendererPoint) {
+            if (rendererPoint.isOutput) {
+                return "translate(" + [
+                        rendererPoint.rendererBlock.size[0] - renderer._config.block.padding,
+                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            } else {
+                return "translate(" + [
+                        renderer._config.block.padding,
+                        rendererPoint.index * renderer._config.point.height + renderer._config.block.header
+                    ] + ")";
+            }
+        });
+    updatedD3Points
+        .select("text")
+        .attr("transform", function (rendererPoint) {
+            if (rendererPoint.isOutput) {
+                return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
+            } else {
+                return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
+            }
+        });
+};
+
+/**
+ * Creates the d3PointShapes
+ * @param d3Point {d3.selection}
+ * @returns {d3.selection}
+ * @private
+ */
+cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
+    var renderer = this;
+    d3Point
+        .selectAll(".cg-point-shape")
+        .data(d3Point.data(), function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
+        .enter()
+        .append("svg:path")
+        .classed("cg-point-shape", true)
+        .attr("d", function (rendererPoint) {
+            var r = renderer._config.point.radius;
+            if (pandora.typename(rendererPoint.cgPoint) === "Stream") {
+                return ["M " + -r + " " + -r * 2 + " L " + -r + " " + r * 2 + " L " + r + " " + 0 + " Z"];
+            } else {
+                return ["M 0, 0", "m " + -r + ", 0", "a " + [r, r] + " 0 1,0 " + r * 2 + ",0", "a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0"];
+            }
+        })
+        .call(renderer._removeRendererConnectionBehavior())
+        .call(renderer._dragRendererConnectionBehavior());
 };
