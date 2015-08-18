@@ -2223,10 +2223,10 @@ cg.RendererSaver = (function() {
         });
         pandora.forEach(renderer._rendererConnections, function (rendererConnection) {
             result.connections.push({
-                "outputName": rendererConnection.outputPoint.cgPoint.cgName,
-                "outputBlockId": rendererConnection.outputPoint.rendererBlock.id,
-                "inputName": rendererConnection.inputPoint.cgPoint.cgName,
-                "inputBlockId": rendererConnection.inputPoint.rendererBlock.id
+                "outputName": rendererConnection.outputRendererPoint.cgPoint.cgName,
+                "outputBlockId": rendererConnection.outputRendererPoint.rendererBlock.id,
+                "inputName": rendererConnection.inputRendererPoint.cgPoint.cgName,
+                "inputBlockId": rendererConnection.inputRendererPoint.rendererBlock.id
             });
         });
         return result;
@@ -2938,7 +2938,7 @@ cg.Renderer.prototype._removeRendererConnectionBehavior = function () {
                 d3.event.sourceEvent.stopImmediatePropagation();
                 while (rendererPoint.connections.length > 0) {
                     var rendererConnection = rendererPoint.connections[0];
-                    rendererBlocks.push(rendererConnection.outputPoint.rendererBlock, rendererConnection.inputPoint.rendererBlock);
+                    rendererBlocks.push(rendererConnection.outputRendererPoint.rendererBlock, rendererConnection.inputRendererPoint.rendererBlock);
                     renderer._removeRendererConnection(rendererConnection);
                 }
                 renderer._removeD3Connections();
@@ -3208,8 +3208,8 @@ cg.Renderer.prototype._createRendererConnection = function (rendererConnectionDa
         outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
     }
     var rendererConnection = {
-        "outputPoint": outputRendererPoint,
-        "inputPoint": inputRendererPoint
+        "outputRendererPoint": outputRendererPoint,
+        "inputRendererPoint": inputRendererPoint
     };
     this._rendererConnections.push(rendererConnection);
     outputRendererPoint.connections.push(rendererConnection);
@@ -3222,8 +3222,8 @@ cg.Renderer.prototype._createRendererConnection = function (rendererConnectionDa
  * @private
  */
 cg.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
-    var outputPointRendererConnectionFound = rendererConnection.outputPoint.connections.indexOf(rendererConnection);
-    var inputPointRendererConnectionFound = rendererConnection.inputPoint.connections.indexOf(rendererConnection);
+    var outputPointRendererConnectionFound = rendererConnection.outputRendererPoint.connections.indexOf(rendererConnection);
+    var inputPointRendererConnectionFound = rendererConnection.inputRendererPoint.connections.indexOf(rendererConnection);
     var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
     if (outputPointRendererConnectionFound === -1 || inputPointRendererConnectionFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in inputPoint or outputPoint");
@@ -3231,8 +3231,8 @@ cg.Renderer.prototype._removeRendererConnection = function (rendererConnection) 
     if (rendererConnectionFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererConnection() Connection not found");
     }
-    rendererConnection.outputPoint.connections.splice(outputPointRendererConnectionFound, 1);
-    rendererConnection.inputPoint.connections.splice(inputPointRendererConnectionFound, 1);
+    rendererConnection.outputRendererPoint.connections.splice(outputPointRendererConnectionFound, 1);
+    rendererConnection.inputRendererPoint.connections.splice(inputPointRendererConnectionFound, 1);
     this._rendererConnections.splice(rendererConnectionFound, 1);
 };
 /**
@@ -3486,15 +3486,15 @@ cg.Renderer.prototype._createD3Connections = function () {
     var createdD3Connections = this.d3Connections
         .data(this._rendererConnections, function (rendererConnection) {
             if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
+                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
             }
         })
         .enter()
         .append("svg:path")
         .classed("cg-connection", true)
         .classed("cg-stream", function (rendererConnection) {
-            return pandora.typename(rendererConnection.inputPoint.cgPoint) === "Stream";
+            return pandora.typename(rendererConnection.inputRendererPoint.cgPoint) === "Stream";
         });
     this._updateSelectedD3Connections(createdD3Connections);
 };
@@ -3516,8 +3516,8 @@ cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connecti
     var renderer = this;
     updatedD3Connections
         .attr("d", function (rendererConnection) {
-            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputPoint);
-            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputPoint);
+            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputRendererPoint);
+            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputRendererPoint);
             return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
         }.bind(this));
 };
@@ -3530,8 +3530,8 @@ cg.Renderer.prototype._removeD3Connections = function () {
     var removedRendererConnections = this.d3Connections
         .data(this._rendererConnections, function (rendererConnection) {
             if (rendererConnection) {
-                return rendererConnection.outputPoint.rendererBlock.id + ":" + rendererConnection.outputPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputPoint.rendererBlock.id + ":" + rendererConnection.inputPoint.cgPoint.cgName;
+                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
             }
         })
         .exit()
