@@ -1817,25 +1817,30 @@ cg.Instruction = (function () {
      * @constructor
      */
     var Instruction = pandora.class_("Instruction", cg.Block, function (cgGraph, data) {
-        data.cgInputs.unshift({
-            "cgName": "in",
-            "cgType": "Stream"
-        });
-        data.cgOutputs = [
-            {
+        cg.Block.call(this, cgGraph, {
+            cgId: data.cgId,
+            cgName: data.cgName,
+            cgModel: data.cgModel,
+            cgTemplates: data.cgTemplates,
+            cgInputs: [{
+                "cgName": "in",
+                "cgType": "Stream"
+            }].concat(data.cgInputs),
+            cgOutputs: data.cgReturn ? [{
                 "cgName": "out",
                 "cgType": "Stream"
-            }
-        ];
-        if (data.cgReturn) {
-            data.cgOutputs.push({
+            }, {
                 "cgType": "Point",
                 "cgName": "value",
                 "cgValueType": data.cgReturn.cgValueType,
                 "cgTemplate": data.cgReturn.cgTemplate
-            });
-        }
-        cg.Block.call(this, cgGraph, data);
+            }] : [
+                {
+                    "cgName": "out",
+                    "cgType": "Stream"
+                }
+            ]
+        });
     });
 
     return Instruction;
@@ -3411,11 +3416,18 @@ cg.Renderer.prototype._createD3Blocks = function () {
         })
         .classed("cg-block", true)
         .call(this._dragRendererNodeBehavior())
-        .call(this._removeRendererNodeFromParentBehavior());
+        .call(this._removeRendererNodeFromParentBehavior())
+        .each(function (rendererBlock) {
+            d3.select(this).classed("cg-" + pandora.typename(rendererBlock.cgBlock).toLowerCase(), true);
+        });
     createdD3Blocks
         .append("svg:rect")
-        .attr("rx", 5)
-        .attr("ry", 5);
+        .attr("rx", function (rendererBlock) {
+            return ["Variable", "Value"].indexOf(pandora.typename(rendererBlock.cgBlock)) !== -1 ? 30 : 5;
+        })
+        .attr("ry", function (rendererBlock) {
+            return ["Variable", "Value"].indexOf(pandora.typename(rendererBlock.cgBlock)) !== -1 ? 30 : 5;
+        });
     createdD3Blocks
         .append("svg:text")
         .classed("cg-title", true)
