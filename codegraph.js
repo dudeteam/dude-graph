@@ -2485,13 +2485,6 @@ cg.Renderer = (function () {
         this._config = pandora.mergeObjects(data.config, DEFAULT_RENDERER_CONFIG, true, true);
 
         /**
-         * Stores custom functions to render block from their type
-         * @type {Object<String, Function>}
-         * @private
-         */
-        this._renderBlockFunctions = {};
-
-        /**
          * The root SVG node of the renderer
          * @type {d3.selection}
          */
@@ -2664,49 +2657,6 @@ cg.Renderer = (function () {
      * Creates the svg nodes and listen the graph's events in order to update the rendered svg graph.
      */
     Renderer.prototype.initialize = function () {
-        var renderer = this;
-        var renderGetter = {
-            create: function (rendererBlock) {
-                var d3Block = d3.select(this);
-                d3Block
-                    .classed("cg-" + pandora.typename(rendererBlock.cgBlock).toLowerCase(), true);
-                d3Block
-                    .append("svg:rect");
-                d3Block
-                    .append("svg:text")
-                    .attr("class", "cg-title")
-                    .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "text-before-edge");
-            },
-            update: function (rendererBlock) {
-                var d3Block = d3.select(this);
-                //renderer._createD3Points(d3Block.append("svg:g"));
-                d3Block
-                    .each(function (rendererBlock) {
-                        rendererBlock.size[1] = 50;
-                    })
-                    .select("rect")
-                    .attr("rx", 25)
-                    .attr("ry", 25)
-                    .attr("width", function () {
-                        return rendererBlock.size[0];
-                    })
-                    .attr("height", function () {
-                        return rendererBlock.size[1];
-                    });
-
-                d3Block
-                    .select("text")
-                    .text(function () {
-                        return rendererBlock.cgBlock.cgName;
-                    })
-                    .attr("transform", function (block) {
-                        return "translate(" + [block.size[0] / 2, renderer._config.block.padding * 1.5] + ")";
-                    });
-            }
-        };
-        this.addRenderBlock("Variable", renderGetter);
-        this.addRenderBlock("Value", renderGetter);
         this._initialize();
         this._createSelectionBehavior();
         this._createZoomBehavior();
@@ -2714,15 +2664,6 @@ cg.Renderer = (function () {
         this._createD3Connections();
         this._createD3Groups();
         this._initializeListeners();
-    };
-
-    /**
-     * Adds a custom function to render a specify type of block.
-     * @param type {String}
-     * @param fn {{create: Function, update: Function}}
-     */
-    Renderer.prototype.addRenderBlock = function (type, fn) {
-        this._renderBlockFunctions[type] = fn;
     };
 
     /**
@@ -2823,12 +2764,8 @@ cg.Renderer = (function () {
             var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
             renderer._positionRendererBlockBehavior(d3Block);
         });
-        this._cgGraph.on("cg-block-name-changed", function () {
-            renderer._updateD3Blocks();
-        });
-        this._cgGraph.on("cg-block-remove", function (cgBlock) {
-            // TODO: Remove the rendererBlocks having a reference to the cgBlock
-            // TODO: Remove as well all connections having a reference to the rendererBlocks removed this way
+        this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
+            renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(renderer._getRendererBlocksByCgBlock(cgBlock)));
         });
     };
 
