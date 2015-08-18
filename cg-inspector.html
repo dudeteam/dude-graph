@@ -267,6 +267,11 @@ methods and properties.
                                 this._blockName = node.cgBlock.cgName;
                                 this._blockInputs = node.cgBlock.cgInputs.filter(function (point) {
                                     return pandora.typename(point) === "Point";
+                                }).map(function (point) {
+                                    return {
+                                        cgName: point.cgName,
+                                        cgValue: point.cgValue
+                                    };
                                 });
                                 this._blockNoInput = this._blockInputs.length === 0;
                         }
@@ -322,6 +327,10 @@ methods and properties.
             },
             _editBlockClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._blockName;
+                pandora.forEach(this._blockInputs, function (input) {
+                    console.log(this._selectedNode.cgBlock.inputByName(input.cgName));
+                    this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
+                }.bind(this));
             },
             _editGroupClicked: function () {
                 this._selectedNode.description = this._groupDescription;

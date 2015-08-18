@@ -803,10 +803,10 @@ cg.Graph = (function () {
                 return pandora.typename(value) === "String";
             },
             "Number": function (value) {
-                return pandora.typename(value) === "Number";
+                return pandora.typename(value) === "Number" || /^[0-9]+(\.[0-9]+)?$/.test(value);
             },
             "Boolean": function (value) {
-                return pandora.typename(value) === "Boolean";
+                return pandora.typename(value) === "Boolean" || /^(true|false)/.test(value);
             }
         };
 
@@ -873,7 +873,7 @@ cg.Graph = (function () {
      * @param type {String} The type that the value should have
      */
     Graph.prototype.canAssign = function (value, type) {
-        return value === null || (this._validators[type] && this._validators[type](value));
+        return value === null || value === undefined || (this._validators[type] && this._validators[type](value));
     };
 
     /**
