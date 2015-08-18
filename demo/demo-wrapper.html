@@ -20,7 +20,9 @@
             </cg-element>
             <cg-inspector id="inspector"
                           class="panel layout horizontal flex"
-                          models="{{modelsData}}"></cg-inspector>
+                          models="{{modelsData}}"
+                          on-save="_graphSaved"
+                          on-compile="_graphCompiled"></cg-inspector>
         </div>
     </template>
     <script src="dude-models.js"></script>
@@ -50,6 +52,12 @@
             ready: function () {
                 this.$.inspector.bindElement(this.$.element);
                 this.$.inspector.bindBuilder(new DudeSaver());
+            },
+            _graphSaved: function (e) {
+                console.log(e.detail);
+            },
+            _graphCompiled: function (e) {
+                console.log(e.detail);
             }
         });
     </script>

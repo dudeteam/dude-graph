@@ -314,33 +314,21 @@ methods and properties.
                 this.$.blocks.loadItems(this._models); // Refresh the list
             },
             _editVariableClicked: function () {
-                console.log("_editVariableClicked");
-                console.log(this._selectedNode);
-                console.log(this._varName);
-                console.log(this._varValue);
                 this._selectedNode.cgBlock.cgName = this._varName;
                 this._selectedNode.cgBlock.cgValue = this._varValue;
             },
             _editValueClicked: function () {
-                console.log("_editValueClicked");
-                console.log(this._value);
                 this._selectedNode.cgBlock.cgValue = this._varValue;
             },
             _editBlockClicked: function () {
-                console.log("_editBlockClicked");
-                console.log(this._blockName);
-                console.log(this._blockInputs);
                 this._selectedNode.cgBlock.cgName = this._blockName;
             },
             _editGroupClicked: function () {
-                console.log("_editGroupClicked");
-                console.log(this._groupDescription);
                 this._selectedNode.description = this._groupDescription;
                 this.element.renderer._updateD3Groups(); // TODO: Public API
             },
             _compile: function () {
-                this._compiledCode = this._builder.save(this.element.graph);
-                this.$.compileResult.open();
+                this.fire("compile", this._builder.save(this.element.graph));
             },
             _addGroup: function () {
                 this.element.renderer.createGroupFromSelection(prompt("Group name:"));
@@ -349,7 +337,7 @@ methods and properties.
                 this.element.renderer.removeSelection();
             },
             _save: function () {
-                console.log(new cg.JSONSaver().save(this.element.renderer, this.element.graph));
+                this.fire("save", new cg.JSONSaver().save(this.element.renderer, this.element.graph));
             }
         });
     </script>
