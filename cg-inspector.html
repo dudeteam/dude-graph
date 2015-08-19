@@ -228,8 +228,16 @@ methods and properties.
                         this._blocksTree.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
+                this._blocksTree.unshift({group: {name: "control", icon: "fa fa-folder", items: [
+                    {item: {name: "Condition", icon: "fa fa-square", data: {"cgType": "Condition"}}},
+                    {item: {name: "Each", icon: "fa fa-square", data: {"cgType": "Each"}}},
+                    {item: {name: "Range", icon: "fa fa-square", data: {"cgType": "Range"}}}
+                ]}});
                 this._customVariables = {group: {name: "custom variables", icon: "fa fa-folder", items: []}};
                 this._blocksTree.unshift(this._customVariables);
+                this._blocksTree.unshift({item: {name: "assignation", icon: "fa fa-square", data: {
+                    "cgType": "Assignation"
+                }}});
                 this.$.blocks.loadItems(this._blocksTree);
             },
             bindBuilder: function (builder) {
@@ -237,15 +245,7 @@ methods and properties.
             },
             bindElement: function (element) {
                 this.element = element;
-                pandora.forEach(this.element.graph.blocksByType("Variable"), function (variable) {
-                    this._customVariables.group.items.push({
-                        item: {
-                            name: variable.cgName,
-                            icon: "fa fa-circle",
-                            data: variable
-                        }
-                    });
-                }.bind(this));
+                pandora.forEach(this.element.graph.blocksByType("Variable"), this.addVariable.bind(this));
                 this.$.blocks.loadItems(this._blocksTree);
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
@@ -282,6 +282,15 @@ methods and properties.
                     this._currentState = "root";
                 }.bind(this));
             },
+            addVariable: function (variable) {
+                this._customVariables.group.items.push({
+                    item: {
+                        name: variable.cgName,
+                        icon: "fa fa-circle",
+                        data: variable
+                    }
+                });
+            },
             _createBlock: function (e) {
                 if (e.detail.item.group) {
                     return;
@@ -291,7 +300,11 @@ methods and properties.
                         this.element.renderer.createRendererBlock(e.detail.item.data);
                     } else {
                         var data = Object.create(e.detail.item.data);
-                        data.cgName = e.detail.item.name;
+                        if (e.detail.item.data.cgType === "Assignation") {
+                            data.cgValueType = prompt("What type?");
+                        } else {
+                            data.cgName = e.detail.item.name;
+                        }
                         data.cgId = cg.UUID.generate();
                         this.element.graph.loader.loadBlock(data);
                     }
@@ -313,14 +326,10 @@ methods and properties.
                     cgValue: this._varValue
                 });
                 this.element.graph.addBlock(variable, true);
-                this._customVariables.group.items.push({
-                    item: {
-                        name: variable.cgName,
-                        icon: "fa fa-circle",
-                        data: variable
-                    }
-                });
+                this.addVariable(variable);
                 this.$.blocks.loadItems(this._blocksTree); // Refresh the list
+                this._varName = "";
+                this._varValue = "";
             },
             _editVariableClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._varName;
@@ -332,7 +341,6 @@ methods and properties.
             _editBlockClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._blockName;
                 pandora.forEach(this._blockInputs, function (input) {
-                    console.log(this._selectedNode.cgBlock.inputByName(input.cgName));
                     this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
                 }.bind(this));
             },
