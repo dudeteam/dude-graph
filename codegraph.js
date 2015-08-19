@@ -849,8 +849,8 @@ cg.Graph = (function () {
 
     /**
      * Add a validator predicate for the given `type`
-     * @param type {String} The type on which this validator will be applied
-     * @param fn {Function} A function which takes a value in parameter and returns true if it can be assigned
+     * @param {String} type - The type on which this validator will be applied
+     * @param {Function} fn - A function which takes a value in parameter and returns true if it can be assigned
      */
     Graph.prototype.addValidator = function (type, fn) {
         this._validators[type] = fn;
@@ -858,8 +858,8 @@ cg.Graph = (function () {
 
     /**
      * Checks whether the first type can be converted into the second one.
-     * @param firstType {String}
-     * @param secondType {String}
+     * @param {String} firstType
+     * @param {String} secondType
      * @returns {Boolean}
      */
     Graph.prototype.canConvert = function (firstType, secondType) {
@@ -869,8 +869,8 @@ cg.Graph = (function () {
 
     /**
      * Checks whether the given `value` is assignable to the given `type`.
-     * @param value {*} A value to check.
-     * @param type {String} The type that the value should have
+     * @param {*} value - A value to check.
+     * @param {String} type - The type that the value should have
      */
     Graph.prototype.canAssign = function (value, type) {
         return value === null || value === undefined || (this._validators[type] && this._validators[type](value));
@@ -878,8 +878,8 @@ cg.Graph = (function () {
 
     /**
      * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
-     * @param point The point on which the connection will be created
-     * @param type The type of the connection that we try to attach
+     * @param point - The point on which the connection will be created
+     * @param type - The type of the connection that we try to attach
      * @returns {boolean}
      */
     Graph.prototype.updateTemplate = function (point, type) {
@@ -888,8 +888,8 @@ cg.Graph = (function () {
 
     /**
      * Adds a block to the graph
-     * @param {cg.Block} cgBlock to add to the graph
-     * @param {Boolean} quiet Whether the event should be emitted
+     * @param {cg.Block} cgBlock - cgBlock to add to the graph
+     * @param {Boolean} quiet - Whether the event should be emitted
      * @emit "cg-block-create" {cg.Block}
      * @return {cg.Block}
      */
@@ -914,7 +914,7 @@ cg.Graph = (function () {
 
     /**
      * Removes a block from the graph
-     * @param cgBlock {cg.Block}
+     * @param {cg.Block} cgBlock
      */
     Graph.prototype.removeBlock = function (cgBlock) {
         var blockFoundIndex = this._cgBlocks.indexOf(cgBlock);
@@ -931,18 +931,21 @@ cg.Graph = (function () {
     };
 
     /**
-     * Returns a connection between two points
+     * Creates a connection between two cgPoints
      * @param {cg.Point} cgOutputPoint
      * @param {cg.Point} cgInputPoint
      * @emit "cg-connection-create" {cg.Connection}
      * @returns {cg.Connection|null}
      */
-    Graph.prototype.connectPoints = function (cgOutputPoint, cgInputPoint) {
+    Graph.prototype._connectPoints = function (cgOutputPoint, cgInputPoint) {
         if (this.connectionByPoints(cgOutputPoint, cgInputPoint) !== null) {
             throw new cg.GraphError("Graph::connectPoints() Connection already exists between these two points: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
         if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
+        }
+        if (!(cgOutputPoint.acceptConnect(cgInputPoint) && cgInputPoint.acceptConnect(cgOutputPoint))) {
+            throw new cg.GraphError("Graph::connectPoints() Cannot connect `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
         if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType) &&
             !this.updateTemplate(cgInputPoint, cgOutputPoint.cgValueType)) {
@@ -957,13 +960,13 @@ cg.Graph = (function () {
     };
 
     /**
-     * Removes a connection between two points
+     * Removes a connection between two connected cgPoints
      * @param {cg.Point} cgOutputPoint
      * @param {cg.Point} cgInputPoint
      * @emit "cg-connection-create" {cg.Connection}
      * @returns {cg.Connection|null}
      */
-    Graph.prototype.disconnectPoints = function (cgOutputPoint, cgInputPoint) {
+    Graph.prototype._disconnectPoints = function (cgOutputPoint, cgInputPoint) {
         var cgConnection = this.connectionByPoints(cgOutputPoint, cgInputPoint);
         if (cgConnection === null) {
             throw new cg.GraphError("Graph::disconnectPoints() No connections between these two points: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
@@ -972,11 +975,12 @@ cg.Graph = (function () {
         cgOutputPoint._cgConnections.splice(this._cgConnections.indexOf(cgConnection), 1);
         cgInputPoint._cgConnections.splice(this._cgConnections.indexOf(cgConnection), 1);
         this.emit("cg-connection-remove", cgConnection);
+        return cgConnection;
     };
 
     /**
      * Disconnect all connections from this point
-     * @param cgPoint {cg.Point}
+     * @param {cg.Point} cgPoint
      */
     Graph.prototype.disconnectPoint = function (cgPoint) {
         var cgPointConnections = cgPoint.cgConnections;
@@ -1000,7 +1004,7 @@ cg.Graph = (function () {
 
     /**
      * Returns the first block with the given name.
-     * @param cgBlockName
+     * @param {String} cgBlockName
      * @returns {cg.Block}
      */
     Graph.prototype.blockByName = function (cgBlockName) {
@@ -1015,7 +1019,7 @@ cg.Graph = (function () {
 
     /**
      * Returns an array of blocks which have the given type.
-     * @param cgBlockType
+     * @param {String} cgBlockType
      * @returns {Array<cg.Block>}
      */
     Graph.prototype.blocksByType = function (cgBlockType) {
@@ -1038,7 +1042,7 @@ cg.Graph = (function () {
 
     /**
      * Returns the list of connections for every points in the given block
-     * @param cgBlock
+     * @param {cg.Block} cgBlock
      * @returns {Array<cg.Connection>}
      */
     Graph.prototype.connectionsByBlock = function (cgBlock) {
@@ -1082,7 +1086,7 @@ cg.Graph = (function () {
      * Clone all the given blocks
      * If connections exist between the cloned blocks, this method will try to recreate them
      * Connections from/to a cloned block to/from a non cloned block won't be duplicated
-     * @param cgBlocks {Array<cg.Block>}
+     * @param {Array<cg.Block>} cgBlocks
      * @returns {Array<cg.Block>} the cloned blocks
      */
     Graph.prototype.cloneBlocks = function (cgBlocks) {
@@ -1124,8 +1128,8 @@ cg.Block = (function () {
     /**
      * Block is the base class for all codegraph nodes
      * A Block has a list of inputs and outputs points
-     * @param cgGraph {cg.Graph}
-     * @param data {{cgId: Number, cgTemplates: Object}}
+     * @param {cg.Graph} cgGraph
+     * @param {{cgId: Number, cgTemplates: Object}} data
      * @constructor
      */
     var Block = pandora.class_("Block", function (cgGraph, data) {
@@ -1226,7 +1230,7 @@ cg.Block = (function () {
 
     /**
      * Adds an input or an output point
-     * @param cgPoint {cg.Point}
+     * @param {cg.Point} cgPoint
      * @emit "cg-point-create" {cg.Block} {cg.Point}
      * @return {cg.Point}
      */
@@ -1270,8 +1274,8 @@ cg.Block = (function () {
 
     /**
      * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
-     * @param cgPoint {cg.Point} The point on which the connection will be created
-     * @param type {String} The type of the connection that we try to attach
+     * @param {cg.Point} cgPoint - The point on which the connection will be created
+     * @param {String} type - The type of the connection that we try to attach
      * @returns {boolean}
      */
     Block.prototype.updateTemplate = function (cgPoint, type) {
@@ -1301,7 +1305,7 @@ cg.Block = (function () {
 
     /**
      * Returns a copy of this block
-     * @param cgGraph {cg.Graph} The graph on which the cloned block will be attached to
+     * @param {cg.Graph} cgGraph - The graph on which the cloned block will be attached to
      * @return {cg.Block}
      */
     Block.prototype.clone = function (cgGraph) {
@@ -1346,9 +1350,9 @@ cg.Point = (function () {
      *      "cgValueType": "Number", // The point value type, required
      *      // For an output, "cgValue" should be generated by the block and read only
      * }
-     * @param cgBlock {cg.Block} The block this point refers to
-     * @param data {Object}
-     * @param isOutput {Boolean} True if this point is an output, False for an input
+     * @param {cg.Block} cgBlock - The block this point refers to
+     * @param {Object} data
+     * @param {Boolean} isOutput - True if this point is an output, False for an input
      * @constructor
      */
     var Point = pandora.class_("Point", function (cgBlock, data, isOutput) {
@@ -1423,7 +1427,7 @@ cg.Point = (function () {
                 return this._cgMaxConnections;
             }.bind(this),
             set: function (cgMaxConnections) {
-                if (cgMaxConnections instanceof Number || cgMaxConnections < 0) {
+                if (!(cgMaxConnections instanceof Number) || cgMaxConnections < 0) {
                     throw new cg.GraphError("Point::cgMaxConnections must be a zero or positive number");
                 }
                 this._cgMaxConnections = cgMaxConnections;
@@ -1437,7 +1441,9 @@ cg.Point = (function () {
          */
         this._cgTemplate = data.cgTemplate || null;
         Object.defineProperty(this, "cgTemplate", {
-            get: function () { return this._cgTemplate; }.bind(this)
+            get: function () {
+                return this._cgTemplate;
+            }.bind(this)
         });
 
         /**
@@ -1470,8 +1476,7 @@ cg.Point = (function () {
          * @private
          */
         if (data.cgValue !== undefined && isOutput) {
-            throw new cg.GraphError("Shouldn't create output point `{0}` in block `{1}` with a value.",
-                this._cgName, this._cgBlock.cgId);
+            throw new cg.GraphError("Shouldn't create output point `{0}` in block `{1}` with a value.", this._cgName, this._cgBlock.cgId);
         }
         this._cgValue = data.cgValue;
         Object.defineProperty(this, "cgValue", {
@@ -1485,38 +1490,61 @@ cg.Point = (function () {
                     this._cgValue = cgValue;
                     this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
                 } else {
-                    throw new cg.GraphError("Point::cgValue Invalid value `{0}` for `{1}` in `{2}`",
-                        String(cgValue),
-                        this._cgValueType, this._cgName);
+                    throw new cg.GraphError("Point::cgValue Invalid value `{0}` for `{1}` in `{2}`", String(cgValue), this._cgValueType, this._cgName);
                 }
             }.bind(this)
         });
 
     });
 
+    /**
+     * Returns whether this cgPoint is empty (no connections and no cgValue)
+     * @returns {Boolean}
+     */
     Point.prototype.empty = function () {
         return this._cgConnections.length === 0 && this._cgValue === undefined;
     };
 
     /**
-     * Adds a connection from this inbound point to an outbound point
+     * Checks if this cgPoint accepts a connection to the given cgPoint
+     * @param {cg.Point} cgPoint
+     * @returns {Boolean}
+     */
+    Point.prototype.acceptConnect = function (cgPoint) {
+        if (this._cgConnections.length >= this._cgMaxConnections) {
+            throw new cg.GraphError("Point::acceptConnect() Point `{0}` cannot accept more than `{1}` connection(s)", this._cgName, this._cgMaxConnections);
+        }
+        return true;
+    };
+
+    /**
+     * Adds a connection from this cgPoint to the given cgPoint
      * @param {cg.Point} cgPoint
      * @return {cg.Connection}
      */
     Point.prototype.connect = function (cgPoint) {
-        if (this._cgConnections.length >= this._cgMaxConnections) {
-            throw new cg.GraphError("Point::connect() Cannot accept more than `{0}` connection(s)", this._cgMaxConnections);
-        }
         if (this._isOutput) {
-            return this._cgGraph.connectPoints(this, cgPoint);
+            return this._cgGraph._connectPoints(this, cgPoint);
         } else {
-            return this._cgGraph.connectPoints(cgPoint, this);
+            return this._cgGraph._connectPoints(cgPoint, this);
+        }
+    };
+
+    /**
+     * Removes the connections between this cgPoint and the given cgPoint
+     * @param {cg.Point} cgPoint
+     */
+    Point.prototype.disconnect = function (cgPoint) {
+        if (this._isOutput) {
+            return this._cgGraph._disconnectPoints(this, cgPoint);
+        } else {
+            return this._cgGraph._disconnectPoints(cgPoint, this);
         }
     };
 
     /**
      * Returns a copy of this point
-     * @param cgBlock {cg.Block} The block on which this cloned point will be attached to
+     * @param {cg.Block} cgBlock - The block on which this cloned point will be attached to
      * @return {cg.Point}
      */
     Point.prototype.clone = function (cgBlock) {
@@ -1579,9 +1607,9 @@ cg.Connection = (function () {
 
     });
 
-    /***
+    /**
      * Returns the other point
-     * @param cgPoint {cg.Point}
+     * @param {cg.Point} cgPoint
      * returns {cg.Point}
      */
     Connection.prototype.otherPoint = function (cgPoint) {
@@ -1593,6 +1621,13 @@ cg.Connection = (function () {
         throw new cg.GraphError("Connection::otherPoint() Point `{0}` is not in this connection", cgPoint.cgName);
     };
 
+    /**
+     * Remove self from the connections
+     */
+    Connection.prototype.remove = function () {
+        // TODO
+    };
+
     return Connection;
 
 })();
@@ -1602,8 +1637,8 @@ cg.Assignation = (function () {
      * This is like function however, it takes a stream in input and output. In code it would represent function
      * separated by semicolons.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Assignation = pandora.class_("Assignation", cg.Block, function (cgGraph, data) {
@@ -1640,8 +1675,8 @@ cg.Condition = (function () {
     /**
      *
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Condition = pandora.class_("Condition", cg.Block, function (cgGraph, data) {
@@ -1681,8 +1716,8 @@ cg.Delegate = (function () {
      * This is like function however, it takes a stream in input and output. In code it would represent function
      * separated by semicolons.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Delegate = pandora.class_("Delegate", cg.Block, function (cgGraph, data) {
@@ -1705,8 +1740,8 @@ cg.Each = (function () {
     /**
      *
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Each = pandora.class_("Each", cg.Block, function (cgGraph, data) {
@@ -1750,8 +1785,8 @@ cg.Function = (function () {
     /**
      * This block represents a simple function that takes some inputs and returns one or zero output.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Function = pandora.class_("Function", cg.Block, function (cgGraph, data) {
@@ -1778,8 +1813,8 @@ cg.Getter = (function () {
     /**
      * This block represents a simple Getter that takes some inputs and returns one or zero output.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Getter = pandora.class_("Getter", cg.Block, function (cgGraph, data) {
@@ -1815,8 +1850,8 @@ cg.Instruction = (function () {
      * This is like function however, it takes a stream in input and output. In code it would represent function
      * separated by semicolons.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Instruction = pandora.class_("Instruction", cg.Block, function (cgGraph, data) {
@@ -1854,8 +1889,8 @@ cg.Operator = (function () {
     /**
      * This block represents a simple Operator that takes some inputs and returns one or zero output.
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Operator = pandora.class_("Operator", cg.Block, function (cgGraph, data) {
@@ -1887,8 +1922,8 @@ cg.Range = (function () {
     /**
      *
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Range = pandora.class_("Range", cg.Block, function (cgGraph, data) {
@@ -1942,8 +1977,8 @@ cg.Value = (function () {
     /**
      *
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Value = pandora.class_("Value", cg.Block, function (cgGraph, data) {
@@ -1997,8 +2032,8 @@ cg.Variable = (function () {
     /**
      *
      * @extends {cg.Block}
-     * @param cgGraph {cg.Graph}
-     * @param data {Object}
+     * @param {cg.Graph} cgGraph
+     * @param {Object} data
      * @constructor
      */
     var Variable = pandora.class_("Variable", cg.Block, function (cgGraph, data) {
@@ -2056,7 +2091,7 @@ cg.Stream = (function () {
 
     /**
      * Returns a copy of this Stream
-     * @param cgBlock {cg.Block} The block on which the cloned stream will be attached to
+     * @param {cg.Block} cgBlock - The block on which the cloned stream will be attached to
      * @returns {*}
      */
     Stream.prototype.clone = function (cgBlock) {
@@ -2270,7 +2305,7 @@ cg.JSONLoader = (function () {
      * @extends {pandora.EventEmitter}
      * @constructor
      * @param cgGraph {Object} The graph to load
-     * @param data {Object} The graph data
+     * @param {Object} data The graph data
      * @param models {Object} The models used to load the graph
      */
     var JSONLoader = pandora.class_("JSONLoader", pandora.EventEmitter, function (cgGraph, data, models) {
@@ -2343,7 +2378,7 @@ cg.JSONLoader = (function () {
     /**
      * Loads the points of a given block, this method is called automatically be the cg.Block instances to load
      * their points.
-     * @param cgBlock {cg.Block}
+     * @param {cg.Block} cgBlock
      * @param cgBlockData {Object}
      * @private
      */
@@ -2403,7 +2438,7 @@ cg.JSONLoader = (function () {
 
     /**
      *
-     * @param cgGraph {cg.Graph}
+     * @param {cg.Graph} cgGraph
      * @param cgConnectionsData {Array<{cgOutputBlockId: String, cgOutputName: String, cgInputBlockId: String, cgInputName: String,}>}
      * @private
      */
@@ -2690,7 +2725,7 @@ cg.Renderer = (function () {
 
     /**
      * Creates a rendererBlock from the given cgBlock.
-     * @param cgBlock {cg.Block}
+     * @param {cg.Block} cgBlock
      * @returns {cg.RendererBlock}
      */
     Renderer.prototype.createRendererBlock = function (cgBlock) {
@@ -2790,7 +2825,7 @@ cg.Renderer.prototype._removeRendererNodeFromParentBehavior = function () {
 
 /**
  * Positions the rendererBlock at the mouse, and releases on mousedown
- * @param d3Block {d3.selection}
+ * @param {d3.selection} d3Block
  * @private
  */
 cg.Renderer.prototype._positionRendererBlockBehavior = function (d3Block) {
@@ -2825,19 +2860,15 @@ cg.Renderer.prototype._positionRendererBlockBehavior = function (d3Block) {
  */
 cg.Renderer.prototype._removeRendererConnectionBehavior = function () {
     var renderer = this;
-    var rendererBlocks = [];
     return d3.behavior.mousedown()
         .on("mousedown", function (rendererPoint) {
             if (d3.event.sourceEvent.altKey) {
                 d3.event.sourceEvent.preventDefault();
                 d3.event.sourceEvent.stopImmediatePropagation();
-                while (rendererPoint.connections.length > 0) {
-                    var rendererConnection = rendererPoint.connections[0];
-                    rendererBlocks.push(rendererConnection.outputRendererPoint.rendererBlock, rendererConnection.inputRendererPoint.rendererBlock);
-                    renderer._removeRendererConnection(rendererConnection);
-                }
+                renderer._removeRendererPointRendererConnections(rendererPoint);
                 renderer._removeD3Connections();
-                renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(rendererBlocks));
+                // TODO: Optimize
+                renderer._updateD3Blocks();
             }
         });
 };
@@ -2964,8 +2995,8 @@ cg.Renderer.prototype._createSelectionBehavior = function () {
 
 /**
  * Adds the given d3Nodes to the current selection
- * @param d3Nodes {d3.selection} The d3Nodes to select
- * @param clearSelection {Boolean?} If true, everything but the d3Nodes will be unselected
+ * @param {d3.selection} d3Nodes - The d3Nodes to select
+ * @param {Boolean?} clearSelection - If true, everything but the d3Nodes will be unselected
  * @private
  */
 cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
@@ -2978,7 +3009,7 @@ cg.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
 
 /**
  * Clears the selection
- * @param ignoreEmit {Boolean?} If true, the unselect event will not be emitted
+ * @param {Boolean?} ignoreEmit - If true, the unselect event will not be emitted
  * @private
  */
 cg.Renderer.prototype._clearSelection = function (ignoreEmit) {
@@ -3126,7 +3157,7 @@ cg.Renderer.prototype._initializeListeners = function () {
 };
 /**
  * Returns the rendererNode associated with the given id
- * @param id
+ * @param {String} id
  * @returns {cg.RendererBlock|null}
  * @private
  */
@@ -3136,7 +3167,7 @@ cg.Renderer.prototype._getRendererBlockById = function (id) {
 
 /**
  * Returns the rendererBlocks bound to the given cgBlock
- * @param cgBlock {cg.Block}
+ * @param {cg.Block} cgBlock
  * @returns {Array<cg.RendererBlock>}
  * @private
  */
@@ -3152,7 +3183,7 @@ cg.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
 
 /**
  * Creates a renderer block
- * @param rendererBlockData
+ * @param {Object} rendererBlockData
  * @returns {cg.RendererBlock}
  * @private
  */
@@ -3182,21 +3213,19 @@ cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
 };
 
 /**
- * Removes the rendererBlock
+ * Removes the given rendererBlock, and all its rendererConnections
  * Also removes the cgBlock from the cgGraph if it is the last reference
- * @param rendererBlock {cg.RendererBlock}
+ * @param {cg.RendererBlock} rendererBlock
  * @private
  */
 cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
     var renderer = this;
     var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
     if (rendererBlockFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererBlock() RendererBlock not found and thus cannot be removed");
+        throw new cg.RendererError("Renderer::_removeRendererBlock() Cannot find rendererBlock");
     }
     pandora.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
-        while (rendererPoint.connections.length > 0) {
-            renderer._removeRendererConnection(rendererPoint.connections[0]);
-        }
+        renderer._removeRendererPointRendererConnections(rendererPoint);
     });
     this._removeRendererNodeParent(rendererBlock);
     this._rendererBlocks.splice(rendererBlockFound, 1);
@@ -3206,8 +3235,8 @@ cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
 };
 /**
  * Creates a rendererConnection
- * @param rendererConnectionData {Object}
- * @param ignoreCgConnection {Boolean?} Whether we ignore the creation of a cgConnection
+ * @param {Object} rendererConnectionData
+ * @param {Boolean} [ignoreCgConnection=false] - Whether we ignore the creation of a cgConnection
  * @private
  */
 cg.Renderer.prototype._createRendererConnection = function (rendererConnectionData, ignoreCgConnection) {
@@ -3230,7 +3259,7 @@ cg.Renderer.prototype._createRendererConnection = function (rendererConnectionDa
         });
     }
     if (!cgConnection) {
-        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot create a rendererConnection without an existing cgConnection");
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot create a rendererConnection without a cgConnection");
     }
     var rendererConnection = {
         "cgConnection": cgConnection,
@@ -3238,36 +3267,24 @@ cg.Renderer.prototype._createRendererConnection = function (rendererConnectionDa
         "inputRendererPoint": inputRendererPoint
     };
     this._rendererConnections.push(rendererConnection);
-    outputRendererPoint.connections.push(rendererConnection);
-    inputRendererPoint.connections.push(rendererConnection);
 };
 
 /**
  * Removes the given rendererConnection
- * @param rendererConnection {cg.RendererConnection}
+ * @param {cg.RendererConnection} rendererConnection
  * @private
  */
 cg.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
-    var outputRendererPointRendererConnectionFound = rendererConnection.outputRendererPoint.connections.indexOf(rendererConnection);
-    var inputRendererPointRendererConnectionFound = rendererConnection.inputRendererPoint.connections.indexOf(rendererConnection);
     var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
-    if (outputRendererPointRendererConnectionFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in outputRendererPoint");
-    }
-    if (inputRendererPointRendererConnectionFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in inputRendererPoint");
-    }
     if (rendererConnectionFound === -1) {
         throw new cg.RendererError("Renderer::_removeRendererConnection() Connection not found");
     }
-    rendererConnection.outputRendererPoint.connections.splice(outputRendererPointRendererConnectionFound, 1);
-    rendererConnection.inputRendererPoint.connections.splice(inputRendererPointRendererConnectionFound, 1);
     this._rendererConnections.splice(rendererConnectionFound, 1);
-    // TODO: Remove connection from cgGraph
+    rendererConnection.outputRendererPoint.cgPoint.disconnect(rendererConnection.inputRendererPoint.cgPoint);
 };
 /**
  * Returns the rendererGroup associated with the given id
- * @param id
+ * @param {String} id
  * @returns {cg.RendererGroup|null}
  * @private
  */
@@ -3277,7 +3294,7 @@ cg.Renderer.prototype._getRendererGroupById = function (id) {
 
 /**
  * Creates a rendererGroup
- * @param rendererGroupData
+ * @param {Object} rendererGroupData
  * @returns {cg.RendererGroup}
  * @private
  */
@@ -3302,7 +3319,7 @@ cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
 
 /**
  * Removes the rendererGroup
- * @param rendererGroup {cg.RendererGroup}
+ * @param {cg.RendererGroup} rendererGroup
  * @private
  */
 cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
@@ -3316,7 +3333,7 @@ cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
 /**
  * Removes the given rendererNode from the renderer
  * Also removes the cgBlock if it is the rendererNode was the last reference on it
- * @param rendererNode {cg.RendererBlock|cg.RendererGroup}
+ * @param {cg.RendererNode} rendererNode
  * @private
  */
 cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
@@ -3329,7 +3346,7 @@ cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
 
 /**
  * Returns the parent hierarchy of the given rendererNode
- * @type {cg.RendererNode}
+ * @param {cg.RendererNode} rendererNode
  * @returns {Array<cg.RendererGroup>}
  * @private
  */
@@ -3345,8 +3362,8 @@ cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
 
 /**
  * Adds the given rendererNode in the rendererGroupParent
- * @param rendererNode {cg.RendererNode}
- * @param rendererGroupParent{cg.RendererGroup}
+ * @param {cg.RendererNode} rendererNode
+ * @param {cg.RendererGroup} rendererGroupParent
  * @private
  */
 cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
@@ -3368,7 +3385,7 @@ cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererG
 
 /**
  * Removes the rendererNode from his parent
- * @param rendererNode {cg.RendererNode}
+ * @param {cg.RendererNode} rendererNode
  * @private
  */
 cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
@@ -3379,8 +3396,8 @@ cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
 };
 /**
  * Returns the rendererPoint associated with the given name
- * @param rendererBlock {cg.RendererBlock}
- * @param rendererPointName {String}
+ * @param {cg.RendererBlock} rendererBlock
+ * @param {String} rendererPointName
  * @returns {cg.RendererPoint|null}
  * @private
  */
@@ -3393,7 +3410,7 @@ cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendere
 
 /**
  * Creates the rendererPoints for a given rendererBlock
- * @param rendererBlock {cg.RendererBlock}
+ * @param {cg.RendererBlock} rendererBlock
  * @private
  */
 cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
@@ -3404,8 +3421,7 @@ cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
             "rendererBlock": rendererBlock,
             "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
             "cgPoint": cgOutput,
-            "isOutput": true,
-            "connections": []
+            "isOutput": true
         });
     });
     pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
@@ -3414,9 +3430,37 @@ cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
             "rendererBlock": rendererBlock,
             "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
             "cgPoint": cgInput,
-            "isOutput": false,
-            "connections": []
+            "isOutput": false
         });
+    });
+};
+
+/**
+ * Returns all rendererConnections for the given rendererPoint
+ * @param {cg.RendererPoint} rendererPoint
+ * @returns {Array<cg.RendererConnection>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointRendererConnections = function (rendererPoint) {
+    var rendererConnections = [];
+    pandora.forEach(this._rendererConnections, function (rendererConnection) {
+        if (rendererConnection.outputRendererPoint === rendererPoint || rendererConnection.inputRendererPoint === rendererPoint) {
+            rendererConnections.push(rendererConnection);
+        }
+    });
+    return rendererConnections;
+};
+
+/**
+ * Removes all rendererConnections for the given rendererPoint
+ * @param {cg.RendererPoint} rendererPoint
+ * @private
+ */
+cg.Renderer.prototype._removeRendererPointRendererConnections = function (rendererPoint) {
+    var renderer = this;
+    var removeRendererConnections = renderer._getRendererPointRendererConnections(rendererPoint);
+    pandora.forEach(removeRendererConnections, function (removeRendererConnection) {
+        renderer._removeRendererConnection(removeRendererConnection);
     });
 };
 /**
@@ -3475,7 +3519,7 @@ cg.Renderer.prototype._updateD3Blocks = function () {
 
 /**
  * Updates selected d3Blocks
- * @param updatedD3Blocks {d3.selection}
+ * @param {d3.selection} updatedD3Blocks
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
@@ -3546,7 +3590,7 @@ cg.Renderer.prototype._updatedD3Connections = function () {
 
 /**
  * Updates selected d3Connections
- * @param updatedD3Connections
+ * @param {d3.selection} updatedD3Connections
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
@@ -3613,7 +3657,7 @@ cg.Renderer.prototype._updateD3Groups = function () {
 
 /**
  * Updates selected d3Groups
- * @param updatedD3Groups {d3.selection}
+ * @param {d3.selection} updatedD3Groups
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
@@ -3657,7 +3701,7 @@ cg.Renderer.prototype._removeD3Groups = function () {
 };
 /**
  * This method will update all nodes and their parents if needed
- * @param d3Nodes {d3.selection}
+ * @param {d3.selection} d3Nodes
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
@@ -3676,7 +3720,7 @@ cg.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
 };
 /**
  * Creates d3Points
- * @param d3Block {d3.selection} The svg group which will contains the d3Points of the current block
+ * @param {d3.selection} d3Block - The svg group which will contains the d3Points of the current block
  * @private
  */
 cg.Renderer.prototype._createD3Points = function (d3Block) {
@@ -3710,14 +3754,14 @@ cg.Renderer.prototype._createD3Points = function (d3Block) {
 
 /**
  * Updates the selected d3Points
- * @param updatedD3Points
+ * @param {d3.selection} updatedD3Points
  * @private
  */
 cg.Renderer.prototype._updateSelectedD3Points = function (updatedD3Points) {
     var renderer = this;
     updatedD3Points
         .classed("cg-empty", function (rendererPoint) {
-            return rendererPoint.connections.length === 0;
+            return renderer._getRendererPointRendererConnections(rendererPoint).length === 0;
         })
         .classed("cg-stream", function (rendererPoint) {
             return pandora.typename(rendererPoint.cgPoint) === "Stream";
@@ -3748,7 +3792,7 @@ cg.Renderer.prototype._updateSelectedD3Points = function (updatedD3Points) {
 
 /**
  * Creates the d3PointShapes
- * @param d3Point {d3.selection}
+ * @param {d3.selection} d3Point
  * @returns {d3.selection}
  * @private
  */
@@ -3822,10 +3866,10 @@ cg.Renderer.prototype._createRendererPointsCollisions = function () {
 
 /**
  * Returns all RendererNodes overlapping the given area
- * @param x0 {Number} Top left x
- * @param y0 {Number} Top left y
- * @param x3 {Number} Bottom right x
- * @param y3 {Number} Bottom right y
+ * @param {Number} x0 - Top left x
+ * @param {Number} y0 - Top left y
+ * @param {Number} x3 - Bottom right x
+ * @param {Number} y3 - Bottom right y
  * @return {Array<cg.RendererNode>}
  * @private
  */
@@ -3848,7 +3892,7 @@ cg.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
 
 /**
  * Get the best rendererGroup that can accept the given rendererNode
- * @param rendererNode {cg.RendererNode}
+ * @param {cg.RendererNode} rendererNode
  * @returns {cg.RendererGroup|null}
  * @private
  */
@@ -3886,8 +3930,8 @@ cg.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
 };
 
 /**
- * Returns
- * @param position {[Number, Number]}
+ * Returns the nearest renderer point at the given position
+ * @param {[Number, Number]} position
  * @return {cg.Point|null}
  * @private
  */
@@ -4001,7 +4045,7 @@ d3.behavior.doubleClick = function () {
  * Returns an absolute position in the SVG from the relative position in the SVG container
  * It takes into account all transformations applied to the SVG
  * Example: renderer._getAbsolutePosition(d3.mouse(this));
- * @param point {[Number, Number]}
+ * @param {[Number, Number]} point
  * @return {[Number, Number]}
  * @private
  */
@@ -4016,7 +4060,7 @@ cg.Renderer.prototype._getAbsolutePosition = function (point) {
  * Returns a relative position in the SVG container from absolute position in the SVG
  * It takes into account all transformations applied to the SVG
  * Example: renderer._getRelativePosition(d3.mouse(this));
- * @param point {[Number, Number]}
+ * @param {[Number, Number]} point
  * @return {[Number, Number]}
  * @private
  */
@@ -4029,7 +4073,7 @@ cg.Renderer.prototype._getRelativePosition = function (point) {
 
 /**
  * Returns the bounding box for all the given rendererNodes
- * @param rendererNodes {Array<cg.RendererNode>}
+ * @param {Array<cg.RendererNode>} rendererNodes
  * @returns {[[Number, Number], [Number, Number]]}
  * @private
  */
@@ -4053,7 +4097,7 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
 
 /**
  * Computes the position and the size of the given rendererGroup depending of its children
- * @param rendererGroup {cg.RendererGroup}
+ * @param {cg.RendererGroup} rendererGroup
  * @private
  */
 cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererGroup) {
@@ -4087,7 +4131,7 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
 
 /**
  * Returns the rendererPoint position
- * @param rendererPoint {cg.RendererPoint}
+ * @param {cg.RendererPoint} rendererPoint
  * @return {[Number, Number]}
  * @private
  */
@@ -4107,8 +4151,8 @@ cg.Renderer.prototype._getRendererPointPosition = function (rendererPoint) {
 
 /**
  * Computes the connection path between two points
- * @param point1 {[Number, Number]}
- * @param point2 {[Number, Number]}
+ * @param {[Number, Number]} point1
+ * @param {[Number, Number]} point2
  * @returns {String}
  * @private
  */
@@ -4126,8 +4170,8 @@ cg.Renderer.prototype._computeConnectionPath = function (point1, point2) {
 };
 /**
  * Returns an unique HTML usable id for the given rendererNode
- * @param rendererNode {cg.RendererNode}
- * @param sharp {Boolean?} True to include the sharp to select, False otherwise
+ * @param {cg.RendererNode} rendererNode
+ * @param {Boolean?} sharp - True to include the sharp to select, False otherwise
  * @return {String}
  * @private
  */
@@ -4137,7 +4181,7 @@ cg.Renderer.prototype._getRendererNodeUniqueID = function (rendererNode, sharp) 
 
 /**
  * Returns a selection of d3Nodes from rendererNodes
- * @param rendererNodes {Array<cg.RendererNode>}
+ * @param {Array<cg.RendererNode>} rendererNodes
  * @returns {d3.selection}
  * @private
  */
@@ -4151,7 +4195,7 @@ cg.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
 
 /**
  * Moves the d3 selection nodes to the top front of their respective parents
- * @param d3Selection {d3.selection}
+ * @param {d3.selection} d3Selection
  * @returns {d3.selection}
  * @private
  */
