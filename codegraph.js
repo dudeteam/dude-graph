@@ -944,6 +944,9 @@ cg.Graph = (function () {
         if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect either two inputs or two outputs: `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
         }
+        if (!(cgOutputPoint.acceptConnect(cgInputPoint) && cgInputPoint.acceptConnect(cgOutputPoint))) {
+            throw new cg.GraphError("Graph::connectPoints() Cannot connect `{0}` and `{1}`", cgOutputPoint.cgName, cgInputPoint.cgName);
+        }
         if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType) &&
             !this.updateTemplate(cgInputPoint, cgOutputPoint.cgValueType)) {
             throw new cg.GraphError("Graph::connectPoints() Cannot connect two points of different value types: `{0}` and `{1}`", cgOutputPoint.cgValueType, cgInputPoint.cgValueType);
@@ -1438,7 +1441,9 @@ cg.Point = (function () {
          */
         this._cgTemplate = data.cgTemplate || null;
         Object.defineProperty(this, "cgTemplate", {
-            get: function () { return this._cgTemplate; }.bind(this)
+            get: function () {
+                return this._cgTemplate;
+            }.bind(this)
         });
 
         /**
@@ -1471,8 +1476,7 @@ cg.Point = (function () {
          * @private
          */
         if (data.cgValue !== undefined && isOutput) {
-            throw new cg.GraphError("Shouldn't create output point `{0}` in block `{1}` with a value.",
-                this._cgName, this._cgBlock.cgId);
+            throw new cg.GraphError("Shouldn't create output point `{0}` in block `{1}` with a value.", this._cgName, this._cgBlock.cgId);
         }
         this._cgValue = data.cgValue;
         Object.defineProperty(this, "cgValue", {
@@ -1486,9 +1490,7 @@ cg.Point = (function () {
                     this._cgValue = cgValue;
                     this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
                 } else {
-                    throw new cg.GraphError("Point::cgValue Invalid value `{0}` for `{1}` in `{2}`",
-                        String(cgValue),
-                        this._cgValueType, this._cgName);
+                    throw new cg.GraphError("Point::cgValue Invalid value `{0}` for `{1}` in `{2}`", String(cgValue), this._cgValueType, this._cgName);
                 }
             }.bind(this)
         });
@@ -1496,7 +1498,7 @@ cg.Point = (function () {
     });
 
     /**
-     * Returns whether this cgPoint has connections
+     * Returns whether this cgPoint is empty (no connections and no cgValue)
      * @returns {Boolean}
      */
     Point.prototype.empty = function () {
@@ -1504,14 +1506,23 @@ cg.Point = (function () {
     };
 
     /**
-     * Adds a connection from this inbound point to an outbound point
+     * Checks if this cgPoint accepts a connection to the given cgPoint
+     * @param {cg.Point} cgPoint
+     * @returns {Boolean}
+     */
+    Point.prototype.acceptConnect = function (cgPoint) {
+        if (this._cgConnections.length >= this._cgMaxConnections) {
+            throw new cg.GraphError("Point::acceptConnect() Point `{0}` cannot accept more than `{1}` connection(s)", this._cgName, this._cgMaxConnections);
+        }
+        return true;
+    };
+
+    /**
+     * Adds a connection from this cgPoint to the given cgPoint
      * @param {cg.Point} cgPoint
      * @return {cg.Connection}
      */
     Point.prototype.connect = function (cgPoint) {
-        if (this._cgConnections.length >= this._cgMaxConnections) {
-            throw new cg.GraphError("Point::connect() Cannot accept more than `{0}` connection(s)", this._cgMaxConnections);
-        }
         if (this._isOutput) {
             return this._cgGraph._connectPoints(this, cgPoint);
         } else {
@@ -1520,7 +1531,7 @@ cg.Point = (function () {
     };
 
     /**
-     * Removes the connections between this point and the given cgPoint
+     * Removes the connections between this cgPoint and the given cgPoint
      * @param {cg.Point} cgPoint
      */
     Point.prototype.disconnect = function (cgPoint) {
@@ -3026,125 +3037,6 @@ cg.Renderer.prototype._createZoomBehavior = function () {
     this._d3Svg.call(this._zoom);
 };
 /**
- * Initializes rendererGroups and rendererBlocks
- * Add parent and children references, and also cgBlocks references to renderer blocks
- * @private
- */
-cg.Renderer.prototype._initialize = function () {
-    this._initializeRendererBlocks();
-    this._initializeRendererConnections();
-    this._initializeRendererGroups();
-    this._initializeRendererGroupParents();
-    this._initializeListeners();
-};
-
-/**
- * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
- * @private
- */
-cg.Renderer.prototype._initializeRendererBlocks = function () {
-    var renderer = this;
-    pandora.forEach(this._data.blocks, function (blockData) {
-        renderer._createRendererBlock(blockData);
-    });
-};
-
-/**
- * Creates the rendererConnection between the rendererBlocks/rendererPoints
- * @private
- */
-cg.Renderer.prototype._initializeRendererConnections = function () {
-    var renderer = this;
-    pandora.forEach(this._data.connections, function (connectionData) {
-        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
-        if (!cgConnection) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}` does not exists", connectionData.cgConnectionIndex);
-        }
-        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
-        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
-        if (!outputRendererBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.outputRendererBlockId);
-        }
-        if (!inputRendererBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.inputRendererBlockId);
-        }
-        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: OutputRendererBlock `{1}` is not holding a reference to the outputCgBlock `{2}`", connectionData.cgConnectionIndex, outputRendererBlock.id, cgConnection.cgOutputPoint.cgBlock.cgId);
-        }
-        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: InputRendererBlock `{1}` is not holding a reference to the inputCgBlock `{2}`", connectionData.cgConnectionIndex, inputRendererBlock.id, cgConnection.cgInputPoint.cgBlock.cgId);
-        }
-        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
-        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
-        if (!outputRendererPoint) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgOutputPoint.cgName);
-        }
-        if (!inputRendererPoint) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgInputPoint.cgName);
-        }
-        renderer._createRendererConnection({
-            "cgConnection": cgConnection,
-            "outputRendererPoint": outputRendererPoint,
-            "inputRendererPoint": inputRendererPoint
-        }, true);
-    });
-    // TODO: Check non linked cgConnections <=> rendererConnections
-};
-
-/**
- * Creates the rendererGroups
- * @private
- */
-cg.Renderer.prototype._initializeRendererGroups = function () {
-    var renderer = this;
-    pandora.forEach(this._data.groups, function (groupData) {
-        renderer._createRendererGroup(groupData);
-    });
-};
-
-/**
- * Assigns rendererGroup parents
- * @private
- */
-cg.Renderer.prototype._initializeRendererGroupParents = function () {
-    var renderer = this;
-    pandora.forEach(this._data.blocks, function (rendererBlockData) {
-        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
-        if (rendererBlockData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
-            if (!rendererGroupParent) {
-                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
-        }
-    });
-    pandora.forEach(this._data.groups, function (rendererGroupData) {
-        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
-        if (rendererGroupData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
-            if (!rendererGroupParent) {
-                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
-        }
-    });
-};
-
-/**
- * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
- * @private
- */
-cg.Renderer.prototype._initializeListeners = function () {
-    var renderer = this;
-    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
-    this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgBlock)));
-    });
-};
-/**
  * Returns the rendererNode associated with the given id
  * @param {String} id
  * @returns {cg.RendererBlock|null}
@@ -3450,6 +3342,125 @@ cg.Renderer.prototype._removeRendererPointRendererConnections = function (render
     var removeRendererConnections = renderer._getRendererPointRendererConnections(rendererPoint);
     pandora.forEach(removeRendererConnections, function (removeRendererConnection) {
         renderer._removeRendererConnection(removeRendererConnection);
+    });
+};
+/**
+ * Initializes rendererGroups and rendererBlocks
+ * Add parent and children references, and also cgBlocks references to renderer blocks
+ * @private
+ */
+cg.Renderer.prototype._initialize = function () {
+    this._initializeRendererBlocks();
+    this._initializeRendererConnections();
+    this._initializeRendererGroups();
+    this._initializeRendererGroupParents();
+    this._initializeListeners();
+};
+
+/**
+ * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererBlocks = function () {
+    var renderer = this;
+    pandora.forEach(this._data.blocks, function (blockData) {
+        renderer._createRendererBlock(blockData);
+    });
+};
+
+/**
+ * Creates the rendererConnection between the rendererBlocks/rendererPoints
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererConnections = function () {
+    var renderer = this;
+    pandora.forEach(this._data.connections, function (connectionData) {
+        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
+        if (!cgConnection) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}` does not exists", connectionData.cgConnectionIndex);
+        }
+        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
+        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
+        if (!outputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.outputRendererBlockId);
+        }
+        if (!inputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.inputRendererBlockId);
+        }
+        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: OutputRendererBlock `{1}` is not holding a reference to the outputCgBlock `{2}`", connectionData.cgConnectionIndex, outputRendererBlock.id, cgConnection.cgOutputPoint.cgBlock.cgId);
+        }
+        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: InputRendererBlock `{1}` is not holding a reference to the inputCgBlock `{2}`", connectionData.cgConnectionIndex, inputRendererBlock.id, cgConnection.cgInputPoint.cgBlock.cgId);
+        }
+        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
+        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
+        if (!outputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgOutputPoint.cgName);
+        }
+        if (!inputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgInputPoint.cgName);
+        }
+        renderer._createRendererConnection({
+            "cgConnection": cgConnection,
+            "outputRendererPoint": outputRendererPoint,
+            "inputRendererPoint": inputRendererPoint
+        }, true);
+    });
+    // TODO: Check non linked cgConnections <=> rendererConnections
+};
+
+/**
+ * Creates the rendererGroups
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroups = function () {
+    var renderer = this;
+    pandora.forEach(this._data.groups, function (groupData) {
+        renderer._createRendererGroup(groupData);
+    });
+};
+
+/**
+ * Assigns rendererGroup parents
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroupParents = function () {
+    var renderer = this;
+    pandora.forEach(this._data.blocks, function (rendererBlockData) {
+        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
+        if (rendererBlockData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
+        }
+    });
+    pandora.forEach(this._data.groups, function (rendererGroupData) {
+        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
+        if (rendererGroupData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
+        }
+    });
+};
+
+/**
+ * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
+ * @private
+ */
+cg.Renderer.prototype._initializeListeners = function () {
+    var renderer = this;
+    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
+    this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgBlock)));
     });
 };
 /**
