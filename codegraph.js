@@ -1424,7 +1424,7 @@ cg.Point = (function () {
                 return this._cgMaxConnections;
             }.bind(this),
             set: function (cgMaxConnections) {
-                if (cgMaxConnections instanceof Number || cgMaxConnections < 0) {
+                if (!cgMaxConnections instanceof Number || cgMaxConnections < 0) {
                     throw new cg.GraphError("Point::cgMaxConnections must be a zero or positive number");
                 }
                 this._cgMaxConnections = cgMaxConnections;
@@ -1524,7 +1524,11 @@ cg.Point = (function () {
      * @param {cg.Point} cgPoint
      */
     Point.prototype.disconnect = function (cgPoint) {
-
+        if (this._isOutput) {
+            return this._cgGraph._disconnectPoints(this, cgPoint);
+        } else {
+            return this._cgGraph._disconnectPoints(cgPoint, this);
+        }
     };
 
     /**
