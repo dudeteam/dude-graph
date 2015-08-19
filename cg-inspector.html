@@ -1,12 +1,10 @@
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../iron-input/iron-input.html">
-<link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
-<link rel="import" href="../magnet-state/magnet-state.html">
-<link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
+<link rel="import" href="../magnet-state/magnet-state.html">
 
 <!--
 `cg-inspector` is a Polymer element which creates the inspector for codegraph. In other words, it creates the sidebar
@@ -81,13 +79,8 @@ methods and properties.
             margin: 2px 0;
         }
 
-        #errorToast {
-            background: var(--cg-error-color);
-            font-family: var(--cg-display-font);
-        }
     </style>
     <template>
-        <paper-toast id="errorToast"></paper-toast>
         <div class="layout vertical flex">
             <div class="box">
                 <div class="title">Tools</div>
@@ -195,10 +188,6 @@ methods and properties.
                 <!-- Edit variable -->
             </magnet-state>
         </div>
-        <paper-dialog id="compileResult">
-            <h2>Code</h2>
-            <pre><code>{{_compiledCode}}</code></pre>
-        </paper-dialog>
     </template>
     <script>
         Polymer({
@@ -217,7 +206,6 @@ methods and properties.
                 this._folders = {};
                 this._selectedNode = null;
                 this._currentState = "root";
-                this._compiledCode = "";
                 this._varType = "";
                 this._varName = "";
                 this._varValue = "";
@@ -240,8 +228,8 @@ methods and properties.
                         this._models.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
-                this._customProperties = {group: {name: "custom properties", icon: "fa fa-folder", items: []}};
-                this._models.unshift(this._customProperties);
+                this._customVariables = {group: {name: "custom variables", icon: "fa fa-folder", items: []}};
+                this._models.unshift(this._customVariables);
                 this.$.blocks.loadItems(this._models);
             },
             bindBuilder: function (builder) {
@@ -297,16 +285,14 @@ methods and properties.
             },
             _createVariableClicked: function () {
                 if (!this._varType) {
-                    this.$.errorToast.text = "A `type` is required to create a variable";
-                    this.$.errorToast.show();
+                    this.fire("error", {message: "A `type` is required to create a variable"});
                     return;
                 }
                 if (!this._varName) {
-                    this.$.errorToast.text = "A `name` is required to create a variable";
-                    this.$.errorToast.show();
+                    this.fire("error", {message: "A `name` is required to create a variable"});
                     return;
                 }
-                this._customProperties.group.items.push({
+                this._customVariables.group.items.push({
                     item: {
                         name: this._varName, icon: "fa fa-circle",
                         data: {
@@ -337,16 +323,25 @@ methods and properties.
                 this.element.renderer._updateD3Groups(); // TODO: Public API
             },
             _compile: function () {
-                this.fire("compile", this._builder.save(this.element.graph));
+                try {
+                    this.fire("compile", this._builder.save(this.element.graph));
+                } catch (e) {
+                    this.fire("error", {error: e, message: e.message});
+                }
             },
             _addGroup: function () {
                 this.element.renderer.createGroupFromSelection(prompt("Group name:"));
             },
             _removeSelection: function () {
                 this.element.renderer.removeSelection();
+                this._currentState = "root";
             },
             _save: function () {
-                this.fire("save", new cg.JSONSaver().save(this.element.renderer, this.element.graph));
+                try {
+                    this.fire("save", new cg.JSONSaver().save(this.element.renderer, this.element.graph));
+                } catch (e) {
+                    this.fire("error", {error: e, message: e.message});
+                }
             }
         });
     </script>

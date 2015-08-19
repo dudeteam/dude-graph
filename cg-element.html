@@ -70,7 +70,6 @@ methods and properties.
             renderer: cg.Renderer
 
         },
-        _currentId: 0,
         ready: function () {
             this.graph = new cg.Graph(this.graphData, this.modelsData);
             this.renderer = new cg.Renderer(this.$.svg, this.graph, this.rendererData);
@@ -78,21 +77,12 @@ methods and properties.
             this.renderer.initialize();
 
             this.renderer.on("error", function (error) {
-                this.$.errorToast.text = error.message;
-                this.$.errorToast.show();
+                this.fire("error", {error: error, message: error.message});
             }.bind(this));
 
             // for debug
             window.cgRenderer = this.renderer;
             window.cgGraph = this.graph;
-        }//,
-//        _createBlock: function () {
-//            if (model) {
-//                this._graph.loader.loadBlock({
-//                    "cgId": "generated_" + this._currentId++,
-//                    "cgModel": model
-//                });
-//            }
-//        }
+        }
     });
 </script>
