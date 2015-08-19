@@ -889,10 +889,11 @@ cg.Graph = (function () {
     /**
      * Adds a block to the graph
      * @param {cg.Block} cgBlock to add to the graph
+     * @param {Boolean} quiet Whether the event should be emitted
      * @emit "cg-block-create" {cg.Block}
      * @return {cg.Block}
      */
-    Graph.prototype.addBlock = function (cgBlock) {
+    Graph.prototype.addBlock = function (cgBlock, quiet) {
         var cgBlockId = cgBlock.cgId;
         if (cgBlock.cgGraph !== this) {
             throw new cg.GraphError("Graph::addBlock() This block does not belong to this graph");
@@ -905,7 +906,9 @@ cg.Graph = (function () {
         }
         this._cgBlocks.push(cgBlock);
         this._cgBlocksIds[cgBlockId] = cgBlock;
-        this.emit("cg-block-create", cgBlock);
+        if (!quiet) {
+            this.emit("cg-block-create", cgBlock);
+        }
         return cgBlock;
     };
 
@@ -2274,7 +2277,7 @@ cg.JSONLoader = (function () {
         pandora.EventEmitter.call(this);
         this._cgGraph = cgGraph;
         this._data = data;
-        this._models = models;
+        this._blocksTree = models;
         this._pointTypes = {};
         this._blockTypes = {};
         this.addBlockType(cg.Block);
@@ -2374,11 +2377,11 @@ cg.JSONLoader = (function () {
             throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Block property `cgId` is required");
         }
         if (cgBlockData.cgModel) {
-            if (this._models[cgBlockData.cgModel] === undefined) {
+            if (this._blocksTree[cgBlockData.cgModel] === undefined) {
                 throw new cg.GraphSerializationError("JSONLoader::_loadBlocks() Model `{0}` not found",
                     cgBlockData.cgModel);
             }
-            pandora.mergeObjects(cgBlockData, this._models[cgBlockData.cgModel]);
+            pandora.mergeObjects(cgBlockData, this._blocksTree[cgBlockData.cgModel]);
         }
         var cgBlockType = cgBlockData.cgType || "Block";
         var cgBlockDeserializer = this._blockTypes[cgBlockType];
@@ -2685,6 +2688,23 @@ cg.Renderer = (function () {
     };
 
     /**
+     * Creates a rendererBlock from the given cgBlock.
+     * @param cgBlock
+     */
+    Renderer.prototype.createRendererBlock = function (cgBlock) {
+        var renderer = this;
+        var rendererBlock = renderer._createRendererBlock({
+            "id": cg.UUID.generate(),
+            "cgBlock": cgBlock.cgId,
+            "position": [100, 100],
+            "size": [100, 100]
+        });
+        renderer._createD3Blocks();
+        var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
+        renderer._positionRendererBlockBehavior(d3Block);
+    };
+
+    /**
      * Remove the current selection.
      */
     Renderer.prototype.removeSelection = function () {
@@ -2753,19 +2773,10 @@ cg.Renderer = (function () {
      */
     Renderer.prototype._initializeListeners = function () {
         var renderer = this;
-        this._cgGraph.on("cg-block-create", function (cgBlock) {
-            var rendererBlock = renderer._createRendererBlock({
-                "id": cg.UUID.generate(),
-                "cgBlock": cgBlock.cgId,
-                "position": [100, 100],
-                "size": [100, 100]
-            });
-            renderer._createD3Blocks();
-            var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
-            renderer._positionRendererBlockBehavior(d3Block);
-        });
+        this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
         this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
-            renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(renderer._getRendererBlocksByCgBlock(cgBlock)));
+            renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+                renderer._getRendererBlocksByCgBlock(cgBlock)));
         });
     };
 

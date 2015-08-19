@@ -202,7 +202,7 @@ methods and properties.
                 }
             },
             ready: function () {
-                this._models = [];
+                this._blocksTree = [];
                 this._folders = {};
                 this._selectedNode = null;
                 this._currentState = "root";
@@ -221,22 +221,32 @@ methods and properties.
                                     items: []
                                 }
                             };
-                            this._models.push(this._folders[value.cgFolder]);
+                            this._blocksTree.push(this._folders[value.cgFolder]);
                         }
                         this._folders[value.cgFolder].group.items.push({item: {name: key, icon: icon, data: value}});
                     } else {
-                        this._models.push({item: {name: key, icon: icon, data: value}});
+                        this._blocksTree.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
                 this._customVariables = {group: {name: "custom variables", icon: "fa fa-folder", items: []}};
-                this._models.unshift(this._customVariables);
-                this.$.blocks.loadItems(this._models);
+                this._blocksTree.unshift(this._customVariables);
+                this.$.blocks.loadItems(this._blocksTree);
             },
             bindBuilder: function (builder) {
                 this._builder = builder;
             },
             bindElement: function (element) {
                 this.element = element;
+                pandora.forEach(this.element.graph.blocksByType("Variable"), function (variable) {
+                    this._customVariables.group.items.push({
+                        item: {
+                            name: variable.cgName,
+                            icon: "fa fa-circle",
+                            data: variable
+                        }
+                    });
+                }.bind(this));
+                this.$.blocks.loadItems(this._blocksTree);
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
                     if (node.type === "block") {
@@ -277,10 +287,14 @@ methods and properties.
                     return;
                 }
                 if (e.detail.item !== null) {
-                    var data = Object.create(e.detail.item.data);
-                    data.cgName = e.detail.item.name;
-                    data.cgId = cg.UUID.generate();
-                    this.element.graph.loader.loadBlock(data);
+                    if (pandora.typename(e.detail.item.data) === "Variable") {
+                        this.element.renderer.createRendererBlock(e.detail.item.data);
+                    } else {
+                        var data = Object.create(e.detail.item.data);
+                        data.cgName = e.detail.item.name;
+                        data.cgId = cg.UUID.generate();
+                        this.element.graph.loader.loadBlock(data);
+                    }
                 }
             },
             _createVariableClicked: function () {
@@ -292,17 +306,21 @@ methods and properties.
                     this.fire("error", {message: "A `name` is required to create a variable"});
                     return;
                 }
+                var variable = new cg.Variable(this.element.graph, {
+                    cgId: cg.UUID.generate(),
+                    cgName: this._varName,
+                    cgValueType: this._varType,
+                    cgValue: this._varValue
+                });
+                this.element.graph.addBlock(variable, true);
                 this._customVariables.group.items.push({
                     item: {
-                        name: this._varName, icon: "fa fa-circle",
-                        data: {
-                            cgType: "Variable",
-                            cgValueType: this._varType,
-                            cgValue: this._varValue
-                        }
+                        name: variable.cgName,
+                        icon: "fa fa-circle",
+                        data: variable
                     }
                 });
-                this.$.blocks.loadItems(this._models); // Refresh the list
+                this.$.blocks.loadItems(this._blocksTree); // Refresh the list
             },
             _editVariableClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._varName;
