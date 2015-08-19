@@ -240,15 +240,14 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         }
     ],
     "connections": [
-        {"outputBlockId": "0", "outputName": "out", "inputBlockId": "1", "inputName": "in"},
-        {"outputBlockId": "2", "outputName": "value", "inputBlockId": "1", "inputName": "test"},
-        {"outputBlockId": "4", "outputName": "value", "inputBlockId": "2", "inputName": "first"},
-        {"outputBlockId": "10", "outputName": "value", "inputBlockId": "9", "inputName": "this"},
-        {"outputBlockId": "17", "outputName": "value", "inputBlockId": "16", "inputName": "this"},
-        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"},
-        {"outputBlockId": "5", "outputName": "value", "inputBlockId": "2", "inputName": "second"},
-        {"outputBlockId": "1", "outputName": "true", "inputBlockId": "3", "inputName": "in"},
-        {"outputBlockId": "6", "outputName": "value", "inputBlockId": "3", "inputName": "this"},
-        {"outputBlockId": "7", "outputName": "value", "inputBlockId": "3", "inputName": "name"}
+        {"cgConnectionIndex": 0, "outputRendererBlockId": "0", "inputRendererBlockId": "1"},
+        {"cgConnectionIndex": 1, "outputRendererBlockId": "2", "inputRendererBlockId": "1"},
+        {"cgConnectionIndex": 2, "outputRendererBlockId": "4", "inputRendererBlockId": "2"},
+        {"cgConnectionIndex": 3, "outputRendererBlockId": "10", "inputRendererBlockId": "9"},
+        {"cgConnectionIndex": 4, "outputRendererBlockId": "17", "inputRendererBlockId": "16"},
+        {"cgConnectionIndex": 5, "outputRendererBlockId": "5", "inputRendererBlockId": "2"},
+        {"cgConnectionIndex": 6, "outputRendererBlockId": "1", "inputRendererBlockId": "3"},
+        {"cgConnectionIndex": 7, "outputRendererBlockId": "6", "inputRendererBlockId": "3"},
+        {"cgConnectionIndex": 8, "outputRendererBlockId": "7", "inputRendererBlockId": "3"}
     ]
 };

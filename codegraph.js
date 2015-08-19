@@ -1508,9 +1508,9 @@ cg.Point = (function () {
             throw new cg.GraphError("Point::connect() Cannot accept more than `{0}` connection(s)", this._cgMaxConnections);
         }
         if (this._isOutput) {
-            this._cgGraph.connectPoints(this, cgPoint);
+            return this._cgGraph.connectPoints(this, cgPoint);
         } else {
-            this._cgGraph.connectPoints(cgPoint, this);
+            return this._cgGraph.connectPoints(cgPoint, this);
         }
     };
 
@@ -2657,7 +2657,7 @@ cg.Renderer = (function () {
     });
 
     /**
-     * Creates the svg nodes and listen the graph's events in order to update the rendered svg graph.
+     * Creates the cgGraph renderer
      */
     Renderer.prototype.initialize = function () {
         this._initialize();
@@ -2666,11 +2666,11 @@ cg.Renderer = (function () {
         this._createD3Blocks();
         this._createD3Connections();
         this._createD3Groups();
-        this._initializeListeners();
     };
 
     /**
-     * Create group from the current selection.
+     * Creates a rendererGroup from the current selection.
+     * @returns {cg.RendererGroup}
      */
     Renderer.prototype.createGroupFromSelection = function (name) {
         var renderer = this;
@@ -2685,11 +2685,13 @@ cg.Renderer = (function () {
         });
         this._createD3Groups();
         this._updateD3Groups();
+        return rendererGroup;
     };
 
     /**
      * Creates a rendererBlock from the given cgBlock.
-     * @param cgBlock
+     * @param cgBlock {cg.Block}
+     * @returns {cg.RendererBlock}
      */
     Renderer.prototype.createRendererBlock = function (cgBlock) {
         var renderer = this;
@@ -2702,6 +2704,7 @@ cg.Renderer = (function () {
         renderer._createD3Blocks();
         var d3Block = renderer._getD3NodesFromRendererNodes([rendererBlock]);
         renderer._positionRendererBlockBehavior(d3Block);
+        return rendererBlock;
     };
 
     /**
@@ -2717,67 +2720,6 @@ cg.Renderer = (function () {
         this._removeD3Connections();
         this._updateD3Blocks();
         this._updateD3Groups();
-    };
-
-    /**
-     * Initializes rendererGroups and rendererBlocks
-     * Add parent and children references, and also cgBlocks references to renderer blocks
-     * @private
-     */
-    Renderer.prototype._initialize = function () {
-        var renderer = this;
-        pandora.forEach(this._data.blocks, function (blockData) {
-            renderer._createRendererBlock(blockData);
-        });
-        pandora.forEach(this._data.connections, function (connectionData) {
-            renderer._createRendererConnection(connectionData);
-        });
-        pandora.forEach(this._data.groups, function (groupData) {
-            renderer._createRendererGroup(groupData);
-        });
-        this._initializeParents();
-    };
-
-    /**
-     * Initializes the parents of the rendererNodes
-     * @private
-     */
-    Renderer.prototype._initializeParents = function () {
-        var renderer = this;
-        pandora.forEach(this._data.blocks, function (rendererBlockData) {
-            var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
-            if (rendererBlockData.parent) {
-                var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
-                if (!rendererGroupParent) {
-                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
-                }
-                renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
-            }
-        });
-        pandora.forEach(this._data.groups, function (rendererGroupData) {
-            var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
-            if (rendererGroupData.parent) {
-                var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
-                if (!rendererGroupParent) {
-                    throw new cg.RendererError("Renderer::_initializeParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
-                }
-                //noinspection JSCheckFunctionSignatures
-                renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
-            }
-        });
-    };
-
-    /**
-     * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
-     * @private
-     */
-    Renderer.prototype._initializeListeners = function () {
-        var renderer = this;
-        this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
-        this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
-            renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-                renderer._getRendererBlocksByCgBlock(cgBlock)));
-        });
     };
 
     return Renderer;
@@ -2907,6 +2849,7 @@ cg.Renderer.prototype._removeRendererConnectionBehavior = function () {
  */
 cg.Renderer.prototype._dragRendererConnectionBehavior = function () {
     var renderer = this;
+    var draggingConnection = null;
     var computeConnectionPath = function (rendererPoint) {
         var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint);
         if (rendererPoint.isOutput) {
@@ -2918,7 +2861,7 @@ cg.Renderer.prototype._dragRendererConnectionBehavior = function () {
         .on("dragstart", function (rendererPoint) {
             d3.event.sourceEvent.preventDefault();
             d3.event.sourceEvent.stopPropagation();
-            renderer.__draggingConnection = renderer._d3Connections
+            draggingConnection = renderer._d3Connections
                 .append("svg:path")
                 .classed("cg-connection", true)
                 .classed("cg-stream", function () {
@@ -2929,7 +2872,7 @@ cg.Renderer.prototype._dragRendererConnectionBehavior = function () {
                 });
         })
         .on("drag", function (rendererPoint) {
-            renderer.__draggingConnection
+            draggingConnection
                 .attr("d", function () {
                     return computeConnectionPath(rendererPoint);
                 });
@@ -2961,8 +2904,7 @@ cg.Renderer.prototype._dragRendererConnectionBehavior = function () {
                 renderer.emit("warning", "Renderer::_createD3PointShapes() No point found for creating connection");
                 //console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
             }
-            renderer.__draggingConnection.remove();
-            delete renderer.__draggingConnection;
+            draggingConnection.remove();
         });
 };
 /**
@@ -3064,282 +3006,122 @@ cg.Renderer.prototype._createZoomBehavior = function () {
     this._d3Svg.call(this._zoom);
 };
 /**
- * Returns the rendererNode associated with the given id
- * @param id
- * @returns {cg.RendererBlock|null}
+ * Initializes rendererGroups and rendererBlocks
+ * Add parent and children references, and also cgBlocks references to renderer blocks
  * @private
  */
-cg.Renderer.prototype._getRendererBlockById = function (id) {
-    return this._rendererBlockIds.get(id) || null;
+cg.Renderer.prototype._initialize = function () {
+    this._initializeRendererBlocks();
+    this._initializeRendererConnections();
+    this._initializeRendererGroups();
+    this._initializeRendererGroupParents();
+    this._initializeListeners();
 };
 
 /**
- * Returns the rendererBlocks bound to the given cgBlock
- * @param cgBlock {cg.Block}
- * @returns {Array<cg.RendererBlock>}
+ * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
  * @private
  */
-cg.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
-    var rendererBlocks = [];
-    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
-        if (rendererBlock.cgBlock === cgBlock) {
-            rendererBlocks.push(rendererBlock);
-        }
-    });
-    return rendererBlocks;
-};
-
-/**
- * Creates a renderer block
- * @param rendererBlockData
- * @returns {cg.RendererBlock}
- * @private
- */
-cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
-    if (!rendererBlockData.id) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
-    }
-    if (this._getRendererBlockById(rendererBlockData.id) !== null) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Multiple rendererBlocks for id `{0}`", rendererBlockData.id);
-    }
-    var cgBlock = this._cgGraph.blockById(rendererBlockData.cgBlock);
-    if (!cgBlock) {
-        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock `{0}` to rendererBlock `{1}`", rendererBlockData.cgBlock, rendererBlockData.id);
-    }
-    var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
-    rendererBlock.type = "block";
-    rendererBlock.parent = null;
-    rendererBlock.cgBlock = cgBlock;
-    rendererBlock.id = rendererBlockData.id;
-    rendererBlock.rendererPoints = [];
-    rendererBlock.position = rendererBlockData.position || [0, 0];
-    rendererBlock.size = rendererBlockData.size || this._config.block.size;
-    this._createRendererPoints(rendererBlock);
-    this._rendererBlocks.push(rendererBlock);
-    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
-    return rendererBlock;
-};
-
-/**
- * Removes the rendererBlock
- * Also removes the cgBlock from the cgGraph if it is the last reference
- * @param rendererBlock {cg.RendererBlock}
- * @private
- */
-cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
+cg.Renderer.prototype._initializeRendererBlocks = function () {
     var renderer = this;
-    var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
-    if (rendererBlockFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererBlock() RendererBlock not found and thus cannot be removed");
-    }
-    pandora.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
-        while (rendererPoint.connections.length > 0) {
-            renderer._removeRendererConnection(rendererPoint.connections[0]);
+    pandora.forEach(this._data.blocks, function (blockData) {
+        renderer._createRendererBlock(blockData);
+    });
+};
+
+/**
+ * Creates the rendererConnection between the rendererBlocks/rendererPoints
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererConnections = function () {
+    var renderer = this;
+    pandora.forEach(this._data.connections, function (connectionData) {
+        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
+        if (!cgConnection) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}` does not exists", connectionData.cgConnectionIndex);
+        }
+        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
+        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
+        if (!outputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.outputRendererBlockId);
+        }
+        if (!inputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.inputRendererBlockId);
+        }
+        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: OutputRendererBlock `{1}` is not holding a reference to the outputCgBlock `{2}`", connectionData.cgConnectionIndex, outputRendererBlock.id, cgConnection.cgOutputPoint.cgBlock.cgId);
+        }
+        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: InputRendererBlock `{1}` is not holding a reference to the inputCgBlock `{2}`", connectionData.cgConnectionIndex, inputRendererBlock.id, cgConnection.cgInputPoint.cgBlock.cgId);
+        }
+        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
+        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
+        if (!outputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgOutputPoint.cgName);
+        }
+        if (!inputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgInputPoint.cgName);
+        }
+        renderer._createRendererConnection({
+            "cgConnection": cgConnection,
+            "outputRendererPoint": outputRendererPoint,
+            "inputRendererPoint": inputRendererPoint
+        }, true);
+    });
+    // TODO: Check non linked cgConnections <=> rendererConnections
+};
+
+/**
+ * Creates the rendererGroups
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroups = function () {
+    var renderer = this;
+    pandora.forEach(this._data.groups, function (groupData) {
+        renderer._createRendererGroup(groupData);
+    });
+};
+
+/**
+ * Assigns rendererGroup parents
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroupParents = function () {
+    var renderer = this;
+    pandora.forEach(this._data.blocks, function (rendererBlockData) {
+        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
+        if (rendererBlockData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
         }
     });
-    this._removeRendererNodeParent(rendererBlock);
-    this._rendererBlocks.splice(rendererBlockFound, 1);
-    if (this._getRendererBlocksByCgBlock(rendererBlock.cgBlock).length === 0) {
-        this._cgGraph.removeBlock(rendererBlock.cgBlock);
-    }
-};
-/**
- * Creates a rendererConnection
- * @param rendererConnectionData {Object}
- * @private
- */
-cg.Renderer.prototype._createRendererConnection = function (rendererConnectionData) {
-    var outputRendererPoint = rendererConnectionData.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.outputBlockId), rendererConnectionData.outputName);
-    var inputRendererPoint = rendererConnectionData.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.inputBlockId), rendererConnectionData.inputName);
-    if (!outputRendererPoint) {
-        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the outputRendererPoint");
-    }
-    if (!inputRendererPoint) {
-        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the inputRendererPoint");
-    }
-    if (!this._cgGraph.connectionByPoints(outputRendererPoint.cgPoint, inputRendererPoint.cgPoint)) {
-        outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
-    }
-    var rendererConnection = {
-        "outputRendererPoint": outputRendererPoint,
-        "inputRendererPoint": inputRendererPoint
-    };
-    this._rendererConnections.push(rendererConnection);
-    outputRendererPoint.connections.push(rendererConnection);
-    inputRendererPoint.connections.push(rendererConnection);
-};
-
-/**
- * Removes the given rendererConnection
- * @param rendererConnection {cg.RendererConnection}
- * @private
- */
-cg.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
-    var outputPointRendererConnectionFound = rendererConnection.outputRendererPoint.connections.indexOf(rendererConnection);
-    var inputPointRendererConnectionFound = rendererConnection.inputRendererPoint.connections.indexOf(rendererConnection);
-    var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
-    if (outputPointRendererConnectionFound === -1 || inputPointRendererConnectionFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in inputPoint or outputPoint");
-    }
-    if (rendererConnectionFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererConnection() Connection not found");
-    }
-    rendererConnection.outputRendererPoint.connections.splice(outputPointRendererConnectionFound, 1);
-    rendererConnection.inputRendererPoint.connections.splice(inputPointRendererConnectionFound, 1);
-    this._rendererConnections.splice(rendererConnectionFound, 1);
-};
-/**
- * Returns the rendererGroup associated with the given id
- * @param id
- * @returns {cg.RendererGroup|null}
- * @private
- */
-cg.Renderer.prototype._getRendererGroupById = function (id) {
-    return this._rendererGroupIds.get(id) || null;
-};
-
-/**
- * Creates a rendererGroup
- * @param rendererGroupData
- * @returns {cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
-    if (!rendererGroupData.id) {
-        throw new cg.RendererError("Renderer::_createRendererGroup() Cannot create a rendererGroup without an id");
-    }
-    if (this._getRendererGroupById(rendererGroupData.id)) {
-        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id `{0}`", rendererGroupData.id);
-    }
-    var rendererGroup = pandora.mergeObjects({}, rendererGroupData, true, true);
-    rendererGroup.type = "group";
-    rendererGroup.id = rendererGroupData.id;
-    rendererGroup.parent = null;
-    rendererGroup.children = [];
-    rendererGroup.position = rendererGroupData.position || [0, 0];
-    rendererGroup.size = rendererGroupData.size || this._config.group.size;
-    this._rendererGroups.push(rendererGroup);
-    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
-    return rendererGroup;
-};
-
-/**
- * Removes the rendererGroup
- * @param rendererGroup {cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
-    var rendererGroupFound = this._rendererGroups.indexOf(rendererGroup);
-    if (rendererGroupFound === -1) {
-        throw new cg.RendererError("Renderer::_removeRendererGroup() RendererGroup not found and thus cannot be removed");
-    }
-    this._removeRendererNodeParent(rendererGroup);
-    this._rendererGroups.splice(rendererGroupFound, 1);
-};
-/**
- * Removes the given rendererNode from the renderer
- * Also removes the cgBlock if it is the rendererNode was the last reference on it
- * @param rendererNode {cg.RendererBlock|cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
-    if (rendererNode.type === "block") {
-        this._removeRendererBlock(rendererNode);
-    } else {
-        this._removeRendererGroup(rendererNode);
-    }
-};
-
-/**
- * Returns the parent hierarchy of the given rendererNode
- * @type {cg.RendererNode}
- * @returns {Array<cg.RendererGroup>}
- * @private
- */
-cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
-    var parents = [];
-    var parent = rendererNode.parent;
-    while (parent) {
-        parents.push(parent);
-        parent = parent.parent;
-    }
-    return parents;
-};
-
-/**
- * Adds the given rendererNode in the rendererGroupParent
- * @param rendererNode {cg.RendererNode}
- * @param rendererGroupParent{cg.RendererGroup}
- * @private
- */
-cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
-    if (rendererNode.parent === rendererGroupParent) {
-        return;
-    }
-    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
-        if (checkRendererGroupParent === rendererNode) {
-            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add `{0}` as a child of `{1}`, because `{0}` is equal or is a parent of `{1}`", rendererNode.id, rendererGroupParent.id);
+    pandora.forEach(this._data.groups, function (rendererGroupData) {
+        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
+        if (rendererGroupData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
         }
-        if (checkRendererGroupParent.parent) {
-            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
-        }
-    })(rendererGroupParent);
-    this._removeRendererNodeParent(rendererNode);
-    rendererGroupParent.children.push(rendererNode);
-    rendererNode.parent = rendererGroupParent;
-};
-
-/**
- * Removes the rendererNode from his parent
- * @param rendererNode {cg.RendererNode}
- * @private
- */
-cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
-    if (rendererNode.parent) {
-        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
-        rendererNode.parent = null;
-    }
-};
-/**
- * Returns the rendererPoint associated with the given name
- * @param rendererBlock {cg.RendererBlock}
- * @param rendererPointName {String}
- * @returns {cg.RendererPoint|null}
- * @private
- */
-cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
-    return pandora.findIf(rendererBlock.rendererPoints, function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName === rendererPointName;
-        }
-    );
-};
-
-/**
- * Creates the rendererPoints for a given rendererBlock
- * @param rendererBlock {cg.RendererBlock}
- * @private
- */
-cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
-    rendererBlock.rendererPoints = [];
-    pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
-            "cgPoint": cgOutput,
-            "isOutput": true,
-            "connections": []
-        });
     });
-    pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
-            "cgPoint": cgInput,
-            "isOutput": false,
-            "connections": []
-        });
+};
+
+/**
+ * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
+ * @private
+ */
+cg.Renderer.prototype._initializeListeners = function () {
+    var renderer = this;
+    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
+    this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgBlock)));
     });
 };
 /**
@@ -3695,6 +3477,301 @@ cg.Renderer.prototype._createD3PointShapes = function (d3Point) {
         })
         .call(renderer._removeRendererConnectionBehavior())
         .call(renderer._dragRendererConnectionBehavior());
+};
+/**
+ * Returns the rendererNode associated with the given id
+ * @param id
+ * @returns {cg.RendererBlock|null}
+ * @private
+ */
+cg.Renderer.prototype._getRendererBlockById = function (id) {
+    return this._rendererBlockIds.get(id) || null;
+};
+
+/**
+ * Returns the rendererBlocks bound to the given cgBlock
+ * @param cgBlock {cg.Block}
+ * @returns {Array<cg.RendererBlock>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
+    var rendererBlocks = [];
+    pandora.forEach(this._rendererBlocks, function (rendererBlock) {
+        if (rendererBlock.cgBlock === cgBlock) {
+            rendererBlocks.push(rendererBlock);
+        }
+    });
+    return rendererBlocks;
+};
+
+/**
+ * Creates a renderer block
+ * @param rendererBlockData
+ * @returns {cg.RendererBlock}
+ * @private
+ */
+cg.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
+    if (!rendererBlockData.id) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot create a rendererBlock without an id");
+    }
+    if (this._getRendererBlockById(rendererBlockData.id) !== null) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Multiple rendererBlocks for id `{0}`", rendererBlockData.id);
+    }
+    var cgBlock = this._cgGraph.blockById(rendererBlockData.cgBlock);
+    if (!cgBlock) {
+        throw new cg.RendererError("Renderer::_createRendererBlock() Cannot link cgBlock `{0}` to rendererBlock `{1}`", rendererBlockData.cgBlock, rendererBlockData.id);
+    }
+    var rendererBlock = pandora.mergeObjects({}, rendererBlockData, true, true);
+    rendererBlock.type = "block";
+    rendererBlock.parent = null;
+    rendererBlock.cgBlock = cgBlock;
+    rendererBlock.id = rendererBlockData.id;
+    rendererBlock.rendererPoints = [];
+    rendererBlock.position = rendererBlockData.position || [0, 0];
+    rendererBlock.size = rendererBlockData.size || this._config.block.size;
+    this._createRendererPoints(rendererBlock);
+    this._rendererBlocks.push(rendererBlock);
+    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
+    return rendererBlock;
+};
+
+/**
+ * Removes the rendererBlock
+ * Also removes the cgBlock from the cgGraph if it is the last reference
+ * @param rendererBlock {cg.RendererBlock}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
+    var renderer = this;
+    var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
+    if (rendererBlockFound === -1) {
+        throw new cg.RendererError("Renderer::_removeRendererBlock() RendererBlock not found and thus cannot be removed");
+    }
+    pandora.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
+        while (rendererPoint.connections.length > 0) {
+            renderer._removeRendererConnection(rendererPoint.connections[0]);
+        }
+    });
+    this._removeRendererNodeParent(rendererBlock);
+    this._rendererBlocks.splice(rendererBlockFound, 1);
+    if (this._getRendererBlocksByCgBlock(rendererBlock.cgBlock).length === 0) {
+        this._cgGraph.removeBlock(rendererBlock.cgBlock);
+    }
+};
+/**
+ * Creates a rendererConnection
+ * @param rendererConnectionData {Object}
+ * @param ignoreCgConnection {Boolean?} Whether we ignore the creation of a cgConnection
+ * @private
+ */
+cg.Renderer.prototype._createRendererConnection = function (rendererConnectionData, ignoreCgConnection) {
+    var outputRendererPoint = rendererConnectionData.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.outputBlockId), rendererConnectionData.outputName);
+    var inputRendererPoint = rendererConnectionData.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.inputBlockId), rendererConnectionData.inputName);
+    var cgConnection = rendererConnectionData.cgConnection;
+    if (!outputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the outputRendererPoint");
+    }
+    if (!inputRendererPoint) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot find the inputRendererPoint");
+    }
+    if (!ignoreCgConnection) {
+        cgConnection = outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
+    } else {
+        pandora.forEach(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection.cgConnection === cgConnection) {
+                throw new cg.RendererError("Renderer::_createRendererConnection() Connections `{0}` is already handled in the renderer by the rendererConnection `{1}`", cgConnection, rendererConnection);
+            }
+        });
+    }
+    if (!cgConnection) {
+        throw new cg.RendererError("Renderer::_createRendererConnection() Cannot create a rendererConnection without an existing cgConnection");
+    }
+    var rendererConnection = {
+        "cgConnection": cgConnection,
+        "outputRendererPoint": outputRendererPoint,
+        "inputRendererPoint": inputRendererPoint
+    };
+    this._rendererConnections.push(rendererConnection);
+    outputRendererPoint.connections.push(rendererConnection);
+    inputRendererPoint.connections.push(rendererConnection);
+};
+
+/**
+ * Removes the given rendererConnection
+ * @param rendererConnection {cg.RendererConnection}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
+    var outputRendererPointRendererConnectionFound = rendererConnection.outputRendererPoint.connections.indexOf(rendererConnection);
+    var inputRendererPointRendererConnectionFound = rendererConnection.inputRendererPoint.connections.indexOf(rendererConnection);
+    var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
+    if (outputRendererPointRendererConnectionFound === -1) {
+        throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in outputRendererPoint");
+    }
+    if (inputRendererPointRendererConnectionFound === -1) {
+        throw new cg.RendererError("Renderer::_removeRendererConnection() Cannot find connection in inputRendererPoint");
+    }
+    if (rendererConnectionFound === -1) {
+        throw new cg.RendererError("Renderer::_removeRendererConnection() Connection not found");
+    }
+    rendererConnection.outputRendererPoint.connections.splice(outputRendererPointRendererConnectionFound, 1);
+    rendererConnection.inputRendererPoint.connections.splice(inputRendererPointRendererConnectionFound, 1);
+    this._rendererConnections.splice(rendererConnectionFound, 1);
+    // TODO: Remove connection from cgGraph
+};
+/**
+ * Returns the rendererGroup associated with the given id
+ * @param id
+ * @returns {cg.RendererGroup|null}
+ * @private
+ */
+cg.Renderer.prototype._getRendererGroupById = function (id) {
+    return this._rendererGroupIds.get(id) || null;
+};
+
+/**
+ * Creates a rendererGroup
+ * @param rendererGroupData
+ * @returns {cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
+    if (!rendererGroupData.id) {
+        throw new cg.RendererError("Renderer::_createRendererGroup() Cannot create a rendererGroup without an id");
+    }
+    if (this._getRendererGroupById(rendererGroupData.id)) {
+        throw new cg.RendererError("Renderer::_createRendererGroup() Duplicate rendererGroup for id `{0}`", rendererGroupData.id);
+    }
+    var rendererGroup = pandora.mergeObjects({}, rendererGroupData, true, true);
+    rendererGroup.type = "group";
+    rendererGroup.id = rendererGroupData.id;
+    rendererGroup.parent = null;
+    rendererGroup.children = [];
+    rendererGroup.position = rendererGroupData.position || [0, 0];
+    rendererGroup.size = rendererGroupData.size || this._config.group.size;
+    this._rendererGroups.push(rendererGroup);
+    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
+    return rendererGroup;
+};
+
+/**
+ * Removes the rendererGroup
+ * @param rendererGroup {cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
+    var rendererGroupFound = this._rendererGroups.indexOf(rendererGroup);
+    if (rendererGroupFound === -1) {
+        throw new cg.RendererError("Renderer::_removeRendererGroup() RendererGroup not found and thus cannot be removed");
+    }
+    this._removeRendererNodeParent(rendererGroup);
+    this._rendererGroups.splice(rendererGroupFound, 1);
+};
+/**
+ * Removes the given rendererNode from the renderer
+ * Also removes the cgBlock if it is the rendererNode was the last reference on it
+ * @param rendererNode {cg.RendererBlock|cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererNode = function (rendererNode) {
+    if (rendererNode.type === "block") {
+        this._removeRendererBlock(rendererNode);
+    } else {
+        this._removeRendererGroup(rendererNode);
+    }
+};
+
+/**
+ * Returns the parent hierarchy of the given rendererNode
+ * @type {cg.RendererNode}
+ * @returns {Array<cg.RendererGroup>}
+ * @private
+ */
+cg.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
+    var parents = [];
+    var parent = rendererNode.parent;
+    while (parent) {
+        parents.push(parent);
+        parent = parent.parent;
+    }
+    return parents;
+};
+
+/**
+ * Adds the given rendererNode in the rendererGroupParent
+ * @param rendererNode {cg.RendererNode}
+ * @param rendererGroupParent{cg.RendererGroup}
+ * @private
+ */
+cg.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
+    if (rendererNode.parent === rendererGroupParent) {
+        return;
+    }
+    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
+        if (checkRendererGroupParent === rendererNode) {
+            throw new cg.RendererError("Renderer::_addRendererNodeParent() Cannot add `{0}` as a child of `{1}`, because `{0}` is equal or is a parent of `{1}`", rendererNode.id, rendererGroupParent.id);
+        }
+        if (checkRendererGroupParent.parent) {
+            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
+        }
+    })(rendererGroupParent);
+    this._removeRendererNodeParent(rendererNode);
+    rendererGroupParent.children.push(rendererNode);
+    rendererNode.parent = rendererGroupParent;
+};
+
+/**
+ * Removes the rendererNode from his parent
+ * @param rendererNode {cg.RendererNode}
+ * @private
+ */
+cg.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
+    if (rendererNode.parent) {
+        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
+        rendererNode.parent = null;
+    }
+};
+/**
+ * Returns the rendererPoint associated with the given name
+ * @param rendererBlock {cg.RendererBlock}
+ * @param rendererPointName {String}
+ * @returns {cg.RendererPoint|null}
+ * @private
+ */
+cg.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
+    return pandora.findIf(rendererBlock.rendererPoints, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName === rendererPointName;
+        }
+    );
+};
+
+/**
+ * Creates the rendererPoints for a given rendererBlock
+ * @param rendererBlock {cg.RendererBlock}
+ * @private
+ */
+cg.Renderer.prototype._createRendererPoints = function (rendererBlock) {
+    rendererBlock.rendererPoints = [];
+    pandora.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
+            "cgPoint": cgOutput,
+            "isOutput": true,
+            "connections": []
+        });
+    });
+    pandora.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
+            "cgPoint": cgInput,
+            "isOutput": false,
+            "connections": []
+        });
+    });
 };
 /**
  * Creates the collision quadtree
