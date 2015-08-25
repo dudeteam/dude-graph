@@ -2,6 +2,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
 <link rel="import" href="../magnet-state/magnet-state.html">
@@ -75,12 +76,23 @@ methods and properties.
             width: 800px;
         }
 
-        paper-button {
+        .box paper-button {
             margin: 2px 0;
         }
 
     </style>
     <template>
+        <paper-dialog id="addGroupDialog" modal>
+            <p>
+                The group's description will be displayed on the top of the group. It should describe what's in the
+                group. Groups are just optional blocks used to describe and organise your graph.
+            </p>
+            <paper-input label="Group description" value="{{_newGroupDescription}}"></paper-input>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button on-click="_confirmAddGroup" dialog-confirm>Accept</paper-button>
+            </div>
+        </paper-dialog>
         <div class="layout vertical flex">
             <div class="box">
                 <div class="title">Tools</div>
@@ -304,7 +316,7 @@ methods and properties.
                     } else {
                         var data = Object.create(e.detail.item.data);
                         if (e.detail.item.data.cgType === "Assignation") {
-                            data.cgValueType = prompt("What type?");
+                            data.cgValueType = "Boolean"; // TODO: replace hard-coded value
                         } else {
                             data.cgName = e.detail.item.name;
                         }
@@ -359,7 +371,11 @@ methods and properties.
                 }
             },
             _addGroup: function () {
-                this.element.renderer.createGroupFromSelection(prompt("Group name:"));
+                this.$.addGroupDialog.open();
+            },
+            _confirmAddGroup: function () {
+                this.element.renderer.createGroupFromSelection(this._newGroupDescription);
+                this._newGroupDescription = "";
             },
             _removeSelection: function () {
                 this.element.renderer.removeSelection();
