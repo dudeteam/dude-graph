@@ -3540,6 +3540,13 @@ cg.Renderer.prototype._updateD3Blocks = function () {
 cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
     var renderer = this;
     updatedD3Blocks
+        .select("text")
+        .text(function (rendererBlock) {
+            return rendererBlock.cgBlock.cgName;
+        });
+    updatedD3Blocks
+        .each(renderer._computeRendererBlockSize.bind(renderer));
+    updatedD3Blocks
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
         });
@@ -3553,9 +3560,6 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
         });
     updatedD3Blocks
         .select("text")
-        .text(function (rendererBlock) {
-            return rendererBlock.cgBlock.cgName;
-        })
         .attr("transform", function (block) {
             return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
         });
@@ -3678,9 +3682,13 @@ cg.Renderer.prototype._updateD3Groups = function () {
 cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
     var renderer = this;
     updatedD3Groups
-        .each(function (rendererGroup) {
-            renderer._computeRendererGroupPositionAndSize(rendererGroup);
-        })
+        .select("text")
+        .text(function (rendererGroup) {
+            return rendererGroup.description;
+        });
+    updatedD3Groups
+        .each(renderer._computeRendererGroupPositionAndSize.bind(renderer));
+    updatedD3Groups
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
         });
@@ -3694,9 +3702,6 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
         });
     updatedD3Groups
         .select("text")
-        .text(function (rendererGroup) {
-            return rendererGroup.description;
-        })
         .attr("transform", function (rendererGroup) {
             return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
         });
@@ -4111,6 +4116,19 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
 };
 
 /**
+ * Computes the size of the given rendererBlock depending on its text or inputs/outputs
+ * @param {cg.RendererBlock} rendererBlock
+ * @private
+ */
+cg.Renderer.prototype._computeRendererBlockSize = function (rendererBlock) {
+    var d3Block = this._getD3NodesFromRendererNodes([rendererBlock]);
+    var d3Text = d3Block.select("text");
+    if (d3Text.node()) {
+        rendererBlock.size[0] = Math.max(rendererBlock.size[0], d3Text.node().getBBox().width + this._config.block.padding * 2);
+    }
+};
+
+/**
  * Computes the position and the size of the given rendererGroup depending of its children
  * @param {cg.RendererGroup} rendererGroup
  * @private
@@ -4131,8 +4149,8 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
         Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
         Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
     ];
-    var d3Groups = this._getD3NodesFromRendererNodes([rendererGroup]);
-    var d3Text = d3Groups.select("text");
+    var d3Group = this._getD3NodesFromRendererNodes([rendererGroup]);
+    var d3Text = d3Group.select("text");
     if (d3Text.node()) {
         rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Text.node().getBBox().width + renderer._config.group.padding * 2);
     }
