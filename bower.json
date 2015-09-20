@@ -1,6 +1,6 @@
 {
   "name": "codegraph",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "description": "Generic tool to visually represent a graph of connected blocks. It can be used for unreal-like blueprints, state machines, etc..",
   "main": "codegraph.js",
   "homepage": "https://github.com/dudeteam/codegraph",
