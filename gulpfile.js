@@ -32,7 +32,7 @@ gulp.task("jshint", function () {
 gulp.task("build", ["jshint"], function () {
     return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(CG_SOURCES))
         .pipe(concat("codegraph.js"))
-        //.pipe(uglify())
+        .pipe(uglify())
         .pipe(gulp.dest("."));
 });
 
@@ -45,6 +45,6 @@ gulp.task("test", ["build"], function () {
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task("serve", ["watch"], shell.task("polyserve -p 9999 -o \"demo\""));
+gulp.task("serve", ["watch"], shell.task("polyserve -p 9999"));
 
 gulp.task("default", ["serve"]);

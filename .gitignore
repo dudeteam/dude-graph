@@ -1,3 +1,6 @@
+# IntelliJ
 .idea
+
+# Node and bower
 bower_components
 node_modules
