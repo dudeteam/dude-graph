@@ -23,6 +23,7 @@
     ".gitignore",
     "tests",
     "demo",
+    "lib",
     "LICENSE.md",
     "README.md",
     "gulpfile.js",
