@@ -20,8 +20,13 @@
   "ignore": [
     "bower_components",
     "node_modules",
+    ".gitignore",
     "tests",
-    "demo"
+    "demo",
+    "LICENSE.md",
+    "README.md",
+    "gulpfile.js",
+    "codegraph.png"
   ],
   "dependencies": {
     "d3": "~3.5.6",
