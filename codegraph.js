@@ -2776,6 +2776,125 @@ cg.Renderer = (function () {
 
 })();
 /**
+ * Initializes rendererGroups and rendererBlocks
+ * Add parent and children references, and also cgBlocks references to renderer blocks
+ * @private
+ */
+cg.Renderer.prototype._initialize = function () {
+    this._initializeRendererBlocks();
+    this._initializeRendererConnections();
+    this._initializeRendererGroups();
+    this._initializeRendererGroupParents();
+    this._initializeListeners();
+};
+
+/**
+ * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererBlocks = function () {
+    var renderer = this;
+    pandora.forEach(this._data.blocks, function (blockData) {
+        renderer._createRendererBlock(blockData);
+    });
+};
+
+/**
+ * Creates the rendererConnection between the rendererBlocks/rendererPoints
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererConnections = function () {
+    var renderer = this;
+    pandora.forEach(this._data.connections, function (connectionData) {
+        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
+        if (!cgConnection) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}` does not exists", connectionData.cgConnectionIndex);
+        }
+        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
+        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
+        if (!outputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.outputRendererBlockId);
+        }
+        if (!inputRendererBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.inputRendererBlockId);
+        }
+        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: OutputRendererBlock `{1}` is not holding a reference to the outputCgBlock `{2}`", connectionData.cgConnectionIndex, outputRendererBlock.id, cgConnection.cgOutputPoint.cgBlock.cgId);
+        }
+        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: InputRendererBlock `{1}` is not holding a reference to the inputCgBlock `{2}`", connectionData.cgConnectionIndex, inputRendererBlock.id, cgConnection.cgInputPoint.cgBlock.cgId);
+        }
+        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
+        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
+        if (!outputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgOutputPoint.cgName);
+        }
+        if (!inputRendererPoint) {
+            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgInputPoint.cgName);
+        }
+        renderer._createRendererConnection({
+            "cgConnection": cgConnection,
+            "outputRendererPoint": outputRendererPoint,
+            "inputRendererPoint": inputRendererPoint
+        }, true);
+    });
+    // TODO: Check non linked cgConnections <=> rendererConnections
+};
+
+/**
+ * Creates the rendererGroups
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroups = function () {
+    var renderer = this;
+    pandora.forEach(this._data.groups, function (groupData) {
+        renderer._createRendererGroup(groupData);
+    });
+};
+
+/**
+ * Assigns rendererGroup parents
+ * @private
+ */
+cg.Renderer.prototype._initializeRendererGroupParents = function () {
+    var renderer = this;
+    pandora.forEach(this._data.blocks, function (rendererBlockData) {
+        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
+        if (rendererBlockData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
+        }
+    });
+    pandora.forEach(this._data.groups, function (rendererGroupData) {
+        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
+        if (rendererGroupData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
+            if (!rendererGroupParent) {
+                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
+        }
+    });
+};
+
+/**
+ * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
+ * @private
+ */
+cg.Renderer.prototype._initializeListeners = function () {
+    var renderer = this;
+    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
+    this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgBlock)));
+    });
+};
+/**
  * Drags the d3Node around
  * @returns {d3.behavior.drag}
  * @private
@@ -3050,125 +3169,6 @@ cg.Renderer.prototype._createZoomBehavior = function () {
             renderer._config.zoom.scale = renderer._zoom.scale();
         }.bind(this));
     this._d3Svg.call(this._zoom);
-};
-/**
- * Initializes rendererGroups and rendererBlocks
- * Add parent and children references, and also cgBlocks references to renderer blocks
- * @private
- */
-cg.Renderer.prototype._initialize = function () {
-    this._initializeRendererBlocks();
-    this._initializeRendererConnections();
-    this._initializeRendererGroups();
-    this._initializeRendererGroupParents();
-    this._initializeListeners();
-};
-
-/**
- * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
- * @private
- */
-cg.Renderer.prototype._initializeRendererBlocks = function () {
-    var renderer = this;
-    pandora.forEach(this._data.blocks, function (blockData) {
-        renderer._createRendererBlock(blockData);
-    });
-};
-
-/**
- * Creates the rendererConnection between the rendererBlocks/rendererPoints
- * @private
- */
-cg.Renderer.prototype._initializeRendererConnections = function () {
-    var renderer = this;
-    pandora.forEach(this._data.connections, function (connectionData) {
-        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
-        if (!cgConnection) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}` does not exists", connectionData.cgConnectionIndex);
-        }
-        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
-        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
-        if (!outputRendererBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.outputRendererBlockId);
-        }
-        if (!inputRendererBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererBlock `{1}`", connectionData.cgConnectionIndex, connectionData.inputRendererBlockId);
-        }
-        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: OutputRendererBlock `{1}` is not holding a reference to the outputCgBlock `{2}`", connectionData.cgConnectionIndex, outputRendererBlock.id, cgConnection.cgOutputPoint.cgBlock.cgId);
-        }
-        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: InputRendererBlock `{1}` is not holding a reference to the inputCgBlock `{2}`", connectionData.cgConnectionIndex, inputRendererBlock.id, cgConnection.cgInputPoint.cgBlock.cgId);
-        }
-        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
-        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
-        if (!outputRendererPoint) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find outputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgOutputPoint.cgName);
-        }
-        if (!inputRendererPoint) {
-            throw new cg.RendererError("Renderer::_initialize() Connection at index `{0}`: Cannot find inputRendererPoint `{1}`", connectionData.cgConnectionIndex, cgConnection.cgInputPoint.cgName);
-        }
-        renderer._createRendererConnection({
-            "cgConnection": cgConnection,
-            "outputRendererPoint": outputRendererPoint,
-            "inputRendererPoint": inputRendererPoint
-        }, true);
-    });
-    // TODO: Check non linked cgConnections <=> rendererConnections
-};
-
-/**
- * Creates the rendererGroups
- * @private
- */
-cg.Renderer.prototype._initializeRendererGroups = function () {
-    var renderer = this;
-    pandora.forEach(this._data.groups, function (groupData) {
-        renderer._createRendererGroup(groupData);
-    });
-};
-
-/**
- * Assigns rendererGroup parents
- * @private
- */
-cg.Renderer.prototype._initializeRendererGroupParents = function () {
-    var renderer = this;
-    pandora.forEach(this._data.blocks, function (rendererBlockData) {
-        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
-        if (rendererBlockData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
-            if (!rendererGroupParent) {
-                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererBlock parent id `{0}`", rendererBlockData.parent);
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
-        }
-    });
-    pandora.forEach(this._data.groups, function (rendererGroupData) {
-        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
-        if (rendererGroupData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
-            if (!rendererGroupParent) {
-                throw new cg.RendererError("Renderer::_initializeRendererGroupParents() Cannot find rendererGroup parent id `{0}`", rendererGroupData.parent);
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
-        }
-    });
-};
-
-/**
- * Initializes the listeners to dynamically creates the rendererBlocks when a cgBlock is added
- * @private
- */
-cg.Renderer.prototype._initializeListeners = function () {
-    var renderer = this;
-    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
-    this._cgGraph.on("cg-block-name-changed", function (cgBlock) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgBlock)));
-    });
 };
 /**
  * Returns the rendererNode associated with the given id
@@ -3521,7 +3521,8 @@ cg.Renderer.prototype._createD3Blocks = function () {
         .append("svg:g")
         .classed("cg-points", true);
     this._createD3Points(createdD3Blocks.select(".cg-points"));
-    this._updateD3Blocks();
+    // TODO: getBBox returns 0 when the d3Blocks are not yet rendered
+    setTimeout(this._updateD3Blocks.bind(this), 10);
 };
 
 /**
@@ -3545,7 +3546,9 @@ cg.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
             return rendererBlock.cgBlock.cgName;
         });
     updatedD3Blocks
-        .each(renderer._computeRendererBlockSize.bind(renderer));
+        .each(function (rendererBlock) {
+            return renderer._computeRendererBlockSize(rendererBlock);
+        });
     updatedD3Blocks
         .attr("transform", function (rendererBlock) {
             return "translate(" + rendererBlock.position + ")";
@@ -3663,7 +3666,8 @@ cg.Renderer.prototype._createD3Groups = function () {
         .attr("class", "cg-title")
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "text-before-edge");
-    this._updateD3Groups();
+    // TODO: getBBox returns 0 when the d3Blocks are not yet rendered
+    setTimeout(this._updateD3Groups.bind(this), 10);
 };
 
 /**
@@ -3687,7 +3691,9 @@ cg.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
             return rendererGroup.description;
         });
     updatedD3Groups
-        .each(renderer._computeRendererGroupPositionAndSize.bind(renderer));
+        .each(function (rendererGroup) {
+            return renderer._computeRendererGroupPositionAndSize(rendererGroup);
+        });
     updatedD3Groups
         .attr("transform", function (rendererGroup) {
             return "translate(" + rendererGroup.position + ")";
@@ -4122,10 +4128,7 @@ cg.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
  */
 cg.Renderer.prototype._computeRendererBlockSize = function (rendererBlock) {
     var d3Block = this._getD3NodesFromRendererNodes([rendererBlock]);
-    var d3Text = d3Block.select("text");
-    if (d3Text.node()) {
-        rendererBlock.size[0] = Math.max(rendererBlock.size[0], d3Text.node().getBBox().width + this._config.block.padding * 2);
-    }
+    rendererBlock.size[0] = Math.max(rendererBlock.size[0], d3Block.select("text").node().getBBox().width + this._config.block.padding * 2);
 };
 
 /**
@@ -4150,10 +4153,7 @@ cg.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererG
         Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
     ];
     var d3Group = this._getD3NodesFromRendererNodes([rendererGroup]);
-    var d3Text = d3Group.select("text");
-    if (d3Text.node()) {
-        rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Text.node().getBBox().width + renderer._config.group.padding * 2);
-    }
+    rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Group.select("text").node().getBBox().width + renderer._config.group.padding * 2);
     (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
         if (rendererGroupParent) {
             renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
