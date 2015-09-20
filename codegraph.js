@@ -1874,16 +1874,9 @@ cg.Instruction = (function () {
                     "cgName": "value",
                     "cgValueType": data.cgReturn.cgValueType,
                     "cgTemplate": data.cgReturn.cgTemplate
-                }, {
-                    "cgName": "osifdhiufgdsfkgdfkdgsfdfgds",
-                    "cgType": "Stream"
                 }] : [
                 {
                     "cgName": "out",
-                    "cgType": "Stream"
-                },
-                {
-                    "cgName": "osifdhiufgdsfkgdfkdgsfdfgds",
                     "cgType": "Stream"
                 }
             ]
