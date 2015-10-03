@@ -79,13 +79,15 @@
             margin: 2px 0;
         }
 
+        .dialog-title {
+            font-size: 2em;
+            color: var(--cg-title-color);
+        }
+
     </style>
     <template>
         <paper-dialog id="addGroupDialog" modal>
-            <p>
-                The group's description will be displayed on the top of the group. It should describe what's in the
-                group. Groups are just optional blocks used to describe and organise your graph.
-            </p>
+            <div class="dialog-title">Add group</div>
             <paper-input label="Group description" value="{{_newGroupDescription}}"></paper-input>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
