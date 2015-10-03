@@ -6,14 +6,14 @@
      * Config
      */
     :root {
-        --cg-primary-color: #ffe488;
+        --default-primary-color: #ffe488;
         --cg-stream-color: #888888;
         --cg-background-color: #333333;
         --cg-title-color: hsla(0, 0%, 90%, 1);
         --cg-text-color: hsla(0, 0%, 60%, 1);
         --cg-error-color: var(--paper-red-700);
         --cg-display-font: "Josefin Sans", arial, sans-serif;
-        --paper-input-container-focus-color: var(--cg-primary-color);
+        --paper-input-container-focus-color: var(--default-primary-color);
         --paper-input-container-input-color: var(--cg-text-color);
         --paper-input-container-input: {
             font-family: var(--cg-display-font);
@@ -24,8 +24,8 @@
         --paper-button: {
             font-size: 0.9em;
             text-transform: none;
-            background: var(--cg-primary-color);
-            color: var(--cg-background-color);
+            border: 2px solid var(--default-primary-color);
+            color: var(--default-primary-color);
             border-radius: 0;
         };
         --paper-dialog: {
@@ -33,6 +33,10 @@
             color: var(--cg-text-color);
             font-family: var(--cg-display-font);
         };
+    }
+
+    .cg-non-clickable {
+        pointer-events: none;
     }
 
     /**
@@ -44,6 +48,7 @@
     }
     .cg-title {
         fill: var(--cg-title-color);
+        font-weight: bold;
     }
 
     /**
@@ -102,8 +107,8 @@
      * Variables
      */
     .cg-variable > rect, .cg-value > rect {
-        fill: var(--cg-primary-color);
-        stroke: var(--cg-primary-color);
+        fill: var(--default-primary-color);
+        stroke: var(--default-primary-color);
     }
 
     .cg-variable > text, .cg-value > text {
@@ -130,8 +135,8 @@
     .cg-input circle, .cg-output circle,
     .cg-input path, .cg-output path {
         stroke-width: 1;
-        stroke: var(--cg-primary-color);
-        fill: var(--cg-primary-color);
+        stroke: var(--default-primary-color);
+        fill: var(--default-primary-color);
     }
     .cg-input.cg-stream circle, .cg-output.cg-stream circle,
     .cg-input.cg-stream path, .cg-output.cg-stream path {
@@ -147,7 +152,7 @@
      */
     .cg-connection {
         stroke-width: 2px;
-        stroke: var(--cg-primary-color);
+        stroke: var(--default-primary-color);
         fill: transparent;
     }
     .cg-connection.cg-stream {

@@ -16,9 +16,23 @@
 -->
 <dom-module id="cg-inspector">
     <style>
+        :root { /* WTF?? Why do I need that?! */
+            --default-primary-color: #ffe488;
+            --text-primary-color: #222222;
+            --paper-input-container-focus-color: var(--default-primary-color);
+            --paper-input-container-input-color: var(--cg-text-color);
+            --paper-button: {
+                 font-size: 0.9em;
+                 text-transform: none;
+                 border: 2px solid var(--default-primary-color);
+                 color: var(--default-primary-color);
+                 border-radius: 0;
+             };
+        }
         :host {
             background: var(--cg-background-color);
             overflow: auto;
+            padding: 5px;
         }
 
         div {
@@ -26,14 +40,25 @@
             color: var(--cg-text-color);
         }
 
+
         .title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--cg-title-color);
+            padding-bottom: 10px;
+        }
+        .subtitle {
             color: var(--cg-title-color);
             padding-bottom: 10px;
         }
 
         .box {
             padding: 10px;
-            border-bottom: 3px solid #222222;
+        }
+
+        .box:not(:last-child) {
+            /*margin-bottom: 10px;*/
+            /*border-bottom: 2px solid #222222;*/
         }
 
         .row {
@@ -41,15 +66,14 @@
         }
 
         label {
-            width: 20%;
-            display: inline-block;
-            padding: 5px;
-            text-align: right;
+            display: block;
+            font-size: .8em;
+            padding-top: 5px;
         }
 
         input, paper-dropdown-menu {
-            width: 70%;
-            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         input[type="text"] {
@@ -57,37 +81,31 @@
             outline: none;
             border: none;
             background: transparent;
-            border-bottom: 2px solid #555555;
+            border-bottom: 1px solid #555555;
             color: var(--cg-text-color);
             font-family: var(--cg-display-font);
             font-size: 1em;
         }
 
         input[type="text"]:focus {
-            border-bottom: 2px solid var(--cg-primary-color);
+            border-bottom: 2px solid var(--default-primary-color);
         }
 
         #state > div:not(.active-state) {
             display: none;
         }
 
-        #compileResult > div {
-            width: 800px;
+        #addGroupDialog {
+            min-width: 350px;
         }
 
         .box paper-button {
             margin: 2px 0;
         }
-
-        .dialog-title {
-            font-size: 2em;
-            color: var(--cg-title-color);
-        }
-
     </style>
     <template>
         <paper-dialog id="addGroupDialog" modal>
-            <div class="dialog-title">Add group</div>
+            <div class="title">Add a new group</div>
             <paper-input label="Group description" value="{{_newGroupDescription}}"></paper-input>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
@@ -158,7 +176,7 @@
                             <input is="iron-input" bind-value="{{_blockName}}" placeholder="my_custom_variable"
                                    type="text">
                         </div>
-                        <div class="title" hidden$="{{_blockNoInput}}">Inputs</div>
+                        <div class="subtitle" hidden$="{{_blockNoInput}}">Inputs</div>
                         <div class="row">
                             <template is="dom-repeat" id="menu" items="{{_blockInputs}}">
                                 <label>{{item.cgName}}</label>
