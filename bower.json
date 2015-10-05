@@ -1,19 +1,18 @@
 {
-  "name": "codegraph",
+  "name": "dude-graph",
   "version": "0.1.1",
   "description": "Generic tool to visually represent a graph of connected blocks. It can be used for unreal-like blueprints, state machines, etc..",
-  "main": "codegraph.js",
-  "homepage": "https://github.com/dudeteam/codegraph",
+  "main": "dude-graph.js",
+  "homepage": "https://github.com/dudeteam/dude-graph",
   "authors": [
     "Jonathan Picques <jonathan.picques@gmail.com>",
     "Jeremie Taboada <taboada.jeremie@gmail.com>"
   ],
   "keywords": [
-    "code",
+    "dude",
     "graph",
     "blueprint",
     "node",
-    "editor",
     "graphnode"
   ],
   "license": "MIT",
@@ -21,16 +20,16 @@
     "bower_components",
     "node_modules",
     ".gitignore",
-    "tests",
     "demo",
     "lib",
-    "LICENSE.md",
-    "README.md",
     "gulpfile.js",
-    "codegraph.png"
+    "dude-graph.png",
+    "LICENSE.md",
+    "README.md"
   ],
   "dependencies": {
     "d3": "~3.5.6",
+    "lodash": "~3.10.1",
     "pandora": "~0.0.11",
     "polymer": "Polymer/polymer#^1.0.0",
     "magnet-state": "*",
@@ -44,8 +43,7 @@
     "paper-button": "PolymerElements/paper-button#~1.0.3",
     "paper-dialog": "PolymerElements/paper-dialog#~1.0.1",
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.5",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.1",
-    "lodash": "~3.10.1"
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

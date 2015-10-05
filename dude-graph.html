@@ -1,16 +1,18 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
-
 <!--
-`cg-element` is a Polymer element which creates a codegraph svg renderer which can be manipulated using several methods and properties.
+`dude-graph` is a Polymer element which creates a codegraph svg renderer which can be manipulated using several methods and properties.
 
-@group Codegraph
-@element cg-element
+@group dude-graph
+@element dude-graph
 @demo demo/index.html
 -->
-<dom-module id="cg-element">
+<dom-module id="dude-graph">
     <style>
         #svg {
             background: var(--cg-background-color);
@@ -22,39 +24,50 @@
         </div>
     </template>
 </dom-module>
-<script src="../lodash/lodash.js"></script>
 <script src="../d3/d3.js"></script>
-<script src="codegraph.js"></script>
+<script src="../lodash/lodash.js"></script>
+<script src="dude-graph.js"></script>
 <script>
     var CgElement = Polymer({
-        is: "cg-element",
+
+        is: "dude-graph",
+
         properties: {
 
             /**
              * This JSON represents the graph data for a given codegraph.
              */
-            graphData: Object,
+            graphData: {
+                "type": Object
+            },
 
             /**
              * This JSON represents the graphical blocks to render.
              */
-            rendererData: Object,
+            rendererData: {
+                "type": Object
+            },
 
             /**
              * A list of blocks models used as shortcuts to generate blocks.
              */
-            modelsData: Object,
+            modelsData: {
+                "type": Object
+            },
 
             /**
              * Holds a reference on the graph.
              */
-            graph: cg.Graph,
+            graph: {
+                "type": cg.Graph
+            },
 
             /**
              * Holds a reference on the renderer.
              */
-            renderer: cg.Renderer
-
+            renderer: {
+                "type": cg.Renderer
+            }
         },
         ready: function () {
             this.graph = new cg.Graph(this.graphData, this.modelsData);
@@ -71,17 +84,11 @@
             this.renderer.addBlockType(cg.Condition);
             this.renderer.addBlockType(cg.Getter);
             this.renderer.addBlockType(cg.Operator);
-
             this.graph.loader.load();
             this.renderer.initialize();
-
             this.renderer.on("error", function (error) {
                 this.fire("error", {error: error, message: error.message});
             }.bind(this));
-
-            // for debug
-            window.cgRenderer = this.renderer;
-            window.cgGraph = this.graph;
         }
     });
 </script>
