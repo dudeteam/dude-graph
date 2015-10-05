@@ -397,7 +397,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _editBlockClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._blockName;
                 pandora.forEach(this._blockInputs, function (input) {
-                    this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
+                    if (input.cgValue && input.cgValue !== "") {
+                        // TODO: Handle difference between "" and null
+                        this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
+                    } else {
+                        this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = null;
+                    }
                 }.bind(this));
             },
             _editGroupClicked: function () {
