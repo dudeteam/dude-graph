@@ -8,10 +8,79 @@
     <!-- firefox didn't for without adding this links in the index -->
     <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,700' rel='stylesheet' type='text/css'>
     <link href="../bower_components/components-font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link rel="import" href="dude-style.html">
     <link rel="import" href="../themes/dude.html">
     <link rel="import" href="demo-wrapper.html">
 </head>
 <body class="fullbleed">
     <demo-wrapper></demo-wrapper>
+    <script src="../bower_components/lodash/lodash.js"></script>
+    <script>
+        var DudeGraph = {};
+
+        DudeGraph.EventEmitter = function () {
+
+        };
+
+        DudeGraph.EventEmitter.prototype.emitEvent = function () {
+            console.log("emit event!!");
+        };
+
+        /**
+         * Block is the base class for all codegraph nodes
+         * A Block has a list of inputs and outputs points
+         * @param {String} name
+         * @param {String} typeName
+         * @constructor
+         */
+        DudeGraph.Block = function (name, typeName) {
+
+            /**
+             * Returns the typename of this block.
+             * @type {String}
+             */
+            Object.defineProperty(this, "typeName", {
+                get: function () {
+                    return typeName || "Block";
+                }.bind(this)
+            });
+
+        };
+
+        /**
+         * Adds a new point to this block.
+         */
+        DudeGraph.Block.prototype.addPoint = function () {
+            console.log("Add point to ", this.name);
+        };
+
+        /**
+         * This block represents a simple function that takes some inputs and returns one or zero output.
+         * @extends {cg.Block}
+         * @param {String} name The name of this block
+         * @constructor
+         */
+        DudeGraph.Function = function (name) {
+            DudeGraph.Block.call(this, name, "Function");
+        };
+
+        _.extend(DudeGraph.Function.prototype,
+            DudeGraph.Block.prototype,
+            DudeGraph.EventEmitter.prototype
+        );
+
+        DudeGraph.Function.prototype.myMethod = function () {
+            console.log("coucou");
+        };
+
+        var func = new DudeGraph.Function("myFunction");
+
+        func.addPoint();
+        func.emitEvent();
+        func.myMethod();
+
+        console.log(func.dgTypeName);
+
+    </script>
 </body>
 </html>

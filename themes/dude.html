@@ -43,11 +43,11 @@
      * Typography
      */
     text {
-        fill: var(--cg-text-color);
-        font-family: var(--cg-display-font);
+        fill: var(--dude-content-text-color);
+        font-family: var(--dude-primary-text-font);
     }
     .cg-title {
-        fill: var(--cg-title-color);
+        fill: var(--dude-title-text-color);
         font-weight: bold;
     }
 
@@ -63,27 +63,25 @@
      * Groups
      */
     .cg-group > rect {
-        fill: #fff;
-        stroke: #fff;
-        opacity: 0.1;
+        @apply(--dude-graph-group);
+    }
+    .cg-group:hover > rect {
+        @apply(--dude-graph-group-hover)
     }
     .cg-group.cg-selected > rect {
-        opacity: 0.15;
+        @apply(--dude-graph-group-selected);
     }
-    .cg-group.cg-active > rect {
-        stroke-width: 10px;
-    }
-
     /**
      * Blocks
      */
     .cg-block > rect {
-        fill: #222;
-        stroke: #222;
-        opacity: 0.8;
+        @apply(--dude-graph-block);
+    }
+    .cg-block:hover > rect {
+        @apply(--dude-graph-block-hover);
     }
     .cg-block.cg-selected > rect {
-        opacity: 1;
+        @apply(--dude-graph-block-selected);
     }
 
     /**
@@ -92,23 +90,13 @@
     .cg-block, .cg-group {
         cursor: move;
     }
-    .cg-block > rect, .cg-group > rect {
-        transition-duration: .2s;
-        transition-property: stroke-width;
-    }
-    .cg-block:hover > rect, .cg-group:hover > rect {
-        stroke-width: 8px;
-    }
-    .cg-block.cg-selected > rect, .cg-group.cg-selected > rect {
-        stroke-width: 8px;
-    }
 
     /**
      * Variables
      */
     .cg-variable > rect, .cg-value > rect {
-        fill: var(--default-primary-color);
-        stroke: var(--default-primary-color);
+        fill: var(--dude-type-number-color);
+        stroke: var(--dude-type-number-color);
     }
 
     .cg-variable > text, .cg-value > text {
@@ -117,10 +105,10 @@
     .cg-variable .cg-points text, .cg-value .cg-points text {
         fill: transparent;
     }
-    .cg-variable .cg-input circle, .cg-variable .cg-output circle,
-    .cg-variable .cg-input path, .cg-variable .cg-output path,
-    .cg-value .cg-input circle, .cg-value .cg-output circle,
-    .cg-value .cg-input path, .cg-value .cg-output path{
+    .cg-variable .cg-output circle,
+    .cg-variable .cg-output path,
+    .cg-value .cg-output circle,
+    .cg-value .cg-output path{
         stroke-width: 1;
         stroke: #333;
         fill: #333;
@@ -135,13 +123,13 @@
     .cg-input circle, .cg-output circle,
     .cg-input path, .cg-output path {
         stroke-width: 1;
-        stroke: var(--default-primary-color);
-        fill: var(--default-primary-color);
+        stroke: var(--dude-type-number-color);
+        fill: var(--dude-type-number-color);
     }
     .cg-input.cg-stream circle, .cg-output.cg-stream circle,
     .cg-input.cg-stream path, .cg-output.cg-stream path {
-        stroke: var(--cg-stream-color);
-        fill: var(--cg-stream-color);
+        stroke: var(--dude-type-stream-color);
+        fill: var(--dude-type-stream-color);
     }
     .cg-input.cg-empty path, .cg-output.cg-empty path {
         fill: transparent;
@@ -152,10 +140,10 @@
      */
     .cg-connection {
         stroke-width: 2px;
-        stroke: var(--default-primary-color);
+        stroke: var(--dude-type-number-color);
         fill: transparent;
     }
     .cg-connection.cg-stream {
-        stroke: var(--cg-stream-color);
+        stroke: var(--dude-type-stream-color);
     }
 </style>
