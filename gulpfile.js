@@ -2,7 +2,6 @@ var gulp = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var jshint = require("gulp-jshint");
-var mocha = require("gulp-mocha");
 var shell = require("gulp-shell");
 
 var CG_SOURCES = [
@@ -38,11 +37,6 @@ gulp.task("build", ["jshint"], function () {
 
 gulp.task("watch", ["build"], function () {
     gulp.watch(CG_SOURCES, ["jshint", "build"]);
-});
-
-gulp.task("test", ["build"], function () {
-    return gulp.src(['test/*.js', 'tests/**/*.js'], {read: false})
-        .pipe(mocha({reporter: 'spec'}));
 });
 
 gulp.task("serve", ["watch"], shell.task("polyserve"));
