@@ -1,5 +1,5 @@
 <link rel="import" href="../dude-graph.html">
-<link rel="import" href="../cg-inspector.html">
+<link rel="import" href="../dude-graph-inspector.html">
 <dom-module id="demo-wrapper">
     <style>
         #wrapper {
@@ -18,12 +18,12 @@
                         models-data="{{modelsData}}"
                         on-error="_handleError">
             </dude-graph>
-            <cg-inspector id="inspector"
+            <dude-graph-inspector id="inspector"
                           class="panel layout horizontal flex"
                           models="{{modelsData}}"
                           on-save="_graphSaved"
                           on-compile="_graphCompiled"
-                          on-error="_handleError"></cg-inspector>
+                          on-error="_handleError"></dude-graph-inspector>
         </div>
     </template>
     <script src="dude-models.js"></script>
