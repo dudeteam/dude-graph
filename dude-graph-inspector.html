@@ -361,7 +361,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         } else {
                             data.cgName = e.detail.item.name;
                         }
-                        data.cgId = cg.UUID.generate();
+                        data.cgId = dudeGraph.UUID.generate();
                         this.element.graph.loader.loadBlock(data);
                     }
                 }
@@ -375,8 +375,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.fire("error", {message: "A `name` is required to create a variable"});
                     return;
                 }
-                var variable = new cg.Variable(this.element.graph, {
-                    cgId: cg.UUID.generate(),
+                var variable = new dudeGraph.Variable(this.element.graph, {
+                    cgId: dudeGraph.UUID.generate(),
                     cgName: this._varName,
                     cgValueType: this._varType,
                     cgValue: this._varValue
@@ -429,7 +429,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
             _save: function () {
                 try {
-                    this.fire("save", new cg.JSONSaver().save(this.element.renderer, this.element.graph));
+                    this.fire("save", new dudeGraph.JSONSaver().save(this.element.renderer, this.element.graph));
                 } catch (e) {
                     this.fire("error", {error: e, message: e.message});
                 }

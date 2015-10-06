@@ -59,31 +59,31 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Holds a reference on the graph.
              */
             graph: {
-                "type": cg.Graph
+                "type": dudeGraph.Graph
             },
 
             /**
              * Holds a reference on the renderer.
              */
             renderer: {
-                "type": cg.Renderer
+                "type": dudeGraph.Renderer
             }
         },
         ready: function () {
-            this.graph = new cg.Graph(this.graphData, this.modelsData);
-            this.renderer = new cg.Renderer(this.$.svg, this.graph, this.rendererData);
-            this.renderer.addBlockType(cg.Block);
-            this.renderer.addBlockType(cg.Function);
-            this.renderer.addBlockType(cg.Instruction);
-            this.renderer.addBlockType(cg.Delegate);
-            this.renderer.addBlockType(cg.Assignation);
-            this.renderer.addBlockType(cg.Variable);
-            this.renderer.addBlockType(cg.Value);
-            this.renderer.addBlockType(cg.Each);
-            this.renderer.addBlockType(cg.Range);
-            this.renderer.addBlockType(cg.Condition);
-            this.renderer.addBlockType(cg.Getter);
-            this.renderer.addBlockType(cg.Operator);
+            this.graph = new dudeGraph.Graph(this.graphData, this.modelsData);
+            this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData);
+            this.renderer.addBlockType(dudeGraph.Block);
+            this.renderer.addBlockType(dudeGraph.Function);
+            this.renderer.addBlockType(dudeGraph.Instruction);
+            this.renderer.addBlockType(dudeGraph.Delegate);
+            this.renderer.addBlockType(dudeGraph.Assignation);
+            this.renderer.addBlockType(dudeGraph.Variable);
+            this.renderer.addBlockType(dudeGraph.Value);
+            this.renderer.addBlockType(dudeGraph.Each);
+            this.renderer.addBlockType(dudeGraph.Range);
+            this.renderer.addBlockType(dudeGraph.Condition);
+            this.renderer.addBlockType(dudeGraph.Getter);
+            this.renderer.addBlockType(dudeGraph.Operator);
             this.graph.loader.load();
             this.renderer.initialize();
             this.renderer.on("error", function (error) {
