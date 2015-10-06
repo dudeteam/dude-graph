@@ -11,4 +11,3 @@ TODO
 
 - Handle types
 - Handle value assignation while using models (removing cgModel from json?)
->>>>>>> Stashed changes

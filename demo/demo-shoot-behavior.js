@@ -16,263 +16,263 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                 }
             ]
         },
-    //    {
-    //        "cgType": "Condition",
-    //        "cgId": "1",
-    //        "cgName": "Condition"
-    //    },
-    //    {
-    //        "cgType": "Operator",
-    //        "cgId": "2",
-    //        "cgName": "greater_than",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "first",
-    //                "cgValueType": "Number"
-    //            },
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "second",
-    //                "cgValueType": "Number"
-    //            }
-    //        ],
-    //        "cgReturn": {
-    //            "cgType": "Point",
-    //            "cgName": "value",
-    //            "cgValueType": "Boolean"
-    //        }
-    //    },
-    //    {
-    //        "cgType": "Instruction",
-    //        "cgId": "3",
-    //        "cgName": "Entity.add_entity",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "this",
-    //                "cgValueType": "Entity"
-    //            },
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "name",
-    //                "cgValueType": "String"
-    //            }
-    //        ],
-    //        "cgReturn": {
-    //            "cgType": "Point",
-    //            "cgName": "value",
-    //            "cgValueType": "Entity"
-    //        }
-    //    },
-    //    {
-    //        "cgType": "Variable",
-    //        "cgId": "4",
-    //        "cgName": "nb_bullets",
-    //        "cgValueType": "Number"
-    //    },
-    //    {
-    //        "cgType": "Value",
-    //        "cgId": "5",
-    //        "cgValue": 10,
-    //        "cgValueType": "Number"
-    //    },
-    //    {
-    //        "cgType": "Variable",
-    //        "cgId": "6",
-    //        "cgName": "entity",
-    //        "cgValueType": "Entity"
-    //    },
-    //    {
-    //        "cgType": "Value",
-    //        "cgId": "7",
-    //        "cgValue": "bullet",
-    //        "cgValueType": "String"
-    //    },
-    //    {
-    //        "cgType": "Delegate",
-    //        "cgId": "8",
-    //        "cgName": "on_start",
-    //        "cgOutputs": [
-    //            {
-    //                "cgType": "Stream",
-    //                "cgName": "out"
-    //            }
-    //        ]
-    //    },
-    //    {
-    //        "cgType": "Assignation",
-    //        "cgId": "9",
-    //        "cgName": "Assignation",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "this",
-    //                "cgValueType": "Number"
-    //            },
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "other",
-    //                "cgValueType": "Number"
-    //            }
-    //        ],
-    //        "cgReturn": null
-    //    },
-    //    {
-    //        "cgType": "Delegate",
-    //        "cgId": "10",
-    //        "cgName": "on_update",
-    //        "cgOutputs": [
-    //            {
-    //                "cgType": "Stream",
-    //                "cgName": "out"
-    //            }
-    //        ]
-    //    },
-    //    {
-    //        "cgType": "Instruction",
-    //        "cgId": "11",
-    //        "cgName": "info",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "message",
-    //                "cgValueType": "String"
-    //            }
-    //        ],
-    //        "cgReturn": null
-    //    },
-    //    {
-    //        "cgType": "Function",
-    //        "cgId": "12",
-    //        "cgName": "to_string",
-    //        "cgTemplates": [
-    //            "Number",
-    //            "Boolean",
-    //            "String",
-    //            "Entity"
-    //        ],
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "data",
-    //                "cgValueType": "Number"
-    //            }
-    //        ],
-    //        "cgReturn": {
-    //            "cgType": "Point",
-    //            "cgName": "value",
-    //            "cgValueType": "String"
-    //        }
-    //    },
-    //    {
-    //        "cgType": "Operator",
-    //        "cgId": "13",
-    //        "cgName": "subtract",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "first",
-    //                "cgValueType": "Number"
-    //            },
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "second",
-    //                "cgValueType": "Number"
-    //            }
-    //        ],
-    //        "cgReturn": {
-    //            "cgType": "Point",
-    //            "cgName": "value",
-    //            "cgValueType": "Number"
-    //        }
-    //    },
-    //    {
-    //        "cgType": "Assignation",
-    //        "cgId": "14",
-    //        "cgName": "Assignation",
-    //        "cgTemplates": {},
-    //        "cgInputs": [
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "this",
-    //                "cgValueType": "Number"
-    //            },
-    //            {
-    //                "cgType": "Point",
-    //                "cgName": "other",
-    //                "cgValueType": "Number"
-    //            }
-    //        ],
-    //        "cgReturn": null
-    //    },
-    //    {
-    //        "cgType": "Value",
-    //        "cgId": "15",
-    //        "cgValue": 50,
-    //        "cgValueType": "Number"
-    //    },
-    //    {
-    //        "cgType": "Value",
-    //        "cgId": "16",
-    //        "cgValue": 1,
-    //        "cgValueType": "Number"
-    //    }
-    //],
-    //"connections": [
-    //    {
-    //        "cgOutputName": "out",
-    //        "cgOutputBlockId": "0",
-    //        "cgInputName": "in",
-    //        "cgInputBlockId": "1"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "2",
-    //        "cgInputName": "test",
-    //        "cgInputBlockId": "1"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "4",
-    //        "cgInputName": "first",
-    //        "cgInputBlockId": "2"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "4",
-    //        "cgInputName": "this",
-    //        "cgInputBlockId": "9"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "4",
-    //        "cgInputName": "this",
-    //        "cgInputBlockId": "14"
-    //    },
-    //    {
-    //        "cgOutputName": "true",
-    //        "cgOutputBlockId": "1",
-    //        "cgInputName": "in",
-    //        "cgInputBlockId": "3"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "6",
-    //        "cgInputName": "this",
-    //        "cgInputBlockId": "3"
-    //    },
-    //    {
-    //        "cgOutputName": "value",
-    //        "cgOutputBlockId": "7",
-    //        "cgInputName": "name",
-    //        "cgInputBlockId": "3"
-    //    }
+        {
+            "cgType": "Condition",
+            "cgId": "1",
+            "cgName": "Condition"
+        },
+        {
+            "cgType": "Operator",
+            "cgId": "2",
+            "cgName": "greater_than",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "first",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "second",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgReturn": {
+                "cgType": "Point",
+                "cgName": "value",
+                "cgValueType": "Boolean"
+            }
+        },
+        {
+            "cgType": "Instruction",
+            "cgId": "3",
+            "cgName": "Entity.add_entity",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Entity"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "name",
+                    "cgValueType": "String"
+                }
+            ],
+            "cgReturn": {
+                "cgType": "Point",
+                "cgName": "value",
+                "cgValueType": "Entity"
+            }
+        },
+        {
+            "cgType": "Variable",
+            "cgId": "4",
+            "cgName": "nb_bullets",
+            "cgValueType": "Number"
+        },
+        {
+            "cgType": "Value",
+            "cgId": "5",
+            "cgValue": 10,
+            "cgValueType": "Number"
+        },
+        {
+            "cgType": "Variable",
+            "cgId": "6",
+            "cgName": "entity",
+            "cgValueType": "Entity"
+        },
+        {
+            "cgType": "Value",
+            "cgId": "7",
+            "cgValue": "bullet",
+            "cgValueType": "String"
+        },
+        {
+            "cgType": "Delegate",
+            "cgId": "8",
+            "cgName": "on_start",
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
+                }
+            ]
+        },
+        {
+            "cgType": "Assignation",
+            "cgId": "9",
+            "cgName": "Assignation",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "other",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgReturn": null
+        },
+        {
+            "cgType": "Delegate",
+            "cgId": "10",
+            "cgName": "on_update",
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
+                }
+            ]
+        },
+        {
+            "cgType": "Instruction",
+            "cgId": "11",
+            "cgName": "info",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "message",
+                    "cgValueType": "String"
+                }
+            ],
+            "cgReturn": null
+        },
+        {
+            "cgType": "Function",
+            "cgId": "12",
+            "cgName": "to_string",
+            "cgTemplates": [
+                "Number",
+                "Boolean",
+                "String",
+                "Entity"
+            ],
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "data",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgReturn": {
+                "cgType": "Point",
+                "cgName": "value",
+                "cgValueType": "String"
+            }
+        },
+        {
+            "cgType": "Operator",
+            "cgId": "13",
+            "cgName": "subtract",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "first",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "second",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgReturn": {
+                "cgType": "Point",
+                "cgName": "value",
+                "cgValueType": "Number"
+            }
+        },
+        {
+            "cgType": "Assignation",
+            "cgId": "14",
+            "cgName": "Assignation",
+            "cgTemplates": {},
+            "cgInputs": [
+                {
+                    "cgType": "Point",
+                    "cgName": "this",
+                    "cgValueType": "Number"
+                },
+                {
+                    "cgType": "Point",
+                    "cgName": "other",
+                    "cgValueType": "Number"
+                }
+            ],
+            "cgReturn": null
+        },
+        {
+            "cgType": "Value",
+            "cgId": "15",
+            "cgValue": 50,
+            "cgValueType": "Number"
+        },
+        {
+            "cgType": "Value",
+            "cgId": "16",
+            "cgValue": 1,
+            "cgValueType": "Number"
+        }
+    ],
+    "connections": [
+        {
+            "cgOutputName": "out",
+            "cgOutputBlockId": "0",
+            "cgInputName": "in",
+            "cgInputBlockId": "1"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "2",
+            "cgInputName": "test",
+            "cgInputBlockId": "1"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "4",
+            "cgInputName": "first",
+            "cgInputBlockId": "2"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "4",
+            "cgInputName": "this",
+            "cgInputBlockId": "9"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "4",
+            "cgInputName": "this",
+            "cgInputBlockId": "14"
+        },
+        {
+            "cgOutputName": "true",
+            "cgOutputBlockId": "1",
+            "cgInputName": "in",
+            "cgInputBlockId": "3"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "6",
+            "cgInputName": "this",
+            "cgInputBlockId": "3"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "7",
+            "cgInputName": "name",
+            "cgInputBlockId": "3"
+        }
     ]
 };
 var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
