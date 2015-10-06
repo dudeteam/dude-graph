@@ -55,7 +55,7 @@
                 this.$.inspector.bindBuilder(new DudeSaver());
             },
             _graphSaved: function (e) {
-                console.log(e.detail);
+                console.log(JSON.stringify(e.detail, null, 2));
             },
             _graphCompiled: function (e) {
                 console.log(e.detail);
