@@ -72,18 +72,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ready: function () {
             this.graph = new dudeGraph.Graph(this.graphData, this.modelsData);
             this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData);
-            this.renderer.addBlockType(dudeGraph.Block);
-            this.renderer.addBlockType(dudeGraph.Function);
-            this.renderer.addBlockType(dudeGraph.Instruction);
-            this.renderer.addBlockType(dudeGraph.Delegate);
-            this.renderer.addBlockType(dudeGraph.Assignation);
-            this.renderer.addBlockType(dudeGraph.Variable);
-            this.renderer.addBlockType(dudeGraph.Value);
-            this.renderer.addBlockType(dudeGraph.Each);
-            this.renderer.addBlockType(dudeGraph.Range);
-            this.renderer.addBlockType(dudeGraph.Condition);
-            this.renderer.addBlockType(dudeGraph.Getter);
-            this.renderer.addBlockType(dudeGraph.Operator);
+            this.renderer.addBlockType("Block", dudeGraph.Block);
+            this.renderer.addBlockType("Function", dudeGraph.Function);
+            this.renderer.addBlockType("Instruction", dudeGraph.Instruction);
+            this.renderer.addBlockType("Delegate", dudeGraph.Delegate);
+            this.renderer.addBlockType("Assignation", dudeGraph.Assignation);
+            this.renderer.addBlockType("Variable", dudeGraph.Variable);
+            this.renderer.addBlockType("Value", dudeGraph.Value);
+            this.renderer.addBlockType("Each", dudeGraph.Each);
+            this.renderer.addBlockType("Range", dudeGraph.Range);
+            this.renderer.addBlockType("Condition", dudeGraph.Condition);
+            this.renderer.addBlockType("Getter", dudeGraph.Getter);
+            this.renderer.addBlockType("Operator", dudeGraph.Operator);
             this.graph.loader.load();
             this.renderer.initialize();
             this.renderer.on("error", function (error) {
