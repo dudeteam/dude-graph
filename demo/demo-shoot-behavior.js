@@ -4,10 +4,12 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Delegate",
             "cgId": "0",
             "cgName": "on_key_down",
+            "cgInputs": [],
             "cgOutputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "out"
+                    "cgName": "out",
+                    "cgValueType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -23,7 +25,8 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgInputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "in"
+                    "cgName": "in",
+                    "cgValueType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -34,11 +37,13 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgOutputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "true"
+                    "cgName": "true",
+                    "cgValueType": "Stream"
                 },
                 {
                     "cgType": "Stream",
-                    "cgName": "false"
+                    "cgName": "false",
+                    "cgValueType": "Stream"
                 }
             ]
         },
@@ -46,7 +51,6 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Operator",
             "cgId": "2",
             "cgName": "greater_than",
-            "cgTemplates": {},
             "cgInputs": [
                 {
                     "cgType": "Point",
@@ -71,11 +75,11 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Instruction",
             "cgId": "3",
             "cgName": "Entity.add_entity",
-            "cgTemplates": {},
             "cgInputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "in"
+                    "cgName": "in",
+                    "cgValueType": "Stream"
                 },
                 {
                     "cgType": "Point",
@@ -92,8 +96,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                 {
                     "cgType": "Point",
                     "cgName": "value",
-                    "cgValueType": "Number",
-                    "cgMaxConnections": Infinity
+                    "cgValueType": "Number"
                 }
             ]
         },
@@ -101,6 +104,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgType": "Variable",
             "cgId": "4",
             "cgName": "nb_bullets",
+            "cgInputs": [],
             "cgOutputs": [
                 {
                     "cgType": "Point",
@@ -283,15 +287,45 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
         }
     ],
     "connections": [
-        {"cgOutputBlockId": "0", "cgOutputName": "out", "cgInputBlockId": "1", "cgInputName": "in"},
-        {"cgOutputBlockId": "2", "cgOutputName": "value", "cgInputBlockId": "1", "cgInputName": "test"},
-        {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "first"},
-        {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "9", "cgInputName": "this"},
-        {"cgOutputBlockId": "4", "cgOutputName": "value", "cgInputBlockId": "14", "cgInputName": "this"},
-        {"cgOutputBlockId": "5", "cgOutputName": "value", "cgInputBlockId": "2", "cgInputName": "second"},
-        {"cgOutputBlockId": "1", "cgOutputName": "true", "cgInputBlockId": "3", "cgInputName": "in"},
-        {"cgOutputBlockId": "6", "cgOutputName": "value", "cgInputBlockId": "3", "cgInputName": "this"},
-        {"cgOutputBlockId": "7", "cgOutputName": "value", "cgInputBlockId": "3", "cgInputName": "name"}
+        {"cgOutputName": "out", "cgOutputBlockId": "0", "cgInputName": "in", "cgInputBlockId": "1"},
+        {"cgOutputName": "value", "cgOutputBlockId": "2", "cgInputName": "test", "cgInputBlockId": "1"},
+        {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "first", "cgInputBlockId": "2" },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "4",
+            "cgInputName": "this",
+            "cgInputBlockId": "9"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "4",
+            "cgInputName": "this",
+            "cgInputBlockId": "14"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "5",
+            "cgInputName": "second",
+            "cgInputBlockId": "2"
+        },
+        {
+            "cgOutputName": "true",
+            "cgOutputBlockId": "1",
+            "cgInputName": "in",
+            "cgInputBlockId": "3"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "6",
+            "cgInputName": "this",
+            "cgInputBlockId": "3"
+        },
+        {
+            "cgOutputName": "value",
+            "cgOutputBlockId": "7",
+            "cgInputName": "name",
+            "cgInputBlockId": "3"
+        }
     ]
 };
 var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
