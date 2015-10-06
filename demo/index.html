@@ -29,19 +29,33 @@
         /**
          * Block is the base class for all codegraph nodes
          * A Block has a list of inputs and outputs points
-         * @param {String} name
-         * @param {String} typeName
+         * @param {Object} graph
+         * @param {String} blockName
+         * @param {String} blockType
          * @constructor
          */
-        DudeGraph.Block = function (name, typeName) {
+        DudeGraph.Block = function (graph, blockName, blockType) {
+
+            this._graph = graph;
+
+            /**
+             * Returns the name of this block.
+             * @type {String}
+             */
+            Object.defineProperty(this, "blockName", {
+                get: function () {
+                    return this._blockName;
+                }.bind(this)
+            });
+            this._blockName = blockName;
 
             /**
              * Returns the typename of this block.
              * @type {String}
              */
-            Object.defineProperty(this, "typeName", {
+            Object.defineProperty(this, "blockType", {
                 get: function () {
-                    return typeName || "Block";
+                    return blockType || "Block";
                 }.bind(this)
             });
 
@@ -51,17 +65,18 @@
          * Adds a new point to this block.
          */
         DudeGraph.Block.prototype.addPoint = function () {
-            console.log("Add point to ", this.name);
+            console.log("Add point to ", this.blockName);
         };
 
         /**
          * This block represents a simple function that takes some inputs and returns one or zero output.
          * @extends {dudeGraph.Block}
-         * @param {String} name The name of this block
+         * @param {Object} graph
+         * @param {String} blockName The name of this block
          * @constructor
          */
-        DudeGraph.Function = function (name) {
-            DudeGraph.Block.call(this, name, "Function");
+        DudeGraph.Function = function (graph, blockName) {
+            DudeGraph.Block.call(this, graph, blockName, "Function");
         };
 
         _.extend(DudeGraph.Function.prototype,
@@ -73,13 +88,13 @@
             console.log("coucou");
         };
 
-        var func = new DudeGraph.Function("myFunction");
+        var func = new DudeGraph.Function(null, "myFunction");
 
         func.addPoint();
         func.emitEvent();
         func.myMethod();
 
-        console.log(func.dgTypeName);
+        console.log(func.blockType);
 
     </script>
 </body>
