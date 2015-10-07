@@ -1694,6 +1694,21 @@ dudeGraph.Assignation = (function () {
      */
     var Assignation = pandora.class_("Assignation", dudeGraph.Block, function (cgGraph, data) {
         dudeGraph.Block.call(this, cgGraph, data, "Assignation");
+        if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
+            throw new Error("Assignation `" + this.cgId + "` must have an input `in` of type `Stream`");
+        }
+        if (!(this.inputByName("this") instanceof dudeGraph.Point)) {
+            throw new Error("Assignation `" + this.cgId + "` must have an input `this` of type `Point`");
+        }
+        if (!(this.inputByName("other") instanceof dudeGraph.Point)) {
+            throw new Error("Assignation `" + this.cgId + "` must have an input `other` of type `Point`");
+        }
+        if (this.inputByName("this")._cgValueType !== this.inputByName("other")._cgValueType) {
+            throw new Error("Assignation `" + this.cgId + "` inputs `this` and `other` must have the same cgValueType");
+        }
+        if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+            throw new Error("Assignation `" + this.cgId + "` must have an output `out` of type `Stream`");
+        }
     });
 
     /**
@@ -1743,16 +1758,16 @@ dudeGraph.Condition = (function () {
     var Condition = pandora.class_("Condition", dudeGraph.Block, function (cgGraph, data) {
         dudeGraph.Block.call(this, cgGraph, data, "Condition");
         if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
-            throw new Error("Condition must have an input `in` of type `Stream`");
+            throw new Error("Condition `" + this.cgId + "` must have an input `in` of type `Stream`");
         }
         if (!(this.inputByName("test") instanceof dudeGraph.Point) || this.inputByName("test").cgValueType !== "Boolean") {
-            throw new Error("Condition must have an input `test` of type `Point` of cgValueType `Boolean`");
+            throw new Error("Condition `" + this.cgId + "` must have an input `test` of type `Point` of cgValueType `Boolean`");
         }
         if (!(this.outputByName("true") instanceof dudeGraph.Stream)) {
-            throw new Error("Condition must have an output `true` of type `Stream`");
+            throw new Error("Condition `" + this.cgId + "` must have an output `true` of type `Stream`");
         }
         if (!(this.outputByName("false") instanceof dudeGraph.Stream)) {
-            throw new Error("Condition must have an output `false` of type `Stream`");
+            throw new Error("Condition `" + this.cgId + "` must have an output `false` of type `Stream`");
         }
     });
 
@@ -1802,6 +1817,9 @@ dudeGraph.Delegate = (function () {
      */
     var Delegate = pandora.class_("Delegate", dudeGraph.Block, function (cgGraph, data) {
         dudeGraph.Block.call(this, cgGraph, data, "Delegate");
+        if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+            throw new Error("Delegate `" + this.cgId + "` must have an output `out` of type `Stream`");
+        }
     });
 
     /**
@@ -1917,12 +1935,6 @@ dudeGraph.Getter = (function () {
      * @constructor
      */
     var Getter = pandora.class_("Getter", dudeGraph.Block, function (cgGraph, data) {
-        if (data.cgClassType === undefined) {
-            throw new Error("Getter `" + data.cgId + "` should specify a class type");
-        }
-        if (data.cgValueType === undefined) {
-            throw new Error("Getter `" + data.cgId + "` should specify a value type");
-        }
         dudeGraph.Block.call(this, cgGraph, data, "Getter");
     });
 
@@ -1930,6 +1942,8 @@ dudeGraph.Getter = (function () {
      * Getter factory
      * @param {dudeGraph.Graph} cgGraph
      * @param {Object} data
+     * @param {String} data.cgClassType - The getter class type
+     * @param {String} data.cgValueType - The getter property type
      */
     Getter.buildBlock = function (cgGraph, data) {
         return new Getter(cgGraph, _.merge(data, {
@@ -1961,6 +1975,12 @@ dudeGraph.Instruction = (function () {
      */
     var Instruction = pandora.class_("Instruction", dudeGraph.Block, function (cgGraph, data) {
         dudeGraph.Block.call(this, cgGraph, data, "Instruction");
+        if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
+            throw new Error("Instruction `" + this.cgId + "` must have an input `in` of type `Stream`");
+        }
+        if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+            throw new Error("Instruction `" + this.cgId + "` must have an output `out` of type `Stream`");
+        }
     });
 
     /**
@@ -2264,6 +2284,9 @@ dudeGraph.Variable = (function () {
      */
     var Variable = pandora.class_("Variable", dudeGraph.Block, function (cgGraph, data) {
         dudeGraph.Block.call(this, cgGraph, data, "Variable");
+        if (!(this.outputByName("value") instanceof dudeGraph.Point)) {
+            throw new Error("Variable `" + this.cgId + "` must have an output `value` of type `Point`");
+        }
 
         /**
          * The type of this variable, the block will return a point of this type.
@@ -3029,6 +3052,137 @@ dudeGraph.Renderer = (function () {
 
 })();
 /**
+ * Initializes rendererGroups and rendererBlocks
+ * Add parent and children references, and also cgBlocks references to renderer blocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._initialize = function () {
+    this._initializeRendererBlocks();
+    this._initializeRendererConnections();
+    this._initializeRendererGroups();
+    this._initializeRendererGroupParents();
+    this._initializeListeners();
+};
+
+/**
+ * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererBlocks = function () {
+    var renderer = this;
+    _.forEach(this._data.blocks, function (blockData) {
+        renderer._createRendererBlock(blockData);
+    });
+};
+
+/**
+ * Creates the rendererConnection between the rendererBlocks/rendererPoints
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererConnections = function () {
+    var renderer = this;
+    _.forEach(this._data.connections, function (connectionData) {
+        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
+        if (!cgConnection) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex + "` does not exists");
+        }
+        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
+        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
+
+        if (!outputRendererBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                    "`: Cannot find outputRendererBlock `" + connectionData.outputRendererBlockId + "`");
+        }
+        if (!inputRendererBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                    "`: Cannot find inputRendererBlock `" + connectionData.inputRendererBlockId + "`");
+        }
+        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: OutputRendererBlock `" + outputRendererBlock.id +
+                "` is not holding a reference to the outputCgBlock `" + cgConnection.cgOutputPoint.cgBlock.cgId + "`");
+        }
+        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: InputRendererBlock `" + inputRendererBlock.id +
+                "` is not holding a reference to the inputCgBlock `" + cgConnection.cgInputPoint.cgBlock.cgId + "`");
+        }
+        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
+        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
+        if (!outputRendererPoint) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: Cannot find outputRendererPoint `" + cgConnection.cgOutputPoint.cgName + "`");
+        }
+        if (!inputRendererPoint) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: Cannot find inputRendererPoint `" + cgConnection.cgInputPoint.cgName + "`");
+        }
+        renderer._createRendererConnection({
+            "cgConnection": cgConnection,
+            "outputRendererPoint": outputRendererPoint,
+            "inputRendererPoint": inputRendererPoint
+        }, true);
+    });
+    // TODO: Check non linked cgConnections <=> rendererConnections
+};
+
+/**
+ * Creates the rendererGroups
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererGroups = function () {
+    var renderer = this;
+    _.forEach(this._data.groups, function (groupData) {
+        renderer._createRendererGroup(groupData);
+    });
+};
+
+/**
+ * Assigns rendererGroup parents
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererGroupParents = function () {
+    var renderer = this;
+    _.forEach(this._data.blocks, function (rendererBlockData) {
+        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
+        if (rendererBlockData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
+            if (!rendererGroupParent) {
+                throw new Error("Cannot find rendererBlock parent id `" + rendererBlockData.parent + "`");
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
+        }
+    });
+    _.forEach(this._data.groups, function (rendererGroupData) {
+        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
+        if (rendererGroupData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
+            if (!rendererGroupParent) {
+                throw new Error("Cannot find rendererGroup parent id `" + rendererGroupData.parent + "`");
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
+        }
+    });
+};
+/**
+ * Initializes the listeners to automatically updates the renderer when a graph change occurs
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeListeners = function () {
+    var renderer = this;
+    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
+    this._cgGraph.on("cg-block-name-change", function (cgBlock) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgBlock)));
+    });
+    this._cgGraph.on("cg-point-value-change", function (cgPoint) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgPoint._cgBlock)));
+    });
+};
+/**
  * Drags the d3Node around
  * @returns {d3.behavior.drag}
  * @private
@@ -3303,137 +3457,6 @@ dudeGraph.Renderer.prototype._createZoomBehavior = function () {
             renderer._config.zoom.scale = renderer._zoom.scale();
         }.bind(this));
     this._d3Svg.call(this._zoom);
-};
-/**
- * Initializes rendererGroups and rendererBlocks
- * Add parent and children references, and also cgBlocks references to renderer blocks
- * @private
- */
-dudeGraph.Renderer.prototype._initialize = function () {
-    this._initializeRendererBlocks();
-    this._initializeRendererConnections();
-    this._initializeRendererGroups();
-    this._initializeRendererGroupParents();
-    this._initializeListeners();
-};
-
-/**
- * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererBlocks = function () {
-    var renderer = this;
-    _.forEach(this._data.blocks, function (blockData) {
-        renderer._createRendererBlock(blockData);
-    });
-};
-
-/**
- * Creates the rendererConnection between the rendererBlocks/rendererPoints
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererConnections = function () {
-    var renderer = this;
-    _.forEach(this._data.connections, function (connectionData) {
-        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
-        if (!cgConnection) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex + "` does not exists");
-        }
-        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
-        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
-
-        if (!outputRendererBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                    "`: Cannot find outputRendererBlock `" + connectionData.outputRendererBlockId + "`");
-        }
-        if (!inputRendererBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                    "`: Cannot find inputRendererBlock `" + connectionData.inputRendererBlockId + "`");
-        }
-        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: OutputRendererBlock `" + outputRendererBlock.id +
-                "` is not holding a reference to the outputCgBlock `" + cgConnection.cgOutputPoint.cgBlock.cgId + "`");
-        }
-        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: InputRendererBlock `" + inputRendererBlock.id +
-                "` is not holding a reference to the inputCgBlock `" + cgConnection.cgInputPoint.cgBlock.cgId + "`");
-        }
-        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
-        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
-        if (!outputRendererPoint) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: Cannot find outputRendererPoint `" + cgConnection.cgOutputPoint.cgName + "`");
-        }
-        if (!inputRendererPoint) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: Cannot find inputRendererPoint `" + cgConnection.cgInputPoint.cgName + "`");
-        }
-        renderer._createRendererConnection({
-            "cgConnection": cgConnection,
-            "outputRendererPoint": outputRendererPoint,
-            "inputRendererPoint": inputRendererPoint
-        }, true);
-    });
-    // TODO: Check non linked cgConnections <=> rendererConnections
-};
-
-/**
- * Creates the rendererGroups
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererGroups = function () {
-    var renderer = this;
-    _.forEach(this._data.groups, function (groupData) {
-        renderer._createRendererGroup(groupData);
-    });
-};
-
-/**
- * Assigns rendererGroup parents
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererGroupParents = function () {
-    var renderer = this;
-    _.forEach(this._data.blocks, function (rendererBlockData) {
-        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
-        if (rendererBlockData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
-            if (!rendererGroupParent) {
-                throw new Error("Cannot find rendererBlock parent id `" + rendererBlockData.parent + "`");
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
-        }
-    });
-    _.forEach(this._data.groups, function (rendererGroupData) {
-        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
-        if (rendererGroupData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
-            if (!rendererGroupParent) {
-                throw new Error("Cannot find rendererGroup parent id `" + rendererGroupData.parent + "`");
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
-        }
-    });
-};
-/**
- * Initializes the listeners to automatically updates the renderer when a graph change occurs
- * @private
- */
-dudeGraph.Renderer.prototype._initializeListeners = function () {
-    var renderer = this;
-    this._cgGraph.on("cg-block-create", this.createRendererBlock.bind(this));
-    this._cgGraph.on("cg-block-name-change", function (cgBlock) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgBlock)));
-    });
-    this._cgGraph.on("cg-point-value-change", function (cgPoint) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgPoint._cgBlock)));
-    });
 };
 /**
  * Returns the rendererNode associated with the given id

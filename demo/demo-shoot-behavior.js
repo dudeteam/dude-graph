@@ -8,8 +8,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgOutputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "out",
-                    "cgValueType": "Stream"
+                    "cgName": "out"
                 },
                 {
                     "cgType": "Point",
@@ -25,8 +24,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgInputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "in",
-                    "cgValueType": "Stream"
+                    "cgName": "in"
                 },
                 {
                     "cgType": "Point",
@@ -37,13 +35,11 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgOutputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "true",
-                    "cgValueType": "Stream"
+                    "cgName": "true"
                 },
                 {
                     "cgType": "Stream",
-                    "cgName": "false",
-                    "cgValueType": "Stream"
+                    "cgName": "false"
                 }
             ]
         },
@@ -78,8 +74,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgInputs": [
                 {
                     "cgType": "Stream",
-                    "cgName": "in",
-                    "cgValueType": "Stream"
+                    "cgName": "in"
                 },
                 {
                     "cgType": "Point",
@@ -93,6 +88,10 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                 }
             ],
             "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
+                },
                 {
                     "cgType": "Point",
                     "cgName": "value",
@@ -171,6 +170,10 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgTemplates": {},
             "cgInputs": [
                 {
+                    "cgType": "Stream",
+                    "cgName": "in"
+                },
+                {
                     "cgType": "Point",
                     "cgName": "this",
                     "cgValueType": "Number"
@@ -179,6 +182,12 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "other",
                     "cgValueType": "Number"
+                }
+            ],
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
                 }
             ]
         },
@@ -200,12 +209,21 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgTemplates": {},
             "cgInputs": [
                 {
+                    "cgType": "Stream",
+                    "cgName": "in"
+                },
+                {
                     "cgType": "Point",
                     "cgName": "message",
                     "cgValueType": "String"
                 }
+            ],
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
+                }
             ]
-
         },
         {
             "cgType": "Function",
@@ -262,6 +280,10 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             "cgTemplates": {},
             "cgInputs": [
                 {
+                    "cgType": "Stream",
+                    "cgName": "in"
+                },
+                {
                     "cgType": "Point",
                     "cgName": "this",
                     "cgValueType": "Number"
@@ -270,6 +292,12 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "other",
                     "cgValueType": "Number"
+                }
+            ],
+            "cgOutputs": [
+                {
+                    "cgType": "Stream",
+                    "cgName": "out"
                 }
             ]
         },
@@ -289,7 +317,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
     "connections": [
         {"cgOutputName": "out", "cgOutputBlockId": "0", "cgInputName": "in", "cgInputBlockId": "1"},
         {"cgOutputName": "value", "cgOutputBlockId": "2", "cgInputName": "test", "cgInputBlockId": "1"},
-        {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "first", "cgInputBlockId": "2" },
+        {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "first", "cgInputBlockId": "2"},
         {
             "cgOutputName": "value",
             "cgOutputBlockId": "4",
