@@ -1439,23 +1439,18 @@ dudeGraph.Point = (function () {
         });
 
         /**
-         * The maximum number of connections this point can accept
-         * [0; Infinity] number of connections
-         * @type {Number}
-         * @private
+         * Whether this point accept one or several connections.
+         * @type {Boolean}
          */
-        this._cgMaxConnections = data.cgMaxConnections || 1;
-        Object.defineProperty(this, "cgMaxConnections", {
+        Object.defineProperty(this, "singleConnection", {
             get: function () {
-                return this._cgMaxConnections;
+                return this._singleConnection;
             }.bind(this),
-            set: function (cgMaxConnections) {
-                if (!(cgMaxConnections instanceof Number) || cgMaxConnections < 0) {
-                    throw new Error("cgMaxConnections must be a zero or positive number");
-                }
-                this._cgMaxConnections = cgMaxConnections;
+            set: function (singleConnection) {
+                this._singleConnection = singleConnection;
             }.bind(this)
         });
+        this._singleConnection = data.singleConnection === undefined ? true : data.singleConnection;
 
         /**
          * The name of the template type used (from parent block).
@@ -1505,9 +1500,9 @@ dudeGraph.Point = (function () {
                 return this._cgValue;
             }.bind(this),
             set: function (cgValue) {
-                if (cgValue !== null && this._cgConnections.length >= this._cgMaxConnections) {
-                    throw new Error("Cannot set `cgValue`: Point `" + this._cgName + "` cannot accept more than `" +
-                        this._cgMaxConnections + "` connection(s)");
+                if (cgValue !== null && !this._singleConnection && this._cgConnections.length > 0) {
+                    throw new Error("Cannot set `cgValue`: Point `" + this._cgName + "` cannot accept more than " +
+                        "one connection");
                 }
                 if (this._cgGraph.canAssign(cgValue, this._cgValueType)) {
                     var oldCgValue = this._cgValue;
@@ -1539,9 +1534,8 @@ dudeGraph.Point = (function () {
      * @returns {Boolean}
      */
     Point.prototype.acceptConnect = function (cgPoint) {
-        if (this._cgConnections.length + (this._cgValue === null ? 0 : 1) >= this._cgMaxConnections) {
-            throw new Error("Point `" + this._cgName + "` cannot accept more than `" +
-                    this._cgMaxConnections + "` connection(s)");
+        if (this._singleConnection && this._cgConnections.length && this._cgValue !== null) {
+            throw new Error("Point `" + this._cgName + "` cannot accept more than one connection");
         }
         return true;
     };
@@ -1671,7 +1665,7 @@ dudeGraph.Stream = (function () {
             cgName: data.cgName,
             cgValueType: "Stream"
         }, isOutput, "Stream");
-        this._cgMaxConnections = 1;
+        this._singleConnection = true;
         Object.defineProperty(this, "cgValue", {
             get: function () {
                 throw new Error("Stream has no `cgValue`.");
@@ -2256,7 +2250,7 @@ dudeGraph.Value = (function () {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": data.cgValueType,
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         }, dudeGraph.ArrayMerger));
@@ -2412,7 +2406,7 @@ dudeGraph.Variable = (function () {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": data.cgValueType,
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         }, dudeGraph.ArrayMerger));
@@ -2471,7 +2465,7 @@ dudeGraph.GraphSaver = (function() {
             "cgType": point.pointType,
             "cgName": point.cgName,
             "cgValueType": point.cgValueType,
-            "cgMaxConnections": point.cgMaxConnections
+            "singleConnection": point.singleConnection
         };
     };
 

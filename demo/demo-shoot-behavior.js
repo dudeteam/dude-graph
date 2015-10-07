@@ -110,7 +110,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": "Number",
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         },
@@ -123,7 +123,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": "Number",
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         },
@@ -136,7 +136,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": "Entity",
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         },
@@ -149,7 +149,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": "String",
-                    "cgMaxConnections": Infinity
+                    "singleConnection": false
                 }
             ]
         },
