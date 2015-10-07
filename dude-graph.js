@@ -90,10 +90,10 @@ pandora.polymorphic = function (type, typeFunctions) {
 };
 
 /**
- * Looks like dudeGraph.polymorphic. However, instead of giving the functions in parameters, to give an instance and a method
+ * Looks like cg.polymorphic. However, instead of giving the functions in parameters, to give an instance and a method
  * name and it will look for the methods within the class. For instance, if you create a polymorphic method "render"
  * like so:
- *      return dudeGraph.polymorphicMethod(this, "render", node, element);
+ *      return cg.polymorphicMethod(this, "render", node, element);
  * it will look for all the method named _renderType (_renderVec2, _renderGraph for instance), and return it.
  * Note that the polymorphism will apply according to the first parameter.
  * @param instance {Object} the instance of the object on which the method exists
@@ -1440,6 +1440,7 @@ dudeGraph.Point = function (cgBlock, data, isOutput, pointType) {
      * Whether this point accept one or several connections.
      * @type {Boolean}
      */
+    this._singleConnection = data.singleConnection === undefined ? true : data.singleConnection;
     Object.defineProperty(this, "singleConnection", {
         get: function () {
             return this._singleConnection;
@@ -1448,7 +1449,6 @@ dudeGraph.Point = function (cgBlock, data, isOutput, pointType) {
             this._singleConnection = singleConnection;
         }.bind(this)
     });
-    this._singleConnection = data.singleConnection === undefined ? true : data.singleConnection;
 
     /**
      * The name of the template type used (from parent block).
