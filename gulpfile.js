@@ -11,7 +11,7 @@ var CG_SOURCES = [
     "lib/graph/block.js",
     "lib/graph/point.js",
     "lib/graph/connection.js",
-    "lib/graph/points/*.js",
+    "lib/points/*.js",
     "lib/blocks/*.js",
     "lib/serialization/graph-saver.js",
     "lib/serialization/renderer-saver.js",
