@@ -2,9 +2,11 @@ var gulp = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var jshint = require("gulp-jshint");
+var plumber = require("gulp-plumber");
+var notify = require("gulp-notify");
 var shell = require("gulp-shell");
 
-var CG_SOURCES = [
+var SOURCES = [
     "lib/index.js",
     "lib/utils/*.js",
     "lib/graph/graph.js",
@@ -23,20 +25,25 @@ var CG_SOURCES = [
 ];
 
 gulp.task("jshint", function () {
-    return gulp.src(CG_SOURCES)
+    return gulp.src(SOURCES)
+        .pipe(plumber())
         .pipe(jshint())
-        .pipe(jshint.reporter());
+        .pipe(jshint.reporter())
+        .pipe(jshint.reporter("fail"))
+        .on("error", notify.onError(function (error) {
+            return error.message;
+        }));
 });
 
 gulp.task("build", ["jshint"], function () {
-    return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(CG_SOURCES))
+    return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(SOURCES))
         .pipe(concat("dude-graph.js"))
         //.pipe(uglify())
         .pipe(gulp.dest("."));
 });
 
 gulp.task("watch", ["build"], function () {
-    gulp.watch(CG_SOURCES, ["jshint", "build"]);
+    gulp.watch(SOURCES, ["jshint", "build"]);
 });
 
 gulp.task("serve", ["watch"], shell.task("polyserve"));

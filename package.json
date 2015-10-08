@@ -25,5 +25,9 @@
     "gulp-jshint": "^1.11.2",
     "gulp-shell": "^0.4.2",
     "gulp-uglify": "^1.2.0"
+  },
+  "dependencies": {
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.0.1"
   }
 }
