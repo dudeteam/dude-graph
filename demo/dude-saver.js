@@ -99,7 +99,7 @@ var DudeSaver = (function() {
         if (!inputThis || !inputOther) {
             throw new Error("`this` and `other` should be specified");
         }
-        if (pandora.typename(inputThis.cgOutputPoint.cgBlock) !== "Variable") {
+        if (inputThis.cgOutputPoint.cgBlock.blockType !== "Variable") {
             throw new Error("`this` should always be a variable");
         }
         result += this._indent(tabs) + this.save(inputThis.cgOutputPoint.cgBlock);
@@ -116,7 +116,7 @@ var DudeSaver = (function() {
         result += this._indent(tabs);
         if (instruction.inputByName("this")) { // method
             var obj = instruction.inputByName("this").cgConnections[0].cgOutputPoint.cgBlock;
-            if (pandora.typename(obj) !== "Variable") {
+            if (obj.blockType !== "Variable") {
                 throw new Error("`this` should always be a variable in block `" + obj.cgId + "`");
             }
             result += obj.cgName + "()->" + instruction.cgName.substr(instruction.cgName.lastIndexOf(".") + 1);
@@ -137,7 +137,7 @@ var DudeSaver = (function() {
         var result = "";
         if (func.inputByName("this")) { // method
             var obj = func.inputByName("this").cgConnections[0].cgOutputPoint.cgBlock;
-            if (pandora.typename(obj) !== "Variable") {
+            if (obj.blockType !== "Variable") {
                 throw new Error("`this` should always be a variable in block `" + obj.cgId + "`");
             }
             result += obj.cgName + "()->" + func.cgName.substr(func.cgName.lastIndexOf(".") + 1);

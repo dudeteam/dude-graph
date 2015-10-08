@@ -306,7 +306,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
                     if (node.type === "block") {
-                        switch (pandora.typename(node.cgBlock)) {
+                        switch (node.cgBlock.blockType) {
                             case "Variable":
                                 this._currentState = "editVariable";
                                 this._varName = node.cgBlock.cgName;
@@ -320,7 +320,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                 this._currentState = "editBlock";
                                 this._blockName = node.cgBlock.cgName;
                                 this._blockInputs = node.cgBlock.cgInputs.filter(function (point) {
-                                    return pandora.typename(point) === "Point";
+                                    return point.pointType === "Point";
                                 }).map(function (point) {
                                     return {
                                         cgName: point.cgName,
@@ -352,7 +352,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     return;
                 }
                 if (e.detail.item !== null) {
-                    if (pandora.typename(e.detail.item.data) === "Variable") {
+                    if (e.detail.item.data.blockType === "Variable") {
                         this.element.renderer.createRendererBlock(e.detail.item.data);
                     } else {
                         var data = Object.create(e.detail.item.data);
