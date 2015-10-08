@@ -1,0 +1,62 @@
+<style is="custom-style">
+    :root {
+
+        /* groups */
+
+        --dude-graph-group: {
+             transition-duration: .2s;
+             transition-property: stroke-width;
+             fill: #fff;
+             stroke: #fff;
+             opacity: 0.1;
+        };
+
+        --dude-graph-group-hover: {
+             stroke-width: 10px;
+        };
+
+        --dude-graph-group-selected: {
+             opacity: 0.15;
+             stroke-width: 10px;
+        };
+
+        /* block */
+
+        --dude-graph-block: {
+             transition-duration: .2s;
+             transition-property: stroke-width;
+             fill: var(--dude-primary-background-color);
+             stroke: var(--dude-primary-background-color);
+             opacity: 0.7;
+        };
+
+        --dude-graph-block-hover: {
+             stroke-width: 10px;
+        };
+
+        --dude-graph-block-selected: {
+             stroke-width: 10px;
+             opacity: .9;
+        };
+    }
+
+    /* Custom blocks */
+
+    .cg-variable > rect, .cg-value > rect {
+        fill: var(--dude-type-number-color) !important;
+        stroke: var(--dude-type-number-color) !important;
+    }
+
+    .cg-variable > text, .cg-value > text {
+        fill: #333;
+    }
+
+    .cg-variable .cg-output circle,
+    .cg-variable .cg-output path,
+    .cg-value .cg-output circle,
+    .cg-value .cg-output path{
+        stroke-width: 1 !important;
+        stroke: #333 !important;
+        fill: #333 !important;
+    }
+</style>
