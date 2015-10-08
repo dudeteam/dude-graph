@@ -18,83 +18,48 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="dude-graph-inspector">
     <style>
-        :root { /* WTF?? Why do I need that?! */
-            --default-primary-color: #ffe488;
-            --text-primary-color: #222222;
-            --paper-input-container-focus-color: var(--default-primary-color);
-            --paper-input-container-input-color: var(--cg-text-color);
+        :root {
+            --default-primary-color: var(--dude-primary-color);
+            --text-primary-color: var(--dude-primary-text-color);
+            --paper-input-container-focus-color: var(--dude-primary-color);
+            --paper-input-container-input-color: var(--dude-content-text-color);
             --paper-button: {
-                 font-size: 0.9em;
-                 text-transform: none;
-                 border: 2px solid var(--default-primary-color);
-                 color: var(--default-primary-color);
-                 border-radius: 0;
+                 @apply(--dude-button);
              };
         }
         :host {
-            background: var(--cg-background-color);
+            background: var(--dude-secondary-background-color);
             overflow: auto;
             padding: 5px;
         }
 
         div {
-            font-family: var(--cg-display-font);
-            color: var(--cg-text-color);
+            font-family: var(--dude-primary-text-font);
+            color: var(--dude-content-text-color);
         }
 
 
         .title {
             font-size: 1.2em;
             font-weight: bold;
-            color: var(--cg-title-color);
+            color: var(--dude-title-text-color);
             padding-bottom: 10px;
             border-bottom: 2px solid #222222;
             margin-bottom: 10px;
             cursor: pointer;
         }
         .title i {
-            color: var(--cg-text-color);
+            color: var(--dude-content-text-color);
             font-size: .8em;
             padding-right: 5px;
         }
         .subtitle {
-            color: var(--cg-title-color);
+            color: var(--dude-title-text-color);
             padding-bottom: 10px;
         }
 
         .box {
             padding: 10px;
-        }
-
-        .row {
-            padding-bottom: 5px;
-        }
-
-        label {
-            display: block;
-            font-size: .8em;
-            padding-top: 5px;
-            color: var(--cg-text-secondary-color);
-        }
-
-        input, paper-dropdown-menu {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input[type="text"] {
-            padding: 5px 0;
-            outline: none;
-            border: none;
-            background: transparent;
-            border-bottom: 1px solid #555555;
-            color: var(--cg-text-color);
-            font-family: var(--cg-display-font);
-            font-size: 1em;
-        }
-
-        input[type="text"]:focus {
-            border-bottom: 2px solid var(--default-primary-color);
         }
 
         #state > div:not(.active-state) {
@@ -306,7 +271,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
                     if (node.type === "block") {
-                        switch (node.cgBlock.blockType) {
+                        switch (pandora.cgBlock.blockType) {
                             case "Variable":
                                 this._currentState = "editVariable";
                                 this._varName = node.cgBlock.cgName;
