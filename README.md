@@ -41,18 +41,18 @@ dudeGraph.MyBlock.buildBlock = function (graph, data) {
 };
 ```
 
-And you can also override the following methods to add a custom rendering (c.f. lib/blocks for concrete examples):
+And you can also override the following static methods to add a custom rendering (c.f. lib/blocks for concrete examples):
 
-### dudeGraph.Variable.rendererBlockCreator(renderer)
+### rendererBlockCreator(renderer)
 
 Specifies how the svg of this block is created. It takes the block information to create a meaningful svg.
 
-### dudeGraph.Variable.rendererBlockUpdater(renderer)
+### rendererBlockUpdater(renderer)
 
 This one takes the svg created in the previous method and update its appearance according changes. You should
 define the style of the properties of the blocks that can be changed dynamically (like its name for example).
 
-### dudeGraph.Variable.pointPositionGetter(rendererPoint, offsetX, offsetY)
+### pointPositionGetter(rendererPoint, offsetX, offsetY)
 
 Finally, this method should be overwritten to specify how to compute the position of each point relative to the block.
 Indeed, depending on the shape of the block the calculation of this position might change.
