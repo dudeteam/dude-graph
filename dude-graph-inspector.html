@@ -228,7 +228,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this._varName = "";
                 this._varValue = "";
                 this._varFolder = "";
-                pandora.forEach(this.models, function (value, key) {
+                _.forEach(this.models, function (value, key) {
                     var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
                     if (value.cgFolder) {
                         if (this._folders[value.cgFolder] === undefined) {
@@ -266,12 +266,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
             bindElement: function (element) {
                 this.element = element;
-                pandora.forEach(this.element.graph.blocksByType("Variable"), this.addVariable.bind(this));
+                _.forEach(this.element.graph.blocksByType("Variable"), this.addVariable.bind(this));
                 this.$.blocks.loadItems(this._blocksTree);
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
                     if (node.type === "block") {
-                        switch (pandora.cgBlock.blockType) {
+                        switch (node.cgBlock.blockType) {
                             case "Variable":
                                 this._currentState = "editVariable";
                                 this._varName = node.cgBlock.cgName;
@@ -361,7 +361,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
             _editBlockClicked: function () {
                 this._selectedNode.cgBlock.cgName = this._blockName;
-                pandora.forEach(this._blockInputs, function (input) {
+                _.forEach(this._blockInputs, function (input) {
                     if (input.cgValue && input.cgValue !== "") {
                         // TODO: Handle difference between "" and null
                         this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
