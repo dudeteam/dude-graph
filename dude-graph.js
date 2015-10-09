@@ -3206,14 +3206,14 @@ dudeGraph.Renderer.prototype._dragRendererNodeBehavior = function () {
                 rendererNode.position[1] += d3.event.dy;
             });
             renderer._updateSelectedD3Nodes(selection);
-            renderer.d3Nodes.classed("cg-active", false);
+            renderer.d3Nodes.classed("dude-graph-active", false);
             var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             if (rendererGroup) {
-                renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("cg-active", true);
+                renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("dude-graph-active", true);
             }
         })
         .on("dragend", function () {
-            renderer.d3Nodes.classed("cg-active", false);
+            renderer.d3Nodes.classed("dude-graph-active", false);
             var selection = renderer.d3Selection;
             var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
             if (rendererGroup) {
@@ -3984,9 +3984,9 @@ dudeGraph.Renderer.prototype._createD3PointShapes = function (d3Point) {
         .attr("d", function (rendererPoint) {
             var r = renderer._config.point.radius;
             if (rendererPoint.cgPoint.pointType === "Stream") {
-                return ["M " + -r + " " + -r * 1.5 + " L " + -r + " " + r * 1.5 + " L " + r + " " + 0 + " Z"];
+                return "M " + -r + " " + -r * 1.5 + " L " + -r + " " + r * 1.5 + " L " + r + " " + 0 + " Z";
             } else {
-                return ["M 0, 0", "m " + -r + ", 0", "a " + [r, r] + " 0 1,0 " + r * 2 + ",0", "a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0"];
+                return "M 0,0m " + -r + ", 0a " + [r, r] + " 0 1,0 " + r * 2 + ",0a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0";
             }
         })
         .call(renderer._removeRendererConnectionBehavior())
