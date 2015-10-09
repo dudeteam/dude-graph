@@ -14,8 +14,113 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="dude-graph">
     <style>
+        /**
+         * SVG viewport
+         */
         #svg {
             background: var(--dude-secondary-background-color);
+        }
+
+        /**
+         * Non clickable
+         */
+        ::content .cg-non-clickable {
+            pointer-events: none;
+        }
+
+        /**
+         * Typography
+         */
+        ::content text {
+            fill: var(--dude-content-text-color);
+            font-family: var(--dude-primary-text-font);
+        }
+
+        ::content .cg-title {
+            fill: var(--dude-title-text-color);
+            font-weight: bold;
+        }
+
+        /**
+         * Selection brush
+         */
+        ::content .cg-selection {
+            fill: hsla(0, 0%, 80%, 0.1);
+            stroke: hsla(0, 0%, 80%, 0.2);
+        }
+
+        /**
+         * Groups
+         */
+        ::content .cg-group > rect {
+        @apply(--dude-graph-group);
+        }
+
+        ::content .cg-group:hover > rect {
+        @apply(--dude-graph-group-hover)
+        }
+
+        ::content .cg-group::content .cg-selected > rect {
+        @apply(--dude-graph-group-selected);
+        }
+
+        /**
+         * Blocks
+         */
+        ::content .cg-block > rect {
+        @apply(--dude-graph-block);
+        }
+
+        ::content .cg-block:hover > rect {
+        @apply(--dude-graph-block-hover);
+        }
+
+        ::content .cg-block::content .cg-selected > rect {
+        @apply(--dude-graph-block-selected);
+        }
+
+        /**
+         * Blocks and groups
+         */
+        ::content .cg-block, ::content .cg-group {
+            cursor: move;
+        }
+
+        /**
+         * Points
+         */
+        ::content .cg-input, ::content .cg-output {
+            cursor: pointer;
+        }
+
+        ::content .cg-input circle, ::content .cg-output circle,
+        ::content .cg-input path, ::content .cg-output path {
+            stroke-width: 1;
+            stroke: var(--dude-type-number-color);
+            fill: var(--dude-type-number-color);
+        }
+
+        ::content .cg-input::content .cg-stream circle, ::content .cg-output::content .cg-stream circle,
+        ::content .cg-input::content .cg-stream path, ::content .cg-output::content .cg-stream path {
+            stroke: var(--dude-type-stream-color);
+            fill: var(--dude-type-stream-color);
+        }
+
+        ::content .cg-input::content .cg-empty path, ::content .cg-output::content .cg-empty path {
+            fill: transparent;
+        }
+
+        /**
+         * Connections
+         */
+        ::content .cg-connection {
+            stroke-width: 2px;
+            stroke: var(--dude-type-number-color);
+            fill: transparent;
+        }
+
+        ::content .cg-connection::content .cg-stream {
+            stroke: var(--dude-type-stream-color);
         }
     </style>
     <template>
