@@ -24,7 +24,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Non clickable
          */
-        ::content .cg-non-clickable {
+        ::content .dude-graph-non-clickable {
             pointer-events: none;
         }
 
@@ -35,7 +35,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             fill: var(--dude-content-text-color);
             font-family: var(--dude-primary-text-font);
         }
-        ::content .cg-title {
+        ::content .dude-graph-title {
             fill: var(--dude-title-text-color);
             font-weight: bold;
         }
@@ -43,7 +43,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Selection brush
          */
-        ::content .cg-selection {
+        ::content .dude-graph-selection {
             fill: hsla(0, 0%, 80%, 0.1);
             stroke: hsla(0, 0%, 80%, 0.2);
         }
@@ -51,70 +51,70 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Groups
          */
-        ::content .cg-group > rect {
+        ::content .dude-graph-group > rect {
             @apply(--dude-graph-group);
         }
-        ::content .cg-group:hover > rect {
+        ::content .dude-graph-group:hover > rect {
             @apply(--dude-graph-group-hover)
         }
-        ::content .cg-group.cg-active > rect,
-        ::content .cg-group.cg-selected > rect {
+        ::content .dude-graph-group.dude-graph-selected > rect,
+        ::content .dude-graph-group.dude-graph-active > rect {
             @apply(--dude-graph-group-selected);
         }
 
         /**
          * Blocks
          */
-        ::content .cg-block > rect {
+        ::content .dude-graph-block > rect {
             @apply(--dude-graph-block);
         }
-        ::content .cg-block:hover > rect {
+        ::content .dude-graph-block:hover > rect {
             @apply(--dude-graph-block-hover);
         }
-        ::content .cg-block.cg-selected > rect {
+        ::content .dude-graph-block.dude-graph-selected > rect {
             @apply(--dude-graph-block-selected);
         }
 
         /**
          * Blocks and groups
          */
-        ::content .cg-block,
-        ::content .cg-group {
+        ::content .dude-graph-block,
+        ::content .dude-graph-group {
             cursor: move;
         }
 
         /**
          * Points
          */
-        ::content .cg-input,
-        ::content .cg-output {
+        ::content .dude-graph-input,
+        ::content .dude-graph-output {
             cursor: pointer;
         }
-        ::content .cg-input path,
-        ::content .cg-output path {
+        ::content .dude-graph-input path,
+        ::content .dude-graph-output path {
             stroke-width: 1;
             stroke: var(--dude-type-number-color);
             fill: var(--dude-type-number-color);
         }
-        ::content .cg-input.cg-stream path,
-        ::content .cg-output.cg-stream path {
+        ::content .dude-graph-input.dude-graph-stream path,
+        ::content .dude-graph-output.dude-graph-stream path {
             stroke: var(--dude-type-stream-color);
             fill: var(--dude-type-stream-color);
         }
-        ::content .cg-input.cg-empty path,
-        ::content .cg-output.cg-empty path {
+        ::content .dude-graph-input.dude-graph-empty path,
+        ::content .dude-graph-output.dude-graph-empty path {
             fill: transparent !important;
         }
 
         /**
          * Connections
          */
-        ::content .cg-connection {
+        ::content .dude-graph-connection {
             stroke-width: 2px;
             stroke: var(--dude-type-number-color);
             fill: transparent;
         }
-        ::content .cg-connection.cg-stream {
+        ::content .dude-graph-connection.dude-graph-stream {
             stroke: var(--dude-type-stream-color);
         }
     </style>
