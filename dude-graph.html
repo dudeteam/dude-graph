@@ -89,16 +89,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ::content .cg-output {
             cursor: pointer;
         }
-        ::content .cg-input circle,
-        ::content .cg-output circle,
         ::content .cg-input path,
         ::content .cg-output path {
             stroke-width: 1;
             stroke: var(--dude-type-number-color);
             fill: var(--dude-type-number-color);
         }
-        ::content .cg-input.cg-stream circle,
-        ::content .cg-output.cg-stream circle,
         ::content .cg-input.cg-stream path,
         ::content .cg-output.cg-stream path {
             stroke: var(--dude-type-stream-color);
@@ -106,7 +102,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
         ::content .cg-input.cg-empty path,
         ::content .cg-output.cg-empty path {
-            fill: transparent;
+            fill: transparent !important;
         }
 
         /**
