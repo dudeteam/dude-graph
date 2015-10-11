@@ -2999,6 +2999,282 @@ dudeGraph.Renderer.prototype.removeSelection = function () {
 };
 
 /**
+ * Drags the d3Node around
+ * @returns {d3.behavior.drag}
+ * @private
+ */
+dudeGraph.Renderer.prototype._dragRendererNodeBehavior = function () {
+    var renderer = this;
+    return d3.behavior.drag()
+        .on("dragstart", function () {
+            d3.event.sourceEvent.preventDefault();
+            d3.event.sourceEvent.stopPropagation();
+            renderer._addToSelection(d3.select(this), !d3.event.sourceEvent.shiftKey);
+            renderer._d3MoveToFront(renderer.d3GroupedSelection);
+        })
+        .on("drag", function () {
+            var selection = renderer.d3GroupedSelection;
+            selection.each(function (rendererNode) {
+                rendererNode.position[0] += d3.event.dx;
+                rendererNode.position[1] += d3.event.dy;
+            });
+            renderer._updateSelectedD3Nodes(selection);
+            renderer.d3Nodes.classed("dude-graph-active", false);
+            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
+            if (rendererGroup) {
+                renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("dude-graph-active", true);
+            }
+        })
+        .on("dragend", function () {
+            renderer.d3Nodes.classed("dude-graph-active", false);
+            var selection = renderer.d3Selection;
+            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
+            if (rendererGroup) {
+                selection.each(function (rendererNode) {
+                    renderer._addRendererNodeParent(rendererNode, rendererGroup);
+                });
+            }
+            renderer._updateSelectedD3Nodes(selection);
+        });
+};
+
+/**
+ * Removes the rendererNode from his parent on double click
+ * @returns {d3.behavior.doubleClick}
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererNodeFromParentBehavior = function () {
+    var renderer = this;
+    return d3.behavior.doubleClick()
+        .on("dblclick", function () {
+            var d3Node = d3.select(this);
+            var rendererNode = d3Node.datum();
+            var rendererGroupParent = rendererNode.parent;
+            if (rendererGroupParent) {
+                d3.event.sourceEvent.preventDefault();
+                d3.event.sourceEvent.stopPropagation();
+                renderer._removeRendererNodeParent(rendererNode);
+                // TODO: Optimize
+                // renderer._updateSelectedD3Nodes(renderer._getD3NodesFromRendererNodes([rendererNode, rendererGroupParent]));
+                renderer._updateSelectedD3Nodes(renderer.d3Nodes);
+            }
+        });
+};
+
+/**
+ * Positions the rendererBlock at the mouse, and releases on mousedown
+ * @param {d3.selection} d3Block
+ * @private
+ */
+dudeGraph.Renderer.prototype._positionRendererBlockBehavior = function (d3Block) {
+    var renderer = this;
+    var namespace = ".placement-behavior";
+    var disablePlacement = function () {
+        renderer._d3Svg.on("mousemove" + namespace, null);
+        renderer._d3Svg.on("mousedown" + namespace, null);
+        renderer.d3Blocks.classed("dude-graph-non-clickable", false);
+        renderer.d3Groups.classed("dude-graph-non-clickable", false);
+    };
+    disablePlacement();
+    this.d3Blocks.classed("dude-graph-non-clickable", true);
+    this.d3Groups.classed("dude-graph-non-clickable", true);
+    this._d3Svg.on("mousemove" + namespace, function () {
+        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
+        renderer._updateSelectedD3Nodes(d3Block);
+    });
+    this._d3Svg.on("mousedown" + namespace, function () {
+        d3.event.preventDefault();
+        d3.event.stopPropagation();
+        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
+        renderer._updateSelectedD3Nodes(d3Block);
+        disablePlacement();
+    });
+};
+
+/**
+ * Removes a connection when clicking and pressing alt on a d3Point
+ * @returns {d3.behavior.click}
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererConnectionBehavior = function () {
+    var renderer = this;
+    return d3.behavior.mousedown()
+        .on("mousedown", function (rendererPoint) {
+            if (d3.event.sourceEvent.altKey) {
+                d3.event.sourceEvent.preventDefault();
+                d3.event.sourceEvent.stopImmediatePropagation();
+                renderer._removeRendererPointRendererConnections(rendererPoint);
+                renderer._removeD3Connections();
+                // TODO: Optimize
+                renderer._updateD3Blocks();
+            }
+        });
+};
+
+/**
+ * Drags a connection from a d3Point
+ * @returns {d3.behavior.drag}
+ * @private
+ */
+dudeGraph.Renderer.prototype._dragRendererConnectionBehavior = function () {
+    var renderer = this;
+    var draggingConnection = null;
+    var computeConnectionPath = function (rendererPoint) {
+        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint, false);
+        if (rendererPoint.isOutput) {
+            return renderer._computeConnectionPath(rendererPointPosition, d3.mouse(this));
+        }
+        return renderer._computeConnectionPath(d3.mouse(this), rendererPointPosition);
+    };
+    return d3.behavior.drag()
+        .on("dragstart", function (rendererPoint) {
+            d3.event.sourceEvent.preventDefault();
+            d3.event.sourceEvent.stopPropagation();
+            draggingConnection = renderer._d3Connections
+                .append("svg:path")
+                .classed("dude-graph-connection", true)
+                .classed("dude-graph-stream", function () {
+                    return rendererPoint.cgPoint.pointType === "Stream";
+                })
+                .attr("d", function () {
+                    return computeConnectionPath.call(this, rendererPoint);
+                });
+        })
+        .on("drag", function (rendererPoint) {
+            draggingConnection
+                .attr("d", function () {
+                    return computeConnectionPath.call(this, rendererPoint);
+                });
+        })
+        .on("dragend", function (rendererPoint) {
+            var position = d3.mouse(renderer._d3Root.node());
+            var nearestRendererPoint = renderer._getNearestRendererPoint(position);
+            if (nearestRendererPoint && rendererPoint !== nearestRendererPoint) {
+                try {
+                    if (rendererPoint.isOutput) {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": rendererPoint,
+                            "inputRendererPoint": nearestRendererPoint
+                        });
+                    } else {
+                        renderer._createRendererConnection({
+                            "outputRendererPoint": nearestRendererPoint,
+                            "inputRendererPoint": rendererPoint
+                        });
+                    }
+                    renderer._createD3Connections();
+                    // TODO: Optimize
+                    renderer._updateD3Blocks();
+                } catch (connectionException) {
+                    //console.error(connectionException);
+                    renderer.emit("error", connectionException);
+                }
+            } else {
+                renderer.emit("warning", "Renderer::_createD3PointShapes() No point found for creating connection");
+                //console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
+            }
+            draggingConnection.remove();
+        });
+};
+/**
+ * Creates the selection brush
+ * @private
+ */
+dudeGraph.Renderer.prototype._createSelectionBehavior = function () {
+    var renderer = this;
+    var selectionBrush = null;
+    this._d3Svg.call(d3.behavior.drag()
+            .on("dragstart", function () {
+                if (d3.event.sourceEvent.shiftKey) {
+                    d3.event.sourceEvent.stopImmediatePropagation();
+                    selectionBrush = renderer._d3Svg
+                        .append("svg:rect")
+                        .classed("dude-graph-selection", true)
+                        .datum(d3.mouse(this));
+                } else {
+                    renderer._clearSelection();
+                }
+            })
+            .on("drag", function () {
+                if (selectionBrush) {
+                    var position = d3.mouse(this);
+                    selectionBrush.attr({
+                        "x": function (origin) {
+                            return Math.min(origin[0], position[0]);
+                        },
+                        "y": function (origin) {
+                            return Math.min(origin[1], position[1]);
+                        },
+                        "width": function (origin) {
+                            return Math.max(position[0] - origin[0], origin[0] - position[0]);
+                        },
+                        "height": function (origin) {
+                            return Math.max(position[1] - origin[1], origin[1] - position[1]);
+                        }
+                    });
+                }
+            })
+            .on("dragend", function () {
+                if (selectionBrush) {
+                    var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
+                    var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
+                    var selectedRendererNodes = renderer._getNearestRendererBlocks(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
+                    if (selectedRendererNodes.length > 0) {
+                        renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
+                    } else {
+                        renderer._clearSelection();
+                    }
+                    selectionBrush.remove();
+                    selectionBrush = null;
+                }
+            })
+    );
+};
+
+/**
+ * Adds the given d3Nodes to the current selection
+ * @param {d3.selection} d3Nodes - The d3Nodes to select
+ * @param {Boolean?} clearSelection - If true, everything but the d3Nodes will be unselected
+ * @private
+ */
+dudeGraph.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
+    if (clearSelection) {
+        this._clearSelection(true);
+    }
+    d3Nodes.classed("dude-graph-selected", true);
+    this.emit("cg-select", d3Nodes.data()[d3Nodes.data().length - 1]);
+};
+
+/**
+ * Clears the selection
+ * @param {Boolean?} ignoreEmit - If true, the unselect event will not be emitted
+ * @private
+ */
+dudeGraph.Renderer.prototype._clearSelection = function (ignoreEmit) {
+    this.d3Selection.classed("dude-graph-selected", false);
+    if (!ignoreEmit) {
+        this.emit("cg-unselect");
+    }
+};
+/**
+ * Creates zoom and pan
+ * @private
+ */
+dudeGraph.Renderer.prototype._createZoomBehavior = function () {
+    var renderer = this;
+    this._zoom = d3.behavior.zoom()
+        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
+        .on("zoom", function () {
+            if (d3.event.sourceEvent) {
+                d3.event.sourceEvent.preventDefault();
+            }
+            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._config.zoom.translate = renderer._zoom.translate();
+            renderer._config.zoom.scale = renderer._zoom.scale();
+        }.bind(this));
+    this._d3Svg.call(this._zoom);
+};
+/**
  * Initializes rendererGroups and rendererBlocks
  * Add parent and children references, and also cgBlocks references to renderer blocks
  * @private
@@ -3128,282 +3404,6 @@ dudeGraph.Renderer.prototype._initializeListeners = function () {
         renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
             renderer._getRendererBlocksByCgBlock(cgPoint._cgBlock)));
     });
-};
-/**
- * Drags the d3Node around
- * @returns {d3.behavior.drag}
- * @private
- */
-dudeGraph.Renderer.prototype._dragRendererNodeBehavior = function () {
-    var renderer = this;
-    return d3.behavior.drag()
-        .on("dragstart", function () {
-            d3.event.sourceEvent.preventDefault();
-            d3.event.sourceEvent.stopPropagation();
-            renderer._addToSelection(d3.select(this), !d3.event.sourceEvent.shiftKey);
-            renderer._d3MoveToFront(renderer.d3GroupedSelection);
-        })
-        .on("drag", function () {
-            var selection = renderer.d3GroupedSelection;
-            selection.each(function (rendererNode) {
-                rendererNode.position[0] += d3.event.dx;
-                rendererNode.position[1] += d3.event.dy;
-            });
-            renderer._updateSelectedD3Nodes(selection);
-            renderer.d3Nodes.classed("dude-graph-active", false);
-            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
-            if (rendererGroup) {
-                renderer._getD3NodesFromRendererNodes([rendererGroup]).classed("dude-graph-active", true);
-            }
-        })
-        .on("dragend", function () {
-            renderer.d3Nodes.classed("dude-graph-active", false);
-            var selection = renderer.d3Selection;
-            var rendererGroup = renderer._getNearestRendererGroup(d3.select(this).datum());
-            if (rendererGroup) {
-                selection.each(function (rendererNode) {
-                    renderer._addRendererNodeParent(rendererNode, rendererGroup);
-                });
-            }
-            renderer._updateSelectedD3Nodes(selection);
-        });
-};
-
-/**
- * Removes the rendererNode from his parent on double click
- * @returns {d3.behavior.doubleClick}
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererNodeFromParentBehavior = function () {
-    var renderer = this;
-    return d3.behavior.doubleClick()
-        .on("dblclick", function () {
-            var d3Node = d3.select(this);
-            var rendererNode = d3Node.datum();
-            var rendererGroupParent = rendererNode.parent;
-            if (rendererGroupParent) {
-                d3.event.sourceEvent.preventDefault();
-                d3.event.sourceEvent.stopPropagation();
-                renderer._removeRendererNodeParent(rendererNode);
-                // TODO: Optimize
-                // renderer._updateSelectedD3Nodes(renderer._getD3NodesFromRendererNodes([rendererNode, rendererGroupParent]));
-                renderer._updateSelectedD3Nodes(renderer.d3Nodes);
-            }
-        });
-};
-
-/**
- * Positions the rendererBlock at the mouse, and releases on mousedown
- * @param {d3.selection} d3Block
- * @private
- */
-dudeGraph.Renderer.prototype._positionRendererBlockBehavior = function (d3Block) {
-    var renderer = this;
-    var namespace = ".placement-behavior";
-    var disablePlacement = function () {
-        renderer._d3Svg.on("mousemove" + namespace, null);
-        renderer._d3Svg.on("mousedown" + namespace, null);
-        renderer.d3Blocks.classed("dude-graph-non-clickable", false);
-        renderer.d3Groups.classed("dude-graph-non-clickable", false);
-    };
-    disablePlacement();
-    this.d3Blocks.classed("dude-graph-non-clickable", true);
-    this.d3Groups.classed("dude-graph-non-clickable", true);
-    this._d3Svg.on("mousemove" + namespace, function () {
-        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
-        renderer._updateSelectedD3Nodes(d3Block);
-    });
-    this._d3Svg.on("mousedown" + namespace, function () {
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
-        d3Block.datum().position = renderer._getRelativePosition(d3.mouse(this));
-        renderer._updateSelectedD3Nodes(d3Block);
-        disablePlacement();
-    });
-};
-
-/**
- * Removes a connection when clicking and pressing alt on a d3Point
- * @returns {d3.behavior.click}
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererConnectionBehavior = function () {
-    var renderer = this;
-    return d3.behavior.mousedown()
-        .on("mousedown", function (rendererPoint) {
-            if (d3.event.sourceEvent.altKey) {
-                d3.event.sourceEvent.preventDefault();
-                d3.event.sourceEvent.stopImmediatePropagation();
-                renderer._removeRendererPointRendererConnections(rendererPoint);
-                renderer._removeD3Connections();
-                // TODO: Optimize
-                renderer._updateD3Blocks();
-            }
-        });
-};
-
-/**
- * Drags a connection from a d3Point
- * @returns {d3.behavior.drag}
- * @private
- */
-dudeGraph.Renderer.prototype._dragRendererConnectionBehavior = function () {
-    var renderer = this;
-    var draggingConnection = null;
-    var computeConnectionPath = function (rendererPoint) {
-        var rendererPointPosition = renderer._getRendererPointPosition(rendererPoint, false);
-        if (rendererPoint.isOutput) {
-            return renderer._computeConnectionPath(rendererPointPosition, renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]));
-        }
-        return renderer._computeConnectionPath(renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]), rendererPointPosition);
-    };
-    return d3.behavior.drag()
-        .on("dragstart", function (rendererPoint) {
-            d3.event.sourceEvent.preventDefault();
-            d3.event.sourceEvent.stopPropagation();
-            draggingConnection = renderer._d3Connections
-                .append("svg:path")
-                .classed("dude-graph-connection", true)
-                .classed("dude-graph-stream", function () {
-                    return rendererPoint.cgPoint.pointType === "Stream";
-                })
-                .attr("d", function () {
-                    return computeConnectionPath(rendererPoint);
-                });
-        })
-        .on("drag", function (rendererPoint) {
-            draggingConnection
-                .attr("d", function () {
-                    return computeConnectionPath(rendererPoint);
-                });
-        })
-        .on("dragend", function (rendererPoint) {
-            var position = renderer._getRelativePosition([d3.event.sourceEvent.clientX, d3.event.sourceEvent.clientY]);
-            var nearestRendererPoint = renderer._getNearestRendererPoint(position);
-            if (nearestRendererPoint && rendererPoint !== nearestRendererPoint) {
-                try {
-                    if (rendererPoint.isOutput) {
-                        renderer._createRendererConnection({
-                            "outputRendererPoint": rendererPoint,
-                            "inputRendererPoint": nearestRendererPoint
-                        });
-                    } else {
-                        renderer._createRendererConnection({
-                            "outputRendererPoint": nearestRendererPoint,
-                            "inputRendererPoint": rendererPoint
-                        });
-                    }
-                    renderer._createD3Connections();
-                    // TODO: Optimize
-                    renderer._updateD3Blocks();
-                } catch (connectionException) {
-                    //console.error(connectionException);
-                    renderer.emit("error", connectionException);
-                }
-            } else {
-                renderer.emit("warning", "Renderer::_createD3PointShapes() No point found for creating connection");
-                //console.warn("Renderer::_createD3PointShapes() No point found for creating connection");
-            }
-            draggingConnection.remove();
-        });
-};
-/**
- * Creates the selection brush
- * @private
- */
-dudeGraph.Renderer.prototype._createSelectionBehavior = function () {
-    var renderer = this;
-    var selectionBrush = null;
-    this._d3Svg.call(d3.behavior.drag()
-            .on("dragstart", function () {
-                if (d3.event.sourceEvent.shiftKey) {
-                    d3.event.sourceEvent.stopImmediatePropagation();
-                    selectionBrush = renderer._d3Svg
-                        .append("svg:rect")
-                        .classed("dude-graph-selection", true)
-                        .datum(d3.mouse(this));
-                } else {
-                    renderer._clearSelection();
-                }
-            })
-            .on("drag", function () {
-                if (selectionBrush) {
-                    var position = d3.mouse(this);
-                    selectionBrush.attr({
-                        "x": function (origin) {
-                            return Math.min(origin[0], position[0]);
-                        },
-                        "y": function (origin) {
-                            return Math.min(origin[1], position[1]);
-                        },
-                        "width": function (origin) {
-                            return Math.max(position[0] - origin[0], origin[0] - position[0]);
-                        },
-                        "height": function (origin) {
-                            return Math.max(position[1] - origin[1], origin[1] - position[1]);
-                        }
-                    });
-                }
-            })
-            .on("dragend", function () {
-                if (selectionBrush) {
-                    var selectionBrushTopLeft = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")), parseInt(selectionBrush.attr("y"))]);
-                    var selectionBrushBottomRight = renderer._getRelativePosition([parseInt(selectionBrush.attr("x")) + parseInt(selectionBrush.attr("width")), parseInt(selectionBrush.attr("y")) + parseInt(selectionBrush.attr("height"))]);
-                    var selectedRendererNodes = renderer._getNearestRendererBlocks(selectionBrushTopLeft[0], selectionBrushTopLeft[1], selectionBrushBottomRight[0], selectionBrushBottomRight[1]);
-                    if (selectedRendererNodes.length > 0) {
-                        renderer._addToSelection(renderer._getD3NodesFromRendererNodes(selectedRendererNodes), true);
-                    } else {
-                        renderer._clearSelection();
-                    }
-                    selectionBrush.remove();
-                    selectionBrush = null;
-                }
-            })
-    );
-};
-
-/**
- * Adds the given d3Nodes to the current selection
- * @param {d3.selection} d3Nodes - The d3Nodes to select
- * @param {Boolean?} clearSelection - If true, everything but the d3Nodes will be unselected
- * @private
- */
-dudeGraph.Renderer.prototype._addToSelection = function (d3Nodes, clearSelection) {
-    if (clearSelection) {
-        this._clearSelection(true);
-    }
-    d3Nodes.classed("dude-graph-selected", true);
-    this.emit("cg-select", d3Nodes.data()[d3Nodes.data().length - 1]);
-};
-
-/**
- * Clears the selection
- * @param {Boolean?} ignoreEmit - If true, the unselect event will not be emitted
- * @private
- */
-dudeGraph.Renderer.prototype._clearSelection = function (ignoreEmit) {
-    this.d3Selection.classed("dude-graph-selected", false);
-    if (!ignoreEmit) {
-        this.emit("cg-unselect");
-    }
-};
-/**
- * Creates zoom and pan
- * @private
- */
-dudeGraph.Renderer.prototype._createZoomBehavior = function () {
-    var renderer = this;
-    this._zoom = d3.behavior.zoom()
-        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
-        .on("zoom", function () {
-            if (d3.event.sourceEvent) {
-                d3.event.sourceEvent.preventDefault();
-            }
-            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            renderer._config.zoom.translate = renderer._zoom.translate();
-            renderer._config.zoom.scale = renderer._zoom.scale();
-        }.bind(this));
-    this._d3Svg.call(this._zoom);
 };
 /**
  * Returns the rendererNode associated with the given id
