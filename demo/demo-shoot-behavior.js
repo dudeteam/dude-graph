@@ -114,19 +114,6 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
             ]
         },
         {
-            "cgType": "Value",
-            "cgId": "5",
-            "cgValue": 0,
-            "cgOutputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "value",
-                    "cgValueType": "Number",
-                    "singleConnection": false
-                }
-            ]
-        },
-        {
             "cgType": "Variable",
             "cgId": "6",
             "cgName": "entity",
@@ -135,19 +122,6 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgType": "Point",
                     "cgName": "value",
                     "cgValueType": "Entity",
-                    "singleConnection": false
-                }
-            ]
-        },
-        {
-            "cgType": "Value",
-            "cgId": "7",
-            "cgValue": "bullet",
-            "cgOutputs": [
-                {
-                    "cgType": "Point",
-                    "cgName": "value",
-                    "cgValueType": "String",
                     "singleConnection": false
                 }
             ]
@@ -300,60 +274,16 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
                     "cgName": "out"
                 }
             ]
-        },
-        {
-            "cgType": "Value",
-            "cgId": "15",
-            "cgValue": 50,
-            "cgValueType": "Number"
-        },
-        {
-            "cgType": "Value",
-            "cgId": "16",
-            "cgValue": 1,
-            "cgValueType": "Number"
         }
     ],
     "connections": [
         {"cgOutputName": "out", "cgOutputBlockId": "0", "cgInputName": "in", "cgInputBlockId": "1"},
         {"cgOutputName": "value", "cgOutputBlockId": "2", "cgInputName": "test", "cgInputBlockId": "1"},
         {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "first", "cgInputBlockId": "2"},
-        {
-            "cgOutputName": "value",
-            "cgOutputBlockId": "4",
-            "cgInputName": "this",
-            "cgInputBlockId": "9"
-        },
-        {
-            "cgOutputName": "value",
-            "cgOutputBlockId": "4",
-            "cgInputName": "this",
-            "cgInputBlockId": "14"
-        },
-        {
-            "cgOutputName": "value",
-            "cgOutputBlockId": "5",
-            "cgInputName": "second",
-            "cgInputBlockId": "2"
-        },
-        {
-            "cgOutputName": "true",
-            "cgOutputBlockId": "1",
-            "cgInputName": "in",
-            "cgInputBlockId": "3"
-        },
-        {
-            "cgOutputName": "value",
-            "cgOutputBlockId": "6",
-            "cgInputName": "this",
-            "cgInputBlockId": "3"
-        },
-        {
-            "cgOutputName": "value",
-            "cgOutputBlockId": "7",
-            "cgInputName": "name",
-            "cgInputBlockId": "3"
-        }
+        {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "this", "cgInputBlockId": "9"},
+        {"cgOutputName": "value", "cgOutputBlockId": "4", "cgInputName": "this", "cgInputBlockId": "14"},
+        {"cgOutputName": "true", "cgOutputBlockId": "1", "cgInputName": "in", "cgInputBlockId": "3"},
+        {"cgOutputName": "value", "cgOutputBlockId": "6", "cgInputName": "this", "cgInputBlockId": "3"}
     ]
 };
 var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
@@ -410,29 +340,11 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
             "parent": "0"
         },
         {
-            "id": "5",
-            "cgBlock": "5",
-            "position": [
-                300,
-                300
-            ],
-            "parent": "0"
-        },
-        {
             "id": "6",
             "cgBlock": "6",
             "position": [
                 500,
                 210
-            ],
-            "parent": "0"
-        },
-        {
-            "id": "7",
-            "cgBlock": "7",
-            "position": [
-                500,
-                280
             ],
             "parent": "0"
         },
@@ -460,15 +372,6 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
             "position": [
                 300,
                 610
-            ],
-            "parent": "1"
-        },
-        {
-            "id": "11",
-            "cgBlock": "15",
-            "position": [
-                300,
-                680
             ],
             "parent": "1"
         },
@@ -534,15 +437,6 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
                 310
             ],
             "parent": "0"
-        },
-        {
-            "id": "19",
-            "cgBlock": "16",
-            "position": [
-                700,
-                380
-            ],
-            "parent": "0"
         }
     ],
     "groups": [
@@ -565,9 +459,7 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {"cgConnectionIndex": 2, "outputRendererBlockId": "4", "inputRendererBlockId": "2"},
         {"cgConnectionIndex": 3, "outputRendererBlockId": "10", "inputRendererBlockId": "9"},
         {"cgConnectionIndex": 4, "outputRendererBlockId": "17", "inputRendererBlockId": "16"},
-        {"cgConnectionIndex": 5, "outputRendererBlockId": "5", "inputRendererBlockId": "2"},
-        {"cgConnectionIndex": 6, "outputRendererBlockId": "1", "inputRendererBlockId": "3"},
-        {"cgConnectionIndex": 7, "outputRendererBlockId": "6", "inputRendererBlockId": "3"},
-        {"cgConnectionIndex": 8, "outputRendererBlockId": "7", "inputRendererBlockId": "3"}
+        {"cgConnectionIndex": 5, "outputRendererBlockId": "1", "inputRendererBlockId": "3"},
+        {"cgConnectionIndex": 6, "outputRendererBlockId": "6", "inputRendererBlockId": "3"}
     ]
 };
