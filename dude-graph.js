@@ -938,9 +938,13 @@ dudeGraph.Graph.prototype._connectPoints = function (cgOutputPoint, cgInputPoint
         throw new Error("Cannot connect either two inputs or two outputs: `" +
                 cgOutputPoint.cgName + "` and `" + cgInputPoint.cgName + "`");
     }
-    if (!(cgOutputPoint.acceptConnect(cgInputPoint) && cgInputPoint.acceptConnect(cgOutputPoint))) {
-        throw new Error("Cannot connect `" +
-                cgOutputPoint.cgName + "` and `" + cgInputPoint.cgName + "`");
+    if (!cgOutputPoint.acceptConnect(cgInputPoint)) {
+        throw new Error("Point `" +
+                cgOutputPoint.cgName + "` does not accept to connect to `" + cgInputPoint.cgName + "` (too many connections)");
+    }
+    if (!cgInputPoint.acceptConnect(cgOutputPoint)) {
+        throw new Error("Point `" +
+            cgInputPoint.cgName + "` does not accept to connect to `" + cgOutputPoint.cgName + "` (too many connections)");
     }
     if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType) &&
         !this.updateTemplate(cgInputPoint, cgOutputPoint.cgValueType)) {
@@ -1484,7 +1488,7 @@ dudeGraph.Point = function (cgBlock, data, isOutput, pointType) {
             return this._cgValue;
         }.bind(this),
         set: function (cgValue) {
-            if (cgValue !== null && !this._singleConnection && this._cgConnections.length > 0) {
+            if (cgValue !== null && !this.acceptValue(cgValue)) {
                 throw new Error("Cannot set `cgValue`: Point `" + this._cgName + "` cannot accept more than " +
                     "one connection");
             }
@@ -1514,15 +1518,21 @@ dudeGraph.Point.prototype.empty = function () {
 };
 
 /**
- * Checks if this cgPoint accepts a connection to the given cgPoint
+ * Returns whether this cgPoint accepts a connection if there is room to the given cgPoint
  * @param {dudeGraph.Point} cgPoint
  * @returns {Boolean}
  */
 dudeGraph.Point.prototype.acceptConnect = function (cgPoint) {
-    if (this._singleConnection && this._cgConnections.length && this._cgValue !== null) {
-        throw new Error("Point `" + this._cgName + "` cannot accept more than one connection");
-    }
-    return true;
+    return !this._singleConnection || (this._cgConnections.length === 0 && this._cgValue === null);
+};
+
+/**
+ * Returns whether this cgPoint accepts a cgValue
+ * @param {*} cgValue
+ * @returns {Boolean}
+ */
+dudeGraph.Point.prototype.acceptValue = function (cgValue) {
+    return !this._singleConnection || this._cgConnections.length === 0;
 };
 
 /**
