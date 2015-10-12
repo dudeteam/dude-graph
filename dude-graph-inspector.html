@@ -96,6 +96,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
                 <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
                 <paper-button class="primary" on-click="_save">Save</paper-button>
+                <paper-button class="primary" on-click="_zoomToFit">Fit to screen</paper-button>
             </div>
             <!-- .box -->
             <magnet-state id="state" class="layout vertical flex" root-state="root" current-state="{{_currentState}}">
@@ -401,6 +402,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 } catch (e) {
                     this.fire("error", {error: e, message: e.message});
                 }
+            },
+            _zoomToFit: function () {
+                this.element.renderer.zoomToFit();
             }
         });
     </script>

@@ -2708,7 +2708,8 @@ dudeGraph.Renderer = function (svg, cgGraph, data) {
     this._config = pandora.mergeObjects(data.config, {
         "zoom": {
             "min": 0.25,
-            "max": 5
+            "max": 5,
+            "transitionSpeed": 300
         },
         "block": {
             "padding": 10,
@@ -3009,6 +3010,12 @@ dudeGraph.Renderer.prototype.removeSelection = function () {
 };
 
 /**
+ * Zoom to best fit all rendererNodes
+ */
+dudeGraph.Renderer.prototype.zoomToFit = function () {
+    this._zoomToFit();
+};
+/**
  * Drags the d3Node around
  * @returns {d3.behavior.drag}
  * @private
@@ -3283,6 +3290,25 @@ dudeGraph.Renderer.prototype._createZoomBehavior = function () {
             renderer._config.zoom.scale = renderer._zoom.scale();
         }.bind(this));
     this._d3Svg.call(this._zoom);
+};
+
+/**
+ * Zoom to best fit all rendererNodes
+ * @private
+ */
+dudeGraph.Renderer.prototype._zoomToFit = function () {
+    var svgBBox = this._d3Svg.node().getBoundingClientRect();
+    var rootBBox = this._d3Root.node().getBBox();
+    var scaleExtent = this._zoom.scaleExtent();
+    var dx = rootBBox.width - rootBBox.x;
+    var dy = rootBBox.height - rootBBox.y;
+    var x = (rootBBox.x + rootBBox.width) / 2;
+    var y = (rootBBox.y + rootBBox.height) / 2;
+    var scale = pandora.clamp(0.9 / Math.max(dx / svgBBox.width, dy / svgBBox.height), scaleExtent[0], scaleExtent[1]);
+    var translate = [svgBBox.width / 2 - scale * x, svgBBox.height / 2 - scale * y];
+    this._d3Svg
+        .transition(this._config.zoom.transitionSpeed)
+        .call(this._zoom.translate(translate).scale(scale).event);
 };
 /**
  * Initializes rendererGroups and rendererBlocks
