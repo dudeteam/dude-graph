@@ -7,8 +7,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../iron-input/iron-input.html">
-<link rel="import" href="../magnet-hierarchy/magnet-hierarchy.html">
 <link rel="import" href="../magnet-state/magnet-state.html">
+<link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
 
@@ -23,12 +23,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             --text-primary-color: var(--dude-primary-text-color);
             --paper-input-container-focus-color: var(--dude-primary-color);
             --paper-input-container-input-color: var(--dude-content-text-color);
-            --paper-button: {
-                 @apply(--dude-button);
-             };
-            --paper-dialog: {
-                @apply(--dude-dialog);
-            };
+
+        -
+        -paper-button: {
+        @apply(- -dude-button);
+        }
+
+        ;
+        -
+        -paper-dialog: {
+        @apply(- -dude-dialog);
+        }
+
+        ;
         }
         :host {
             background: var(--dude-secondary-background-color);
@@ -41,7 +48,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             color: var(--dude-content-text-color);
         }
 
-
         .title {
             font-size: 1.2em;
             font-weight: bold;
@@ -51,11 +57,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             margin-bottom: 10px;
             cursor: pointer;
         }
+
         .title i {
             color: var(--dude-content-text-color);
             font-size: .8em;
             padding-right: 5px;
         }
+
         .subtitle {
             color: var(--dude-title-text-color);
             padding-bottom: 10px;
@@ -106,7 +114,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                             <i class="fa fa-chevron-down"></i>
                             Add block
                         </div>
-                        <magnet-hierarchy id="blocks" on-submit="_createBlock"></magnet-hierarchy>
+                        <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
                     </div>
                     <!-- .box -->
                     <div class="box">
@@ -141,7 +149,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <div class="box">
                         <div class="title">
                             <i class="fa fa-chevron-down"></i>
-                            Edit group</div>
+                            Edit group
+                        </div>
                         <div class="row">
                             <label>description</label>
                             <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..."
@@ -157,7 +166,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <div class="box">
                         <div class="title">
                             <i class="fa fa-chevron-down"></i>
-                            Edit block</div>
+                            Edit block
+                        </div>
                         <div class="row">
                             <label>name</label>
                             <input is="iron-input" bind-value="{{_blockName}}" type="text">
@@ -178,7 +188,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <div class="box">
                         <div class="title">
                             <i class="fa fa-chevron-down"></i>
-                            Edit value</div>
+                            Edit value
+                        </div>
                         <div class="row">
                             <label>value</label>
                             <input is="iron-input" bind-value="{{_value}}" type="text">
@@ -192,7 +203,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <div class="box">
                         <div class="title">
                             <i class="fa fa-chevron-down"></i>
-                            Edit variable</div>
+                            Edit variable
+                        </div>
                         <div class="row">
                             <label>name</label>
                             <input is="iron-input" bind-value="{{_varName}}" type="text">
@@ -250,16 +262,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         this._blocksTree.push({item: {name: key, icon: icon, data: value}});
                     }
                 }.bind(this));
-                this._blocksTree.unshift({group: {name: "control", icon: "fa fa-folder", items: [
-                    {item: {name: "Condition", icon: "fa fa-square", data: {"cgType": "Condition"}}},
-                    {item: {name: "Each", icon: "fa fa-square", data: {"cgType": "Each"}}},
-                    {item: {name: "Range", icon: "fa fa-square", data: {"cgType": "Range"}}}
-                ]}});
+                this._blocksTree.unshift({
+                    group: {
+                        name: "control", icon: "fa fa-folder", items: [
+                            {item: {name: "Condition", icon: "fa fa-square", data: {"cgType": "Condition"}}},
+                            {item: {name: "Each", icon: "fa fa-square", data: {"cgType": "Each"}}},
+                            {item: {name: "Range", icon: "fa fa-square", data: {"cgType": "Range"}}}
+                        ]
+                    }
+                });
                 this._customVariables = {group: {name: "custom variables", icon: "fa fa-folder", items: []}};
                 this._blocksTree.unshift(this._customVariables);
-                this._blocksTree.unshift({item: {name: "Assignation", icon: "fa fa-plus-square", data: {
-                    "cgType": "Assignation"
-                }}});
+                this._blocksTree.unshift({
+                    item: {
+                        name: "Assignation", icon: "fa fa-plus-square", data: {
+                            "cgType": "Assignation"
+                        }
+                    }
+                });
                 this.$.blocks.loadItems(this._blocksTree);
             },
             getHierarchy: function () {
