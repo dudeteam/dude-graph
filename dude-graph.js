@@ -3442,6 +3442,702 @@ dudeGraph.Renderer.prototype._initializeListeners = function () {
     });
 };
 /**
+ * Returns the rendererNode associated with the given id
+ * @param {String} id
+ * @returns {dudeGraph.RendererBlock|null}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererBlockById = function (id) {
+    return this._rendererBlockIds.get(id) || null;
+};
+
+/**
+ * Returns the rendererBlocks bound to the given cgBlock
+ * @param {dudeGraph.Block} cgBlock
+ * @returns {Array<dudeGraph.RendererBlock>}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
+    var rendererBlocks = [];
+    _.forEach(this._rendererBlocks, function (rendererBlock) {
+        if (rendererBlock.cgBlock === cgBlock) {
+            rendererBlocks.push(rendererBlock);
+        }
+    });
+    return rendererBlocks;
+};
+
+/**
+ * Creates a renderer block
+ * @param {Object} rendererBlockData
+ * @returns {dudeGraph.RendererBlock}
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
+    if (!rendererBlockData.id) {
+        throw new Error("Cannot create a rendererBlock without an id");
+    }
+    if (this._getRendererBlockById(rendererBlockData.id) !== null) {
+        throw new Error("Multiple rendererBlocks for id `" + rendererBlockData.id + "`");
+    }
+    var cgBlock = this._cgGraph.blockById(rendererBlockData.cgBlock);
+    if (!cgBlock) {
+        throw new Error("Cannot link cgBlock `" + rendererBlockData.cgBlock +
+            "` to rendererBlock `" + rendererBlockData.id + "`");
+    }
+    var rendererBlock = _.merge({}, rendererBlockData);
+    rendererBlock.type = "block";
+    rendererBlock.parent = null;
+    rendererBlock.cgBlock = cgBlock;
+    rendererBlock.id = rendererBlockData.id;
+    rendererBlock.rendererPoints = [];
+    rendererBlock.position = rendererBlockData.position || [0, 0];
+    rendererBlock.size = rendererBlockData.size || this._config.block.size;
+    this._createRendererPoints(rendererBlock);
+    this._rendererBlocks.push(rendererBlock);
+    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
+    return rendererBlock;
+};
+
+/**
+ * Removes the given rendererBlock, and all its rendererConnections
+ * Also removes the cgBlock from the cgGraph if it is the last reference
+ * @param {dudeGraph.RendererBlock} rendererBlock
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
+    var renderer = this;
+    var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
+    if (rendererBlockFound === -1) {
+        throw new Error("Cannot find rendererBlock `" + rendererBlock.id + "`");
+    }
+    _.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
+        renderer._removeRendererPointRendererConnections(rendererPoint);
+    });
+    this._removeRendererNodeParent(rendererBlock);
+    this._rendererBlocks.splice(rendererBlockFound, 1);
+    if (this._getRendererBlocksByCgBlock(rendererBlock.cgBlock).length === 0) {
+        this._cgGraph.removeBlock(rendererBlock.cgBlock);
+    }
+};
+/**
+ * Creates a rendererConnection
+ * @param {Object} rendererConnectionData
+ * @param {Boolean} [ignoreCgConnection=false] - Whether we ignore the creation of a cgConnection
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererConnection = function (rendererConnectionData, ignoreCgConnection) {
+    var outputRendererPoint = rendererConnectionData.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.outputBlockId), rendererConnectionData.outputName);
+    var inputRendererPoint = rendererConnectionData.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.inputBlockId), rendererConnectionData.inputName);
+    var cgConnection = rendererConnectionData.cgConnection;
+    if (!outputRendererPoint) {
+        throw new Error("Cannot find the outputRendererPoint");
+    }
+    if (!inputRendererPoint) {
+        throw new Error("Cannot find the inputRendererPoint");
+    }
+    if (!ignoreCgConnection) {
+        cgConnection = outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
+    } else {
+        _.forEach(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection.cgConnection === cgConnection) {
+                throw new Error("Connections `" + cgConnection +
+                    "` is already handled in the renderer by the rendererConnection `" + rendererConnection + "`");
+            }
+        });
+    }
+    if (!cgConnection) {
+        throw new Error("Cannot create a rendererConnection without a cgConnection");
+    }
+    var rendererConnection = {
+        "cgConnection": cgConnection,
+        "outputRendererPoint": outputRendererPoint,
+        "inputRendererPoint": inputRendererPoint
+    };
+    this._rendererConnections.push(rendererConnection);
+};
+
+/**
+ * Removes the given rendererConnection
+ * @param {dudeGraph.RendererConnection} rendererConnection
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
+    var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
+    if (rendererConnectionFound === -1) {
+        throw new Error("Connection not found");
+    }
+    rendererConnection.outputRendererPoint.cgPoint.disconnect(rendererConnection.inputRendererPoint.cgPoint);
+    this._rendererConnections.splice(rendererConnectionFound, 1);
+};
+/**
+ * Returns the rendererGroup associated with the given id
+ * @param {String} id
+ * @returns {dudeGraph.RendererGroup|null}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererGroupById = function (id) {
+    return this._rendererGroupIds.get(id) || null;
+};
+
+/**
+ * Creates a rendererGroup
+ * @param {Object} rendererGroupData
+ * @returns {dudeGraph.RendererGroup}
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
+    if (!rendererGroupData.id) {
+        throw new Error("Cannot create a rendererGroup without an id");
+    }
+    if (this._getRendererGroupById(rendererGroupData.id)) {
+        throw new Error("Duplicate rendererGroup for id `" + rendererGroupData.id + "`");
+    }
+    var rendererGroup = _.merge({}, rendererGroupData);
+    rendererGroup.type = "group";
+    rendererGroup.id = rendererGroupData.id;
+    rendererGroup.parent = null;
+    rendererGroup.children = [];
+    rendererGroup.position = rendererGroupData.position || [0, 0];
+    rendererGroup.size = rendererGroupData.size || this._config.group.size;
+    this._rendererGroups.push(rendererGroup);
+    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
+    return rendererGroup;
+};
+
+/**
+ * Removes the rendererGroup
+ * @param {dudeGraph.RendererGroup} rendererGroup
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
+    var rendererGroupFound = this._rendererGroups.indexOf(rendererGroup);
+    if (rendererGroupFound === -1) {
+        throw new Error("RendererGroup not found and thus cannot be removed");
+    }
+    this._removeRendererNodeParent(rendererGroup);
+    this._rendererGroups.splice(rendererGroupFound, 1);
+};
+/**
+ * Removes the given rendererNode from the renderer
+ * Also removes the cgBlock if it is the rendererNode was the last reference on it
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererNode = function (rendererNode) {
+    if (rendererNode.type === "block") {
+        this._removeRendererBlock(rendererNode);
+    } else {
+        this._removeRendererGroup(rendererNode);
+    }
+};
+
+/**
+ * Returns the parent hierarchy of the given rendererNode
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @returns {Array<dudeGraph.RendererGroup>}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
+    var parents = [];
+    var parent = rendererNode.parent;
+    while (parent) {
+        parents.push(parent);
+        parent = parent.parent;
+    }
+    return parents;
+};
+
+/**
+ * Adds the given rendererNode in the rendererGroupParent
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @param {dudeGraph.RendererGroup} rendererGroupParent
+ * @private
+ */
+dudeGraph.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
+    if (rendererNode.parent === rendererGroupParent) {
+        return;
+    }
+    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
+        if (checkRendererGroupParent === rendererNode) {
+            throw new Error("Cannot add `" + rendererNode.id + "` as a child of `" + rendererGroupParent.id +
+                "`, because `" + rendererNode.id + "` is equal or is a parent of `" + rendererGroupParent.id + "`");
+        }
+        if (checkRendererGroupParent.parent) {
+            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
+        }
+    })(rendererGroupParent);
+    this._removeRendererNodeParent(rendererNode);
+    rendererGroupParent.children.push(rendererNode);
+    rendererNode.parent = rendererGroupParent;
+};
+
+/**
+ * Removes the rendererNode from his parent
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
+    if (rendererNode.parent) {
+        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
+        rendererNode.parent = null;
+    }
+};
+/**
+ * Returns the rendererPoint associated with the given name
+ * @param {dudeGraph.RendererBlock} rendererBlock
+ * @param {String} rendererPointName
+ * @returns {dudeGraph.RendererPoint|null}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
+    return _.find(rendererBlock.rendererPoints, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName === rendererPointName;
+        }
+    );
+};
+
+/**
+ * Creates the rendererPoints for a given rendererBlock
+ * @param {dudeGraph.RendererBlock} rendererBlock
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererPoints = function (rendererBlock) {
+    rendererBlock.rendererPoints = [];
+    _.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
+            "cgPoint": cgOutput,
+            "isOutput": true
+        });
+    });
+    _.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
+        rendererBlock.rendererPoints.push({
+            "type": "point",
+            "rendererBlock": rendererBlock,
+            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
+            "cgPoint": cgInput,
+            "isOutput": false
+        });
+    });
+};
+
+/**
+ * Returns all rendererConnections for the given rendererPoint
+ * @param {dudeGraph.RendererPoint} rendererPoint
+ * @returns {Array<dudeGraph.RendererConnection>}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererPointRendererConnections = function (rendererPoint) {
+    var rendererConnections = [];
+    _.forEach(this._rendererConnections, function (rendererConnection) {
+        if (rendererConnection.outputRendererPoint === rendererPoint || rendererConnection.inputRendererPoint === rendererPoint) {
+            rendererConnections.push(rendererConnection);
+        }
+    });
+    return rendererConnections;
+};
+
+/**
+ * Removes all rendererConnections for the given rendererPoint
+ * @param {dudeGraph.RendererPoint} rendererPoint
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeRendererPointRendererConnections = function (rendererPoint) {
+    var renderer = this;
+    var removeRendererConnections = renderer._getRendererPointRendererConnections(rendererPoint);
+    _.forEach(removeRendererConnections, function (removeRendererConnection) {
+        renderer._removeRendererConnection(removeRendererConnection);
+    });
+};
+/**
+ * Creates d3Points
+ * @param {d3.selection} d3Block - The svg group which will contains the d3Points of the current block
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Points = function (d3Block) {
+    var renderer = this;
+    var createdD3Points = d3Block
+        .selectAll(".dude-graph-output, .dude-graph-input")
+        .data(function (rendererBlock) {
+            return rendererBlock.rendererPoints;
+        }, function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("class", function (rendererPoint) {
+            return (rendererPoint.isOutput ? "dude-graph-output" : "dude-graph-input");
+        })
+        .each(function () {
+            renderer._createD3PointShapes(d3.select(this));
+        });
+    createdD3Points
+        .append("svg:text")
+        .attr("alignment-baseline", "middle")
+        .attr("text-anchor", function (rendererPoint) {
+            return rendererPoint.isOutput ? "end" : "start";
+        })
+        .text(function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        });
+    this._updateSelectedD3Points(createdD3Points);
+};
+
+/**
+ * Updates the selected d3Points
+ * @param {d3.selection} updatedD3Points
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateSelectedD3Points = function (updatedD3Points) {
+    var renderer = this;
+    updatedD3Points
+        .classed("dude-graph-empty", function (rendererPoint) {
+            return rendererPoint.cgPoint.empty();
+        })
+        .classed("dude-graph-stream", function (rendererPoint) {
+            return rendererPoint.cgPoint.pointType === "Stream";
+        })
+        .attr("transform", function (rendererPoint) {
+            return "translate(" + renderer._getRendererPointPosition(rendererPoint, true) + ")";
+        });
+    updatedD3Points
+        .select("text")
+        .attr("transform", function (rendererPoint) {
+            if (rendererPoint.isOutput) {
+                return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
+            } else {
+                return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
+            }
+        });
+};
+
+/**
+ * Creates the d3PointShapes
+ * @param {d3.selection} d3Point
+ * @returns {d3.selection}
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3PointShapes = function (d3Point) {
+    var renderer = this;
+    d3Point
+        .selectAll(".cg-point-shape")
+        .data(d3Point.data(), function (rendererPoint) {
+            return rendererPoint.cgPoint.cgName;
+        })
+        .enter()
+        .append("svg:path")
+        .classed("cg-point-shape", true)
+        .attr("d", function (rendererPoint) {
+            var r = renderer._config.point.radius;
+            if (rendererPoint.cgPoint.pointType === "Stream") {
+                return "M " + -r + " " + -r * 1.5 + " L " + -r + " " + r * 1.5 + " L " + r + " " + 0 + " Z";
+            } else {
+                return "M 0,0m " + -r + ", 0a " + [r, r] + " 0 1,0 " + r * 2 + ",0a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0";
+            }
+        })
+        .call(renderer._removeRendererConnectionBehavior())
+        .call(renderer._dragRendererConnectionBehavior());
+};
+/**
+ * Creates d3Blocks with the existing rendererBlocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Blocks = function () {
+    var renderer = this;
+    this.d3Blocks
+        .data(this._rendererBlocks, function (rendererBlock) {
+            var nbPoints = Math.max(rendererBlock.cgBlock.cgInputs.length, rendererBlock.cgBlock.cgOutputs.length);
+            rendererBlock.size = [
+                renderer._config.block.size[0],
+                nbPoints * renderer._config.point.height + renderer._config.block.header
+            ];
+            return rendererBlock.id;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (rendererBlock) {
+            return renderer._getRendererNodeUniqueID(rendererBlock);
+        })
+        .classed("dude-graph-block", true)
+        .call(this._dragRendererNodeBehavior())
+        .call(this._removeRendererNodeFromParentBehavior())
+        .each(function (rendererBlock) {
+            d3.select(this).classed("cg-" + _.kebabCase(rendererBlock.cgBlock.blockType), true);
+            var creator = renderer._rendererBlockCreators[rendererBlock.cgBlock.blockType];
+            if (creator !== undefined) {
+                creator.call(this, renderer);
+            } else {
+                renderer._defaultBlockCreator.call(this, renderer);
+            }
+        });
+    this._updateD3Blocks();
+};
+
+/**
+ *
+ * @param renderer
+ * @private
+ */
+dudeGraph.Renderer.prototype._defaultBlockCreator = function (renderer) {
+    var d3Block = d3.select(this);
+    d3Block
+        .append("svg:rect")
+        .attr("rx", function () {
+            return renderer._config.block.borderRadius || 0;
+        })
+        .attr("ry", function () {
+            return renderer._config.block.borderRadius || 0;
+        });
+    d3Block
+        .append("svg:text")
+        .classed("dude-graph-title", true)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
+    d3Block
+        .append("svg:g")
+        .classed("cg-points", true);
+    renderer._createD3Points(d3Block.select(".cg-points"));
+};
+
+/**
+ * Updates all d3Blocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateD3Blocks = function () {
+    this._updateSelectedD3Blocks(this.d3Blocks);
+};
+
+/**
+ * Updates selected d3Blocks
+ * @param {d3.selection} updatedD3Blocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
+    var renderer = this;
+    updatedD3Blocks.each(function (rendererBlock) {
+        var updater = renderer._rendererBlockUpdaters[rendererBlock.cgBlock.blockType];
+        if (updater !== undefined) {
+            updater.call(this, renderer);
+        } else {
+            renderer._defaultBlockUpdater.call(this, renderer);
+        }
+    });
+};
+
+/**
+ *
+ * @param renderer
+ * @private
+ */
+dudeGraph.Renderer.prototype._defaultBlockUpdater = function (renderer) {
+    var d3Block = d3.select(this);
+    d3Block
+        .select("text")
+        .text(function (rendererBlock) {
+            return rendererBlock.cgBlock.cgName;
+        });
+    d3Block
+        .each(function (rendererBlock) {
+            renderer._computeRendererBlockSize(rendererBlock);
+        });
+    d3Block
+        .attr("transform", function (rendererBlock) {
+            return "translate(" + rendererBlock.position + ")";
+        });
+    d3Block
+        .select("rect")
+        .attr("width", function (rendererBlock) {
+            return rendererBlock.size[0];
+        })
+        .attr("height", function (rendererBlock) {
+            return rendererBlock.size[1];
+        });
+    d3Block
+        .select("text")
+        .attr("transform", function (block) {
+            return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
+        });
+    renderer._updateSelectedD3Points(d3Block.select(".cg-points").selectAll(".dude-graph-output, .dude-graph-input"));
+};
+
+/**
+ * Removes d3Blocks when rendererBlocks are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Blocks = function () {
+    var removedRendererBlocks = this.d3Blocks
+        .data(this._rendererBlocks, function (rendererBlock) {
+            return rendererBlock.id;
+        })
+        .exit()
+        .remove();
+};
+/**
+ * Creates d3Connections with the existing rendererConnections
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Connections = function () {
+    var createdD3Connections = this.d3Connections
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
+            }
+        })
+        .enter()
+        .append("svg:path")
+        .classed("dude-graph-connection", true)
+        .classed("dude-graph-stream", function (rendererConnection) {
+            return rendererConnection.inputRendererPoint.cgPoint.pointType === "Stream";
+        });
+    this._updateSelectedD3Connections(createdD3Connections);
+};
+
+/**
+ * Updates all d3Connections
+ * @private
+ */
+dudeGraph.Renderer.prototype._updatedD3Connections = function () {
+    this._updateSelectedD3Connections(this.d3Connections);
+};
+
+/**
+ * Updates selected d3Connections
+ * @param {d3.selection} updatedD3Connections
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
+    var renderer = this;
+    updatedD3Connections
+        .attr("d", function (rendererConnection) {
+            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputRendererPoint, false);
+            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputRendererPoint, false);
+            return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
+        }.bind(this));
+};
+
+/**
+ * Removes d3Connections when rendererConnections are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Connections = function () {
+    var removedRendererConnections = this.d3Connections
+        .data(this._rendererConnections, function (rendererConnection) {
+            if (rendererConnection) {
+                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
+                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
+            }
+        })
+        .exit()
+        .remove();
+};
+/**
+ * Creates d3Groups with the existing rendererGroups
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Groups = function () {
+    var createdD3Groups = this.d3Groups
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (rendererGroup) {
+            return this._getRendererNodeUniqueID(rendererGroup);
+        }.bind(this))
+        .attr("class", "dude-graph-group")
+        .call(this._dragRendererNodeBehavior())
+        .call(this._removeRendererNodeFromParentBehavior());
+    createdD3Groups
+        .append("svg:rect")
+        .attr("rx", this._config.group.borderRadius || 0)
+        .attr("ry", this._config.group.borderRadius || 0);
+    createdD3Groups
+        .append("svg:text")
+        .attr("class", "dude-graph-title")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
+    this._updateD3Groups();
+};
+
+/**
+ * Updates all d3Groups
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateD3Groups = function () {
+    this._updateSelectedD3Groups(this.d3Groups);
+};
+
+/**
+ * Updates selected d3Groups
+ * @param {d3.selection} updatedD3Groups
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
+    var renderer = this;
+    updatedD3Groups
+        .select("text")
+        .text(function (rendererGroup) {
+            return rendererGroup.description;
+        });
+    updatedD3Groups
+        .each(function (rendererGroup) {
+            return renderer._computeRendererGroupPositionAndSize(rendererGroup);
+        });
+    updatedD3Groups
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + rendererGroup.position + ")";
+        });
+    updatedD3Groups
+        .select("rect")
+        .attr("width", function (rendererGroup) {
+            return rendererGroup.size[0];
+        })
+        .attr("height", function (rendererGroup) {
+            return rendererGroup.size[1];
+        });
+    updatedD3Groups
+        .select("text")
+        .attr("transform", function (rendererGroup) {
+            return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
+        });
+};
+
+/**
+ * Removes d3Groups when rendererGroups are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Groups = function () {
+    var removedD3Groups = this.d3Groups
+        .data(this._rendererGroups, function (rendererGroup) {
+            return rendererGroup.id;
+        })
+        .exit()
+        .remove();
+};
+/**
+ * This method will update all nodes and their parents if needed
+ * @param {d3.selection} d3Nodes
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
+    var renderer = this;
+    var updateParents = [];
+    d3Nodes
+        .attr("transform", function (rendererNode) {
+            updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
+            return "translate(" + rendererNode.position + ")";
+        });
+    if (updateParents.length > 0) {
+        this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
+    }
+    // TODO: Optimize this to only update the needed connections
+    this._updatedD3Connections();
+};
+/**
  * Creates the collision quadtree
  * @private
  */
@@ -3874,701 +4570,5 @@ dudeGraph.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNo
 dudeGraph.Renderer.prototype._d3MoveToFront = function (d3Selection) {
     return d3Selection.each(function () {
         this.parentNode.appendChild(this);
-    });
-};
-/**
- * Creates d3Points
- * @param {d3.selection} d3Block - The svg group which will contains the d3Points of the current block
- * @private
- */
-dudeGraph.Renderer.prototype._createD3Points = function (d3Block) {
-    var renderer = this;
-    var createdD3Points = d3Block
-        .selectAll(".dude-graph-output, .dude-graph-input")
-        .data(function (rendererBlock) {
-            return rendererBlock.rendererPoints;
-        }, function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("class", function (rendererPoint) {
-            return (rendererPoint.isOutput ? "dude-graph-output" : "dude-graph-input");
-        })
-        .each(function () {
-            renderer._createD3PointShapes(d3.select(this));
-        });
-    createdD3Points
-        .append("svg:text")
-        .attr("alignment-baseline", "middle")
-        .attr("text-anchor", function (rendererPoint) {
-            return rendererPoint.isOutput ? "end" : "start";
-        })
-        .text(function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        });
-    this._updateSelectedD3Points(createdD3Points);
-};
-
-/**
- * Updates the selected d3Points
- * @param {d3.selection} updatedD3Points
- * @private
- */
-dudeGraph.Renderer.prototype._updateSelectedD3Points = function (updatedD3Points) {
-    var renderer = this;
-    updatedD3Points
-        .classed("dude-graph-empty", function (rendererPoint) {
-            return rendererPoint.cgPoint.empty();
-        })
-        .classed("dude-graph-stream", function (rendererPoint) {
-            return rendererPoint.cgPoint.pointType === "Stream";
-        })
-        .attr("transform", function (rendererPoint) {
-            return "translate(" + renderer._getRendererPointPosition(rendererPoint, true) + ")";
-        });
-    updatedD3Points
-        .select("text")
-        .attr("transform", function (rendererPoint) {
-            if (rendererPoint.isOutput) {
-                return "translate(" + [-renderer._config.point.radius * 2 - renderer._config.block.padding] + ")";
-            } else {
-                return "translate(" + [renderer._config.point.radius * 2 + renderer._config.block.padding] + ")";
-            }
-        });
-};
-
-/**
- * Creates the d3PointShapes
- * @param {d3.selection} d3Point
- * @returns {d3.selection}
- * @private
- */
-dudeGraph.Renderer.prototype._createD3PointShapes = function (d3Point) {
-    var renderer = this;
-    d3Point
-        .selectAll(".cg-point-shape")
-        .data(d3Point.data(), function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName;
-        })
-        .enter()
-        .append("svg:path")
-        .classed("cg-point-shape", true)
-        .attr("d", function (rendererPoint) {
-            var r = renderer._config.point.radius;
-            if (rendererPoint.cgPoint.pointType === "Stream") {
-                return "M " + -r + " " + -r * 1.5 + " L " + -r + " " + r * 1.5 + " L " + r + " " + 0 + " Z";
-            } else {
-                return "M 0,0m " + -r + ", 0a " + [r, r] + " 0 1,0 " + r * 2 + ",0a " + [r, r] + " 0 1,0 " + -(r * 2) + ",0";
-            }
-        })
-        .call(renderer._removeRendererConnectionBehavior())
-        .call(renderer._dragRendererConnectionBehavior());
-};
-/**
- * Creates d3Blocks with the existing rendererBlocks
- * @private
- */
-dudeGraph.Renderer.prototype._createD3Blocks = function () {
-    var renderer = this;
-    this.d3Blocks
-        .data(this._rendererBlocks, function (rendererBlock) {
-            var nbPoints = Math.max(rendererBlock.cgBlock.cgInputs.length, rendererBlock.cgBlock.cgOutputs.length);
-            rendererBlock.size = [
-                renderer._config.block.size[0],
-                nbPoints * renderer._config.point.height + renderer._config.block.header
-            ];
-            return rendererBlock.id;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("id", function (rendererBlock) {
-            return renderer._getRendererNodeUniqueID(rendererBlock);
-        })
-        .classed("dude-graph-block", true)
-        .call(this._dragRendererNodeBehavior())
-        .call(this._removeRendererNodeFromParentBehavior())
-        .each(function (rendererBlock) {
-            d3.select(this).classed("cg-" + _.kebabCase(rendererBlock.cgBlock.blockType), true);
-            var creator = renderer._rendererBlockCreators[rendererBlock.cgBlock.blockType];
-            if (creator !== undefined) {
-                creator.call(this, renderer);
-            } else {
-                renderer._defaultBlockCreator.call(this, renderer);
-            }
-        });
-    this._updateD3Blocks();
-};
-
-/**
- *
- * @param renderer
- * @private
- */
-dudeGraph.Renderer.prototype._defaultBlockCreator = function (renderer) {
-    var d3Block = d3.select(this);
-    d3Block
-        .append("svg:rect")
-        .attr("rx", function () {
-            return renderer._config.block.borderRadius || 0;
-        })
-        .attr("ry", function () {
-            return renderer._config.block.borderRadius || 0;
-        });
-    d3Block
-        .append("svg:text")
-        .classed("dude-graph-title", true)
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge");
-    d3Block
-        .append("svg:g")
-        .classed("cg-points", true);
-    renderer._createD3Points(d3Block.select(".cg-points"));
-};
-
-/**
- * Updates all d3Blocks
- * @private
- */
-dudeGraph.Renderer.prototype._updateD3Blocks = function () {
-    this._updateSelectedD3Blocks(this.d3Blocks);
-};
-
-/**
- * Updates selected d3Blocks
- * @param {d3.selection} updatedD3Blocks
- * @private
- */
-dudeGraph.Renderer.prototype._updateSelectedD3Blocks = function (updatedD3Blocks) {
-    var renderer = this;
-    updatedD3Blocks.each(function (rendererBlock) {
-        var updater = renderer._rendererBlockUpdaters[rendererBlock.cgBlock.blockType];
-        if (updater !== undefined) {
-            updater.call(this, renderer);
-        } else {
-            renderer._defaultBlockUpdater.call(this, renderer);
-        }
-    });
-};
-
-/**
- *
- * @param renderer
- * @private
- */
-dudeGraph.Renderer.prototype._defaultBlockUpdater = function (renderer) {
-    var d3Block = d3.select(this);
-    d3Block
-        .select("text")
-        .text(function (rendererBlock) {
-            return rendererBlock.cgBlock.cgName;
-        });
-    d3Block
-        .each(function (rendererBlock) {
-            renderer._computeRendererBlockSize(rendererBlock);
-        });
-    d3Block
-        .attr("transform", function (rendererBlock) {
-            return "translate(" + rendererBlock.position + ")";
-        });
-    d3Block
-        .select("rect")
-        .attr("width", function (rendererBlock) {
-            return rendererBlock.size[0];
-        })
-        .attr("height", function (rendererBlock) {
-            return rendererBlock.size[1];
-        });
-    d3Block
-        .select("text")
-        .attr("transform", function (block) {
-            return "translate(" + [block.size[0] / 2, renderer._config.block.padding] + ")";
-        });
-    renderer._updateSelectedD3Points(d3Block.select(".cg-points").selectAll(".dude-graph-output, .dude-graph-input"));
-};
-
-/**
- * Removes d3Blocks when rendererBlocks are removed
- * @private
- */
-dudeGraph.Renderer.prototype._removeD3Blocks = function () {
-    var removedRendererBlocks = this.d3Blocks
-        .data(this._rendererBlocks, function (rendererBlock) {
-            return rendererBlock.id;
-        })
-        .exit()
-        .remove();
-};
-/**
- * Creates d3Connections with the existing rendererConnections
- * @private
- */
-dudeGraph.Renderer.prototype._createD3Connections = function () {
-    var createdD3Connections = this.d3Connections
-        .data(this._rendererConnections, function (rendererConnection) {
-            if (rendererConnection) {
-                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
-            }
-        })
-        .enter()
-        .append("svg:path")
-        .classed("dude-graph-connection", true)
-        .classed("dude-graph-stream", function (rendererConnection) {
-            return rendererConnection.inputRendererPoint.cgPoint.pointType === "Stream";
-        });
-    this._updateSelectedD3Connections(createdD3Connections);
-};
-
-/**
- * Updates all d3Connections
- * @private
- */
-dudeGraph.Renderer.prototype._updatedD3Connections = function () {
-    this._updateSelectedD3Connections(this.d3Connections);
-};
-
-/**
- * Updates selected d3Connections
- * @param {d3.selection} updatedD3Connections
- * @private
- */
-dudeGraph.Renderer.prototype._updateSelectedD3Connections = function (updatedD3Connections) {
-    var renderer = this;
-    updatedD3Connections
-        .attr("d", function (rendererConnection) {
-            var rendererPointPosition1 = this._getRendererPointPosition(rendererConnection.outputRendererPoint, false);
-            var rendererPointPosition2 = this._getRendererPointPosition(rendererConnection.inputRendererPoint, false);
-            return renderer._computeConnectionPath(rendererPointPosition1, rendererPointPosition2);
-        }.bind(this));
-};
-
-/**
- * Removes d3Connections when rendererConnections are removed
- * @private
- */
-dudeGraph.Renderer.prototype._removeD3Connections = function () {
-    var removedRendererConnections = this.d3Connections
-        .data(this._rendererConnections, function (rendererConnection) {
-            if (rendererConnection) {
-                return rendererConnection.outputRendererPoint.rendererBlock.id + ":" + rendererConnection.outputRendererPoint.cgPoint.cgName + "," +
-                    rendererConnection.inputRendererPoint.rendererBlock.id + ":" + rendererConnection.inputRendererPoint.cgPoint.cgName;
-            }
-        })
-        .exit()
-        .remove();
-};
-/**
- * Creates d3Groups with the existing rendererGroups
- * @private
- */
-dudeGraph.Renderer.prototype._createD3Groups = function () {
-    var createdD3Groups = this.d3Groups
-        .data(this._rendererGroups, function (rendererGroup) {
-            return rendererGroup.id;
-        })
-        .enter()
-        .append("svg:g")
-        .attr("id", function (rendererGroup) {
-            return this._getRendererNodeUniqueID(rendererGroup);
-        }.bind(this))
-        .attr("class", "dude-graph-group")
-        .call(this._dragRendererNodeBehavior())
-        .call(this._removeRendererNodeFromParentBehavior());
-    createdD3Groups
-        .append("svg:rect")
-        .attr("rx", this._config.group.borderRadius || 0)
-        .attr("ry", this._config.group.borderRadius || 0);
-    createdD3Groups
-        .append("svg:text")
-        .attr("class", "dude-graph-title")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge");
-    this._updateD3Groups();
-};
-
-/**
- * Updates all d3Groups
- * @private
- */
-dudeGraph.Renderer.prototype._updateD3Groups = function () {
-    this._updateSelectedD3Groups(this.d3Groups);
-};
-
-/**
- * Updates selected d3Groups
- * @param {d3.selection} updatedD3Groups
- * @private
- */
-dudeGraph.Renderer.prototype._updateSelectedD3Groups = function (updatedD3Groups) {
-    var renderer = this;
-    updatedD3Groups
-        .select("text")
-        .text(function (rendererGroup) {
-            return rendererGroup.description;
-        });
-    updatedD3Groups
-        .each(function (rendererGroup) {
-            return renderer._computeRendererGroupPositionAndSize(rendererGroup);
-        });
-    updatedD3Groups
-        .attr("transform", function (rendererGroup) {
-            return "translate(" + rendererGroup.position + ")";
-        });
-    updatedD3Groups
-        .select("rect")
-        .attr("width", function (rendererGroup) {
-            return rendererGroup.size[0];
-        })
-        .attr("height", function (rendererGroup) {
-            return rendererGroup.size[1];
-        });
-    updatedD3Groups
-        .select("text")
-        .attr("transform", function (rendererGroup) {
-            return "translate(" + [rendererGroup.size[0] / 2, renderer._config.group.padding] + ")";
-        });
-};
-
-/**
- * Removes d3Groups when rendererGroups are removed
- * @private
- */
-dudeGraph.Renderer.prototype._removeD3Groups = function () {
-    var removedD3Groups = this.d3Groups
-        .data(this._rendererGroups, function (rendererGroup) {
-            return rendererGroup.id;
-        })
-        .exit()
-        .remove();
-};
-/**
- * This method will update all nodes and their parents if needed
- * @param {d3.selection} d3Nodes
- * @private
- */
-dudeGraph.Renderer.prototype._updateSelectedD3Nodes = function (d3Nodes) {
-    var renderer = this;
-    var updateParents = [];
-    d3Nodes
-        .attr("transform", function (rendererNode) {
-            updateParents = updateParents.concat(renderer._getRendererNodeParents(rendererNode));
-            return "translate(" + rendererNode.position + ")";
-        });
-    if (updateParents.length > 0) {
-        this._updateSelectedD3Groups(this._getD3NodesFromRendererNodes(updateParents));
-    }
-    // TODO: Optimize this to only update the needed connections
-    this._updatedD3Connections();
-};
-/**
- * Returns the rendererNode associated with the given id
- * @param {String} id
- * @returns {dudeGraph.RendererBlock|null}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererBlockById = function (id) {
-    return this._rendererBlockIds.get(id) || null;
-};
-
-/**
- * Returns the rendererBlocks bound to the given cgBlock
- * @param {dudeGraph.Block} cgBlock
- * @returns {Array<dudeGraph.RendererBlock>}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererBlocksByCgBlock = function (cgBlock) {
-    var rendererBlocks = [];
-    _.forEach(this._rendererBlocks, function (rendererBlock) {
-        if (rendererBlock.cgBlock === cgBlock) {
-            rendererBlocks.push(rendererBlock);
-        }
-    });
-    return rendererBlocks;
-};
-
-/**
- * Creates a renderer block
- * @param {Object} rendererBlockData
- * @returns {dudeGraph.RendererBlock}
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererBlock = function (rendererBlockData) {
-    if (!rendererBlockData.id) {
-        throw new Error("Cannot create a rendererBlock without an id");
-    }
-    if (this._getRendererBlockById(rendererBlockData.id) !== null) {
-        throw new Error("Multiple rendererBlocks for id `" + rendererBlockData.id + "`");
-    }
-    var cgBlock = this._cgGraph.blockById(rendererBlockData.cgBlock);
-    if (!cgBlock) {
-        throw new Error("Cannot link cgBlock `" + rendererBlockData.cgBlock +
-            "` to rendererBlock `" + rendererBlockData.id + "`");
-    }
-    var rendererBlock = _.merge({}, rendererBlockData);
-    rendererBlock.type = "block";
-    rendererBlock.parent = null;
-    rendererBlock.cgBlock = cgBlock;
-    rendererBlock.id = rendererBlockData.id;
-    rendererBlock.rendererPoints = [];
-    rendererBlock.position = rendererBlockData.position || [0, 0];
-    rendererBlock.size = rendererBlockData.size || this._config.block.size;
-    this._createRendererPoints(rendererBlock);
-    this._rendererBlocks.push(rendererBlock);
-    this._rendererBlockIds.set(rendererBlock.id, rendererBlock);
-    return rendererBlock;
-};
-
-/**
- * Removes the given rendererBlock, and all its rendererConnections
- * Also removes the cgBlock from the cgGraph if it is the last reference
- * @param {dudeGraph.RendererBlock} rendererBlock
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererBlock = function (rendererBlock) {
-    var renderer = this;
-    var rendererBlockFound = this._rendererBlocks.indexOf(rendererBlock);
-    if (rendererBlockFound === -1) {
-        throw new Error("Cannot find rendererBlock `" + rendererBlock.id + "`");
-    }
-    _.forEach(rendererBlock.rendererPoints, function (rendererPoint) {
-        renderer._removeRendererPointRendererConnections(rendererPoint);
-    });
-    this._removeRendererNodeParent(rendererBlock);
-    this._rendererBlocks.splice(rendererBlockFound, 1);
-    if (this._getRendererBlocksByCgBlock(rendererBlock.cgBlock).length === 0) {
-        this._cgGraph.removeBlock(rendererBlock.cgBlock);
-    }
-};
-/**
- * Creates a rendererConnection
- * @param {Object} rendererConnectionData
- * @param {Boolean} [ignoreCgConnection=false] - Whether we ignore the creation of a cgConnection
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererConnection = function (rendererConnectionData, ignoreCgConnection) {
-    var outputRendererPoint = rendererConnectionData.outputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.outputBlockId), rendererConnectionData.outputName);
-    var inputRendererPoint = rendererConnectionData.inputRendererPoint || this._getRendererPointByName(this._getRendererBlockById(rendererConnectionData.inputBlockId), rendererConnectionData.inputName);
-    var cgConnection = rendererConnectionData.cgConnection;
-    if (!outputRendererPoint) {
-        throw new Error("Cannot find the outputRendererPoint");
-    }
-    if (!inputRendererPoint) {
-        throw new Error("Cannot find the inputRendererPoint");
-    }
-    if (!ignoreCgConnection) {
-        cgConnection = outputRendererPoint.cgPoint.connect(inputRendererPoint.cgPoint);
-    } else {
-        _.forEach(this._rendererConnections, function (rendererConnection) {
-            if (rendererConnection.cgConnection === cgConnection) {
-                throw new Error("Connections `" + cgConnection +
-                    "` is already handled in the renderer by the rendererConnection `" + rendererConnection + "`");
-            }
-        });
-    }
-    if (!cgConnection) {
-        throw new Error("Cannot create a rendererConnection without a cgConnection");
-    }
-    var rendererConnection = {
-        "cgConnection": cgConnection,
-        "outputRendererPoint": outputRendererPoint,
-        "inputRendererPoint": inputRendererPoint
-    };
-    this._rendererConnections.push(rendererConnection);
-};
-
-/**
- * Removes the given rendererConnection
- * @param {dudeGraph.RendererConnection} rendererConnection
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererConnection = function (rendererConnection) {
-    var rendererConnectionFound = this._rendererConnections.indexOf(rendererConnection);
-    if (rendererConnectionFound === -1) {
-        throw new Error("Connection not found");
-    }
-    rendererConnection.outputRendererPoint.cgPoint.disconnect(rendererConnection.inputRendererPoint.cgPoint);
-    this._rendererConnections.splice(rendererConnectionFound, 1);
-};
-/**
- * Returns the rendererGroup associated with the given id
- * @param {String} id
- * @returns {dudeGraph.RendererGroup|null}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererGroupById = function (id) {
-    return this._rendererGroupIds.get(id) || null;
-};
-
-/**
- * Creates a rendererGroup
- * @param {Object} rendererGroupData
- * @returns {dudeGraph.RendererGroup}
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererGroup = function (rendererGroupData) {
-    if (!rendererGroupData.id) {
-        throw new Error("Cannot create a rendererGroup without an id");
-    }
-    if (this._getRendererGroupById(rendererGroupData.id)) {
-        throw new Error("Duplicate rendererGroup for id `" + rendererGroupData.id + "`");
-    }
-    var rendererGroup = _.merge({}, rendererGroupData);
-    rendererGroup.type = "group";
-    rendererGroup.id = rendererGroupData.id;
-    rendererGroup.parent = null;
-    rendererGroup.children = [];
-    rendererGroup.position = rendererGroupData.position || [0, 0];
-    rendererGroup.size = rendererGroupData.size || this._config.group.size;
-    this._rendererGroups.push(rendererGroup);
-    this._rendererGroupIds.set(rendererGroup.id, rendererGroup);
-    return rendererGroup;
-};
-
-/**
- * Removes the rendererGroup
- * @param {dudeGraph.RendererGroup} rendererGroup
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererGroup = function (rendererGroup) {
-    var rendererGroupFound = this._rendererGroups.indexOf(rendererGroup);
-    if (rendererGroupFound === -1) {
-        throw new Error("RendererGroup not found and thus cannot be removed");
-    }
-    this._removeRendererNodeParent(rendererGroup);
-    this._rendererGroups.splice(rendererGroupFound, 1);
-};
-/**
- * Removes the given rendererNode from the renderer
- * Also removes the cgBlock if it is the rendererNode was the last reference on it
- * @param {dudeGraph.RendererNode} rendererNode
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererNode = function (rendererNode) {
-    if (rendererNode.type === "block") {
-        this._removeRendererBlock(rendererNode);
-    } else {
-        this._removeRendererGroup(rendererNode);
-    }
-};
-
-/**
- * Returns the parent hierarchy of the given rendererNode
- * @param {dudeGraph.RendererNode} rendererNode
- * @returns {Array<dudeGraph.RendererGroup>}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererNodeParents = function (rendererNode) {
-    var parents = [];
-    var parent = rendererNode.parent;
-    while (parent) {
-        parents.push(parent);
-        parent = parent.parent;
-    }
-    return parents;
-};
-
-/**
- * Adds the given rendererNode in the rendererGroupParent
- * @param {dudeGraph.RendererNode} rendererNode
- * @param {dudeGraph.RendererGroup} rendererGroupParent
- * @private
- */
-dudeGraph.Renderer.prototype._addRendererNodeParent = function (rendererNode, rendererGroupParent) {
-    if (rendererNode.parent === rendererGroupParent) {
-        return;
-    }
-    (function checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent) {
-        if (checkRendererGroupParent === rendererNode) {
-            throw new Error("Cannot add `" + rendererNode.id + "` as a child of `" + rendererGroupParent.id +
-                "`, because `" + rendererNode.id + "` is equal or is a parent of `" + rendererGroupParent.id + "`");
-        }
-        if (checkRendererGroupParent.parent) {
-            checkRendererNodeParentOfRendererGroupParent(checkRendererGroupParent.parent);
-        }
-    })(rendererGroupParent);
-    this._removeRendererNodeParent(rendererNode);
-    rendererGroupParent.children.push(rendererNode);
-    rendererNode.parent = rendererGroupParent;
-};
-
-/**
- * Removes the rendererNode from his parent
- * @param {dudeGraph.RendererNode} rendererNode
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererNodeParent = function (rendererNode) {
-    if (rendererNode.parent) {
-        rendererNode.parent.children.splice(rendererNode.parent.children.indexOf(rendererNode), 1);
-        rendererNode.parent = null;
-    }
-};
-/**
- * Returns the rendererPoint associated with the given name
- * @param {dudeGraph.RendererBlock} rendererBlock
- * @param {String} rendererPointName
- * @returns {dudeGraph.RendererPoint|null}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererPointByName = function (rendererBlock, rendererPointName) {
-    return _.find(rendererBlock.rendererPoints, function (rendererPoint) {
-            return rendererPoint.cgPoint.cgName === rendererPointName;
-        }
-    );
-};
-
-/**
- * Creates the rendererPoints for a given rendererBlock
- * @param {dudeGraph.RendererBlock} rendererBlock
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererPoints = function (rendererBlock) {
-    rendererBlock.rendererPoints = [];
-    _.forEach(rendererBlock.cgBlock.cgOutputs, function (cgOutput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgOutputs.indexOf(cgOutput),
-            "cgPoint": cgOutput,
-            "isOutput": true
-        });
-    });
-    _.forEach(rendererBlock.cgBlock.cgInputs, function (cgInput) {
-        rendererBlock.rendererPoints.push({
-            "type": "point",
-            "rendererBlock": rendererBlock,
-            "index": rendererBlock.cgBlock.cgInputs.indexOf(cgInput),
-            "cgPoint": cgInput,
-            "isOutput": false
-        });
-    });
-};
-
-/**
- * Returns all rendererConnections for the given rendererPoint
- * @param {dudeGraph.RendererPoint} rendererPoint
- * @returns {Array<dudeGraph.RendererConnection>}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererPointRendererConnections = function (rendererPoint) {
-    var rendererConnections = [];
-    _.forEach(this._rendererConnections, function (rendererConnection) {
-        if (rendererConnection.outputRendererPoint === rendererPoint || rendererConnection.inputRendererPoint === rendererPoint) {
-            rendererConnections.push(rendererConnection);
-        }
-    });
-    return rendererConnections;
-};
-
-/**
- * Removes all rendererConnections for the given rendererPoint
- * @param {dudeGraph.RendererPoint} rendererPoint
- * @private
- */
-dudeGraph.Renderer.prototype._removeRendererPointRendererConnections = function (rendererPoint) {
-    var renderer = this;
-    var removeRendererConnections = renderer._getRendererPointRendererConnections(rendererPoint);
-    _.forEach(removeRendererConnections, function (removeRendererConnection) {
-        renderer._removeRendererConnection(removeRendererConnection);
     });
 };

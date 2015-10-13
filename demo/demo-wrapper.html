@@ -26,21 +26,12 @@
                           on-error="_handleError"></dude-graph-inspector>
         </div>
     </template>
-    <script src="dude-models.js"></script>
-    <script src="shader-graph-models.js"></script>
-    <script src="demo-shader.js"></script>
-    <script src="demo-basic.js"></script>
     <script src="demo-shoot-behavior.js"></script>
     <script src="dude-saver.js"></script>
-    <script src="shader-saver.js"></script>
     <script>
         Polymer({
             is: "demo-wrapper",
             properties: {
-                modelsData: {
-                    type: Object,
-                    value: DUDE_MODELS
-                },
                 graphData: {
                     type: Object,
                     value: DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
