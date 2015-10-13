@@ -1,13 +1,13 @@
 <!--
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
-<link rel="import" href="../iron-input/iron-input.html">
-<link rel="import" href="../magnet-state/magnet-state.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
@@ -24,19 +24,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             --paper-input-container-focus-color: var(--dude-primary-color);
             --paper-input-container-input-color: var(--dude-content-text-color);
 
-        -
-        -paper-button: {
-        @apply(- -dude-button);
+            --paper-button: {
+                @apply(--dude-button);
+            };
+
+            --paper-dialog: {
+                @apply(--dude-dialog);
+            };
         }
 
-        ;
-        -
-        -paper-dialog: {
-        @apply(- -dude-dialog);
-        }
-
-        ;
-        }
         :host {
             background: var(--dude-secondary-background-color);
             overflow: auto;
@@ -73,10 +69,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             padding: 10px;
         }
 
-        #state > div:not(.active-state) {
-            display: none;
-        }
-
         #addGroupDialog {
             min-width: 350px;
         }
@@ -107,7 +99,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 <paper-button class="primary" on-click="_zoomToFit">Fit to screen</paper-button>
             </div>
             <!-- .box -->
-            <magnet-state id="state" class="layout vertical flex" root-state="root" current-state="{{_currentState}}">
+            <iron-pages class="layout vertical flex" attr-for-selected="data-state" selected="[[ _currentState ]]">
                 <div class="layout vertical flex" data-state="root">
                     <div class="box">
                         <div class="title">
@@ -218,7 +210,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <!-- .box -->
                 </div>
                 <!-- Edit variable -->
-            </magnet-state>
+            </iron-pages>
         </div>
     </template>
     <script>

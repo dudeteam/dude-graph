@@ -3016,137 +3016,6 @@ dudeGraph.Renderer.prototype.zoomToFit = function () {
     this._zoomToFit();
 };
 /**
- * Initializes rendererGroups and rendererBlocks
- * Add parent and children references, and also cgBlocks references to renderer blocks
- * @private
- */
-dudeGraph.Renderer.prototype._initialize = function () {
-    this._initializeRendererBlocks();
-    this._initializeRendererConnections();
-    this._initializeRendererGroups();
-    this._initializeRendererGroupParents();
-    this._initializeListeners();
-};
-
-/**
- * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererBlocks = function () {
-    var renderer = this;
-    _.forEach(this._data.blocks, function (blockData) {
-        renderer._createRendererBlock(blockData);
-    });
-};
-
-/**
- * Creates the rendererConnection between the rendererBlocks/rendererPoints
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererConnections = function () {
-    var renderer = this;
-    _.forEach(this._data.connections, function (connectionData) {
-        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
-        if (!cgConnection) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex + "` does not exists");
-        }
-        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
-        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
-
-        if (!outputRendererBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                    "`: Cannot find outputRendererBlock `" + connectionData.outputRendererBlockId + "`");
-        }
-        if (!inputRendererBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                    "`: Cannot find inputRendererBlock `" + connectionData.inputRendererBlockId + "`");
-        }
-        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: OutputRendererBlock `" + outputRendererBlock.id +
-                "` is not holding a reference to the outputCgBlock `" + cgConnection.cgOutputPoint.cgBlock.cgId + "`");
-        }
-        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: InputRendererBlock `" + inputRendererBlock.id +
-                "` is not holding a reference to the inputCgBlock `" + cgConnection.cgInputPoint.cgBlock.cgId + "`");
-        }
-        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
-        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
-        if (!outputRendererPoint) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: Cannot find outputRendererPoint `" + cgConnection.cgOutputPoint.cgName + "`");
-        }
-        if (!inputRendererPoint) {
-            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
-                "`: Cannot find inputRendererPoint `" + cgConnection.cgInputPoint.cgName + "`");
-        }
-        renderer._createRendererConnection({
-            "cgConnection": cgConnection,
-            "outputRendererPoint": outputRendererPoint,
-            "inputRendererPoint": inputRendererPoint
-        }, true);
-    });
-    // TODO: Check non linked cgConnections <=> rendererConnections
-};
-
-/**
- * Creates the rendererGroups
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererGroups = function () {
-    var renderer = this;
-    _.forEach(this._data.groups, function (groupData) {
-        renderer._createRendererGroup(groupData);
-    });
-};
-
-/**
- * Assigns rendererGroup parents
- * @private
- */
-dudeGraph.Renderer.prototype._initializeRendererGroupParents = function () {
-    var renderer = this;
-    _.forEach(this._data.blocks, function (rendererBlockData) {
-        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
-        if (rendererBlockData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
-            if (!rendererGroupParent) {
-                throw new Error("Cannot find rendererBlock parent id `" + rendererBlockData.parent + "`");
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
-        }
-    });
-    _.forEach(this._data.groups, function (rendererGroupData) {
-        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
-        if (rendererGroupData.parent) {
-            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
-            if (!rendererGroupParent) {
-                throw new Error("Cannot find rendererGroup parent id `" + rendererGroupData.parent + "`");
-            }
-            //noinspection JSCheckFunctionSignatures
-            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
-        }
-    });
-};
-/**
- * Initializes the listeners to automatically updates the renderer when a graph change occurs
- * @private
- */
-dudeGraph.Renderer.prototype._initializeListeners = function () {
-    var renderer = this;
-    this._cgGraph.on("dude-graph-block-create", this.createRendererBlock.bind(this));
-    this._cgGraph.on("dude-graph-block-name-change", function (cgBlock) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgBlock)));
-    });
-    this._cgGraph.on("cg-point-value-change", function (cgPoint) {
-        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
-            renderer._getRendererBlocksByCgBlock(cgPoint._cgBlock)));
-    });
-};
-/**
  * Drags the d3Node around
  * @returns {d3.behavior.drag}
  * @private
@@ -3440,6 +3309,572 @@ dudeGraph.Renderer.prototype._zoomToFit = function () {
     this._d3Svg
         .transition(this._config.zoom.transitionSpeed)
         .call(this._zoom.translate(translate).scale(scale).event);
+};
+/**
+ * Initializes rendererGroups and rendererBlocks
+ * Add parent and children references, and also cgBlocks references to renderer blocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._initialize = function () {
+    this._initializeRendererBlocks();
+    this._initializeRendererConnections();
+    this._initializeRendererGroups();
+    this._initializeRendererGroupParents();
+    this._initializeListeners();
+};
+
+/**
+ * Creates the rendererBlocks (linked to their respective cgBlocks) and their rendererPoints
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererBlocks = function () {
+    var renderer = this;
+    _.forEach(this._data.blocks, function (blockData) {
+        renderer._createRendererBlock(blockData);
+    });
+};
+
+/**
+ * Creates the rendererConnection between the rendererBlocks/rendererPoints
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererConnections = function () {
+    var renderer = this;
+    _.forEach(this._data.connections, function (connectionData) {
+        var cgConnection = renderer._cgGraph.cgConnections[connectionData.cgConnectionIndex];
+        if (!cgConnection) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex + "` does not exists");
+        }
+        var outputRendererBlock = renderer._getRendererBlockById(connectionData.outputRendererBlockId);
+        var inputRendererBlock = renderer._getRendererBlockById(connectionData.inputRendererBlockId);
+
+        if (!outputRendererBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                    "`: Cannot find outputRendererBlock `" + connectionData.outputRendererBlockId + "`");
+        }
+        if (!inputRendererBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                    "`: Cannot find inputRendererBlock `" + connectionData.inputRendererBlockId + "`");
+        }
+        if (outputRendererBlock.cgBlock !== cgConnection.cgOutputPoint.cgBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: OutputRendererBlock `" + outputRendererBlock.id +
+                "` is not holding a reference to the outputCgBlock `" + cgConnection.cgOutputPoint.cgBlock.cgId + "`");
+        }
+        if (inputRendererBlock.cgBlock !== cgConnection.cgInputPoint.cgBlock) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: InputRendererBlock `" + inputRendererBlock.id +
+                "` is not holding a reference to the inputCgBlock `" + cgConnection.cgInputPoint.cgBlock.cgId + "`");
+        }
+        var outputRendererPoint = renderer._getRendererPointByName(outputRendererBlock, cgConnection.cgOutputPoint.cgName);
+        var inputRendererPoint = renderer._getRendererPointByName(inputRendererBlock, cgConnection.cgInputPoint.cgName);
+        if (!outputRendererPoint) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: Cannot find outputRendererPoint `" + cgConnection.cgOutputPoint.cgName + "`");
+        }
+        if (!inputRendererPoint) {
+            throw new Error("Connection at index `" + connectionData.cgConnectionIndex +
+                "`: Cannot find inputRendererPoint `" + cgConnection.cgInputPoint.cgName + "`");
+        }
+        renderer._createRendererConnection({
+            "cgConnection": cgConnection,
+            "outputRendererPoint": outputRendererPoint,
+            "inputRendererPoint": inputRendererPoint
+        }, true);
+    });
+    // TODO: Check non linked cgConnections <=> rendererConnections
+};
+
+/**
+ * Creates the rendererGroups
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererGroups = function () {
+    var renderer = this;
+    _.forEach(this._data.groups, function (groupData) {
+        renderer._createRendererGroup(groupData);
+    });
+};
+
+/**
+ * Assigns rendererGroup parents
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeRendererGroupParents = function () {
+    var renderer = this;
+    _.forEach(this._data.blocks, function (rendererBlockData) {
+        var rendererBlock = renderer._getRendererBlockById(rendererBlockData.id);
+        if (rendererBlockData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererBlockData.parent);
+            if (!rendererGroupParent) {
+                throw new Error("Cannot find rendererBlock parent id `" + rendererBlockData.parent + "`");
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererBlock, rendererGroupParent);
+        }
+    });
+    _.forEach(this._data.groups, function (rendererGroupData) {
+        var rendererGroup = renderer._getRendererGroupById(rendererGroupData.id);
+        if (rendererGroupData.parent) {
+            var rendererGroupParent = renderer._getRendererGroupById(rendererGroupData.parent);
+            if (!rendererGroupParent) {
+                throw new Error("Cannot find rendererGroup parent id `" + rendererGroupData.parent + "`");
+            }
+            //noinspection JSCheckFunctionSignatures
+            renderer._addRendererNodeParent(rendererGroup, rendererGroupParent);
+        }
+    });
+};
+/**
+ * Initializes the listeners to automatically updates the renderer when a graph change occurs
+ * @private
+ */
+dudeGraph.Renderer.prototype._initializeListeners = function () {
+    var renderer = this;
+    this._cgGraph.on("dude-graph-block-create", this.createRendererBlock.bind(this));
+    this._cgGraph.on("dude-graph-block-name-change", function (cgBlock) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgBlock)));
+    });
+    this._cgGraph.on("cg-point-value-change", function (cgPoint) {
+        renderer._updateSelectedD3Blocks(renderer._getD3NodesFromRendererNodes(
+            renderer._getRendererBlocksByCgBlock(cgPoint._cgBlock)));
+    });
+};
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererBlocksCollisions = function () {
+    this._rendererBlocksQuadtree = d3.geom.quadtree()
+        .x(function (rendererBlock) {
+            return rendererBlock.position[0];
+        })
+        .y(function (rendererBlock) {
+            return rendererBlock.position[1];
+        })(this._rendererBlocks);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererGroupsCollisions = function () {
+    this._rendererGroupsQuadtree = d3.geom.quadtree()
+        .x(function (rendererGroup) {
+            return rendererGroup.position[0];
+        })
+        .y(function (rendererGroup) {
+            return rendererGroup.position[1];
+        })(this._rendererGroups);
+};
+
+/**
+ * Creates the collision quadtree
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRendererPointsCollisions = function () {
+    var renderer = this;
+    var rendererPoints = [];
+    _.forEach(this._rendererBlocks, function (rendererBlock) {
+        rendererPoints = rendererPoints.concat(rendererBlock.rendererPoints);
+    });
+    this._rendererPointsQuadtree = d3.geom.quadtree()
+        .x(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[0];
+        })
+        .y(function (rendererPoint) {
+            return renderer._getRendererPointPosition(rendererPoint)[1];
+        })(rendererPoints);
+};
+
+/**
+ * Returns all RendererNodes overlapping the given area
+ * @param {Number} x0 - Top left x
+ * @param {Number} y0 - Top left y
+ * @param {Number} x3 - Bottom right x
+ * @param {Number} y3 - Bottom right y
+ * @return {Array<dudeGraph.RendererNode>}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererBlocksCollisions();
+    var rendererBlocks = [];
+    this._rendererBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererBlock = d3QuadtreeNode.point;
+        if (rendererBlock) {
+            var bounds = [rendererBlock.position[0], rendererBlock.position[1], rendererBlock.position[0] + rendererBlock.size[0], rendererBlock.position[1] + rendererBlock.size[1]];
+            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
+                rendererBlocks.push(rendererBlock);
+            }
+        }
+        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
+    });
+    return rendererBlocks;
+};
+
+/**
+ * Get the best rendererGroup that can accept the given rendererNode
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @returns {dudeGraph.RendererGroup|null}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererGroupsCollisions();
+    var bestRendererGroups = [];
+    var x0 = rendererNode.position[0];
+    var y0 = rendererNode.position[1];
+    var x3 = rendererNode.position[0] + rendererNode.size[0];
+    var y3 = rendererNode.position[1] + rendererNode.size[1];
+    this._rendererGroupsQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var rendererGroup = d3QuadtreeNode.point;
+        if (rendererGroup && rendererGroup !== rendererNode) {
+            var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
+            if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
+                bestRendererGroups.push(rendererGroup);
+            }
+        }
+        return false; // TODO: Optimize
+    });
+    var bestRendererGroup = null;
+    pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
+        if (rendererNode.parent && bestRendererGroupPossible === rendererNode.parent) {
+            bestRendererGroup = bestRendererGroupPossible;
+            return true;
+        }
+        if (bestRendererGroup === null) {
+            bestRendererGroup = bestRendererGroupPossible;
+        } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
+            bestRendererGroup = bestRendererGroupPossible;
+        }
+    });
+    return bestRendererGroup;
+};
+
+/**
+ * Returns the nearest renderer point at the given position
+ * @param {[Number, Number]} position
+ * @return {dudeGraph.Point|null}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getNearestRendererPoint = function (position) {
+    // TODO: Update the quadtree only when needed
+    this._createRendererPointsCollisions();
+    var rendererPoint = this._rendererPointsQuadtree.find(position);
+    if (rendererPoint) {
+        var rendererPointPosition = this._getRendererPointPosition(rendererPoint);
+        if (rendererPointPosition[0] > position[0] - this._config.point.height && rendererPointPosition[0] < position[0] + this._config.point.height &&
+            rendererPointPosition[1] > position[1] - this._config.point.height && rendererPointPosition[1] < position[1] + this._config.point.height) {
+            return rendererPoint;
+        }
+    }
+    return null;
+};
+/**
+ * Internal function of d3
+ * @param dispatch
+ * @returns {event}
+ */
+function d3_dispatch_event(dispatch) {
+    var listeners = [], listenerByName = d3.map();
+
+    function event() {
+        var z = listeners, i = -1, n = z.length, l;
+        while (++i < n) {
+            l = z[i].on;
+            if (l) {
+                l.apply(this, arguments);
+            }
+        }
+        return dispatch;
+    }
+
+    event.on = function (name, listener) {
+        var l = listenerByName.get(name), i;
+        if (arguments.length < 2) return l && l.on;
+        if (l) {
+            l.on = null;
+            listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
+            listenerByName.remove(name);
+        }
+        if (listener) listeners.push(listenerByName.set(name, {on: listener}));
+        return dispatch;
+    };
+    return event;
+}
+
+/**
+ * Internal function of d3
+ * @param target
+ */
+function d3_eventDispatch(target) {
+    var dispatch = d3.dispatch(), i = 0, n = arguments.length;
+    while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
+    dispatch.of = function (thiz, argumentz) {
+        return function (e1) {
+            var e0;
+            try {
+                e0 = e1.sourceEvent = d3.event;
+                e1.target = target;
+                d3.event = e1;
+                dispatch[e1.type].apply(thiz, argumentz);
+            } finally {
+                d3.event = e0;
+            }
+        };
+    };
+    return dispatch;
+}
+
+/**
+ * Click behavior
+ */
+d3.behavior.mousedown = function () {
+    var event = d3_eventDispatch(mousedown, "mousedown");
+    function mousedown(selection) {
+        selection.each(function (i) {
+            var dispatch = event.of(this, arguments);
+            d3.select(this).on("mousedown", clicked);
+            function clicked() {
+                dispatch({
+                    "type": "mousedown"
+                });
+            }
+        });
+    }
+    return d3.rebind(mousedown, event, "on");
+};
+
+/**
+ * Double click behavior
+ */
+d3.behavior.doubleClick = function () {
+    var event = d3_eventDispatch(doubleClick, "dblclick");
+    function doubleClick(selection) {
+        selection.each(function (i) {
+            var dispatch = event.of(this, arguments);
+            d3.select(this).on("dblclick", clicked);
+            function clicked() {
+                dispatch({
+                    "type": "dblclick"
+                });
+            }
+        });
+    }
+    return d3.rebind(doubleClick, event, "on");
+};
+/**
+ * Get the text bounding box
+ * Fixes a bug on chrome where the bounding box is zero when the element is not yet rendered
+ * @param textElement {HTMLElement}
+ * @return {[Number, Number]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getTextBBox = function (textElement) {
+    var bbox = textElement.getBBox();
+    if (bbox.width === 0 && bbox.height === 0) {
+        bbox = {
+            width: textElement.textContent.length * 8,
+            height: 24
+        };
+    }
+    return [bbox.width, bbox.height];
+};
+
+/**
+ * Returns an absolute position in the SVG from the relative position in the SVG container
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getAbsolutePosition(d3.mouse(this));
+ * @param {[Number, Number]} point
+ * @return {[Number, Number]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getAbsolutePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
+    return [position.x, position.y];
+};
+
+/**
+ * Returns a relative position in the SVG container from absolute position in the SVG
+ * It takes into account all transformations applied to the SVG
+ * Example: renderer._getRelativePosition(d3.mouse(this));
+ * @param {[Number, Number]} point
+ * @return {[Number, Number]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRelativePosition = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getScreenCTM().inverse());
+    return [position.x, position.y];
+};
+
+/**
+ * Returns the bounding box for all the given rendererNodes
+ * @param {Array<dudeGraph.RendererNode>} rendererNodes
+ * @returns {[[Number, Number], [Number, Number]]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
+    var topLeft = null;
+    var bottomRight = null;
+    _.forEach(rendererNodes, function (rendererNode) {
+        if (!topLeft) {
+            topLeft = new pandora.Vec2(rendererNode.position);
+        }
+        if (!bottomRight) {
+            bottomRight = new pandora.Vec2(rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]);
+        }
+        topLeft.x = Math.min(rendererNode.position[0], topLeft.x);
+        topLeft.y = Math.min(rendererNode.position[1], topLeft.y);
+        bottomRight.x = Math.max(bottomRight.x, rendererNode.position[0] + rendererNode.size[0]);
+        bottomRight.y = Math.max(bottomRight.y, rendererNode.position[1] + rendererNode.size[1]);
+    });
+    return [topLeft.toArray(), bottomRight.toArray()];
+};
+
+/**
+ * Computes the size of the given rendererBlock depending on its text or inputs/outputs
+ * @param {dudeGraph.RendererBlock} rendererBlock
+ * @private
+ */
+dudeGraph.Renderer.prototype._computeRendererBlockSize = function (rendererBlock) {
+    var renderer = this;
+    var d3Block = this._getD3NodesFromRendererNodes([rendererBlock]);
+    var blockSize = renderer._getTextBBox(d3Block.select("text").node());
+    var d3Points = d3Block.select(".cg-points").selectAll(".dude-graph-output, .dude-graph-input");
+    var maxOutput = 0;
+    var maxInput = 0;
+    rendererBlock.size[0] = Math.max(rendererBlock.size[0], blockSize[0] + this._config.block.padding * 2);
+    d3Points.each(function (rendererPoint) {
+        var d3Point = d3.select(this);
+        var textSize = renderer._getTextBBox(d3Point.select("text").node());
+        if (rendererPoint.isOutput) {
+            maxOutput = Math.max(maxOutput, textSize[0]);
+        } else {
+            maxInput = Math.max(maxInput, textSize[0]);
+        }
+    });
+    rendererBlock.size[0] = Math.max(rendererBlock.size[0], maxOutput + maxInput + this._config.block.padding * 4 + this._config.point.radius * 2 + this._config.point.offset);
+};
+
+/**
+ * Computes the position and the size of the given rendererGroup depending of its children
+ * @param {dudeGraph.RendererGroup} rendererGroup
+ * @private
+ */
+dudeGraph.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererGroup) {
+    var renderer = this;
+    if (rendererGroup.children.length > 0) {
+        var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
+        rendererGroup.position = [
+            size[0][0] - renderer._config.group.padding,
+            size[0][1] - renderer._config.group.padding - renderer._config.group.header];
+        rendererGroup.size = [
+            size[1][0] - size[0][0] + renderer._config.group.padding * 2,
+            size[1][1] - size[0][1] + renderer._config.group.padding * 2 + renderer._config.group.header
+        ];
+    }
+    rendererGroup.size = [
+        Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
+        Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
+    ];
+    var d3Group = this._getD3NodesFromRendererNodes([rendererGroup]);
+    rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Group.select("text").node().getBBox().width + renderer._config.group.padding * 2);
+    (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
+        if (rendererGroupParent) {
+            renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
+            computeRendererGroupParentPositionAndSize(rendererGroupParent.parent);
+        }
+    })(rendererGroup.parent);
+};
+
+/**
+ * Returns the rendererPoint position
+ * @param {dudeGraph.RendererPoint} rendererPoint
+ * @param {Boolean} relative - Whether the position is relative to the block position.
+ * @return {[Number, Number]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererPointPosition = function (rendererPoint, relative) {
+    var offsetX = relative ? 0 : rendererPoint.rendererBlock.position[0];
+    var offsetY = relative ? 0 : rendererPoint.rendererBlock.position[1];
+    var pointPositionGetter = this._pointPositionGetters[rendererPoint.rendererBlock.cgBlock.blockType];
+    if (pointPositionGetter) {
+        return pointPositionGetter.call(this, rendererPoint, offsetX, offsetY);
+    } else {
+        if (rendererPoint.isOutput) {
+            return [
+                offsetX + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
+                offsetY + this._config.block.header + this._config.point.height * rendererPoint.index
+            ];
+        } else {
+            return [
+                offsetX + this._config.block.padding,
+                offsetY + this._config.block.header + this._config.point.height * rendererPoint.index
+            ];
+        }
+    }
+};
+
+/**
+ * Computes the connection path between two points
+ * @param {[Number, Number]} point1
+ * @param {[Number, Number]} point2
+ * @return {String}
+ * @private
+ */
+dudeGraph.Renderer.prototype._computeConnectionPath = function (point1, point2) {
+    var step = 150;
+    if (point1[0] - point2[0] < 0) {
+        step += Math.max(-100, point1[0] - point2[0]);
+    }
+    return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
+        x: point1[0], y: point1[1],
+        x1: point1[0] + step, y1: point1[1],
+        x2: point2[0] - step, y2: point2[1],
+        x3: point2[0], y3: point2[1]
+    });
+};
+/**
+ * Returns an unique HTML usable id for the given rendererNode
+ * @param {dudeGraph.RendererNode} rendererNode
+ * @param {Boolean?} sharp - True to include the sharp to select, False otherwise
+ * @return {String}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getRendererNodeUniqueID = function (rendererNode, sharp) {
+    return pandora.formatString("{0}cg-{1}-{2}", sharp ? "#" : "", rendererNode.type, rendererNode.id);
+};
+
+/**
+ * Returns a selection of d3Nodes from rendererNodes
+ * @param {Array<dudeGraph.RendererNode>} rendererNodes
+ * @returns {d3.selection}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
+    var groupedSelectionIds = d3.set();
+    pandora.forEach(rendererNodes, function (rendererNode) {
+        groupedSelectionIds.add(this._getRendererNodeUniqueID(rendererNode, true));
+    }.bind(this));
+    return this._d3Root.selectAll(groupedSelectionIds.values().join(", "));
+};
+
+/**
+ * Moves the d3 selection nodes to the top front of their respective parents
+ * @param {d3.selection} d3Selection
+ * @returns {d3.selection}
+ * @private
+ */
+dudeGraph.Renderer.prototype._d3MoveToFront = function (d3Selection) {
+    return d3Selection.each(function () {
+        this.parentNode.appendChild(this);
+    });
 };
 /**
  * Creates d3Points
@@ -4135,440 +4570,5 @@ dudeGraph.Renderer.prototype._removeRendererPointRendererConnections = function 
     var removeRendererConnections = renderer._getRendererPointRendererConnections(rendererPoint);
     _.forEach(removeRendererConnections, function (removeRendererConnection) {
         renderer._removeRendererConnection(removeRendererConnection);
-    });
-};
-/**
- * Creates the collision quadtree
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererBlocksCollisions = function () {
-    this._rendererBlocksQuadtree = d3.geom.quadtree()
-        .x(function (rendererBlock) {
-            return rendererBlock.position[0];
-        })
-        .y(function (rendererBlock) {
-            return rendererBlock.position[1];
-        })(this._rendererBlocks);
-};
-
-/**
- * Creates the collision quadtree
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererGroupsCollisions = function () {
-    this._rendererGroupsQuadtree = d3.geom.quadtree()
-        .x(function (rendererGroup) {
-            return rendererGroup.position[0];
-        })
-        .y(function (rendererGroup) {
-            return rendererGroup.position[1];
-        })(this._rendererGroups);
-};
-
-/**
- * Creates the collision quadtree
- * @private
- */
-dudeGraph.Renderer.prototype._createRendererPointsCollisions = function () {
-    var renderer = this;
-    var rendererPoints = [];
-    _.forEach(this._rendererBlocks, function (rendererBlock) {
-        rendererPoints = rendererPoints.concat(rendererBlock.rendererPoints);
-    });
-    this._rendererPointsQuadtree = d3.geom.quadtree()
-        .x(function (rendererPoint) {
-            return renderer._getRendererPointPosition(rendererPoint)[0];
-        })
-        .y(function (rendererPoint) {
-            return renderer._getRendererPointPosition(rendererPoint)[1];
-        })(rendererPoints);
-};
-
-/**
- * Returns all RendererNodes overlapping the given area
- * @param {Number} x0 - Top left x
- * @param {Number} y0 - Top left y
- * @param {Number} x3 - Bottom right x
- * @param {Number} y3 - Bottom right y
- * @return {Array<dudeGraph.RendererNode>}
- * @private
- */
-dudeGraph.Renderer.prototype._getNearestRendererBlocks = function (x0, y0, x3, y3) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererBlocksCollisions();
-    var rendererBlocks = [];
-    this._rendererBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
-        var rendererBlock = d3QuadtreeNode.point;
-        if (rendererBlock) {
-            var bounds = [rendererBlock.position[0], rendererBlock.position[1], rendererBlock.position[0] + rendererBlock.size[0], rendererBlock.position[1] + rendererBlock.size[1]];
-            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
-                rendererBlocks.push(rendererBlock);
-            }
-        }
-        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
-    });
-    return rendererBlocks;
-};
-
-/**
- * Get the best rendererGroup that can accept the given rendererNode
- * @param {dudeGraph.RendererNode} rendererNode
- * @returns {dudeGraph.RendererGroup|null}
- * @private
- */
-dudeGraph.Renderer.prototype._getNearestRendererGroup = function (rendererNode) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererGroupsCollisions();
-    var bestRendererGroups = [];
-    var x0 = rendererNode.position[0];
-    var y0 = rendererNode.position[1];
-    var x3 = rendererNode.position[0] + rendererNode.size[0];
-    var y3 = rendererNode.position[1] + rendererNode.size[1];
-    this._rendererGroupsQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
-        var rendererGroup = d3QuadtreeNode.point;
-        if (rendererGroup && rendererGroup !== rendererNode) {
-            var bounds = [rendererGroup.position[0], rendererGroup.position[1], rendererGroup.position[0] + rendererGroup.size[0], rendererGroup.position[1] + rendererGroup.size[1]];
-            if (x0 > bounds[0] && y0 > bounds[1] && x3 < bounds[2] && y3 < bounds[3]) {
-                bestRendererGroups.push(rendererGroup);
-            }
-        }
-        return false; // TODO: Optimize
-    });
-    var bestRendererGroup = null;
-    pandora.forEach(bestRendererGroups, function (bestRendererGroupPossible) {
-        if (rendererNode.parent && bestRendererGroupPossible === rendererNode.parent) {
-            bestRendererGroup = bestRendererGroupPossible;
-            return true;
-        }
-        if (bestRendererGroup === null) {
-            bestRendererGroup = bestRendererGroupPossible;
-        } else if (bestRendererGroupPossible.size[0] < bestRendererGroup.size[0] && bestRendererGroupPossible.size[1] < bestRendererGroup.size[1]) {
-            bestRendererGroup = bestRendererGroupPossible;
-        }
-    });
-    return bestRendererGroup;
-};
-
-/**
- * Returns the nearest renderer point at the given position
- * @param {[Number, Number]} position
- * @return {dudeGraph.Point|null}
- * @private
- */
-dudeGraph.Renderer.prototype._getNearestRendererPoint = function (position) {
-    // TODO: Update the quadtree only when needed
-    this._createRendererPointsCollisions();
-    var rendererPoint = this._rendererPointsQuadtree.find(position);
-    if (rendererPoint) {
-        var rendererPointPosition = this._getRendererPointPosition(rendererPoint);
-        if (rendererPointPosition[0] > position[0] - this._config.point.height && rendererPointPosition[0] < position[0] + this._config.point.height &&
-            rendererPointPosition[1] > position[1] - this._config.point.height && rendererPointPosition[1] < position[1] + this._config.point.height) {
-            return rendererPoint;
-        }
-    }
-    return null;
-};
-/**
- * Internal function of d3
- * @param dispatch
- * @returns {event}
- */
-function d3_dispatch_event(dispatch) {
-    var listeners = [], listenerByName = d3.map();
-
-    function event() {
-        var z = listeners, i = -1, n = z.length, l;
-        while (++i < n) {
-            l = z[i].on;
-            if (l) {
-                l.apply(this, arguments);
-            }
-        }
-        return dispatch;
-    }
-
-    event.on = function (name, listener) {
-        var l = listenerByName.get(name), i;
-        if (arguments.length < 2) return l && l.on;
-        if (l) {
-            l.on = null;
-            listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
-            listenerByName.remove(name);
-        }
-        if (listener) listeners.push(listenerByName.set(name, {on: listener}));
-        return dispatch;
-    };
-    return event;
-}
-
-/**
- * Internal function of d3
- * @param target
- */
-function d3_eventDispatch(target) {
-    var dispatch = d3.dispatch(), i = 0, n = arguments.length;
-    while (++i < n) dispatch[arguments[i]] = d3_dispatch_event(dispatch);
-    dispatch.of = function (thiz, argumentz) {
-        return function (e1) {
-            var e0;
-            try {
-                e0 = e1.sourceEvent = d3.event;
-                e1.target = target;
-                d3.event = e1;
-                dispatch[e1.type].apply(thiz, argumentz);
-            } finally {
-                d3.event = e0;
-            }
-        };
-    };
-    return dispatch;
-}
-
-/**
- * Click behavior
- */
-d3.behavior.mousedown = function () {
-    var event = d3_eventDispatch(mousedown, "mousedown");
-    function mousedown(selection) {
-        selection.each(function (i) {
-            var dispatch = event.of(this, arguments);
-            d3.select(this).on("mousedown", clicked);
-            function clicked() {
-                dispatch({
-                    "type": "mousedown"
-                });
-            }
-        });
-    }
-    return d3.rebind(mousedown, event, "on");
-};
-
-/**
- * Double click behavior
- */
-d3.behavior.doubleClick = function () {
-    var event = d3_eventDispatch(doubleClick, "dblclick");
-    function doubleClick(selection) {
-        selection.each(function (i) {
-            var dispatch = event.of(this, arguments);
-            d3.select(this).on("dblclick", clicked);
-            function clicked() {
-                dispatch({
-                    "type": "dblclick"
-                });
-            }
-        });
-    }
-    return d3.rebind(doubleClick, event, "on");
-};
-/**
- * Get the text bounding box
- * Fixes a bug on chrome where the bounding box is zero when the element is not yet rendered
- * @param textElement {HTMLElement}
- * @return {[Number, Number]}
- * @private
- */
-dudeGraph.Renderer.prototype._getTextBBox = function (textElement) {
-    var bbox = textElement.getBBox();
-    if (bbox.width === 0 && bbox.height === 0) {
-        bbox = {
-            width: textElement.textContent.length * 8,
-            height: 24
-        };
-    }
-    return [bbox.width, bbox.height];
-};
-
-/**
- * Returns an absolute position in the SVG from the relative position in the SVG container
- * It takes into account all transformations applied to the SVG
- * Example: renderer._getAbsolutePosition(d3.mouse(this));
- * @param {[Number, Number]} point
- * @return {[Number, Number]}
- * @private
- */
-dudeGraph.Renderer.prototype._getAbsolutePosition = function (point) {
-    this._svgPoint.x = point[0];
-    this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
-    return [position.x, position.y];
-};
-
-/**
- * Returns a relative position in the SVG container from absolute position in the SVG
- * It takes into account all transformations applied to the SVG
- * Example: renderer._getRelativePosition(d3.mouse(this));
- * @param {[Number, Number]} point
- * @return {[Number, Number]}
- * @private
- */
-dudeGraph.Renderer.prototype._getRelativePosition = function (point) {
-    this._svgPoint.x = point[0];
-    this._svgPoint.y = point[1];
-    var position = this._svgPoint.matrixTransform(this._d3Root.node().getScreenCTM().inverse());
-    return [position.x, position.y];
-};
-
-/**
- * Returns the bounding box for all the given rendererNodes
- * @param {Array<dudeGraph.RendererNode>} rendererNodes
- * @returns {[[Number, Number], [Number, Number]]}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererNodesBoundingBox = function (rendererNodes) {
-    var topLeft = null;
-    var bottomRight = null;
-    _.forEach(rendererNodes, function (rendererNode) {
-        if (!topLeft) {
-            topLeft = new pandora.Vec2(rendererNode.position);
-        }
-        if (!bottomRight) {
-            bottomRight = new pandora.Vec2(rendererNode.position[0] + rendererNode.size[0], rendererNode.position[1] + rendererNode.size[1]);
-        }
-        topLeft.x = Math.min(rendererNode.position[0], topLeft.x);
-        topLeft.y = Math.min(rendererNode.position[1], topLeft.y);
-        bottomRight.x = Math.max(bottomRight.x, rendererNode.position[0] + rendererNode.size[0]);
-        bottomRight.y = Math.max(bottomRight.y, rendererNode.position[1] + rendererNode.size[1]);
-    });
-    return [topLeft.toArray(), bottomRight.toArray()];
-};
-
-/**
- * Computes the size of the given rendererBlock depending on its text or inputs/outputs
- * @param {dudeGraph.RendererBlock} rendererBlock
- * @private
- */
-dudeGraph.Renderer.prototype._computeRendererBlockSize = function (rendererBlock) {
-    var renderer = this;
-    var d3Block = this._getD3NodesFromRendererNodes([rendererBlock]);
-    var blockSize = renderer._getTextBBox(d3Block.select("text").node());
-    var d3Points = d3Block.select(".cg-points").selectAll(".dude-graph-output, .dude-graph-input");
-    var maxOutput = 0;
-    var maxInput = 0;
-    rendererBlock.size[0] = Math.max(rendererBlock.size[0], blockSize[0] + this._config.block.padding * 2);
-    d3Points.each(function (rendererPoint) {
-        var d3Point = d3.select(this);
-        var textSize = renderer._getTextBBox(d3Point.select("text").node());
-        if (rendererPoint.isOutput) {
-            maxOutput = Math.max(maxOutput, textSize[0]);
-        } else {
-            maxInput = Math.max(maxInput, textSize[0]);
-        }
-    });
-    rendererBlock.size[0] = Math.max(rendererBlock.size[0], maxOutput + maxInput + this._config.block.padding * 4 + this._config.point.radius * 2 + this._config.point.offset);
-};
-
-/**
- * Computes the position and the size of the given rendererGroup depending of its children
- * @param {dudeGraph.RendererGroup} rendererGroup
- * @private
- */
-dudeGraph.Renderer.prototype._computeRendererGroupPositionAndSize = function (rendererGroup) {
-    var renderer = this;
-    if (rendererGroup.children.length > 0) {
-        var size = renderer._getRendererNodesBoundingBox(rendererGroup.children);
-        rendererGroup.position = [
-            size[0][0] - renderer._config.group.padding,
-            size[0][1] - renderer._config.group.padding - renderer._config.group.header];
-        rendererGroup.size = [
-            size[1][0] - size[0][0] + renderer._config.group.padding * 2,
-            size[1][1] - size[0][1] + renderer._config.group.padding * 2 + renderer._config.group.header
-        ];
-    }
-    rendererGroup.size = [
-        Math.max(rendererGroup.size[0], renderer._config.group.size[0] + renderer._config.group.padding * 2),
-        Math.max(rendererGroup.size[1], renderer._config.group.size[1] + renderer._config.group.padding * 2 + renderer._config.group.header)
-    ];
-    var d3Group = this._getD3NodesFromRendererNodes([rendererGroup]);
-    rendererGroup.size[0] = Math.max(rendererGroup.size[0], d3Group.select("text").node().getBBox().width + renderer._config.group.padding * 2);
-    (function computeRendererGroupParentPositionAndSize(rendererGroupParent) {
-        if (rendererGroupParent) {
-            renderer._computeRendererGroupPositionAndSize(rendererGroupParent);
-            computeRendererGroupParentPositionAndSize(rendererGroupParent.parent);
-        }
-    })(rendererGroup.parent);
-};
-
-/**
- * Returns the rendererPoint position
- * @param {dudeGraph.RendererPoint} rendererPoint
- * @param {Boolean} relative - Whether the position is relative to the block position.
- * @return {[Number, Number]}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererPointPosition = function (rendererPoint, relative) {
-    var offsetX = relative ? 0 : rendererPoint.rendererBlock.position[0];
-    var offsetY = relative ? 0 : rendererPoint.rendererBlock.position[1];
-    var pointPositionGetter = this._pointPositionGetters[rendererPoint.rendererBlock.cgBlock.blockType];
-    if (pointPositionGetter) {
-        return pointPositionGetter.call(this, rendererPoint, offsetX, offsetY);
-    } else {
-        if (rendererPoint.isOutput) {
-            return [
-                offsetX + rendererPoint.rendererBlock.size[0] - this._config.block.padding,
-                offsetY + this._config.block.header + this._config.point.height * rendererPoint.index
-            ];
-        } else {
-            return [
-                offsetX + this._config.block.padding,
-                offsetY + this._config.block.header + this._config.point.height * rendererPoint.index
-            ];
-        }
-    }
-};
-
-/**
- * Computes the connection path between two points
- * @param {[Number, Number]} point1
- * @param {[Number, Number]} point2
- * @return {String}
- * @private
- */
-dudeGraph.Renderer.prototype._computeConnectionPath = function (point1, point2) {
-    var step = 150;
-    if (point1[0] - point2[0] < 0) {
-        step += Math.max(-100, point1[0] - point2[0]);
-    }
-    return pandora.formatString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
-        x: point1[0], y: point1[1],
-        x1: point1[0] + step, y1: point1[1],
-        x2: point2[0] - step, y2: point2[1],
-        x3: point2[0], y3: point2[1]
-    });
-};
-/**
- * Returns an unique HTML usable id for the given rendererNode
- * @param {dudeGraph.RendererNode} rendererNode
- * @param {Boolean?} sharp - True to include the sharp to select, False otherwise
- * @return {String}
- * @private
- */
-dudeGraph.Renderer.prototype._getRendererNodeUniqueID = function (rendererNode, sharp) {
-    return pandora.formatString("{0}cg-{1}-{2}", sharp ? "#" : "", rendererNode.type, rendererNode.id);
-};
-
-/**
- * Returns a selection of d3Nodes from rendererNodes
- * @param {Array<dudeGraph.RendererNode>} rendererNodes
- * @returns {d3.selection}
- * @private
- */
-dudeGraph.Renderer.prototype._getD3NodesFromRendererNodes = function (rendererNodes) {
-    var groupedSelectionIds = d3.set();
-    pandora.forEach(rendererNodes, function (rendererNode) {
-        groupedSelectionIds.add(this._getRendererNodeUniqueID(rendererNode, true));
-    }.bind(this));
-    return this._d3Root.selectAll(groupedSelectionIds.values().join(", "));
-};
-
-/**
- * Moves the d3 selection nodes to the top front of their respective parents
- * @param {d3.selection} d3Selection
- * @returns {d3.selection}
- * @private
- */
-dudeGraph.Renderer.prototype._d3MoveToFront = function (d3Selection) {
-    return d3Selection.each(function () {
-        this.parentNode.appendChild(this);
     });
 };

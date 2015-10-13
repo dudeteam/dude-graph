@@ -33,7 +33,6 @@
     "pandora": "~0.0.11",
     "polymer": "Polymer/polymer#^1.0.0",
     "dude-hierarchy": "~0.0.4",
-    "magnet-state": "*",
     "iron-input": "PolymerElements/iron-input#~1.0.4",
     "paper-fab": "PolymerElements/paper-fab#~1.0.3",
     "paper-item": "PolymerElements/paper-item#~1.0.2",
