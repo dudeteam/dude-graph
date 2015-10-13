@@ -80,7 +80,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <paper-dialog id="addGroupDialog" modal>
             <div class="title">Add a new group</div>
-            <paper-input label="Group description" value="{{_newGroupDescription}}"></paper-input>
+            <paper-input label="Group description" value="{{ _newGroupDescription }}"></paper-input>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
                 <paper-button on-click="_confirmAddGroup" dialog-confirm>Accept</paper-button>
@@ -116,7 +116,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </div>
                         <div class="row">
                             <label>type</label>
-                            <paper-dropdown-menu label="Choose..." selected-item-label="{{_varType}}" no-label-float>
+                            <paper-dropdown-menu label="Choose..." selected-item-label="[[ _varType ]]" no-label-float>
                                 <paper-menu class="dropdown-content">
                                     <paper-item>Boolean</paper-item>
                                     <paper-item>Number</paper-item>
@@ -126,11 +126,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_varName}}" type="text">
+                            <input is="iron-input" bind-value="{{ _varName }}" type="text">
                         </div>
                         <div class="row">
                             <label>value</label>
-                            <input is="iron-input" bind-value="{{_varValue}}" type="text">
+                            <input is="iron-input" bind-value="{{ _varValue }}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
                     </div>
@@ -162,13 +162,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_blockName}}" type="text">
+                            <input is="iron-input" bind-value="{{ _blockName }}" type="text">
                         </div>
-                        <div class="subtitle" hidden$="{{_blockNoInput}}">Inputs</div>
+                        <div class="subtitle" hidden$="[[ _blockNoInput ]]">Inputs</div>
                         <div class="row">
-                            <template is="dom-repeat" id="menu" items="{{_blockInputs}}">
+                            <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
                                 <label>{{item.cgName}}</label>
-                                <input is="iron-input" bind-value="{{item.cgValue}}" type="text">
+                                <input is="iron-input" bind-value="{{ item.cgValue }}" type="text">
                             </template>
                         </div>
                         <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
@@ -184,7 +184,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </div>
                         <div class="row">
                             <label>value</label>
-                            <input is="iron-input" bind-value="{{_value}}" type="text">
+                            <input is="iron-input" bind-value="{{ _value }}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
                     </div>
@@ -199,11 +199,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </div>
                         <div class="row">
                             <label>name</label>
-                            <input is="iron-input" bind-value="{{_varName}}" type="text">
+                            <input is="iron-input" bind-value="{{ _varName }}" type="text">
                         </div>
                         <div class="row">
                             <label>value</label>
-                            <input is="iron-input" bind-value="{{_varValue}}" type="text">
+                            <input is="iron-input" bind-value="{{ _varValue }}" type="text">
                         </div>
                         <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
                     </div>
