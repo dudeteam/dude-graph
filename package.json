@@ -19,7 +19,7 @@
     "test": "tests"
   },
   "devDependencies": {
-    "bower": "^1.5.3",
+    "bower": "^1.6.2",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-jshint": "^1.11.2",
