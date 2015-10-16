@@ -8,6 +8,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
@@ -36,7 +37,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         :host {
             background: var(--dude-secondary-background-color);
             overflow: auto;
-            padding: 5px;
+            padding: 10px 5px 5px;
         }
 
         div {
@@ -65,16 +66,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             padding-bottom: 10px;
         }
 
-        .box {
-            padding: 10px;
-        }
-
         #addGroupDialog {
             min-width: 350px;
         }
 
         .box paper-button {
             margin: 2px 0;
+        }
+
+        dude-collapse {
+            padding-bottom: 5px;
         }
     </style>
     <template>
@@ -87,130 +88,93 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             </div>
         </paper-dialog>
         <div class="layout vertical flex">
-            <div class="box">
-                <div class="title">
-                    <i class="fa fa-chevron-down"></i>
-                    Tools
-                </div>
+            <dude-collapse title="Tools">
                 <paper-button class="primary" on-click="_compile">Compile</paper-button>
                 <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
                 <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
                 <paper-button class="primary" on-click="_save">Save</paper-button>
                 <paper-button class="primary" on-click="_zoomToFit">Fit to screen</paper-button>
+            </dude-collapse>
+        <iron-pages class="layout vertical flex" attr-for-selected="data-state" selected="[[ _currentState ]]">
+            <div class="layout vertical flex" data-state="root">
+                <dude-collapse title="Add block">
+                    <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
+                </dude-collapse>
+                <dude-collapse title="Create variable">
+                    <div class="row">
+                        <label>type</label>
+                        <paper-dropdown-menu label="Choose..." selected-item-label="[[ _varType ]]" no-label-float>
+                            <paper-menu class="dropdown-content">
+                                <paper-item>Boolean</paper-item>
+                                <paper-item>Number</paper-item>
+                                <paper-item>String</paper-item>
+                            </paper-menu>
+                        </paper-dropdown-menu>
+                    </div>
+                    <div class="row">
+                        <label>name</label>
+                        <input is="iron-input" bind-value="{{ _varName }}" type="text">
+                    </div>
+                    <div class="row">
+                        <label>value</label>
+                        <input is="iron-input" bind-value="{{ _varValue }}" type="text">
+                    </div>
+                    <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
+                </dude-collapse>
             </div>
-            <!-- .box -->
-            <iron-pages class="layout vertical flex" attr-for-selected="data-state" selected="[[ _currentState ]]">
-                <div class="layout vertical flex" data-state="root">
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Add block
-                        </div>
-                        <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
+            <!-- root -->
+            <div data-state="editGroup">
+                <dude-collapse title="Edit group">
+                    <div class="row">
+                        <label>description</label>
+                        <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..."
+                               type="text">
                     </div>
-                    <!-- .box -->
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Create variable
-                        </div>
-                        <div class="row">
-                            <label>type</label>
-                            <paper-dropdown-menu label="Choose..." selected-item-label="[[ _varType ]]" no-label-float>
-                                <paper-menu class="dropdown-content">
-                                    <paper-item>Boolean</paper-item>
-                                    <paper-item>Number</paper-item>
-                                    <paper-item>String</paper-item>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                        </div>
-                        <div class="row">
-                            <label>name</label>
-                            <input is="iron-input" bind-value="{{ _varName }}" type="text">
-                        </div>
-                        <div class="row">
-                            <label>value</label>
-                            <input is="iron-input" bind-value="{{ _varValue }}" type="text">
-                        </div>
-                        <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
+                    <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
+                </dude-collapse>
+            </div>
+            <!-- Edit group -->
+            <div data-state="editBlock">
+                <dude-collapse title="Edit block">
+                    <div class="row">
+                        <label>name</label>
+                        <input is="iron-input" bind-value="{{ _blockName }}" type="text">
                     </div>
-                    <!-- .box -->
-                </div>
-                <!-- root -->
-                <div data-state="editGroup">
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Edit group
-                        </div>
-                        <div class="row">
-                            <label>description</label>
-                            <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..."
-                                   type="text">
-                        </div>
-                        <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
+                    <div class="subtitle" hidden$="[[ _blockNoInput ]]">Inputs</div>
+                    <div class="row">
+                        <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
+                            <label>{{item.cgName}}</label>
+                            <input is="iron-input" bind-value="{{ item.cgValue }}" type="text">
+                        </template>
                     </div>
-                    <!-- .box -->
-
-                </div>
-                <!-- Edit group -->
-                <div data-state="editBlock">
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Edit block
-                        </div>
-                        <div class="row">
-                            <label>name</label>
-                            <input is="iron-input" bind-value="{{ _blockName }}" type="text">
-                        </div>
-                        <div class="subtitle" hidden$="[[ _blockNoInput ]]">Inputs</div>
-                        <div class="row">
-                            <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
-                                <label>{{item.cgName}}</label>
-                                <input is="iron-input" bind-value="{{ item.cgValue }}" type="text">
-                            </template>
-                        </div>
-                        <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
+                    <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
+                </dude-collapse>
+            </div>
+            <!-- Edit value -->
+            <div data-state="editValue">
+                <dude-collapse title="Edit value">
+                    <div class="row">
+                        <label>value</label>
+                        <input is="iron-input" bind-value="{{ _value }}" type="text">
                     </div>
-                    <!-- .box -->
-                </div>
-                <!-- Edit block -->
-                <div data-state="editValue">
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Edit value
-                        </div>
-                        <div class="row">
-                            <label>value</label>
-                            <input is="iron-input" bind-value="{{ _value }}" type="text">
-                        </div>
-                        <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
+                    <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
+                </dude-collapse>
+            </div>
+            <!-- Edit variable -->
+            <div data-state="editVariable">
+                <dude-collapse title="Edit variable">
+                    <div class="row">
+                        <label>name</label>
+                        <input is="iron-input" bind-value="{{ _varName }}" type="text">
                     </div>
-                    <!-- .box -->
-                </div>
-                <!-- Edit value -->
-                <div data-state="editVariable">
-                    <div class="box">
-                        <div class="title">
-                            <i class="fa fa-chevron-down"></i>
-                            Edit variable
-                        </div>
-                        <div class="row">
-                            <label>name</label>
-                            <input is="iron-input" bind-value="{{ _varName }}" type="text">
-                        </div>
-                        <div class="row">
-                            <label>value</label>
-                            <input is="iron-input" bind-value="{{ _varValue }}" type="text">
-                        </div>
-                        <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
+                    <div class="row">
+                        <label>value</label>
+                        <input is="iron-input" bind-value="{{ _varValue }}" type="text">
                     </div>
-                    <!-- .box -->
-                </div>
-                <!-- Edit variable -->
-            </iron-pages>
+                    <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
+                </dude-collapse>
+            </div>
+        </iron-pages>
         </div>
     </template>
     <script>
