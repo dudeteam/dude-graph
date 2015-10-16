@@ -9,6 +9,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
+<link rel="import" href="../dude-property/dude-property.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
@@ -101,79 +102,60 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
                 </dude-collapse>
                 <dude-collapse title="Create variable">
-                    <div class="row">
-                        <label>type</label>
-                        <paper-dropdown-menu label="Choose..." selected-item-label="[[ _varType ]]" no-label-float>
-                            <paper-menu class="dropdown-content">
-                                <paper-item>Boolean</paper-item>
-                                <paper-item>Number</paper-item>
-                                <paper-item>String</paper-item>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                    </div>
-                    <div class="row">
-                        <label>name</label>
-                        <input is="iron-input" bind-value="{{ _varName }}" type="text">
-                    </div>
-                    <div class="row">
-                        <label>value</label>
-                        <input is="iron-input" bind-value="{{ _varValue }}" type="text">
-                    </div>
+                    <dude-property property-type="choice"
+                                   property-name="type"
+                                   property-value="{{ varType }}"
+                                   property-choice="[[ types ]]">
+                    </dude-property>
+                    <dude-property property-type="string"
+                                   property-name="name"
+                                   property-value="{{ varName }}">
+                    </dude-property>
+                    <dude-property property-type="{{ varType }}"
+                                   property-name="value"
+                                   property-value="{{ varValue }}">
+                    </dude-property>
                     <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
                 </dude-collapse>
-            </div>
-            <!-- root -->
+            </div> <!-- /root -->
             <div data-state="editGroup">
                 <dude-collapse title="Edit group">
-                    <div class="row">
-                        <label>description</label>
-                        <input is="iron-input" bind-value="{{_groupDescription}}" placeholder="Group description..."
-                               type="text">
-                    </div>
+                    <dude-property property-type="string"
+                                   property-name="description"
+                                   property-value="{{ _groupDescription }}">
+                    </dude-property>
                     <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
                 </dude-collapse>
-            </div>
-            <!-- Edit group -->
+            </div> <!-- /editGroup -->
             <div data-state="editBlock">
                 <dude-collapse title="Edit block">
-                    <div class="row">
-                        <label>name</label>
-                        <input is="iron-input" bind-value="{{ _blockName }}" type="text">
-                    </div>
+                    <dude-property property-type="string"
+                                   property-name="name"
+                                   property-value="{{ _blockName }}">
+                    </dude-property>
                     <div class="subtitle" hidden$="[[ _blockNoInput ]]">Inputs</div>
-                    <div class="row">
-                        <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
-                            <label>{{item.cgName}}</label>
-                            <input is="iron-input" bind-value="{{ item.cgValue }}" type="text">
-                        </template>
-                    </div>
+                    <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
+                        <dude-property property-type="{{ _getType(item) }}"
+                                       property-name="{{ item.cgName }}"
+                                       property-value="{{ item.cgValue }}">
+                        </dude-property>
+                    </template>
                     <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
                 </dude-collapse>
-            </div>
-            <!-- Edit value -->
-            <div data-state="editValue">
-                <dude-collapse title="Edit value">
-                    <div class="row">
-                        <label>value</label>
-                        <input is="iron-input" bind-value="{{ _value }}" type="text">
-                    </div>
-                    <paper-button class="primary" on-click="_editValueClicked">Edit</paper-button>
-                </dude-collapse>
-            </div>
-            <!-- Edit variable -->
+            </div> <!-- /editBlock -->
             <div data-state="editVariable">
                 <dude-collapse title="Edit variable">
-                    <div class="row">
-                        <label>name</label>
-                        <input is="iron-input" bind-value="{{ _varName }}" type="text">
-                    </div>
-                    <div class="row">
-                        <label>value</label>
-                        <input is="iron-input" bind-value="{{ _varValue }}" type="text">
-                    </div>
+                    <dude-property property-type="string"
+                                   property-name="name"
+                                   property-value="{{ _varName }}">
+                    </dude-property>
+                    <dude-property property-type="{{ _varType }}"
+                                   property-name="value"
+                                   property-value="{{ _varValue }}">
+                    </dude-property>
                     <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
                 </dude-collapse>
-            </div>
+            </div> <!-- /editVariable -->
         </iron-pages>
         </div>
     </template>
@@ -189,17 +171,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
                 "element": {
                     type: DudeGraph
+                },
+                "types": {
+                    "type": Array,
+                    "value": ["boolean", "number", "string"]
+                },
+                "varType": {
+                    "type": String,
+                    "value": "boolean"
                 }
+            },
+            _getType: function (item) {
+                return item.cgValueType.toLowerCase();
             },
             ready: function () {
                 this._blocksTree = [];
                 this._folders = {};
                 this._selectedNode = null;
                 this._currentState = "root";
-                this._varType = "";
-                this._varName = "";
-                this._varValue = "";
-                this._varFolder = "";
                 _.forEach(this.models, function (value, key) {
                     var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
                     if (value.cgFolder) {
@@ -269,7 +258,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                 }).map(function (point) {
                                     return {
                                         cgName: point.cgName,
-                                        cgValue: point.cgValue
+                                        cgValue: point.cgValue,
+                                        cgValueType: point.cgValueType
                                     };
                                 });
                                 this._blockNoInput = this._blockInputs.length === 0;
