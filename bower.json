@@ -44,8 +44,8 @@
     "paper-dialog": "PolymerElements/paper-dialog#~1.0.1",
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.5",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.1",
-    "dude-style": "*",
-    "dude-collapse": "*"
+    "dude-style": "~0.0.1",
+    "dude-collapse": "~0.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
