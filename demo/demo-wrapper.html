@@ -1,5 +1,11 @@
-<link rel="import" href="../dude-graph.html">
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../dude-graph-editor.html">
 <link rel="import" href="../dude-graph-inspector.html">
+<!--
+`demo-wrapper` is a Polymer element to wrap dude-graph demos
+-->
 <dom-module id="demo-wrapper">
     <style>
         #wrapper {
@@ -11,19 +17,16 @@
     </style>
     <template>
         <div id="wrapper" class="layout horizontal fit">
-            <dude-graph id="element"
-                        class="panel layout horizontal flex-2"
-                        graph-data="{{graphData}}"
-                        renderer-data="{{rendererData}}"
-                        models-data="{{modelsData}}"
-                        on-error="_handleError">
-            </dude-graph>
-            <dude-graph-inspector id="inspector"
-                          class="panel layout horizontal flex"
-                          models="{{modelsData}}"
-                          on-save="_graphSaved"
-                          on-compile="_graphCompiled"
-                          on-error="_handleError"></dude-graph-inspector>
+            <dude-graph-editor id="dudeGraphEditor"
+                               class="panel layout horizontal flex-2"
+                               graph-data="[[ graphData ]]"
+                               renderer-data="[[ rendererData ]]"
+                               on-dude-graph-editor-error="_handleDudeGraphEditorError">
+            </dude-graph-editor>
+            <dude-graph-inspector id="dudeGraphInspector"
+                                  class="panel layout horizontal flex"
+                                  model-data="[[ modelData ]]">
+            </dude-graph-inspector>
         </div>
     </template>
     <script src="demo-shoot-behavior.js"></script>
@@ -32,27 +35,46 @@
         Polymer({
             is: "demo-wrapper",
             properties: {
-                graphData: {
-                    type: Object,
-                    value: DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
+                /**
+                 * The graph data
+                 */
+                "graphData": {
+                    "type": Object,
+                    "value": DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
                 },
-                rendererData: {
-                    type: Object,
-                    value: DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
+
+                /**
+                 * The renderer
+                 */
+                "rendererData": {
+                    "type": Object,
+                    "value": DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
+                },
+
+                /**
+                 * The blocks
+                 */
+                "modelData": {
+                    "type": Array,
+                    "value": DEMO_SHOOT_BEHAVIOR_MODEL_DATA
                 }
             },
+
+            /**
+             * Called when the demo-wrapper element is ready
+             * @delegate
+             */
             ready: function () {
-                this.$.inspector.bindElement(this.$.element);
-                this.$.inspector.bindBuilder(new DudeSaver());
+                this.$.dudeGraphInspector.dudeGraphEditor = this.$.dudeGraphEditor;
             },
-            _graphSaved: function (e) {
-                console.log(JSON.stringify(e.detail, null, 2));
-            },
-            _graphCompiled: function (e) {
-                console.log(e.detail);
-            },
-            _handleError: function (e) {
-                console.log("error: ", e.detail.message);
+
+            /**
+             * Called when a error occurs in dudeGraphEditor
+             * @param {CustomEvent} e
+             * @private
+             */
+            _handleDudeGraphEditorError: function (e) {
+                console.error(e.detail.error);
             }
         });
     </script>

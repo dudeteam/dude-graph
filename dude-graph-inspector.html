@@ -1,13 +1,9 @@
 <!--
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
-<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="stylesheet" href="../font-awesome/css/font-awesome.css">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../paper-menu/paper-menu.html">
-<link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-property/dude-property.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
@@ -40,340 +36,210 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             overflow: auto;
             padding: 10px 5px 5px;
         }
-
-        div {
-            font-family: var(--dude-primary-text-font);
-            color: var(--dude-content-text-color);
-        }
-
-        .title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--dude-title-text-color);
-            padding-bottom: 10px;
-            border-bottom: 2px solid #222222;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-
-        .title i {
-            color: var(--dude-content-text-color);
-            font-size: .8em;
-            padding-right: 5px;
-        }
-
-        .subtitle {
-            color: var(--dude-title-text-color);
-            padding-bottom: 10px;
-        }
-
-        #addGroupDialog {
-            min-width: 350px;
-        }
-
-        .box paper-button {
-            margin: 2px 0;
-        }
-
-        dude-collapse {
-            padding-bottom: 5px;
-        }
     </style>
     <template>
-        <paper-dialog id="addGroupDialog" modal>
-            <div class="title">Add a new group</div>
-            <paper-input label="Group description" value="{{ _newGroupDescription }}"></paper-input>
-            <div class="buttons">
-                <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button on-click="_confirmAddGroup" dialog-confirm>Accept</paper-button>
-            </div>
-        </paper-dialog>
         <div class="layout vertical flex">
             <dude-collapse title="Tools">
-                <paper-button class="primary" on-click="_compile">Compile</paper-button>
-                <paper-button class="primary" on-click="_addGroup">Add group</paper-button>
-                <paper-button class="primary" on-click="_removeSelection">Remove selection</paper-button>
-                <paper-button class="primary" on-click="_save">Save</paper-button>
-                <paper-button class="primary" on-click="_zoomToFit">Fit to screen</paper-button>
+                <paper-button><i class="fa fa-play"></i></paper-button>
+                <paper-button on-click="_showCreateGroup"><i class="fa fa-object-group"></i></paper-button>
+                <paper-button on-click="_removeSelection"><i class="fa fa-remove"></i></paper-button>
+                <paper-button><i class="fa fa-save"></i></paper-button>
+                <paper-button on-click="_zoomToFit"><i class="fa fa-compress"></i></paper-button>
             </dude-collapse>
-        <iron-pages class="layout vertical flex" attr-for-selected="data-state" selected="[[ _currentState ]]">
-            <div class="layout vertical flex" data-state="root">
-                <dude-collapse title="Add block">
-                    <!-- TODO: Fix dude-hierarchy to support new API
-                        <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
-                    -->
-                </dude-collapse>
-                <dude-collapse title="Create variable">
-                    <dude-property property-type="choice"
-                                   property-name="type"
-                                   property-value="{{ varType }}"
-                                   property-choice="[[ types ]]">
-                    </dude-property>
-                    <dude-property property-type="string"
-                                   property-name="name"
-                                   property-value="{{ varName }}">
-                    </dude-property>
-                    <dude-property property-type="{{ varType }}"
-                                   property-name="value"
-                                   property-value="{{ varValue }}">
-                    </dude-property>
-                    <paper-button class="primary" on-click="_createVariableClicked">Create</paper-button>
-                </dude-collapse>
-            </div> <!-- /root -->
-            <div data-state="editGroup">
-                <dude-collapse title="Edit group">
-                    <dude-property property-type="string"
-                                   property-name="description"
-                                   property-value="{{ _groupDescription }}">
-                    </dude-property>
-                    <paper-button class="primary" on-click="_editGroupClicked">Edit</paper-button>
-                </dude-collapse>
-            </div> <!-- /editGroup -->
-            <div data-state="editBlock">
-                <dude-collapse title="Edit block">
-                    <dude-property property-type="string"
-                                   property-name="name"
-                                   property-value="{{ _blockName }}">
-                    </dude-property>
-                    <div class="subtitle" hidden$="[[ _blockNoInput ]]">Inputs</div>
-                    <template is="dom-repeat" id="menu" items="[[ _blockInputs ]]">
-                        <dude-property property-type="{{ _getType(item) }}"
-                                       property-name="{{ item.cgName }}"
-                                       property-value="{{ item.cgValue }}">
+            <dude-collapse title="Add Block">
+                <dude-hierarchy
+                        items="[[ modelData ]]"
+                        on-dude-hierarchy-item-submit="_createBlockFromModel">
+                </dude-hierarchy>
+            </dude-collapse>
+            <template is="dom-if" if="[[ _rendererBlock ]]" restamp>
+                <dude-collapse title="Edit Block">
+                    <input
+                            is="input"
+                            type="text"
+                            value="{{ _rendererBlock.cgBlock.cgName::input }}"
+                            bind-value="[[ _rendererBlock.cgBlock.cgName ]]" />
+                    <template is="dom-repeat" items="[[ _getInputs(_rendererBlock) ]]" as="cgPoint">
+                        <dude-property property-type="{{ _getType(cgPoint) }}"
+                                       property-name="{{ cgPoint.cgName }}"
+                                       property-value="{{ cgPoint.cgValue }}"
+                                       no-reference>
                         </dude-property>
                     </template>
-                    <paper-button class="primary" on-click="_editBlockClicked">Edit</paper-button>
                 </dude-collapse>
-            </div> <!-- /editBlock -->
-            <div data-state="editVariable">
-                <dude-collapse title="Edit variable">
-                    <dude-property property-type="string"
-                                   property-name="name"
-                                   property-value="{{ _varName }}">
-                    </dude-property>
-                    <dude-property property-type="{{ _varType }}"
-                                   property-name="value"
-                                   property-value="{{ _varValue }}">
-                    </dude-property>
-                    <paper-button class="primary" on-click="_editVariableClicked">Edit</paper-button>
+            </template>
+            <template is="dom-if" if="[[ _rendererGroup ]]" restamp>
+                <dude-collapse title="Edit Group">
+                    <input
+                            is="input"
+                            type="text"
+                            value="{{ _rendererGroup.description::input }}"
+                            bind-value="[[ _rendererGroup.description ]]"/>
                 </dude-collapse>
-            </div> <!-- /editVariable -->
-        </iron-pages>
+            </template>
+            <template is="dom-if" if="[[ _createGroupState ]]">
+                <dude-collapse title="Create group">
+                    <input
+                            is="input"
+                            type="text"
+                            value="{{ _groupName::input }}"
+                            bind-value="[[ _groupName ]]"/>
+                    <paper-button on-click="_createGroup">Create</paper-button>
+                </dude-collapse>
+            </template>
         </div>
     </template>
     <script>
         var DudeGraphInspector = Polymer({
-
             is: "dude-graph-inspector",
 
             properties: {
-                "models": {
-                    "type": Object,
-                    "value": {}
+                /**
+                 * The DudeGraph element to inspect
+                 */
+                "dudeGraphEditor": {
+                    "type": DudeGraphEditor,
+                    "value": null
                 },
-                "element": {
-                    type: DudeGraph
-                },
-                "types": {
+
+                /**
+                 * The list of blocks that can be added to the dudeGraph
+                 */
+                "modelData": {
                     "type": Array,
-                    "value": ["boolean", "number", "string"]
+                    "value": []
                 },
-                "varType": {
-                    "type": String,
-                    "value": "boolean"
+
+                /**
+                 * The graph saver
+                 */
+                "saver": {
+                    "type": Function,
+                    "value": null
                 }
             },
-            _getType: function (item) {
-                return item.cgValueType.toLowerCase();
-            },
-            ready: function () {
-                this._blocksTree = [];
-                this._folders = {};
-                this._selectedNode = null;
-                this._currentState = "root";
-                _.forEach(this.models, function (value, key) {
-                    var icon = ["Value", "Variable"].indexOf(value.cgType) === -1 ? "fa fa-square" : "fa fa-circle";
-                    if (value.cgFolder) {
-                        if (this._folders[value.cgFolder] === undefined) {
-                            this._folders[value.cgFolder] = {
-                                group: {
-                                    name: value.cgFolder,
-                                    icon: "fa fa-folder",
-                                    items: []
-                                }
-                            };
-                            this._blocksTree.push(this._folders[value.cgFolder]);
-                        }
-                        this._folders[value.cgFolder].group.items.push({item: {name: key, icon: icon, data: value}});
-                    } else {
-                        this._blocksTree.push({item: {name: key, icon: icon, data: value}});
+
+            /**
+             * The current selected rendererBlock
+             * @type {dudeGraph.RendererBlock}
+             */
+            _rendererBlock: null,
+
+            /**
+             * The current selected rendererBlock
+             * @type {dudeGraph.RendererGroup}
+             */
+            _rendererGroup: null,
+
+            /**
+             * Whether the createGroup should be displayed
+             * @type {Boolean}
+             */
+            _createGroupState: false,
+
+            /**
+             * The group name to be created
+             * @type {String}
+             */
+            _groupName: null,
+
+            /**
+             * Called when the dudeGraphInspector element is ready and attached
+             * @delegate
+             */
+            attached: function () {
+                this.dudeGraphEditor.renderer.on("cg-select", function (rendererNode) {
+                    if (rendererNode.type === "block") {
+                        this.set("_rendererBlock", rendererNode);
+                        this.set("_rendererGroup", null);
+                    } else if (rendererNode.type === "group") {
+                        this.set("_rendererGroup", rendererNode);
+                        this.set("_rendererBlock", null);
                     }
                 }.bind(this));
-                this._blocksTree.unshift({
-                    group: {
-                        name: "control", icon: "fa fa-folder", items: [
-                            {item: {name: "Condition", icon: "fa fa-square", data: {"cgType": "Condition"}}},
-                            {item: {name: "Each", icon: "fa fa-square", data: {"cgType": "Each"}}},
-                            {item: {name: "Range", icon: "fa fa-square", data: {"cgType": "Range"}}}
-                        ]
-                    }
-                });
-                this._customVariables = {group: {name: "custom variables", icon: "fa fa-folder", items: []}};
-                this._blocksTree.unshift(this._customVariables);
-                this._blocksTree.unshift({
-                    item: {
-                        name: "Assignation", icon: "fa fa-plus-square", data: {
-                            "cgType": "Assignation"
-                        }
-                    }
-                });
-                // this.$.blocks.loadItems(this._blocksTree);
-            },
-            getHierarchy: function () {
-                return this.$.blocks;
-            },
-            bindBuilder: function (builder) {
-                this._builder = builder;
-            },
-            bindElement: function (element) {
-                this.element = element;
-                _.forEach(this.element.graph.blocksByType("Variable"), this.addVariable.bind(this));
-                // this.$.blocks.loadItems(this._blocksTree);
-                this.element.renderer.on("cg-select", function (node) {
-                    this._selectedNode = node;
-                    if (node.type === "block") {
-                        switch (node.cgBlock.blockType) {
-                            case "Variable":
-                                this._currentState = "editVariable";
-                                this._varName = node.cgBlock.cgName;
-                                this._varValue = node.cgBlock.cgValue;
-                                break;
-                            case "Value":
-                                this._currentState = "editValue";
-                                this._value = node.cgBlock.cgValue;
-                                break;
-                            default:
-                                this._currentState = "editBlock";
-                                this._blockName = node.cgBlock.cgName;
-                                this._blockInputs = node.cgBlock.cgInputs.filter(function (point) {
-                                    return point.pointType === "Point";
-                                }).map(function (point) {
-                                    return {
-                                        cgName: point.cgName,
-                                        cgValue: point.cgValue,
-                                        cgValueType: point.cgValueType
-                                    };
-                                });
-                                this._blockNoInput = this._blockInputs.length === 0;
-                        }
-                    } else if (node.type === "group") {
-                        this._currentState = "editGroup";
-                        this._groupDescription = node.description;
-                    }
-                }.bind(this));
-                this.element.renderer.on("cg-unselect", function () {
-                    this._currentState = "root";
+                this.dudeGraphEditor.renderer.on("cg-unselect", function () {
+                    this.set("_rendererBlock", null);
+                    this.set("_rendererGroup", null);
                 }.bind(this));
             },
-            addVariable: function (variable) {
-                this._customVariables.group.items.push({
-                    item: {
-                        name: variable.cgName,
-                        icon: "fa fa-circle",
-                        data: variable
-                    }
-                });
-            },
-            _createBlock: function (e) {
-                if (e.detail.item.group) {
-                    return;
-                }
-                if (e.detail.item !== null) {
-                    if (e.detail.item.data.blockType === "Variable") {
-                        this.element.renderer.createRendererBlock(e.detail.item.data);
-                    } else {
-                        var data = Object.create(e.detail.item.data);
-                        if (e.detail.item.data.cgType === "Assignation") {
-                            data.cgValueType = "Boolean"; // TODO: replace hard-coded value
-                        } else {
-                            data.cgName = e.detail.item.name;
-                        }
-                        data.cgId = dudeGraph.UUID.generate();
-                        this.element.graph.loader.loadBlock(data);
-                    }
+
+            /**
+             * Called when an item is submitted in dude-hierarchy
+             * Creates a block in dudeGraph
+             * @param {CustomEvent} e
+             * @private
+             */
+            _createBlockFromModel: function (e) {
+                if (e.detail.item.data) {
+                    this.dudeGraphEditor.createBlock(e.detail.item.data);
                 }
             },
-            _createVariableClicked: function () {
-                if (!this._varType) {
-                    this.fire("error", {message: "A `type` is required to create a variable"});
-                    return;
-                }
-                if (!this._varName) {
-                    this.fire("error", {message: "A `name` is required to create a variable"});
-                    return;
-                }
-                var variable = new dudeGraph.Variable(this.element.graph, {
-                    cgId: dudeGraph.UUID.generate(),
-                    cgName: this._varName,
-                    cgValueType: this._varType,
-                    cgValue: this._varValue
-                });
-                this.element.graph.addBlock(variable, true);
-                this.addVariable(variable);
-                // this.$.blocks.loadItems(this._blocksTree); // Refresh the list
-                this._varName = "";
-                this._varValue = "";
+
+            /**
+             * Called when clicking on the show create group button
+             * Shows the group creation popup
+             * @delegate
+             * @private
+             */
+            _showCreateGroup: function () {
+                this.set("_createGroupState", true);
             },
-            _editVariableClicked: function () {
-                this._selectedNode.cgBlock.cgName = this._varName;
-                this._selectedNode.cgBlock.cgValue = this._varValue;
+
+            /**
+             * Called when clicking on the create group button
+             * Creates a rendererGroup
+             * @delegate
+             * @private
+             */
+            _createGroup: function () {
+                this.dudeGraphEditor.createGroup(this._groupName);
+                this.set("_groupName", null);
+                this.set("_createGroupState", false);
             },
-            _editValueClicked: function () {
-                this._selectedNode.cgBlock.cgValue = this._varValue;
-            },
-            _editBlockClicked: function () {
-                this._selectedNode.cgBlock.cgName = this._blockName;
-                _.forEach(this._blockInputs, function (input) {
-                    if (input.cgValue && input.cgValue !== "") {
-                        // TODO: Handle difference between "" and null
-                        this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = input.cgValue;
-                    } else {
-                        this._selectedNode.cgBlock.inputByName(input.cgName).cgValue = null;
-                    }
-                }.bind(this));
-            },
-            _editGroupClicked: function () {
-                this._selectedNode.description = this._groupDescription;
-                this.element.renderer._updateD3Groups(); // TODO: Public API
-            },
-            _compile: function () {
-                try {
-                    this.fire("compile", this._builder.save(this.element.graph));
-                } catch (e) {
-                    this.fire("error", {error: e, message: e.message});
-                }
-            },
-            _addGroup: function () {
-                this.$.addGroupDialog.open();
-            },
-            _confirmAddGroup: function () {
-                this.element.renderer.createGroupFromSelection(this._newGroupDescription);
-                this._newGroupDescription = "";
-            },
+
+            /**
+             * Called when clicking on the remove selection button
+             * Removes the selected rendererNodes
+             * @delegate
+             * @private
+             */
             _removeSelection: function () {
-                this.element.renderer.removeSelection();
-                this._currentState = "root";
+                this.dudeGraphEditor.removeSelection();
             },
-            _save: function () {
-                try {
-                    this.fire("save", new dudeGraph.JSONSaver().save(this.element.renderer, this.element.graph));
-                } catch (e) {
-                    this.fire("error", {error: e, message: e.message});
-                }
-            },
+
+            /**
+             * Called when clicking on the zoom to fit button
+             * @delegate
+             * @private
+             */
             _zoomToFit: function () {
-                this.element.renderer.zoomToFit();
+                this.dudeGraphEditor.zoomToFit();
+            },
+
+            /**
+             * Returns the list of cgInputs that accept property
+             * @param {dudeGraph.RendererBlock} rendererBlock
+             * @returns {Array<dudeGraph.cgPoint>}
+             * @private
+             */
+            _getInputs: function (rendererBlock) {
+                if (rendererBlock === null) {
+                    return null;
+                }
+                return _.filter(rendererBlock.cgBlock.cgInputs, function (cgPoint) {
+                    return cgPoint.acceptValue() && cgPoint.cgValueType !== "Stream";
+                });
+            },
+
+            /**
+             * Returns lowercase type of cgPoint
+             * @param {dudeGraph.Point} cgPoint
+             * @returns {String}
+             * @private
+             */
+            _getType: function (cgPoint) {
+                return cgPoint.cgValueType.toLowerCase();
             }
-        });
+        })
     </script>
 </dom-module>

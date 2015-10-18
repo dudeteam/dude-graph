@@ -6,13 +6,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <!--
-`dude-graph` is a Polymer element which creates a codegraph svg renderer which can be manipulated using several methods and properties.
+`dude-graph` is a Polymer element which creates a dudeGraph svg renderer which can be manipulated using several methods and properties.
 
 @group dude-graph
 @element dude-graph
 @demo demo/index.html
 -->
-<dom-module id="dude-graph">
+<dom-module id="dude-graph-editor">
     <style>
         /**
          * SVG viewport
@@ -35,6 +35,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             fill: var(--dude-content-text-color);
             font-family: var(--dude-primary-text-font);
         }
+
         ::content .dude-graph-title {
             fill: var(--dude-title-text-color);
             font-weight: bold;
@@ -52,27 +53,31 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Groups
          */
         ::content .dude-graph-group > rect {
-            @apply(--dude-graph-group);
+        @apply(--dude-graph-group);
         }
+
         ::content .dude-graph-group:hover > rect {
-            @apply(--dude-graph-group-hover)
+        @apply(--dude-graph-group-hover)
         }
+
         ::content .dude-graph-group.dude-graph-selected > rect,
         ::content .dude-graph-group.dude-graph-active > rect {
-            @apply(--dude-graph-group-selected);
+        @apply(--dude-graph-group-selected);
         }
 
         /**
          * Blocks
          */
         ::content .dude-graph-block > rect {
-            @apply(--dude-graph-block);
+        @apply(--dude-graph-block);
         }
+
         ::content .dude-graph-block:hover > rect {
-            @apply(--dude-graph-block-hover);
+        @apply(--dude-graph-block-hover);
         }
+
         ::content .dude-graph-block.dude-graph-selected > rect {
-            @apply(--dude-graph-block-selected);
+        @apply(--dude-graph-block-selected);
         }
 
         /**
@@ -90,17 +95,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ::content .dude-graph-output {
             cursor: pointer;
         }
+
         ::content .dude-graph-input path,
         ::content .dude-graph-output path {
             stroke-width: 1;
             stroke: var(--dude-type-number-color);
             fill: var(--dude-type-number-color);
         }
+
         ::content .dude-graph-input.dude-graph-stream path,
         ::content .dude-graph-output.dude-graph-stream path {
             stroke: var(--dude-type-stream-color);
             fill: var(--dude-type-stream-color);
         }
+
         ::content .dude-graph-input.dude-graph-empty path,
         ::content .dude-graph-output.dude-graph-empty path {
             fill: transparent !important;
@@ -114,6 +122,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             stroke: var(--dude-type-number-color);
             fill: transparent;
         }
+
         ::content .dude-graph-connection.dude-graph-stream {
             stroke: var(--dude-type-stream-color);
         }
@@ -128,14 +137,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <script src="../lodash/lodash.js"></script>
 <script src="dude-graph.js"></script>
 <script>
-    var DudeGraph = Polymer({
+    var DudeGraphEditor = Polymer({
 
-        is: "dude-graph",
+        is: "dude-graph-editor",
 
         properties: {
 
             /**
-             * This JSON represents the graph data for a given codegraph.
+             * This JSON represents the graph data for a given dudeGraph.
              */
             graphData: {
                 "type": Object
@@ -145,13 +154,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * This JSON represents the graphical blocks to render.
              */
             rendererData: {
-                "type": Object
-            },
-
-            /**
-             * A list of blocks models used as shortcuts to generate blocks.
-             */
-            modelsData: {
                 "type": Object
             },
 
@@ -169,8 +171,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "type": dudeGraph.Renderer
             }
         },
+
+        /**
+         * Called when the DudeGraph element is ready
+         * @delegate
+         */
         ready: function () {
-            this.graph = new dudeGraph.Graph(this.graphData, this.modelsData);
+            this.graph = new dudeGraph.Graph(this.graphData);
             this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData);
             this.renderer.addBlockType("Block", dudeGraph.Block);
             this.renderer.addBlockType("Assignation", dudeGraph.Assignation);
@@ -186,8 +193,39 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             this.graph.loader.load();
             this.renderer.initialize();
             this.renderer.on("error", function (error) {
-                this.fire("error", {error: error, message: error.message});
+                this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
             }.bind(this));
+        },
+
+        /**
+         * Creates a block from data in dudeGraph
+         */
+        createBlock: function (blockData) {
+            this.graph.loader.loadBlock(_.merge(blockData, {
+                "cgId": dudeGraph.UUID.generate()
+            }));
+        },
+
+        /***
+         * Creates a rendererGroup for the selected rendererNodes
+         * @param {String} name - the rendererGroup name
+         */
+        createGroup: function (name) {
+            this.renderer.createRendererGroupFromSelection(name);
+        },
+
+        /**
+         * Removes the selected rendererNodes
+         */
+        removeSelection: function () {
+            this.renderer.removeSelection();
+        },
+
+        /**
+         * Zoom to best fit all rendererNodes
+         */
+        zoomToFit: function () {
+            this.renderer.zoomToFit();
         }
     });
 </script>

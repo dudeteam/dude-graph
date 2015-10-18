@@ -463,3 +463,75 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {"cgConnectionIndex": 6, "outputRendererBlockId": "6", "inputRendererBlockId": "3"}
     ]
 };
+var DEMO_SHOOT_BEHAVIOR_MODEL_DATA = [
+    {
+        "item": {
+            "name": "Entity.add_block",
+            "icon": "fa fa-plus-square",
+            "data": {
+                "cgType": "Instruction",
+                "cgName": "Entity.add_entity",
+                "cgInputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "in"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "this",
+                        "cgValueType": "Entity"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "name",
+                        "cgValueType": "String"
+                    }
+                ],
+                "cgOutputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "out"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "group": {
+            "name": "Control",
+            "items": [
+                {
+                    "item": {
+                        "name": "Condition",
+                        "icon": "fa fa-share-alt",
+                        "data": {
+                            "cgType": "Condition",
+                            "cgName": "Condition",
+                            "cgInputs": [
+                                {
+                                    "cgType": "Stream",
+                                    "cgName": "in"
+                                },
+                                {
+                                    "cgType": "Point",
+                                    "cgName": "test",
+                                    "cgValueType": "Boolean"
+                                }
+                            ],
+                            "cgOutputs": [
+                                {
+                                    "cgType": "Stream",
+                                    "cgName": "true"
+                                },
+                                {
+                                    "cgType": "Stream",
+                                    "cgName": "false"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+];
