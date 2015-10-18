@@ -32,7 +32,6 @@
     "lodash": "~3.10.1",
     "pandora": "~0.0.11",
     "polymer": "Polymer/polymer#^1.0.0",
-    "dude-hierarchy": "~0.0.4",
     "iron-pages": "PolymerElements/iron-pages#~1.0.3",
     "iron-input": "PolymerElements/iron-input#~1.0.4",
     "paper-fab": "PolymerElements/paper-fab#~1.0.3",
@@ -45,7 +44,9 @@
     "paper-checkbox": "PolymerElements/paper-checkbox#~1.0.5",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.0.1",
     "dude-style": "~0.0.1",
-    "dude-collapse": "~0.0.2"
+    "dude-property": "~0.0.4",
+    "dude-collapse": "~0.0.2",
+    "dude-hierarchy": "~0.0.4"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

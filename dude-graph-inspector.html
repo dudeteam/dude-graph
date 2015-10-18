@@ -99,7 +99,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <iron-pages class="layout vertical flex" attr-for-selected="data-state" selected="[[ _currentState ]]">
             <div class="layout vertical flex" data-state="root">
                 <dude-collapse title="Add block">
-                    <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
+                    <!-- TODO: Fix dude-hierarchy to support new API
+                        <dude-hierarchy id="blocks" on-submit="_createBlock"></dude-hierarchy>
+                    -->
                 </dude-collapse>
                 <dude-collapse title="Create variable">
                     <dude-property property-type="choice"
@@ -225,7 +227,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         }
                     }
                 });
-                this.$.blocks.loadItems(this._blocksTree);
+                // this.$.blocks.loadItems(this._blocksTree);
             },
             getHierarchy: function () {
                 return this.$.blocks;
@@ -236,7 +238,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             bindElement: function (element) {
                 this.element = element;
                 _.forEach(this.element.graph.blocksByType("Variable"), this.addVariable.bind(this));
-                this.$.blocks.loadItems(this._blocksTree);
+                // this.$.blocks.loadItems(this._blocksTree);
                 this.element.renderer.on("cg-select", function (node) {
                     this._selectedNode = node;
                     if (node.type === "block") {
@@ -318,7 +320,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
                 this.element.graph.addBlock(variable, true);
                 this.addVariable(variable);
-                this.$.blocks.loadItems(this._blocksTree); // Refresh the list
+                // this.$.blocks.loadItems(this._blocksTree); // Refresh the list
                 this._varName = "";
                 this._varValue = "";
             },
