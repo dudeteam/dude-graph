@@ -139,33 +139,52 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         is: "dude-graph-editor",
 
         properties: {
-
             /**
              * This JSON represents the graph data for a given dudeGraph.
              */
-            graphData: {
+            "graphData": {
                 "type": Object
             },
 
             /**
              * This JSON represents the graphical blocks to render.
              */
-            rendererData: {
+            "rendererData": {
                 "type": Object
             },
 
             /**
              * Holds a reference on the graph.
              */
-            graph: {
+            "graph": {
                 "type": dudeGraph.Graph
             },
 
             /**
              * Holds a reference on the renderer.
              */
-            renderer: {
+            "renderer": {
                 "type": dudeGraph.Renderer
+            },
+
+            /**
+             * The block types
+             */
+            "blockTypes": {
+                "type": Array,
+                "value": [
+                    {"block": "Block", "type": dudeGraph.Block},
+                    {"block": "Assignation", "type": dudeGraph.Assignation},
+                    {"block": "Condition", "type": dudeGraph.Condition},
+                    {"block": "Delegate", "type": dudeGraph.Delegate},
+                    {"block": "Each", "type": dudeGraph.Each},
+                    {"block": "Function", "type": dudeGraph.Function},
+                    {"block": "Getter", "type": dudeGraph.Getter},
+                    {"block": "Instruction", "type": dudeGraph.Instruction},
+                    {"block": "Operator", "type": dudeGraph.Operator},
+                    {"block": "Range", "type": dudeGraph.Range},
+                    {"block": "Variable", "type": dudeGraph.Variable}
+                ]
             }
         },
 
@@ -176,17 +195,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ready: function () {
             this.graph = new dudeGraph.Graph(this.graphData);
             this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData);
-            this.renderer.addBlockType("Block", dudeGraph.Block);
-            this.renderer.addBlockType("Assignation", dudeGraph.Assignation);
-            this.renderer.addBlockType("Condition", dudeGraph.Condition);
-            this.renderer.addBlockType("Delegate", dudeGraph.Delegate);
-            this.renderer.addBlockType("Each", dudeGraph.Each);
-            this.renderer.addBlockType("Function", dudeGraph.Function);
-            this.renderer.addBlockType("Getter", dudeGraph.Getter);
-            this.renderer.addBlockType("Instruction", dudeGraph.Instruction);
-            this.renderer.addBlockType("Operator", dudeGraph.Operator);
-            this.renderer.addBlockType("Range", dudeGraph.Range);
-            this.renderer.addBlockType("Variable", dudeGraph.Variable);
+            _.forEach(this.blockTypes, function (blockType) {
+                this.renderer.addBlockType(blockType.block, blockType.type);
+            }.bind(this));
             this.graph.loader.load();
             this.renderer.initialize();
             this.renderer.on("error", function (error) {
