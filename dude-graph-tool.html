@@ -14,13 +14,13 @@
     </style>
     <template>
         <a id="tool" on-click="_toolClicked"><i class$="[[icon]]"></i></a>
-        <paper-tooltip>[[title]]</paper-tooltip>
+        <paper-tooltip for="tool">[[description]]</paper-tooltip>
     </template>
     <script>
         Polymer({
             is: "dude-graph-tool",
             properties: {
-                title: {
+                description: {
                     type: String,
                     value: "tool description"
                 },
