@@ -192,6 +192,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             this.renderer.on("error", function (error) {
                 this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
             }.bind(this));
+            // TODO: Remove this ugly fix for chrome getBBox
+            setTimeout(function () {
+                this.renderer._updateD3Nodes();
+            }.bind(this), 100);
         },
 
         /**
