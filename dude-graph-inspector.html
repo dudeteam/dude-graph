@@ -79,7 +79,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <dude-collapse heading="Add Block">
                 <dude-hierarchy
                         items="[[ modelData ]]"
-                        placeholder="Search block to create..."
+                        placeholder="Search blocks to create..."
                         on-dude-hierarchy-item-submit="_createBlockFromModel">
                 </dude-hierarchy>
             </dude-collapse>
@@ -132,9 +132,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
 
                 /**
-                 * The graph saver
+                 * The graph builder
                  */
-                "saver": {
+                "builder": {
                     "type": Function,
                     "value": null
                 }
@@ -185,15 +185,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when an item is submitted in dude-hierarchy
-             * Creates a block in dudeGraph
-             * @param {CustomEvent} e
+             * Called when clicking on the create group button
+             * Creates a rendererGroup
+             * @delegate
              * @private
              */
-            _createBlockFromModel: function (e) {
-                if (e.detail.item.data) {
-                    this.dudeGraphEditor.createBlock(e.detail.item.data);
-                }
+            _createGroup: function () {
+                this.dudeGraphEditor.createGroup(this._groupName);
+                this.set("_groupName", null);
+                this.set("_createGroupState", false);
             },
 
             /**
@@ -206,19 +206,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("_createGroupState", true);
             },
 
-            _hideCreateGroup: function () {
-                this.set("_createGroupState", false);
-            },
-
             /**
-             * Called when clicking on the create group button
-             * Creates a rendererGroup
+             * Called when clicking on the cancel create group button
+             * Hides the group creation popup
              * @delegate
              * @private
              */
-            _createGroup: function () {
-                this.dudeGraphEditor.createGroup(this._groupName);
-                this.set("_groupName", null);
+            _hideCreateGroup: function () {
                 this.set("_createGroupState", false);
             },
 
@@ -233,12 +227,33 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Called when clicking on the save button
+             * @delegate
+             * @private
+             */
+            _saveGraph: function () {
+                this.fire("dude-graph-inspector-save", this.dudeGraphEditor.save());
+            },
+
+            /**
              * Called when clicking on the zoom to fit button
              * @delegate
              * @private
              */
             _zoomToFit: function () {
                 this.dudeGraphEditor.zoomToFit();
+            },
+
+            /**
+             * Called when an item is submitted in dude-hierarchy
+             * Creates a block in dudeGraph
+             * @param {CustomEvent} e
+             * @private
+             */
+            _createBlockFromModel: function (e) {
+                if (e.detail.item.data) {
+                    this.dudeGraphEditor.createBlock(e.detail.item.data);
+                }
             },
 
             /**

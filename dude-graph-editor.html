@@ -210,6 +210,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
+         * Saves the current renderer and the graph
+         * @return {Object}
+         */
+        save: function () {
+            return new dudeGraph.JSONSaver().save(this.renderer, this.graph);
+        },
+
+        /**
          * Creates a block from data in dudeGraph
          */
         createBlock: function (blockData) {

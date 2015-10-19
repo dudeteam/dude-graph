@@ -1,5 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<!--
+`dude-graph-tool`
+
+@group dude-graph
+@element dude-graph-tool
+@demo demo/index.html
+-->
 <dom-module id="dude-graph-tool">
     <style>
         :host {
@@ -13,24 +20,29 @@
         }
     </style>
     <template>
-        <a id="tool" on-click="_toolClicked"><i class$="[[icon]]"></i></a>
-        <paper-tooltip for="tool">[[description]]</paper-tooltip>
+        <a id="tool"><i class$="[[ icon ]]"></i></a>
+        <paper-tooltip for="tool">[[ description ]]</paper-tooltip>
     </template>
     <script>
         Polymer({
             is: "dude-graph-tool",
+
             properties: {
+                /**
+                 *
+                 */
                 description: {
                     type: String,
                     value: "tool description"
                 },
+
+                /**
+                 *
+                 */
                 icon: {
                     type: String,
                     value: "fa fa-square-o"
                 }
-            },
-            _toolClicked: function () {
-                this.fire("click");
             }
         })
     </script>

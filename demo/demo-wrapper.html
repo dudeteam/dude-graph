@@ -25,7 +25,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             </dude-graph-editor>
             <dude-graph-inspector id="dudeGraphInspector"
                                   class="panel layout horizontal flex"
-                                  model-data="[[ modelData ]]">
+                                  model-data="[[ modelData ]]"
+                                  on-dude-graph-inspector-save="_dudeGraphInspectorSave">
             </dude-graph-inspector>
         </div>
     </template>
@@ -75,6 +76,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _handleDudeGraphEditorError: function (e) {
                 console.error(e.detail.error);
+            },
+
+            /**
+             * Called when the cgRenderer and the cgGraph is saved
+             * @param {CustomEvent} e
+             * @private
+             */
+            _dudeGraphInspectorSave: function (e) {
+                console.log("save", e.detail);
             }
         });
     </script>
