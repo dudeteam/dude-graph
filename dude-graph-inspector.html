@@ -23,14 +23,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             --text-primary-color: var(--dude-primary-text-color);
             --paper-input-container-focus-color: var(--dude-primary-color);
             --paper-input-container-input-color: var(--dude-content-text-color);
-
-            --paper-button: {
-                @apply(--dude-button);
-            };
-
-            --paper-dialog: {
-                @apply(--dude-dialog);
-            };
         }
 
         :host {
@@ -38,10 +30,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             overflow: auto;
             padding: 10px 5px 5px;
         }
+        dude-collapse {
+            padding-top: 5px;
+        }
     </style>
     <template>
         <div class="layout vertical flex">
-            <dude-collapse title="Tools">
+            <dude-collapse heading="Tools">
                 <div class="layout horizontal">
                     <dude-graph-tool class="flex"
                                      icon="fa fa-play"
@@ -70,7 +65,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     </dude-graph-tool>
                 </div>
             </dude-collapse>
-            <dude-collapse title="Add Block">
+            <template is="dom-if" if="[[ _createGroupState ]]">
+                <dude-collapse heading="Create group">
+                    <dude-property property-type="string"
+                                   property-name="group name"
+                                   property-value="{{ _groupName }}"
+                                   no-menu>
+                    </dude-property>
+                    <paper-button on-click="_createGroup">Create</paper-button>
+                    <paper-button on-click="_hideCreateGroup">Cancel</paper-button>
+                </dude-collapse>
+            </template>
+            <dude-collapse heading="Add Block">
                 <dude-hierarchy
                         items="[[ modelData ]]"
                         placeholder="Search block to create..."
@@ -78,12 +84,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 </dude-hierarchy>
             </dude-collapse>
             <template is="dom-if" if="[[ _rendererBlock ]]" restamp>
-                <dude-collapse title="Edit Block">
-                    <input
-                            is="input"
-                            type="text"
-                            value="{{ _rendererBlock.cgBlock.cgName::input }}"
-                            bind-value="[[ _rendererBlock.cgBlock.cgName ]]" />
+                <dude-collapse heading="Edit Block">
+                    <dude-property property-type="string"
+                                   property-name="block name"
+                                   property-value="{{ _rendererBlock.cgBlock.cgName }}"
+                                   no-menu>
+                    </dude-property>
                     <template is="dom-repeat" items="[[ _getInputs(_rendererBlock) ]]" as="cgPoint">
                         <dude-property property-type="{{ _getType(cgPoint) }}"
                                        property-name="{{ cgPoint.cgName }}"
@@ -94,22 +100,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 </dude-collapse>
             </template>
             <template is="dom-if" if="[[ _rendererGroup ]]" restamp>
-                <dude-collapse title="Edit Group">
-                    <input
-                            is="input"
-                            type="text"
-                            value="{{ _rendererGroup.description::input }}"
-                            bind-value="[[ _rendererGroup.description ]]"/>
-                </dude-collapse>
-            </template>
-            <template is="dom-if" if="[[ _createGroupState ]]">
-                <dude-collapse title="Create group">
-                    <input
-                            is="input"
-                            type="text"
-                            value="{{ _groupName::input }}"
-                            bind-value="[[ _groupName ]]"/>
-                    <paper-button on-click="_createGroup">Create</paper-button>
+                <dude-collapse heading="Edit Group">
+                    <dude-property property-type="string"
+                                   property-name="group name"
+                                   property-value="{{ _rendererGroup.description }}"
+                                   no-menu>
+                    </dude-property>
                 </dude-collapse>
             </template>
         </div>
@@ -208,6 +204,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _showCreateGroup: function () {
                 this.set("_createGroupState", true);
+            },
+
+            _hideCreateGroup: function () {
+                this.set("_createGroupState", false);
             },
 
             /**
