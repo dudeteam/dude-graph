@@ -39,7 +39,8 @@
     "dude-style": "~0.0.1",
     "dude-property": "~0.0.4",
     "dude-collapse": "~0.0.2",
-    "dude-hierarchy": "~0.0.4"
+    "dude-hierarchy": "~0.0.4",
+    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

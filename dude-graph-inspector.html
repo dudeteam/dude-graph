@@ -8,6 +8,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../dude-property/dude-property.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <link rel="stylesheet" href="../font-awesome/css/font-awesome.css">
+<link rel="import" href="dude-graph-tool.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
 
@@ -41,11 +42,33 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="layout vertical flex">
             <dude-collapse title="Tools">
-                <paper-button><i class="fa fa-play"></i></paper-button>
-                <paper-button on-click="_showCreateGroup"><i class="fa fa-object-group"></i></paper-button>
-                <paper-button on-click="_removeSelection"><i class="fa fa-remove"></i></paper-button>
-                <paper-button><i class="fa fa-save"></i></paper-button>
-                <paper-button on-click="_zoomToFit"><i class="fa fa-compress"></i></paper-button>
+                <div class="layout horizontal">
+                    <dude-graph-tool class="flex"
+                                     icon="fa fa-play"
+                                     title="Build"
+                                     on-click="_buildGraph">
+                    </dude-graph-tool>
+                    <dude-graph-tool class="flex"
+                                     icon="fa fa-square-o"
+                                     title="Add group"
+                                     on-click="_showCreateGroup">
+                    </dude-graph-tool>
+                    <dude-graph-tool class="flex"
+                                     icon="fa fa-remove"
+                                     title="Remove selection"
+                                     on-click="_removeSelection">
+                    </dude-graph-tool>
+                    <dude-graph-tool class="flex"
+                                     icon="fa fa-save"
+                                     title="Save"
+                                     on-click="_saveGraph">
+                    </dude-graph-tool>
+                    <dude-graph-tool class="flex"
+                                     icon="fa fa-compress"
+                                     title="Zoom to fit"
+                                     on-click="_zoomToFit">
+                    </dude-graph-tool>
+                </div>
             </dude-collapse>
             <dude-collapse title="Add Block">
                 <dude-hierarchy

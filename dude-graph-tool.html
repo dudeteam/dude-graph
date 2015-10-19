@@ -1,0 +1,37 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<dom-module id="dude-graph-tool">
+    <style>
+        :host {
+            text-align: center;
+        }
+        #tool {
+            display: block;
+            color: var(--dude-primary-color);
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+    <template>
+        <a id="tool" on-click="_toolClicked"><i class$="[[icon]]"></i></a>
+        <paper-tooltip>[[title]]</paper-tooltip>
+    </template>
+    <script>
+        Polymer({
+            is: "dude-graph-tool",
+            properties: {
+                title: {
+                    type: String,
+                    value: "tool description"
+                },
+                icon: {
+                    type: String,
+                    value: "fa fa-square-o"
+                }
+            },
+            _toolClicked: function () {
+                this.fire("click");
+            }
+        })
+    </script>
+</dom-module>
