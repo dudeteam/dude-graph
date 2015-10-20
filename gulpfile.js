@@ -13,12 +13,9 @@ var SOURCES = [
     "lib/graph/block.js",
     "lib/graph/point.js",
     "lib/graph/connection.js",
+    "lib/graph/loader.js",
     "lib/graph/points/*.js",
     "lib/graph/blocks/*.js",
-    "lib/serialization/graph-saver.js",
-    "lib/serialization/renderer-saver.js",
-    "lib/serialization/json-saver.js",
-    "lib/serialization/json-loader.js",
     "lib/renderer/renderer.js",
     "lib/renderer/*.js",
     "lib/renderer/**/*.js"
