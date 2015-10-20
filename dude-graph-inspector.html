@@ -35,80 +35,82 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
     </style>
     <template>
-        <div class="layout vertical flex">
-            <dude-collapse heading="Tools">
-                <div class="layout horizontal">
-                    <dude-graph-tool class="flex"
-                                     icon="fa fa-play"
-                                     description="Build"
-                                     on-click="_buildGraph">
-                    </dude-graph-tool>
-                    <dude-graph-tool class="flex"
-                                     icon="fa fa-square-o"
-                                     description="Add group"
-                                     on-click="_showCreateGroup">
-                    </dude-graph-tool>
-                    <dude-graph-tool class="flex"
-                                     icon="fa fa-remove"
-                                     description="Remove selection"
-                                     on-click="_removeSelection">
-                    </dude-graph-tool>
-                    <dude-graph-tool class="flex"
-                                     icon="fa fa-save"
-                                     description="Save"
-                                     on-click="_saveGraph">
-                    </dude-graph-tool>
-                    <dude-graph-tool class="flex"
-                                     icon="fa fa-compress"
-                                     description="Zoom to fit"
-                                     on-click="_zoomToFit">
-                    </dude-graph-tool>
-                </div>
-            </dude-collapse>
-            <template is="dom-if" if="[[ _createGroupState ]]">
-                <dude-collapse heading="Create group">
-                    <dude-property property-type="string"
-                                   property-name="group name"
-                                   property-value="{{ _groupName }}"
-                                   no-menu>
-                    </dude-property>
-                    <paper-button on-click="_createGroup">Create</paper-button>
-                    <paper-button on-click="_hideCreateGroup">Cancel</paper-button>
+        <template is="dom-if" if="[[ _loaded ]]">
+            <div class="layout vertical flex">
+                <dude-collapse heading="Tools">
+                    <div class="layout horizontal">
+                        <dude-graph-tool class="flex"
+                                         icon="fa fa-play"
+                                         description="Build"
+                                         on-click="_buildGraph">
+                        </dude-graph-tool>
+                        <dude-graph-tool class="flex"
+                                         icon="fa fa-square-o"
+                                         description="Add group"
+                                         on-click="_showCreateGroup">
+                        </dude-graph-tool>
+                        <dude-graph-tool class="flex"
+                                         icon="fa fa-remove"
+                                         description="Remove selection"
+                                         on-click="_removeSelection">
+                        </dude-graph-tool>
+                        <dude-graph-tool class="flex"
+                                         icon="fa fa-save"
+                                         description="Save"
+                                         on-click="_saveGraph">
+                        </dude-graph-tool>
+                        <dude-graph-tool class="flex"
+                                         icon="fa fa-compress"
+                                         description="Zoom to fit"
+                                         on-click="_zoomToFit">
+                        </dude-graph-tool>
+                    </div>
                 </dude-collapse>
-            </template>
-            <dude-collapse heading="Add Block">
-                <dude-hierarchy
-                        items="[[ modelData ]]"
-                        placeholder="Search blocks to create..."
-                        on-dude-hierarchy-item-submit="_createBlockFromModel">
-                </dude-hierarchy>
-            </dude-collapse>
-            <template is="dom-if" if="[[ _rendererBlock ]]" restamp>
-                <dude-collapse heading="Edit Block">
-                    <dude-property property-type="string"
-                                   property-name="block name"
-                                   property-value="{{ _rendererBlock.cgBlock.cgName }}"
-                                   no-menu>
-                    </dude-property>
-                    <template is="dom-repeat" items="[[ _getInputs(_rendererBlock) ]]" as="cgPoint">
-                        <dude-property property-type="{{ _getType(cgPoint) }}"
-                                       property-name="{{ cgPoint.cgName }}"
-                                       property-value="{{ cgPoint.cgValue }}"
-                                       no-reference>
+                <template is="dom-if" if="[[ _createGroupState ]]">
+                    <dude-collapse heading="Create group">
+                        <dude-property property-type="string"
+                                       property-name="group name"
+                                       property-value="{{ _groupName }}"
+                                       no-menu>
                         </dude-property>
-                    </template>
+                        <paper-button on-click="_createGroup">Create</paper-button>
+                        <paper-button on-click="_hideCreateGroup">Cancel</paper-button>
+                    </dude-collapse>
+                </template>
+                <dude-collapse heading="Add Block">
+                    <dude-hierarchy
+                            items="[[ modelData ]]"
+                            placeholder="Search blocks to create..."
+                            on-dude-hierarchy-item-submit="_createBlockFromModel">
+                    </dude-hierarchy>
                 </dude-collapse>
-            </template>
-            <template is="dom-if" if="[[ _rendererGroup ]]" restamp>
-                <dude-collapse heading="Edit Group">
-                    <dude-property property-type="string"
-                                   property-name="group name"
-                                   property-value="{{ _rendererGroup.description }}"
-                                   no-menu>
-                    </dude-property>
-                </dude-collapse>
-            </template>
-        </div>
+                <template is="dom-if" if="[[ _rendererBlock ]]" restamp>
+                    <dude-collapse heading="Edit Block">
+                        <dude-property property-type="string"
+                                       property-name="block name"
+                                       property-value="{{ _rendererBlock.cgBlock.cgName }}"
+                                       no-menu>
+                        </dude-property>
+                        <template is="dom-repeat" items="[[ _getInputs(_rendererBlock) ]]" as="cgPoint">
+                            <dude-property property-type="{{ _getType(cgPoint) }}"
+                                           property-name="{{ cgPoint.cgName }}"
+                                           property-value="{{ cgPoint.cgValue }}"
+                                           no-reference>
+                            </dude-property>
+                        </template>
+                    </dude-collapse>
+                </template>
+                <template is="dom-if" if="[[ _rendererGroup ]]" restamp>
+                    <dude-collapse heading="Edit Group">
+                        <dude-property property-type="string"
+                                       property-name="group name"
+                                       property-value="{{ _rendererGroup.description }}"
+                                       no-menu>
+                        </dude-property>
+                    </dude-collapse>
+                </template>
+            </div>
+        </template>
     </template>
     <script>
         var DudeGraphInspector = Polymer({
@@ -141,6 +143,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Whether the inspector is ready to inspect the dudeGraphEditor
+             * @type {Boolean}
+             */
+            _loaded: false,
+
+            /**
              * The current selected rendererBlock
              * @type {dudeGraph.RendererBlock}
              */
@@ -165,10 +173,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _groupName: null,
 
             /**
-             * Called when the dudeGraphInspector element is ready and attached
-             * @delegate
+             * Call this when the inspected dudeGraphEditor is loaded
              */
-            attached: function () {
+            load: function () {
                 this.dudeGraphEditor.renderer.on("cg-select", function (rendererNode) {
                     if (rendererNode.type === "block") {
                         this.set("_rendererBlock", rendererNode);
@@ -182,6 +189,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.set("_rendererBlock", null);
                     this.set("_rendererGroup", null);
                 }.bind(this));
+                this.set("_loaded", true);
             },
 
             /**

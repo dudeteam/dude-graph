@@ -40,11 +40,11 @@
     "dude-style": "~0.0.3",
     "dude-property": "~0.0.4",
     "dude-collapse": "~0.0.3",
-    "dude-hierarchy": "~0.0.9",
-    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1"
+    "dude-hierarchy": "~0.0.9"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#~1.0.4",
     "web-component-tester": "*"
   }
 }
