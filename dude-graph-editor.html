@@ -154,6 +154,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * This JSON contains some config for the renderer style.
+             */
+            "rendererConfig": {
+                "type": Object,
+                "value": {}
+            },
+
+            /**
              * Holds a reference on the graph.
              */
             "graph": {
@@ -193,7 +201,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         load: function () {
             this.graph = new dudeGraph.Graph(this.graphData);
-            this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData);
+            this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData, this.rendererConfig);
             _.forEach(this.blockTypes, function (blockType) {
                 this.renderer.addBlockType(blockType.block, blockType.type);
             }.bind(this));

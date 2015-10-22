@@ -33,6 +33,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                class="panel layout horizontal flex-2"
                                graph-data="[[ graphData ]]"
                                renderer-data="[[ rendererData ]]"
+                               renderer-config="[[ rendererConfig ]]"
                                on-dude-graph-editor-error="_handleDudeGraphEditorError">
             </dude-graph-editor>
             <dude-graph-inspector id="dudeGraphInspector"
@@ -54,6 +55,36 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "graphData": {
                     "type": Object,
                     "value": DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
+                },
+
+                "rendererConfig": {
+                    "type": Object,
+                    "value": {
+                        "zoom": {
+                            "translate": [0, 0],
+                            "scale": 1,
+                            "min": 0.25,
+                            "max": 5,
+                            "transitionSpeed": 500
+                        },
+                        "block": {
+                            "padding": 10,
+                            "header": 40,
+                            "size": [80, 100],
+                            "borderRadius": 0
+                        },
+                        "group": {
+                            "padding": 10,
+                            "header": 30,
+                            "size": [200, 150],
+                            "borderRadius": 0
+                        },
+                        "point": {
+                            "height": 20,
+                            "radius": 3,
+                            "offset": 20
+                        }
+                    }
                 },
 
                 /**
