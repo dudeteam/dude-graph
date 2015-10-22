@@ -1,6 +1,6 @@
 {
   "name": "dude-graph",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Generic tool to visually represent a graph of connected blocks. It can be used for unreal-like blueprints, state machines, etc..",
   "main": "dude-graph.js",
   "homepage": "https://github.com/dudeteam/dude-graph",
@@ -38,9 +38,9 @@
     "paper-button": "PolymerElements/paper-button#~1.0.3",
     "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
     "dude-style": "~0.0.3",
-    "dude-property": "~0.0.7",
+    "dude-property": "~0.0.8",
     "dude-collapse": "~0.0.3",
-    "dude-hierarchy": "~0.1.0"
+    "dude-hierarchy": "~0.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
