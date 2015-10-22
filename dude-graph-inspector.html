@@ -105,6 +105,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         <dude-property property-type="string"
                                        property-name="group name"
                                        property-value="{{ _rendererGroup.description }}"
+                                       property-resources="{{ resources }}"
                                        no-menu>
                         </dude-property>
                     </dude-collapse>
@@ -139,6 +140,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "builder": {
                     "type": Function,
                     "value": null
+                },
+
+                /**
+                 * The resources list for point cgValue properties
+                 */
+                "resources": {
+                    "type": Array,
+                    "value": []
                 }
             },
 
