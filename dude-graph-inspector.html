@@ -95,6 +95,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                             <dude-property property-type="{{ _getType(cgPoint) }}"
                                            property-name="{{ cgPoint.cgName }}"
                                            property-value="{{ cgPoint.cgValue }}"
+                                           property-resources="{{ resources }}"
                                            no-reference>
                             </dude-property>
                         </template>
@@ -105,7 +106,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         <dude-property property-type="string"
                                        property-name="group name"
                                        property-value="{{ _rendererGroup.description }}"
-                                       property-resources="{{ resources }}"
                                        no-menu>
                         </dude-property>
                     </dude-collapse>
