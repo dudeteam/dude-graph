@@ -135,14 +135,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
 
                 /**
-                 * The graph builder
-                 */
-                "builder": {
-                    "type": Function,
-                    "value": null
-                },
-
-                /**
                  * The resources list for point cgValue properties
                  */
                 "resources": {
@@ -241,6 +233,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _removeSelection: function () {
                 this.dudeGraphEditor.removeSelection();
+            },
+
+            /**
+             * Called when clicking on the save button
+             * @delegate
+             * @private
+             */
+            _buildGraph: function () {
+                this.fire("dude-graph-inspector-build");
             },
 
             /**
