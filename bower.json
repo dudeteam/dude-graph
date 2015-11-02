@@ -38,7 +38,7 @@
     "paper-button": "PolymerElements/paper-button#~1.0.3",
     "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
     "dude-style": "~0.0.3",
-    "dude-property": "~0.0.8",
+    "dude-property": "~0.0.9",
     "dude-collapse": "~0.0.3",
     "dude-hierarchy": "~0.1.1"
   },
