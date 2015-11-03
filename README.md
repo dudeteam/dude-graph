@@ -34,6 +34,15 @@ Then, import it and use it:
 
 ```
 
+Overview
+--------
+
+The repository is organise as a classic Polymer element. The elements are in HTML files in the root folder (`dude-graph-editor` and `dude-graph-inspector`). The first one creates the svg canvas which will contains the rendered graph, and the second one is an inspector which allows to interact with this graph (create blocks, update points values, etc.).
+
+There is also a `demo/` folder which contains a demonstration of how to use the elements in your project. 
+
+Finally, the `lib/` folder contains all the js code of the framework. And those files are concatenated together using `gulp`.
+
 Contribute
 ----------
 
