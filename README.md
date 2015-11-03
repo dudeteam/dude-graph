@@ -34,8 +34,8 @@ Then, import it and use it:
 
 ```
 
-How to contribute?
-------------------
+Contribute
+----------
 
 If you want to test dude-graph to add new features, you should fork the repository. Then, run the following command in the root folder:
 
@@ -47,8 +47,8 @@ Then go to `http:://localhost:4242/components/dude-graph/` for the documentation
 
 Moreover, if you want to change code within the js library (dude-graph.js), you need to run `gulp watch` so the library code will be automatically updated each time you change a file.
 
-How to create a custom block?
------------------------------
+Create a custom block
+---------------------
 
 Create a class which inherits from dudeGraph.Block as follow:
 
@@ -75,3 +75,8 @@ dudeGraph.MyBlock.buildBlock = function (graph, data) {
     }, dudeGraph.ArrayMerger));
 };
 ```
+
+Create a custom builder
+-----------------------
+
+TODO
