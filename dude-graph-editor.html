@@ -140,17 +140,43 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
         properties: {
             /**
+             * Holds a reference on the graph.
+             */
+            "graph": {
+                "type": dudeGraph.Graph,
+                "value": null
+            },
+
+            /**
+             * Holds a reference on the renderer.
+             */
+            "renderer": {
+                "type": dudeGraph.Renderer,
+                "value": null
+            },
+
+            /**
+             * Holds a reference on the loader.
+             */
+            "loader": {
+                "type": dudeGraph.Loader,
+                "value": null
+            },
+
+            /**
              * This JSON represents the graph data for a given dudeGraph.
              */
             "graphData": {
-                "type": Object
+                "type": Object,
+                "value": null
             },
 
             /**
              * This JSON represents the graphical blocks to render.
              */
             "rendererData": {
-                "type": Object
+                "type": Object,
+                "value": null
             },
 
             /**
@@ -162,26 +188,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Holds a reference on the graph.
-             */
-            "graph": {
-                "type": dudeGraph.Graph
-            },
-
-            /**
-             * Holds a reference on the renderer.
-             */
-            "renderer": {
-                "type": dudeGraph.Renderer
-            },
-
-            /**
              * The block types
              */
             "blockTypes": {
                 "type": Array,
                 "value": [
-                    {"block": "Block", "type": dudeGraph.Block},
                     {"block": "Assignation", "type": dudeGraph.Assignation},
                     {"block": "Condition", "type": dudeGraph.Condition},
                     {"block": "Delegate", "type": dudeGraph.Delegate},
@@ -193,6 +204,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     {"block": "Range", "type": dudeGraph.Range},
                     {"block": "Variable", "type": dudeGraph.Variable}
                 ]
+            },
+
+            /**
+             * The point types
+             */
+            "pointTypes": {
+                "type": Array,
+                "value": [
+                    {"point": "Stream", "type": dudeGraph.Stream}
+                ]
             }
         },
 
@@ -200,20 +221,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Loads the graph and the renderer
          */
         load: function () {
-            this.graph = new dudeGraph.Graph(this.graphData);
+            this.graph = new dudeGraph.Graph();
             this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData, this.rendererConfig);
+            this.loader = new dudeGraph.Loader();
             _.forEach(this.blockTypes, function (blockType) {
-                this.renderer.addBlockType(blockType.block, blockType.type);
+                this.loader.registerBlockType(blockType.block, blockType.type);
             }.bind(this));
-            this.graph.loader.load();
+            _.forEach(this.pointTypes, function (pointType) {
+                this.loader.registerPointType(pointType.point, pointType.type);
+            }.bind(this));
+            this.loader.load(this.graph, this.graphData);
             this.renderer.initialize();
             this.renderer.on("error", function (error) {
                 this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
             }.bind(this));
-            // TODO: Remove this ugly fix for chrome getBBox
-            setTimeout(function () {
-                this.renderer._updateD3Nodes();
-            }.bind(this), 100);
         },
 
         /**
@@ -228,16 +249,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
-         * Creates a block from data in dudeGraph
+         * Creates a block from data
+         * @param {Object} cgBlockData
          */
-        createBlock: function (blockData) {
-            this.graph.loader.loadBlock(_.merge(blockData, {
+        createBlock: function (cgBlockData) {
+            this.loader.loadBlock(this.graph, _.merge(cgBlockData, {
                 "cgId": dudeGraph.UUID.generate()
             }));
         },
 
         /***
-         * Creates a rendererGroup for the selected rendererNodes
+         * Creates a group for the selected blocks
          * @param {String} name - the rendererGroup name
          */
         createGroup: function (name) {
@@ -245,14 +267,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
-         * Removes the selected rendererNodes
+         * Removes the selected blocks and groups
          */
         removeSelection: function () {
             this.renderer.removeSelection();
         },
 
         /**
-         * Zoom to best fit all rendererNodes
+         * Zoom to best fit all blocks and groups
          */
         zoomToFit: function () {
             this.renderer.zoomToFit();
