@@ -13,9 +13,9 @@ var SOURCES = [
     "lib/graph/block.js",
     "lib/graph/point.js",
     "lib/graph/connection.js",
-    "lib/graph/loader.js",
     "lib/graph/points/*.js",
     "lib/graph/blocks/*.js",
+    "lib/graph/**/*.js",
     "lib/renderer/renderer.js",
     "lib/renderer/*.js",
     "lib/renderer/**/*.js"
@@ -35,7 +35,7 @@ gulp.task("jshint", function () {
 gulp.task("build", ["jshint"], function () {
     return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(SOURCES))
         .pipe(concat("dude-graph.js"))
-        //.pipe(uglify())
+        .pipe(uglify())
         .pipe(gulp.dest("."));
 });
 

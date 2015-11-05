@@ -164,6 +164,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Holds a reference on the saver.
+             */
+            "saver": {
+                "type": dudeGraph.Saver,
+                "value": null
+            },
+
+            /**
              * This JSON represents the graph data for a given dudeGraph.
              */
             "graphData": {
@@ -224,6 +232,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             this.graph = new dudeGraph.Graph();
             this.renderer = new dudeGraph.Renderer(this.$.svg, this.rendererConfig);
             this.loader = new dudeGraph.Loader();
+            this.saver = new dudeGraph.Saver();
             _.forEach(this.blockTypes, function (blockType) {
                 this.loader.registerBlockType(blockType.block, blockType.type);
             }.bind(this));
@@ -244,7 +253,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         save: function () {
             return {
                 "rendererData": this.renderer.save(),
-                "graphData": this.graph.save()
+                "graphData": this.saver.save(this.graph)
             };
         },
 
