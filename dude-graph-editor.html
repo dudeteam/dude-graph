@@ -222,7 +222,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         load: function () {
             this.graph = new dudeGraph.Graph();
-            this.renderer = new dudeGraph.Renderer(this.$.svg, this.graph, this.rendererData, this.rendererConfig);
+            this.renderer = new dudeGraph.Renderer(this.$.svg, this.rendererConfig);
             this.loader = new dudeGraph.Loader();
             _.forEach(this.blockTypes, function (blockType) {
                 this.loader.registerBlockType(blockType.block, blockType.type);
@@ -231,7 +231,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.loader.registerPointType(pointType.point, pointType.type);
             }.bind(this));
             this.loader.load(this.graph, this.graphData);
-            this.renderer.initialize();
+            this.renderer.load(this.graph, this.rendererData);
             this.renderer.on("error", function (error) {
                 this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
             }.bind(this));
