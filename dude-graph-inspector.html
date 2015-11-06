@@ -3,6 +3,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-property/dude-property.html">
@@ -30,6 +31,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             overflow: auto;
             padding: 10px 5px 5px;
         }
+
         dude-collapse {
             padding-top: 5px;
         }
@@ -143,6 +145,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
             },
 
+            behaviors: [Polymer.IronA11yKeysBehavior],
+
             /**
              * Whether the inspector is ready to inspect the dudeGraphEditor
              * @type {Boolean}
@@ -191,44 +195,86 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.set("_rendererGroup", null);
                 }.bind(this));
                 this.set("_loaded", true);
+                this.keyEventTarget = document.body;
+                if (navigator.platform.toUpperCase().indexOf("MAC") !== -1) {
+                    this.addOwnKeyBinding("meta+s", "_saveGraph");
+                    this.addOwnKeyBinding("meta+b", "_playGraph");
+                    this.addOwnKeyBinding("meta+g", "_showCreateGroup");
+                    this.addOwnKeyBinding("meta+0", "_zoomToFit");
+                } else {
+                    this.addOwnKeyBinding("ctrl+s", "_saveGraph");
+                    this.addOwnKeyBinding("ctrl+b", "_playGraph");
+                    this.addOwnKeyBinding("ctrl+g", "_showCreateGroup");
+                    this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
+                }
+                this.addOwnKeyBinding("del", "_removeSelection");
             },
 
             /**
              * Called when clicking on the save button
+             * @param {CustomEvent} e
              * @delegate
              * @private
              */
-            _saveGraph: function () {
+            _saveGraph: function (e) {
                 this.fire("dude-graph-inspector-save", this.dudeGraphEditor.save());
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
             },
 
             /**
              * Called when clicking on the play button
+             * @param {CustomEvent} e
              * @delegate
              * @private
              */
-            _playGraph: function () {
+            _playGraph: function (e) {
                 this.fire("dude-graph-inspector-play");
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
             },
 
             /**
              * Called when clicking on the remove selection button
              * Removes the selected rendererNodes
+             * @param {CustomEvent} e
              * @delegate
              * @private
              */
-            _removeSelection: function () {
+            _removeSelection: function (e) {
                 this.dudeGraphEditor.removeSelection();
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
             },
 
             /**
              * Called when clicking on the show create group button
              * Shows the group creation popup
+             * @param {CustomEvent} e
              * @delegate
              * @private
              */
-            _showCreateGroup: function () {
+            _showCreateGroup: function (e) {
                 this.set("_createGroupState", true);
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * Called when clicking on the zoom to fit button
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _zoomToFit: function (e) {
+                this.dudeGraphEditor.zoomToFit();
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
             },
 
             /**
@@ -251,15 +297,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.dudeGraphEditor.createGroup(this._groupName);
                 this.set("_groupName", null);
                 this.set("_createGroupState", false);
-            },
-
-            /**
-             * Called when clicking on the zoom to fit button
-             * @delegate
-             * @private
-             */
-            _zoomToFit: function () {
-                this.dudeGraphEditor.zoomToFit();
             },
 
             /**
