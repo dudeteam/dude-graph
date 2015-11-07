@@ -466,7 +466,7 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
 var DEMO_SHOOT_BEHAVIOR_MODEL_DATA = [
     {
         "item": {
-            "name": "Entity.add_block",
+            "name": "Entity.add_entity",
             "icon": "fa fa-plus-square",
             "data": {
                 "cgType": "Instruction",
