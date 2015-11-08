@@ -18,12 +18,12 @@
   "license": "MIT",
   "ignore": [
     "bower_components",
-    "node_modules",
-    ".gitignore",
     "demo",
     "lib",
-    "gulpfile.js",
+    "node_modules",
+    ".gitignore",
     "dude-graph.png",
+    "gulpfile.js",
     "LICENSE.md",
     "README.md"
   ],
