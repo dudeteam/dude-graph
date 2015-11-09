@@ -273,6 +273,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
+         * Removes the selected blocks and groups
+         * @param {Boolean} ignoreBlocks - Whether to not select all blocks
+         * @param {Boolean} ignoreGroups - Whether to not select all groups
+         */
+        selectAll: function (ignoreBlocks, ignoreGroups) {
+            this.renderer.selectAll(ignoreBlocks, ignoreGroups);
+        },
+
+        /**
          * Zoom to best fit all blocks and groups
          */
         zoomToFit: function () {
