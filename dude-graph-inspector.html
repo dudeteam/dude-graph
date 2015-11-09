@@ -201,11 +201,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.addOwnKeyBinding("meta+b", "_playGraph");
                     this.addOwnKeyBinding("meta+g", "_showCreateGroup");
                     this.addOwnKeyBinding("meta+0", "_zoomToFit");
+                    this.addOwnKeyBinding("meta+shift+0", "_zoomToSelection");
                 } else {
                     this.addOwnKeyBinding("ctrl+s", "_saveGraph");
                     this.addOwnKeyBinding("ctrl+b", "_playGraph");
                     this.addOwnKeyBinding("ctrl+g", "_showCreateGroup");
                     this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
+                    this.addOwnKeyBinding("ctrl+shift+0", "_zoomToSelection");
                 }
                 this.addOwnKeyBinding("del", "_removeSelection");
             },
@@ -272,6 +274,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _zoomToFit: function (e) {
                 this.dudeGraphEditor.zoomToFit();
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * Called when clicking on the zoom to fit button
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _zoomToSelection: function (e) {
+                this.dudeGraphEditor.zoomToSelection();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
