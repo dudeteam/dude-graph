@@ -653,45 +653,6 @@ var dudeGraph = (function() {
     }
     return namespace;
 })();
-(function () {
-    _.mixin({
-        /**
-         * Clamps a value between a minimum number and a maximum number.
-         * @param value {Number}
-         * @param min {Number}
-         * @param max {Number}
-         * @return {Number}
-         */
-        clamp: function (value, min, max) {
-            return Math.min(Math.max(value, min), max);
-        }
-    });
-})();
-(function () {
-    /**
-     * Generate a random bit of a UUID
-     * @returns {String}
-     */
-    var s4 = function () {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    };
-
-    /**
-     * The UUID's salt
-     * @type {String}
-     */
-    var salt = s4();
-
-    _.mixin({
-        /**
-         * Generate a random salted UUID
-         * @returns {String}
-         */
-        uuid: function () {
-            return salt + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
-        }
-    });
-})();
 //
 // Copyright (c) 2015 DudeTeam. All rights reserved.
 //
@@ -2402,19 +2363,17 @@ dudeGraph.Renderer.defaultConfig = {
     },
     "block": {
         "padding": 10,
-        "header": 40,
-        "size": [80, 100]
+        "header": 50,
+        "pointSpacing": 10
     },
     "group": {
         "padding": 10,
-        "header": 30,
-        "size": [200, 150]
+        "header": 30
     },
     "point": {
         "height": 20,
         "padding": 10,
-        "radius": 3,
-        "offset": 20
+        "radius": 3
     }
 };
 
@@ -2721,14 +2680,19 @@ dudeGraph.RenderBlock.prototype.updateSize = function () {
     var widerInput = _.max(this._renderInputPoints, function (renderPoint) {
         return renderPoint.pointSize[0];
     });
+    var titleWidth = this._renderer.textBoundingBox(this._nodeName)[0];
     var maxOutputWidth = widerOutput !== -Infinity ? widerOutput.pointSize[0] : 0;
     var maxInputWidth = widerInput !== -Infinity ? widerInput.pointSize[0] : 0;
     var maxPoints = this._renderOutputPoints.length > this._renderInputPoints.length;
     var maxPointsHeight = _.sum(maxPoints ? this._renderOutputPoints : this._renderInputPoints, function (renderPoint) {
         return renderPoint.pointSize[1];
     });
+    var maxWidth = Math.max(
+        titleWidth + this._renderer.config.block.padding * 2,
+        maxOutputWidth + maxInputWidth + this._renderer.config.block.pointSpacing
+    );
     this._nodeSize = [
-        maxOutputWidth + maxInputWidth + this._renderer.config.block.padding * 4 + this._renderer.config.point.radius * 2 + this._renderer.config.point.offset,
+        maxWidth,
         maxPointsHeight + this._renderer.config.block.header
     ];
 };
@@ -2858,12 +2822,12 @@ dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
         get: function () {
             if (this.point.isOutput) {
                 return [
-                    this._renderBlock.nodeSize[0] - this._renderer.config.block.padding,
+                    this._renderBlock.nodeSize[0] - this._renderer.config.point.padding,
                     this._renderer.config.block.header + this._renderer.config.point.height * this._index
                 ];
             } else {
                 return [
-                    this._renderer.config.block.padding,
+                    this._renderer.config.point.padding,
                     this._renderer.config.block.header + this._renderer.config.point.height * this._index
                 ];
             }
@@ -2879,8 +2843,8 @@ dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
         get: function () {
             var textBoundingBox = this._renderer.textBoundingBox(this._point.cgName);
             return [
-                textBoundingBox[0] + this._renderer.config.point.radius + this._renderer.config.point.padding,
-                textBoundingBox[1]
+                textBoundingBox[0] + this._renderer.config.point.padding * 2,
+                Math.max(textBoundingBox[1], this._renderer.config.point.height)
             ];
         }.bind(this)
     });
@@ -2919,22 +2883,16 @@ dudeGraph.RenderPoint.prototype.update = function () {
     var position = this.pointPosition;
     this._d3Circle
         .attr({
-            "cx": position[0],
+            "cx": position[0] + (this.point.isOutput ? -1 : 1) * this._renderer.config.point.radius / 2,
             "cy": position[1],
             "r": this._renderer.config.point.radius
         });
     this._d3Text
         .text(this._point.cgName)
         .attr({
-            "x": position[0],
+            "x": position[0] + (this.point.isOutput ? -1 : 1) * this._renderer.config.point.padding,
             "y": position[1]
-        }).attr("transform", function (renderPoint) {
-        if (renderPoint._point.isOutput) {
-            return "translate(" + [-renderPoint._renderer.config.point.radius * 2 - renderPoint._renderer.config.point.padding] + ")";
-        } else {
-            return "translate(" + [renderPoint._renderer.config.point.radius * 2 + renderPoint._renderer.config.point.padding] + ")";
-        }
-    });
+        });
 };
 
 /**
@@ -3033,16 +2991,6 @@ dudeGraph.Renderer.prototype._createRenderGroup = function (renderGroupData) {
     this._renderGroups.push(renderGroup);
     this._renderGroupIds[renderGroup.nodeId] = renderGroup;
     return renderGroup;
-};
-/**
- * Returns the text bounding box
- * @param {String|SVGTextElement} text
- */
-dudeGraph.Renderer.prototype.textBoundingBox = function (text) {
-    if (text instanceof SVGTextElement) {
-        text = text.textContent;
-    }
-    return [text.length * 5, 24];
 };
 /**
  * Creates d3Blocks with the existing renderBlocks
@@ -3173,4 +3121,16 @@ dudeGraph.Renderer.prototype.load = function (data) {
     });
     this._createD3Blocks();
     this._createD3Groups();
+};
+
+/**
+ * Returns the text bounding box, prediction can be done accurately while using a monospace font
+ * Always use a monospace font for fast prediction of the text size, unless you'd like to deal with FOUT and getBBox...
+ * @param {String|SVGTextElement} text
+ */
+dudeGraph.Renderer.prototype.textBoundingBox = function (text) {
+    if (text instanceof SVGTextElement) {
+        text = text.textContent;
+    }
+    return [text.length * 8, 17];
 };
