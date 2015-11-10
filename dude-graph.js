@@ -1,2 +1,3833 @@
-var pandora=function(){var t="undefined"==typeof Module?{}:Module;return"undefined"!=typeof exports&&("undefined"!=typeof module&&module.exports&&(exports=module.exports=t),exports.pandora=t),t}();pandora.typename=function(t){if(void 0!==t.constructor.typename)return t.constructor.typename;switch(typeof t){case"boolean":return"Boolean";case"number":return"Number";case"string":return"String";case"function":return"Function";case"object":if(t instanceof Array)return"Array";if(t instanceof Object)return"Object"}return null===t?"null":void 0===t?"undefined":"Unknown"},pandora.class_=function(){for(var t=arguments[0],e=arguments[arguments.length-1],n=1;n<arguments.length-1;++n){if("function"!=typeof arguments[n])throw new pandora.Exception("{0} is not a valid constructor type",pandora.typename(arguments[n]));var o=arguments[n].prototype;for(var r in o)o.hasOwnProperty(r)&&(e.prototype[r]=o[r])}return Object.defineProperty(e,"typename",{value:t,writable:!1}),e},pandora.polymorphic=function(t,e){var n=pandora.typename(t);if(void 0===e[n]){if(void 0===e._)throw new pandora.MissingOverloadError(n);return e._()}return e[n]()},pandora.polymorphicMethod=function(t,e,n){var o=pandora.typename(n),r=t["_"+e+o];if(void 0===r)throw new pandora.MissingOverloadError(e+o,pandora.typename(t));return r.apply(t,Array.prototype.slice.call(arguments,2))},pandora.preventCallback=function(t,e,n){void 0!==t.preventDefault&&void 0!==t.stopPropagation&&void 0!==t.stopImmediatePropagation&&(n=t),n.preventDefault(),n.stopPropagation(),n.stopImmediatePropagation()},pandora.defaultCallback=function(){},pandora.mouseWheel=function(t,e){var n=function(t){t||(t=event);var n=0;n=t.wheelDelta?t.wheelDelta/360:t.detail/-9,e(t,n)};t.addEventListener("DOMMouseScroll",n,!1),t.addEventListener("mousewheel",n,!1)},pandora.EventEmitter=function(){var t=pandora.class_("EventEmitter",function(){this._listeners={}});return t.prototype.on=function(t,e){void 0===this._listeners[t]&&(this._listeners[t]=[]),this._listeners[t].push(e)},t.prototype.off=function(t){this._listeners[t]=[]},t.prototype.emit=function(t){if(void 0!==this._listeners[t])for(var e=0;e<this._listeners[t].length;++e)this._listeners[t][e].apply(this,Array.prototype.slice.call(arguments,1))},t}(),pandora.formatString=function(){var t=arguments[0],e=arguments[1];return 1===arguments.length?t:e&&"object"==typeof e?pandora.formatDictionary.apply(this,arguments):pandora.formatArray.apply(this,arguments)},pandora.formatArray=function(){var t=Array.prototype.slice.call(arguments,1);return arguments[0].replace(/{(\d+)}/g,function(e,n){return t[n]})},pandora.formatDictionary=function(){var t=/\{([^\}]+)\}/g,e=/(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g,n=function(t,n,o){var r=o;return n.replace(e,function(t,e,n,o,i){e=e||o,void 0!==r&&(e in r&&(r=r[e]),"function"==typeof r&&i&&(r=r()))}),r=(null===r||r===o?t:r)+""};return function(e,o){return String(e).replace(t,function(t,e){return n(t,e,o)})}}(),pandora.camelcase=function(t,e){return e=e||"-",t[0].toUpperCase()+t.replace(new RegExp("("+e+"[a-z])","g"),function(t){return t.toUpperCase().replace(e,"")}).substr(1)},pandora.uncamelcase=function(t,e){return t.replace(/([A-Z])/g,function(t){return e+t.toLowerCase()}).substr(1)},pandora.forEach=function(t,e){pandora.polymorphic(t,{Array:function(){for(var n=0;n<t.length;++n)if(e(t[n],n)===!0)return},Object:function(){for(var n in t)if(t.hasOwnProperty(n)&&e(t[n],n)===!0)return}})},pandora.mergeObjects=function(t,e,n,o){for(var r in e)e.hasOwnProperty(r)&&(n&&"object"==typeof e[r]?(t[r]=t[r]||{},pandora.mergeObjects(t[r],e[r],n)):(o||void 0===t[r])&&(t[r]=e[r]));return t},pandora.Exception=function(){return pandora.class_("Exception",function(){var t=new Error(pandora.formatString.apply(null,arguments));return t.name=pandora.typename(this),t})}(),pandora.MissingOverloadError=function(){return pandora.class_("MissingOverloadError",pandora.Exception,function(t,e){var n=void 0!==e?e+".prototype._":"_";return pandora.Exception.call(this,"{0}{1}() overload is missing",n,t)})}(),pandora.clamp=function(t,e,n){return Math.min(Math.max(t,e),n)},pandora.Box2=function(){var t=pandora.class_("Box2",function(t,e,n,o){this.assign(t,e,n,o)});return t.prototype.assign=function(){var t=arguments[0],e=arguments[1],n=arguments[2],o=arguments[3];return void 0===t?(this.x=0,this.y=0,this.width=0,this.height=0):"Number"===pandora.typename(t)&&void 0===e?(this.x=t,this.y=t,this.width=t,this.height=t):"Vec2"===pandora.typename(t)&&"Vec2"===pandora.typename(e)?(this.x=t.x,this.y=t.y,this.width=e.x,this.height=e.y):"Array"===pandora.typename(t)?(this.x=t[0],this.y=t[1],this.width=t[2],this.height=t[3]):void 0!==t.x&&void 0!==t.y&&void 0!==t.width&&void 0!==t.height?(this.x=t.x,this.y=t.y,this.width=t.width,this.height=t.height):void 0!==t.left&&void 0!==t.right&&void 0!==t.top&&void 0!==t.bottom?(this.x=t.left,this.y=t.top,this.width=t.right-t.left,this.height=t.bottom-t.top):(this.x=t,this.y=e,this.width=n,this.height=o),this},t.prototype.clone=function(){return new t(this.x,this.y,this.width,this.height)},t.prototype.toArray=function(){return[this.x,this.y,this.width,this.height]},t.prototype.collide=function(t){return pandora.polymorphic(t,{Vec2:function(){return t.x>=this.x&&t.x<=this.x+this.width&&t.y>=this.y&&t.y<=this.y+this.height}.bind(this),Box2:function(){return this.x<t.x+t.width&&this.x+this.width>t.x&&this.y<t.y+t.height&&this.height+this.y>t.y}.bind(this)})},t.prototype.contain=function(t){return pandora.polymorphic(t,{Vec2:function(){return t.x>=this.x&&t.x<=this.x+this.width&&t.y>=this.y&&t.y<=this.y+this.height}.bind(this),Box2:function(){return t.x>this.x&&t.x+t.width<this.x+this.width&&t.y>this.y&&t.y+t.height<this.y+this.height}.bind(this)})},t}(),pandora.Vec2=function(){var t=pandora.class_("Vec2",function(t,e){this.assign(t,e)});return t.prototype.assign=function(){var t=arguments[0],e=arguments[1];return void 0===t?(this.x=0,this.y=0):"number"==typeof t&&void 0===e?(this.x=t,this.y=t):"Array"===pandora.typename(t)?(this.x=t[0],this.y=t[1]):"Vec2"===pandora.typename(t)||"number"==typeof t.x&&"number"==typeof t.y?(this.x=t.x,this.y=t.y):(this.x=t,this.y=e),this},t.prototype.clone=function(){return new t(this.x,this.y)},t.prototype.toArray=function(){return[this.x,this.y]},t.prototype.collideCircle=function(t,e){e=e||5;var n=this.x-t.x,o=this.y-t.y;return Math.sqrt(n*n+o*o)<2*e},t.prototype.add=function(t){return pandora.polymorphic(t,{Number:function(){this.x+=t,this.y+=t}.bind(this),Vec2:function(){this.x+=t.x,this.y+=t.y}.bind(this)}),this},t.prototype.subtract=function(t){return pandora.polymorphic(t,{Number:function(){this.x-=t,this.y-=t}.bind(this),Vec2:function(){this.x-=t.x,this.y-=t.y}.bind(this)}),this},t.prototype.multiply=function(t){return pandora.polymorphic(t,{Number:function(){this.x*=t,this.y*=t}.bind(this),Vec2:function(){this.x*=t.x,this.y*=t.y}.bind(this)}),this},t.prototype.divide=function(t){return pandora.polymorphic(t,{Number:function(){this.x/=t,this.y/=t}.bind(this),Vec2:function(){this.x/=t.x,this.y/=t.y}.bind(this)}),this},t}();var dudeGraph=function(){var t={};return"undefined"!=typeof exports?("undefined"!=typeof module&&module.exports&&(exports=module.exports=t),exports.dudeGraph=t):window.dudeGraph=t,t}();!function(){var t=function(){var t=!!window.opera||navigator.userAgent.indexOf(" OPR/")>=0;return t?"Opera":"undefined"!=typeof InstallTrigger?"Firefox":Object.prototype.toString.call(window.HTMLElement).indexOf("Constructor")>0?"Safari":-1!==navigator.userAgent.indexOf("Edge")?"Edge":window.chrome&&!t?"Chrome":document.documentMode?"IE":"Unknown"};_.mixin({browser:t,browserIf:function(e,n,o){_.contains(e,t())?(n&&n||function(){})():(o&&o||function(){})()}})}(),function(){_.mixin({clamp:function(t,e,n){return Math.min(Math.max(t,e),n)}})}(),function(){_.mixin({templateString:function(t,e){var n=/\{([^\}]+)\}/g,o=/(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g,r=function(t,e,n){var r=n;return e.replace(o,function(t,e,n,o,i){e=e||o,void 0!==r&&(e in r&&(r=r[e]),"function"==typeof r&&i&&(r=r()))}),r=(null===r||r===n?t:r)+""};return String(t).replace(n,function(t,n){return r(t,n,e)})}})}(),function(){var t=function(){return Math.floor(65536*(1+Math.random())).toString(16).substring(1)},e=t();_.mixin({uuid:function(){return e+"-"+t()+"-"+t()+"-"+t()+"-"+t()+"-"+t()+t()+t()}})}(),dudeGraph.Graph=function(){pandora.EventEmitter.call(this),this._cgTypes={Stream:["Stream"],Array:["Array"],String:["String"],Number:["Number","Boolean"],Boolean:["Boolean","Number"],Vec2:["Vec2"],Vec3:["Vec3"],Vec4:["Vec4"],Color:["Color","Vec4"],Texture2D:["Texture2D"],Entity:["Entity"],Resource:["Resource"]},this._validators={Array:function(t){return _.isArray(t)},String:function(t){return _.isString(t)},Number:function(t){return _.isNumber(t)||/^[0-9]+(\.[0-9]+)?$/.test(t)},Boolean:function(t){return _.isBoolean(t)||/^(true|false)/.test(t)},Resource:function(t){return _.isObject(t)}},Object.defineProperty(this,"cgBlocks",{get:function(){return this._cgBlocks}.bind(this)}),this._cgBlocks=[],Object.defineProperty(this,"cgBlocksIds",{get:function(){return this._cgBlocksIds}.bind(this)}),this._cgBlocksIds={},Object.defineProperty(this,"cgConnections",{get:function(){return this._cgConnections}.bind(this)}),this._cgConnections=[]},dudeGraph.Graph.prototype=_.create(pandora.EventEmitter.prototype,{constructor:dudeGraph.Graph}),dudeGraph.Graph.prototype.addBlock=function(t,e){var n=t.cgId;if(t.cgGraph!==this)throw new Error("This block does not belong to this graph");if(null===n||_.isUndefined(n))throw new Error("Block id is null");if(this._cgBlocksIds[n])throw new Error("Block with id `"+n+"` already exists");return t.validate(),this._cgBlocks.push(t),this._cgBlocksIds[n]=t,e||this.emit("dude-graph-block-create",t),t},dudeGraph.Graph.prototype.removeBlock=function(t){var e=this._cgBlocks.indexOf(t);if(-1===e||t.cgGraph!==this)throw new Error("This block does not belong to this graph");var n=t.cgOutputs.concat(t.cgInputs);_.forEach(n,function(t){this.disconnectPoint(t)}.bind(this)),this._cgBlocks.splice(e,1),delete this._cgBlocksIds[t.cgId],this.emit("dude-graph-block-remove",t)},dudeGraph.Graph.prototype.blockById=function(t){var e=this._cgBlocksIds[t];if(!e)throw new Error("Block not found for id `"+t+"`");return e},dudeGraph.Graph.prototype.blockByName=function(t){var e=null;return _.forEach(this.cgBlocks,function(n){n.cgName===t&&(e=n)}),e},dudeGraph.Graph.prototype.blocksByType=function(t){var e=[];return _.forEach(this.cgBlocks,function(n){n.blockType===t&&e.push(n)}),e},dudeGraph.Graph.prototype.nextBlockId=function(){return _.uuid()},dudeGraph.Graph.prototype.connectPoints=function(t,e){if(null!==this.connectionByPoints(t,e))throw new Error("Connection already exists between these two points: `"+t.cgName+"` and `"+e.cgName+"`");if(t.isOutput===e.isOutput)throw new Error("Cannot connect either two inputs or two outputs: `"+t.cgName+"` and `"+e.cgName+"`");if(!t.acceptConnect(e))throw new Error("Point `"+t.cgName+"` does not accept to connect to `"+e.cgName+"` (too many connections)");if(!e.acceptConnect(t))throw new Error("Point `"+e.cgName+"` does not accept to connect to `"+t.cgName+"` (too many connections)");if(!this.canConvert(t.cgValueType,e.cgValueType)&&!this.updateTemplate(e,t.cgValueType))throw new Error("Cannot connect two points of different value types: `"+t.cgValueType+"` and `"+e.cgValueType+"`");var n=new dudeGraph.Connection(t,e);return this._cgConnections.push(n),t._cgConnections.push(n),e._cgConnections.push(n),this.emit("dude-graph-connection-create",n),n},dudeGraph.Graph.prototype.disconnectPoints=function(t,e){var n=this.connectionByPoints(t,e);if(null===n)throw new Error("No connections between these two points: `"+t.cgName+"` and `"+e.cgName+"`");return this._cgConnections.splice(this._cgConnections.indexOf(n),1),t._cgConnections.splice(t._cgConnections.indexOf(n),1),e._cgConnections.splice(e._cgConnections.indexOf(n),1),this.emit("dude-graph-connection-remove",n),n},dudeGraph.Graph.prototype.disconnectPoint=function(t){var e=t.cgConnections;_.forEach(e,function(t){this.disconnectPoints(t.cgOutputPoint,t.cgInputPoint)}.bind(this))},dudeGraph.Graph.prototype.connectionsByBlock=function(t){var e=[];return _.forEach(this._cgConnections,function(n){(n.cgOutputPoint.cgBlock===t||n.cgInputPoint.cgBlock===t)&&e.push(n)}),e},dudeGraph.Graph.prototype.connectionByPoints=function(t,e){return _.find(this._cgConnections,function(n){return n.cgOutputPoint===t&&n.cgInputPoint===e})||null},dudeGraph.Graph.prototype.connectionsByPoint=function(t){var e=[];return _.forEach(this._cgConnections,function(n){(n.cgOutputPoint===t||n.cgInputPoint===t)&&e.push(n)}),e},dudeGraph.Graph.prototype.cloneBlocks=function(t){var e=[],n=[],o=[];return _.forEach(t,function(r){var i=this.connectionsByBlock(r),d=r.clone(this);this.addBlock(d),n.push(d),e[r.cgId]=d,_.forEach(i,function(e){-1===o.indexOf(e)&&-1!==t.indexOf(e.cgOutputPoint.cgBlock)&&-1!==t.indexOf(e.cgInputPoint.cgBlock)&&o.push(e)})}.bind(this)),_.forEach(o,function(t){try{e[t.cgOutputPoint.cgBlock.cgId].outputByName(t.cgOutputPoint.cgName).connect(e[t.cgInputPoint.cgBlock.cgId].inputByName(t.cgInputPoint.cgName))}catch(n){throw new Error("Connection duplication silenced exception: "+n)}}),n},dudeGraph.Graph.prototype.addValidator=function(t,e){this._validators[t]=e},dudeGraph.Graph.prototype.canConvert=function(t,e){return t===e||this._cgTypes[t]&&-1!==this._cgTypes[t].indexOf(e)},dudeGraph.Graph.prototype.canAssign=function(t,e){return null===t||this._validators[e]&&this._validators[e](t)},dudeGraph.Graph.prototype.updateTemplate=function(t,e){return t.cgBlock.updateTemplate(t,e)},dudeGraph.Block=function(t,e,n){if(e=e||{},Object.defineProperty(this,"cgGraph",{get:function(){return this._cgGraph}.bind(this)}),this._cgGraph=t,!t)throw new Error("Block() Cannot create a Block without a graph");Object.defineProperty(this,"blockType",{get:function(){return this._blockType}.bind(this)}),this._blockType=n||"Block",Object.defineProperty(this,"cgId",{get:function(){return this._cgId}.bind(this)}),this._cgId=e.cgId||t.nextBlockId(),Object.defineProperty(this,"cgName",{get:function(){return this._cgName}.bind(this),set:function(t){var e=this._cgName;this._cgName=t,this._cgGraph.emit("dude-graph-block-name-change",this,e,t)}.bind(this)}),this._cgName=e.cgName||this._blockType,Object.defineProperty(this,"cgTemplates",{get:function(){return this._cgTemplates}.bind(this)}),this._cgTemplates=e.cgTemplates||{},Object.defineProperty(this,"cgInputs",{get:function(){return this._cgInputs}.bind(this)}),this._cgInputs=[],Object.defineProperty(this,"cgOutputs",{get:function(){return this._cgOutputs}.bind(this)}),this._cgOutputs=[]},dudeGraph.Block.prototype.validate=function(){},dudeGraph.Block.prototype.addPoint=function(t){if(t.cgBlock!==this)throw new Error("Point `"+t.cgName+"` is not bound to this block `"+this._cgId+"`");if(t.isOutput&&this.outputByName(t.cgName)||!t.isOutput&&this.inputByName(t.cgName))throw new Error("Block `"+this._cgId+"` has already an "+(t.isOutput?"output":"input")+": `"+t.cgName+"`");return t.isOutput?this._cgOutputs.push(t):this._cgInputs.push(t),this._cgGraph.emit("cg-point-create",this,t),t},dudeGraph.Block.prototype.outputByName=function(t){return _.find(this._cgOutputs,function(e){return e.cgName===t})},dudeGraph.Block.prototype.inputByName=function(t){return _.find(this._cgInputs,function(e){return e.cgName===t})},dudeGraph.Block.prototype.updateTemplate=function(t,e){if(null===t.cgTemplate||!this.cgTemplates[t.cgTemplate]||-1===this.cgTemplates[t.cgTemplate].indexOf(e))return!1;t.cgValueType=e;var n=!1,o=function(o){if(n)return!0;if(o.cgTemplate===t.cgTemplate){if(0!==t.cgConnections.length)return n=!0,!0;o.cgValueType=e}};return _.forEach(this._cgInputs,o.bind(this)),_.forEach(this._cgOutputs,o.bind(this)),!n},dudeGraph.Block.prototype.clone=function(t){if("Block"!==this._blockType)throw new Error("Method `clone` must be overridden by `"+this._blockType+"`");var e=new dudeGraph.Block(t);return e.cgName=this._cgName,_.forEach(this._cgOutputs,function(t){var n=t.clone(e);e.addPoint(n)}),_.forEach(this._cgInputs,function(t){var n=t.clone(e);e.addPoint(n)}),e},dudeGraph.Point=function(t,e,n,o){if(Object.defineProperty(this,"cgGraph",{get:function(){return this._cgGraph}.bind(this)}),this._cgGraph=t.cgGraph,Object.defineProperty(this,"pointType",{get:function(){return this._pointType}.bind(this)}),this._pointType=o||"Point",Object.defineProperty(this,"cgBlock",{get:function(){return this._cgBlock}.bind(this)}),this._cgBlock=t,Object.defineProperty(this,"cgName",{get:function(){return this._cgName}.bind(this)}),this._cgName=e.cgName||this._pointType,Object.defineProperty(this,"isOutput",{get:function(){return this._isOutput}.bind(this)}),this._isOutput=n,Object.defineProperty(this,"cgConnections",{get:function(){return this._cgConnections}.bind(this)}),this._cgConnections=[],Object.defineProperty(this,"singleConnection",{get:function(){return this._singleConnection}.bind(this),set:function(t){this._singleConnection=t}.bind(this)}),this._singleConnection=_.isUndefined(e.singleConnection)?!0:e.singleConnection,Object.defineProperty(this,"cgTemplate",{get:function(){return this._cgTemplate}.bind(this)}),this._cgTemplate=e.cgTemplate||null,Object.defineProperty(this,"cgValueType",{get:function(){return this._cgValueType}.bind(this),set:function(t){var e=this._cgValueType;this._cgValueType=t,this._cgGraph.emit("cg-point-value-type-change",this,e,t)}.bind(this)}),this._cgValueType=e.cgValueType,_.isUndefined(e.cgValueType))throw new Error("Cannot create the point `"+this._cgName+"` in block `"+this._cgBlock.cgId+"` without specifying a value type");if(Object.defineProperty(this,"cgValue",{configurable:!0,get:function(){return this._cgValue}.bind(this),set:function(t){if(null!==t&&!this.acceptValue(t))throw new Error("Cannot set `cgValue`: Point `"+this._cgName+"` cannot accept more than one connection");if(!this._cgGraph.canAssign(t,this._cgValueType))throw new Error("Invalid value `"+String(t)+"` for `"+this._cgValueType+"` in `"+this._cgName+"`");var e=this._cgValue;this._cgValue=t,this._cgGraph.emit("cg-point-value-change",this,e,t)}.bind(this)}),this._cgValue=e.cgValue||null,!_.isUndefined(e.cgValue)&&n)throw new Error("Shouldn't create output point `"+this._cgName+"` in block `"+this._cgBlock.cgId+"` with a value.")},dudeGraph.Point.prototype.empty=function(){return 0===this._cgConnections.length&&null===this._cgValue},dudeGraph.Point.prototype.acceptConnect=function(t){return!this._singleConnection||0===this._cgConnections.length&&null===this._cgValue},dudeGraph.Point.prototype.acceptValue=function(t){return!this._singleConnection||0===this._cgConnections.length},dudeGraph.Point.prototype.connect=function(t){return this._isOutput?this._cgGraph.connectPoints(this,t):this._cgGraph.connectPoints(t,this)},dudeGraph.Point.prototype.disconnect=function(t){return this._isOutput?this._cgGraph.disconnectPoints(this,t):this._cgGraph.disconnectPoints(t,this)},dudeGraph.Point.prototype.clone=function(t){if("Point"!==this._pointType)throw new Error("Method `clone` must be overridden by `"+this._pointType+"`");return new dudeGraph.Point(t,{cgName:this._cgName,cgValueType:this._cgValueType,cgValue:this._cgValue},this._isOutput)},dudeGraph.Connection=function(t,e){if(Object.defineProperty(this,"cgOutputPoint",{get:function(){return this._cgOutputPoint}.bind(this)}),this._cgOutputPoint=t,!t.isOutput)throw new Error("outputPoint is not an output");if(Object.defineProperty(this,"cgInputPoint",{get:function(){return this._cgInputPoint}.bind(this)}),this._cgInputPoint=e,e.isOutput)throw new Error("inputPoint is not an input")},dudeGraph.Connection.prototype.otherPoint=function(t){if(t===this._cgOutputPoint)return this._cgInputPoint;if(t===this._cgInputPoint)return this._cgOutputPoint;throw new Error("Point `"+t.cgName+"` is not in this connection")},dudeGraph.Connection.prototype.remove=function(){},dudeGraph.Stream=function(t,e,n){dudeGraph.Point.call(this,t,_.merge(e,{cgName:e.cgName,cgValueType:"Stream"}),n,"Stream"),Object.defineProperty(this,"cgValue",{get:function(){throw new Error("Stream has no `cgValue`.")}.bind(this),set:function(){throw new Error("Stream has no `cgValue`.")}.bind(this)})},dudeGraph.Stream.prototype=_.create(dudeGraph.Point.prototype,{constructor:dudeGraph.Stream}),dudeGraph.Stream.prototype.clone=function(t){return new dudeGraph.Stream(t,this._cgName,this._isOutput)},dudeGraph.Assignation=function(t,e){dudeGraph.Block.call(this,t,e,"Assignation")},dudeGraph.Assignation.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Assignation}),dudeGraph.Assignation.prototype.validate=function(){if(!(this.inputByName("in")instanceof dudeGraph.Stream))throw new Error("Assignation `"+this.cgId+"` must have an input `in` of type `Stream`");if(!(this.inputByName("this")instanceof dudeGraph.Point))throw new Error("Assignation `"+this.cgId+"` must have an input `this` of type `Point`");if(!(this.inputByName("other")instanceof dudeGraph.Point))throw new Error("Assignation `"+this.cgId+"` must have an input `other` of type `Point`");if(this.inputByName("this")._cgValueType!==this.inputByName("other")._cgValueType)throw new Error("Assignation `"+this.cgId+"` inputs `this` and `other` must have the same cgValueType");if(!(this.outputByName("out")instanceof dudeGraph.Stream))throw new Error("Assignation `"+this.cgId+"` must have an output `out` of type `Stream`")},dudeGraph.Condition=function(t,e){dudeGraph.Block.call(this,t,e,"Condition")},dudeGraph.Condition.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Condition}),dudeGraph.Condition.prototype.validate=function(){if(!(this.inputByName("in")instanceof dudeGraph.Stream))throw new Error("Condition `"+this.cgId+"` must have an input `in` of type `Stream`");if(!(this.inputByName("test")instanceof dudeGraph.Point)||"Boolean"!==this.inputByName("test").cgValueType)throw new Error("Condition `"+this.cgId+"` must have an input `test` of type `Point` of cgValueType `Boolean`");if(!(this.outputByName("true")instanceof dudeGraph.Stream))throw new Error("Condition `"+this.cgId+"` must have an output `true` of type `Stream`");if(!(this.outputByName("false")instanceof dudeGraph.Stream))throw new Error("Condition `"+this.cgId+"` must have an output `false` of type `Stream`")},dudeGraph.Delegate=function(t,e){dudeGraph.Block.call(this,t,e,"Delegate")},dudeGraph.Delegate.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Delegate}),dudeGraph.Delegate.prototype.validate=function(){if(!(this.outputByName("out")instanceof dudeGraph.Stream))throw new Error("Delegate `"+this.cgId+"` must have an output `out` of type `Stream`")},dudeGraph.Each=function(t,e){dudeGraph.Block.call(this,t,e,"Each")},dudeGraph.Each.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Each}),dudeGraph.Function=function(t,e){dudeGraph.Block.call(this,t,e,"Function")},dudeGraph.Function.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Function}),dudeGraph.Getter=function(t,e){dudeGraph.Block.call(this,t,e,"Getter")},dudeGraph.Getter.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Getter}),dudeGraph.Instruction=function(t,e){dudeGraph.Block.call(this,t,e,"Instruction")},dudeGraph.Instruction.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Instruction}),dudeGraph.Instruction.prototype.validate=function(){if(!(this.inputByName("in")instanceof dudeGraph.Stream))throw new Error("Instruction `"+this.cgId+"` must have an input `in` of type `Stream`");if(!(this.outputByName("out")instanceof dudeGraph.Stream))throw new Error("Instruction `"+this.cgId+"` must have an output `out` of type `Stream`")},dudeGraph.Operator=function(t,e){dudeGraph.Block.call(this,t,e,"Operator")},dudeGraph.Operator.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Operator}),dudeGraph.Operator.prototype.validate=function(){if(2!==this.cgInputs.length)throw new Error("Operator `"+this.cgId+"` must only take 2 inputs");if(1!==this.cgOutputs.length)throw new Error("Operator `"+this.cgId+"` must return one value")},dudeGraph.Range=function(t,e){dudeGraph.Block.call(this,t,e,"Range")},dudeGraph.Range.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Range}),dudeGraph.Variable=function(t,e){dudeGraph.Block.call(this,t,e,"Variable"),Object.defineProperty(this,"cgValueType",{get:function(){return this._cgValueType}.bind(this)}),this._cgValueType=e.cgValueType,Object.defineProperty(this,"cgValue",{get:function(){return this._cgValue}.bind(this),set:function(t){this._cgValue=t,this.cgOutputs[0].cgValue=t}.bind(this)}),this._cgValue=e.cgValue},dudeGraph.Variable.prototype=_.create(dudeGraph.Block.prototype,{constructor:dudeGraph.Variable}),dudeGraph.Variable.prototype.validate=function(){if(!(this.outputByName("value")instanceof dudeGraph.Point))throw new Error("Variable `"+this.cgId+"` must have an output `value` of type `Point`")},dudeGraph.Loader=function(){this._blockTypes={Block:dudeGraph.Block},this._pointTypes={Point:dudeGraph.Point}},dudeGraph.Loader.prototype.registerBlockType=function(t,e){this._blockTypes[t]=e},dudeGraph.Loader.prototype.registerPointType=function(t,e){this._pointTypes[t]=e},dudeGraph.Loader.prototype.load=function(t,e){var n=this;_.forEach(e.blocks,function(e){n.loadBlock(t,e)}),_.forEach(e.connections,function(e){n.loadConnection(t,e)})},dudeGraph.Loader.prototype.loadBlock=function(t,e){var n=this;if(!e.hasOwnProperty("cgId"))throw new Error("Block property `cgId` is required");var o=this._blockTypes[e.cgType];if(_.isUndefined(o))throw new Error("Block type `"+e.cgType+"` not registered by the loader");var r=new o(t,e,e.cgType);return _.forEach(e.cgOutputs,function(t){n.loadPoint(r,t,!0)}),_.forEach(e.cgInputs,function(t){n.loadPoint(r,t,!1)}),t.addBlock(r),r},dudeGraph.Loader.prototype.loadPoint=function(t,e,n){if(!e.cgName)throw new Error("Block `"+t.cgId+"`: Point property `cgName` is required");var o=e.cgType,r=this._pointTypes[o];if(!r)throw new Error("Point type `"+o+"` not registered by the loader");var i=new r(t,e,n);return t.addPoint(i),i},dudeGraph.Loader.prototype.loadConnection=function(t,e){var n=e.cgOutputBlockId,o=e.cgOutputName,r=e.cgInputBlockId,i=e.cgInputName,d=t.blockById(n);if(!d)throw new Error("Output block not found for id `"+n+"`");var c=t.blockById(r);if(!c)throw new Error("Input block not found for id `"+r+"`");var a=d.outputByName(o);if(!a)throw new Error("Output point `"+o+"` not found in block `"+n+"`");var u=c.inputByName(i);if(!u)throw new Error("Input point `"+i+"` not found in block `"+r+"`");a.connect(u)},dudeGraph.Saver=function(){},dudeGraph.Saver.prototype.save=function(t){var e=this;return{blocks:_.map(t.cgBlocks,function(t){return e.saveBlock(t)}),connections:_.map(t.cgConnections,function(t){return e.saveConnection(t)})}},dudeGraph.Saver.prototype.saveBlock=function(t){var e=this;return{cgType:t._blockType,cgId:t._cgId,cgName:t._cgName,cgInputs:_.map(t._cgInputs,function(t){return e.savePoint(t)}),cgOutputs:_.map(t._cgOutputs,function(t){return e.savePoint(t)})}},dudeGraph.Saver.prototype.savePoint=function(t){var e={cgType:t.pointType,cgName:t._cgName,cgValueType:t._cgValueType,singleConnection:t._singleConnection};return t._isOutput||(e.cgValue=t._cgValue),e},dudeGraph.Saver.prototype.saveConnection=function(t){return{cgOutputName:t._cgOutputPoint._cgName,cgOutputBlockId:t._cgOutputPoint._cgBlock._cgId,cgInputName:t._cgInputPoint._cgName,cgInputBlockId:t._cgInputPoint._cgBlock._cgId}},dudeGraph.Renderer=function(){this._graph=null,Object.defineProperty(this,"graph",{get:function(){return this._graph}.bind(this)}),this._config=null,Object.defineProperty(this,"config",{get:function(){return this._config}.bind(this)}),this._zoom=null,this._d3Svg=null,this._d3Root=null,this._d3Groups=null,this._d3Connections=null,this._d3Block=null,this._svgPoint=null,this._renderBlocks=null,this._renderGroups=null,this._renderConnections=null,this._selectedRenderNodes=null,this._renderBlockTypes=null,this._renderBlockIds=null,this._renderGroupIds=null,this._renderBlocksQuadtree=null,this._renderGroupsQuadtree=null,this._renderPointsQuadtree=null,Object.defineProperty(this,"d3Blocks",{get:function(){return this._d3Block.selectAll(".dude-graph-block")}.bind(this)}),Object.defineProperty(this,"d3Groups",{get:function(){return this._d3Groups.selectAll(".dude-graph-group")}.bind(this)}),Object.defineProperty(this,"d3Connections",{get:function(){return this._d3Connections.selectAll(".dude-graph-connection")}.bind(this)})},dudeGraph.Renderer.prototype=_.create(EventEmitter.prototype,{constructor:dudeGraph.Renderer}),dudeGraph.Renderer.prototype.initialize=function(t,e,n){this._graph=t,this._d3Svg=d3.select(e),this._d3Root=this._d3Svg.append("svg:g").attr("id","dude-graph-renderer"),this._d3Groups=this._d3Root.append("svg:g").attr("id","dude-graph-groups"),this._d3Connections=this._d3Root.append("svg:g").attr("id","dude-graph-connections"),this._d3Block=this._d3Root.append("svg:g").attr("id","dude-graph-blocks"),this._svgPoint=e.createSVGPoint(),this._renderBlocks=[],this._renderGroups=[],this._renderConnections=[],this._selectedRenderNodes=[],this._renderBlockTypes={Block:dudeGraph.RenderBlock},this._renderBlockIds={},this._renderGroupIds={},this._renderBlocksQuadtree=null,this._renderGroupsQuadtree=null,this._renderPointsQuadtree=null,this._config=_.defaultsDeep(n||{},dudeGraph.Renderer.defaultConfig),this._zoom=dudeGraph.Renderer.defaultZoom,this._createSelectionBehavior(),this._createZoomBehavior()},dudeGraph.Renderer.prototype.registerRenderBlock=function(t,e){this._renderBlockTypes[t]=e},dudeGraph.Renderer.defaultConfig={zoom:{min:.25,max:5,margin:[10,10],transitionSpeed:800},block:{padding:10,header:50,pointSpacing:10},group:{padding:10,header:30},point:{height:20,padding:10,radius:3},connection:{step:150}},dudeGraph.Renderer.defaultZoom={translate:[0,0],scale:1},dudeGraph.RenderNode=function(t,e){this._renderer=t,this._nodeId=e,Object.defineProperty(this,"nodeId",{configurable:!0,get:function(){return this._nodeId}.bind(this)}),this._nodeName=null,Object.defineProperty(this,"nodeName",{configurable:!0,get:function(){return this._nodeName}.bind(this),set:function(t){this._nodeName=t}.bind(this)}),Object.defineProperty(this,"nodeFancyName",{configurable:!0,get:function(){return this._nodeName+" (#"+this._nodeId+")"}.bind(this)}),this._nodeParent=null,Object.defineProperty(this,"nodeParent",{configurable:!0,get:function(){return this._nodeParent}.bind(this),set:function(t){null!==this._nodeParent&&this._nodeParent.removeChildRenderNode(this),t.addChildRenderNode(this),this._nodeParent=t}.bind(this)}),this._nodePosition=[0,0],Object.defineProperty(this,"nodePosition",{configurable:!0,get:function(){return this._nodePosition}.bind(this),set:function(t){this._nodePosition=t}.bind(this)}),this._nodeSize=[0,0],Object.defineProperty(this,"nodeSize",{configurable:!0,get:function(){return this._nodeSize}.bind(this),set:function(t){this._nodeSize=t}.bind(this)}),this._d3Node=null,Object.defineProperty(this,"d3Node",{configurable:!0,get:function(){return this._d3Node}.bind(this)})},dudeGraph.RenderNode.prototype.create=function(t){this._d3Node=t},dudeGraph.RenderNode.prototype.move=function(){this._d3Node.attr("transform","translate("+this._nodePosition+")")},dudeGraph.RenderNode.prototype.update=function(){this.move()},dudeGraph.RenderNode.prototype.remove=function(){},dudeGraph.RenderNode.prototype.select=function(){this._d3Folie=this._d3Node.append("svg:polygon"),this._d3Folie.attr("points",function(){for(var t=[],e=5,n=Math.PI/e,o=0;2*e>o;o++){var r=o%2===0?5:10,i=5+Math.cos(o*n)*r,d=5+Math.sin(o*n)*r;t.push([i,d])}return t})},dudeGraph.RenderNode.prototype.unselect=function(){this._d3Folie.remove()},dudeGraph.RenderBlock=function(t,e,n){
-dudeGraph.RenderNode.call(this,t,e),this._block=n,Object.defineProperty(this,"block",{get:function(){return this._block}.bind(this)}),this._renderPoints=[],Object.defineProperty(this,"renderPoints",{get:function(){return this._renderPoints}.bind(this),set:function(t){this._renderPoints=t,this._renderOutputPoints=_.filter(this.renderPoints,function(t){return t.point.isOutput}),this._renderInputPoints=_.filter(this.renderPoints,function(t){return!t.point.isOutput})}.bind(this)}),this._d3Points=null,Object.defineProperty(this,"d3Points",{get:function(){return this._d3Points.selectAll(".dude-graph-point")}.bind(this)})},dudeGraph.RenderBlock.buildRenderBlock=function(t,e){var n=t.graph.blockById(e.cgBlock);if(!n)throw new Error("Unknown block `"+e.cgBlock+"` for renderBlock `"+e.id+"`");var o=new dudeGraph.RenderBlock(t,e.id,n);return o.nodeName=e.description||n.cgName||"",o.nodePosition=e.position||[0,0],o.parentGroup=e.parent||null,o.renderPoints=Array.prototype.concat(_.map(n.cgOutputs,function(e,n){return new dudeGraph.RenderPoint(t,o,e,n)}),_.map(n.cgInputs,function(e,n){return new dudeGraph.RenderPoint(t,o,e,n)})),o},dudeGraph.RenderBlock.prototype=_.create(dudeGraph.RenderNode.prototype,{constructor:dudeGraph.RenderBlock}),dudeGraph.RenderBlock.prototype.create=function(t){dudeGraph.RenderNode.prototype.create.call(this,t),this._d3Rect=t.append("svg:rect"),this._d3Title=t.append("svg:text").attr("text-anchor","middle").attr("dominant-baseline","text-before-edge"),this._d3Points=t.append("svg:g").classed("dude-graph-points",!0),this.d3Points.data(this.renderPoints,function(t){return t.point.cgName}).enter().append("g").classed("dude-graph-point",!0),this.d3Points.each(function(t){t.create(d3.select(this))}),this.updateSize(),this.d3Points.each(function(t){t.updatePosition()}),this.update()},dudeGraph.RenderBlock.prototype.update=function(){var t=this;dudeGraph.RenderNode.prototype.update.call(this),this._d3Rect.attr({x:0,y:0,width:this._nodeSize[0],height:this._nodeSize[1]}),this._d3Title.text(this._nodeName).attr({x:this._nodeSize[0]/2,y:this._renderer.config.block.padding}),_.browserIf(["IE","Edge"],function(){t._d3Title.attr("y",t._renderer.config.block.padding+t._renderer.textBoundingBox(t._d3Title)[1]/2)}),this.d3Points.each(function(t){t.update()}),this.move()},dudeGraph.RenderBlock.prototype.updateSize=function(){var t=_.max(this._renderOutputPoints,function(t){return t.pointSize[0]}),e=_.max(this._renderInputPoints,function(t){return t.pointSize[0]}),n=this._renderer.textBoundingBox(this._nodeName)[0],o=t!==-(1/0)?t.pointSize[0]:0,r=e!==-(1/0)?e.pointSize[0]:0,i=this._renderOutputPoints.length>this._renderInputPoints.length,d=_.sum(i?this._renderOutputPoints:this._renderInputPoints,function(t){return t.pointSize[1]}),c=Math.max(n+2*this._renderer.config.block.padding,o+r+this._renderer.config.block.pointSpacing);this._nodeSize=[c,d+this._renderer.config.block.header]},dudeGraph.RenderConnection=function(t,e,n,o){this._renderer=t,this._connection=e,Object.defineProperty(this,"connection",{get:function(){return this._connection}.bind(this)}),this._outputRenderPoint=n,Object.defineProperty(this,"outputRenderPoint",{get:function(){return this._outputRenderPoint}.bind(this)}),this._inputRenderPoint=o,Object.defineProperty(this,"inputRenderPoint",{get:function(){return this._inputRenderPoint}.bind(this)}),Object.defineProperty(this,"connectionId",{get:function(){return this.outputRenderPoint.renderBlock.nodeId+":"+this.outputRenderPoint.point.cgName+","+this.inputRenderPoint.renderBlock.nodeId+":"+this.inputRenderPoint.point.cgName}.bind(this)}),this._d3Connection=null,Object.defineProperty(this,"d3Connection",{get:function(){return this._d3Connection}.bind(this)})},dudeGraph.RenderConnection.buildRenderConnection=function(t,e){var n=t._graph.cgConnections[e.cgConnectionIndex];if(!n)throw new Error("Connection at index `"+e.cgConnectionIndex+"` does not exists");var o=t.getRenderBlockById(e.outputRendererBlockId),r=t.getRenderBlockById(e.inputRendererBlockId);if(null===o)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: Cannot find outputRenderBlock `"+e.outputRendererBlockId+"`");if(null===r)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: Cannot find inputRenderBlock `"+e.inputRendererBlockId+"`");if(o.block!==n.cgOutputPoint.cgBlock)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: output render block `"+o.nodeFancyName+"` is not holding a reference to the output block `"+n.cgOutputPoint.cgBlock.cgId+"`");if(r.block!==n.cgInputPoint.cgBlock)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: input render block `"+r.nodeFancyName+"` is not holding a reference to the input block `"+n.cgInputPoint.cgBlock.cgId+"`");var i=t.getRenderPointByName(o,n.cgOutputPoint.cgName),d=t.getRenderPointByName(r,n.cgInputPoint.cgName);if(!i)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: Cannot find outputRenderPoint `"+n.cgOutputPoint.cgName+"`");if(!d)throw new Error("Connection at index `"+e.cgConnectionIndex+"`: Cannot find inputRenderPoint `"+n.cgInputPoint.cgName+"`");return new dudeGraph.RenderConnection(t,n,i,d)},dudeGraph.RenderConnection.prototype.create=function(t){this._d3Connection=t},dudeGraph.RenderConnection.prototype.update=function(){this._d3Connection.attr("d",this.computePath())},dudeGraph.RenderConnection.prototype.remove=function(){},dudeGraph.RenderConnection.prototype.computePath=function(){var t=this._outputRenderPoint.absolutePointPosition,e=this._inputRenderPoint.absolutePointPosition,n=this._renderer.config.connection.step;return t[0]-e[0]<0&&(n+=Math.max(-100,t[0]-e[0])),_.templateString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}",{x:t[0],y:t[1],x1:t[0]+n,y1:t[1],x2:e[0]-n,y2:e[1],x3:e[0],y3:e[1]})},dudeGraph.RenderGroup=function(t,e){dudeGraph.RenderNode.call(this,t,e),this._childrenRenderNodes=[]},dudeGraph.RenderGroup.buildRenderGroup=function(t,e){return new dudeGraph.RenderGroup(t,e.id)},dudeGraph.RenderGroup.prototype=_.create(dudeGraph.RenderNode.prototype,{constructor:dudeGraph.RenderGroup}),dudeGraph.RenderGroup.prototype.create=function(t){dudeGraph.RenderNode.prototype.create.call(this,t),this.update()},dudeGraph.RenderGroup.prototype.addChildRenderNode=function(t){var e=_.find(this._childrenRenderNodes,t);if(!_.isUndefined(e))throw new Error("`"+t.nodeFancyName+"` is already a child of `"+this.nodeFancyName+"`");this._childrenRenderNodes.push(t)},dudeGraph.RenderGroup.prototype.removeChildRenderNode=function(t){var e=_.find(this._childrenRenderNodes,t);if(_.isUndefined(e))throw new Error("`"+t.nodeFancyName+"` is not a child of `"+this.nodeFancyName+"`");_.pull(this._childrenRenderNodes,t)},dudeGraph.RenderPoint=function(t,e,n,o){this._renderer=t,this._renderBlock=e,Object.defineProperty(this,"renderBlock",{get:function(){return this._renderBlock}.bind(this)}),this._index=o,Object.defineProperty(this,"index",{get:function(){return this._index}.bind(this)}),this._point=n,Object.defineProperty(this,"point",{get:function(){return this._point}.bind(this)}),this._pointPosition=[0,0],Object.defineProperty(this,"pointPosition",{get:function(){return this._pointPosition}.bind(this)}),this._pointSize=[0,0],Object.defineProperty(this,"pointSize",{get:function(){return this._pointSize}.bind(this)}),Object.defineProperty(this,"absolutePointPosition",{get:function(){var t=this._renderBlock.nodePosition,e=this._pointPosition;return[t[0]+e[0],t[1]+e[1]]}.bind(this)}),this._d3Point=null,Object.defineProperty(this,"d3Point",{get:function(){return this._d3Point}.bind(this)})},dudeGraph.RenderPoint.prototype.create=function(t){this._d3Point=t,this._d3Circle=t.append("svg:circle"),this._d3Title=t.append("svg:text").attr("text-anchor",this._point.isOutput?"end":"start").attr("dominant-baseline","middle"),this.updateSize()},dudeGraph.RenderPoint.prototype.update=function(){var t=this;this._d3Circle.attr({cx:this._pointPosition[0]+(this.point.isOutput?-1:1)*this._renderer.config.point.radius/2,cy:this._pointPosition[1],r:this._renderer.config.point.radius}),this._d3Title.text(this._point.cgName).attr({x:this._pointPosition[0]+(this.point.isOutput?-1:1)*this._renderer.config.point.padding,y:this._pointPosition[1]}),_.browserIf(["IE","Edge"],function(){t._d3Title.attr("y",t._pointPosition[1]+t._renderer.textBoundingBox(t._d3Title)[1]/4)})},dudeGraph.RenderPoint.prototype.remove=function(){},dudeGraph.RenderPoint.prototype.updateSize=function(){var t=this._renderer.textBoundingBox(this._point.cgName);this._pointSize=[t[0]+2*this._renderer.config.point.padding,this._renderer.config.point.height]},dudeGraph.RenderPoint.prototype.updatePosition=function(){this.point.isOutput?this._pointPosition=[this._renderBlock.nodeSize[0]-this._renderer.config.point.padding,this._renderer.config.block.header+this._renderer.config.point.height*this._index]:this._pointPosition=[this._renderer.config.point.padding,this._renderer.config.block.header+this._renderer.config.point.height*this._index]},dudeGraph.RenderVariable=function(t,e,n){dudeGraph.RenderBlock.call(this,t,e,n)},dudeGraph.RenderVariable.buildRenderBlock=function(t,e){return dudeGraph.RenderBlock.buildRenderBlock.call(this,t,e)},dudeGraph.RenderVariable.prototype=_.create(dudeGraph.RenderBlock.prototype,{constructor:dudeGraph.RenderBlock}),dudeGraph.Renderer.prototype._createRenderBlocksCollisions=function(){this._renderBlocksQuadtree=d3.geom.quadtree().x(function(t){return t.nodePosition[0]}).y(function(t){return t.nodePosition[1]})(this._renderBlocks)},dudeGraph.Renderer.prototype._getNearestRenderBlocks=function(t,e,n,o){this._createRenderBlocksCollisions();var r=[];return this._renderBlocksQuadtree.visit(function(i,d,c,a,u){var s=i.point;if(s){var p=[s.nodePosition[0],s.nodePosition[1],s.nodePosition[0]+s.nodeSize[0],s.nodePosition[1]+s.nodeSize[1]];t>p[2]||e>p[3]||n<p[0]||o<p[1]||r.push(s)}return d-50>=n||c-35>=o||t>a+50||e>u+35}),r},dudeGraph.Renderer.prototype._createSelectionBehavior=function(){var t=this,e=null;this._d3Svg.call(d3.behavior.drag().on("dragstart",function(){d3.event.sourceEvent.shiftKey?(d3.event.sourceEvent.stopImmediatePropagation(),e=t._d3Svg.append("svg:rect").classed("dude-graph-select",!0).datum(d3.mouse(this))):t._clearSelection()}).on("drag",function(){if(e){var t=d3.mouse(this);e.attr({x:function(e){return Math.min(e[0],t[0])},y:function(e){return Math.min(e[1],t[1])},width:function(e){return Math.max(t[0]-e[0],e[0]-t[0])},height:function(e){return Math.max(t[1]-e[1],e[1]-t[1])}})}}).on("dragend",function(){if(null!==e){var n=[parseInt(e.attr("x")),parseInt(e.attr("y"))],o=[n[0]+parseInt(e.attr("width")),n[1]+parseInt(e.attr("height"))],r=t._screenToWorld(n),i=t._screenToWorld(o),d=t._getNearestRenderBlocks(r[0],r[1],i[0],i[1]);d3.event.sourceEvent.altKey?t._removeSelection(d):t._addSelection(d),e.remove(),e=null}}))},dudeGraph.Renderer.prototype._addSelection=function(t){var e=this;_.forEach(t,function(t){_.includes(e._selectedRenderNodes,t)||(t.select(),t.d3Node.classed("dude-graph-selected",!0),e._selectedRenderNodes.push(t))})},dudeGraph.Renderer.prototype._removeSelection=function(t){var e=this;_.forEach(t,function(t){_.includes(e._selectedRenderNodes,t)&&(t.unselect(),t.d3Node.classed("dude-graph-selected",!1),_.pull(e._selectedRenderNodes,t))})},dudeGraph.Renderer.prototype._clearSelection=function(){this._removeSelection(this._selectedRenderNodes)},dudeGraph.Renderer.prototype._createZoomBehavior=function(){var t=this;this._zoomBehavior=d3.behavior.zoom().scaleExtent([this._config.zoom.min,this._config.zoom.max]).on("zoom",function(){d3.event.sourceEvent&&_.browserIf(["IE"],function(){d3.event.sourceEvent.defaultPrevented=!0},function(){d3.event.sourceEvent.preventDefault()}),t._d3Root.attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale+")"),t._zoom.translate=t._zoomBehavior.translate(),t._zoom.scale=t._zoomBehavior.scale()}.bind(this)),this._d3Svg.call(this._zoomBehavior)},dudeGraph.Renderer.prototype._updateZoom=function(){this._d3Svg.transition().duration(this._config.zoom.transitionSpeed).call(this._zoomBehavior.translate(this._zoom.translate).scale(this._zoom.scale).event)},dudeGraph.Renderer.prototype.getRenderBlockById=function(t){return this._renderBlockIds[t]||null},dudeGraph.Renderer.prototype.createRenderBlock=function(t){var e=this._graph.blockById(t.cgBlock);if(null===e)throw 42;var n=this._renderBlockTypes[e.blockType];if(!n)throw new Error("Render block type `"+e.blockType+"` not registered in the renderer");var o=n.buildRenderBlock(this,t);if(null===o.nodeId)throw new Error("Cannot create a renderBlock without an id");var r=this.getRenderBlockById(o.nodeId);if(null!==r)throw new Error("Duplicate renderBlocks for id `"+o.nodeId+"`: `"+r.nodeFancyName+"` was here before `"+o.nodeFancyName+"`");return this._renderBlocks.push(o),this._renderBlockIds[o.nodeId]=o,o},dudeGraph.Renderer.prototype.createRendererConnection=function(t){var e=dudeGraph.RenderConnection.buildRenderConnection(this,t);return this._renderConnections.push(e),e},dudeGraph.Renderer.prototype.getRenderGroupById=function(t){return this._renderGroupIds[t]||null},dudeGraph.Renderer.prototype._createRenderGroup=function(t){var e=dudeGraph.RenderGroup.buildRenderGroup(this,t);if(null===e.nodeId)throw new Error("Cannot create a renderGroup without an id");var n=this.getRenderGroupById(e.nodeId);if(null!==n)throw new Error("Duplicate renderGroups for id `"+e.nodeId+"`: `"+n.nodeFancyName+"` was here before `"+e.nodeFancyName+"`");return this._renderGroups.push(e),this._renderGroupIds[e.nodeId]=e,e},dudeGraph.Renderer.prototype.getRenderPointByName=function(t,e){return _.find(t.renderPoints,function(t){return t.point.cgName===e})},dudeGraph.Renderer.prototype._createD3Blocks=function(){this.d3Blocks.data(this._renderBlocks,function(t){return t.nodeId}).enter().append("svg:g").attr("id",function(t){return t.nodeId}).classed("dude-graph-block",!0).each(function(t){t.create(d3.select(this))}),this._updateD3Blocks()},dudeGraph.Renderer.prototype._updateD3Blocks=function(){this.d3Blocks.each(function(t){t.update()})},dudeGraph.Renderer.prototype._removeD3Blocks=function(){this.d3Blocks.data(this._renderBlocks,function(t){return t.nodeId}).exit().each(function(t){t.remove()}).remove()},dudeGraph.Renderer.prototype._createD3Connections=function(){this.d3Connections.data(this._renderConnections,function(t){return t.connectionId}).enter().append("svg:path").attr("id",function(t){return t.connectionId}).classed("dude-graph-connection",!0).each(function(t){t.create(d3.select(this))}),this._updateD3Connections()},dudeGraph.Renderer.prototype._updateD3Connections=function(){this.d3Connections.each(function(t){t.update()})},dudeGraph.Renderer.prototype._removeD3Connections=function(){this.d3Connections.data(this._renderConnections,function(t){return t.connectionId}).exit().each(function(t){t.remove()}).remove()},dudeGraph.Renderer.prototype._createD3Groups=function(){this.d3Groups.data(this._renderGroups,function(t){return t.nodeId}).enter().append("svg:g").attr("id",function(t){return t.nodeId}).classed("dude-graph-group",!0).each(function(t){t.create(d3.select(this))}),this._updateD3Groups()},dudeGraph.Renderer.prototype._updateD3Groups=function(){this.d3Groups.each(function(t){t.update()})},dudeGraph.Renderer.prototype._removeD3Groups=function(){this.d3Groups.data(this._renderGroups,function(t){return t.nodeId}).exit().each(function(t){t.remove()}).remove()},dudeGraph.Renderer.prototype.textBoundingBox=function(t){if(t instanceof d3.selection){var e=t.node().getBBox();return[e.width,e.height]}return[8*t.length,17]},dudeGraph.Renderer.prototype._screenToWorld=function(t){this._svgPoint.x=t[0],this._svgPoint.y=t[1];var e=this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());return[e.x,e.y]},dudeGraph.Renderer.prototype.load=function(t){var e=this;_.forEach(t.blocks,function(t){e.createRenderBlock(t)}),_.forEach(t.groups,function(t){e._createRenderGroup(t)}),_.forEach(t.connections,function(t){e.createRendererConnection(t)}),_.forEach(t.blocks,function(t){var n=e.getRenderBlockById(t.id);if(t.parent){var o=e.getRenderGroupById(t.parent);if(null===o)throw new Error("Cannot find renderBlock `"+n.nodeFancyName+"` parent id `"+t.parent+"`");n.nodeParent=o}}),_.forEach(t.groups,function(t){var n=e.getRenderGroupById(t.id);if(t.parent){var o=e.getRenderGroupById(t.parent);if(null===o)throw new Error("Cannot find renderGroup `"+n.nodeFancyName+"` parent id `"+t.parent+"`");n.nodeParent=o}}),this._createD3Blocks(),this._createD3Groups(),this._createD3Connections()};
+/**
+ * @namespace pandora
+ * @type {Object}
+ */
+var pandora = (function () {
+    var namespace = typeof Module === "undefined" ? {} : Module;
+    if (typeof exports !== "undefined") {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = namespace;
+        }
+        exports.pandora = namespace;
+    }
+    return namespace;
+})();
+/**
+ * Try to determine the type of the given value or return Unknown otherwise. Note that it first try to use the
+ * value.constructor.typename attribute, so if you created your value with a class generated using pandora.class_
+ * it will return its name.
+ * @param value {*}
+ * @returns {String}
+ */
+pandora.typename = function (value) {
+    if (value.constructor.typename !== undefined) {
+        return value.constructor.typename;
+    }
+    switch (typeof value) {
+        case "boolean": return "Boolean";
+        case "number": return "Number";
+        case "string": return "String";
+        case "function": return "Function";
+        case "object":
+            if (value instanceof Array) {
+                return "Array";
+            } else if (value instanceof Object) {
+                return "Object";
+            }
+    }
+    if (value === null) {
+        return "null";
+    } else if (value === undefined) {
+        return "undefined";
+    }
+    return "Unknown";
+};
+
+/**
+ * Simulate class behavior in JS. It generate a function constructor, set the typename of the class and apply
+ * inheritance.
+ * Takes the typename in first parameter, followed by the classes from which inherit and finally the class'
+ * constructor.
+ * @param {...}
+ * @returns {Function}
+ */
+pandora.class_ = function () {
+    var typename = arguments[0];
+    var constructor = arguments[arguments.length - 1];
+    for (var i = 1; i < arguments.length - 1; ++i) {
+        if (typeof arguments[i] !== "function") {
+            throw new pandora.Exception("{0} is not a valid constructor type", pandora.typename(arguments[i]));
+        }
+        var proto = arguments[i].prototype;
+        for (var method in proto) {
+            if (proto.hasOwnProperty(method)) {
+                constructor.prototype[method] = proto[method];
+            }
+        }
+    }
+    Object.defineProperty(constructor, "typename", {
+        value: typename,
+        writable: false
+    });
+    return constructor;
+};
+
+/**
+ * Generate a polymorphic function for the given type.
+ * @param type {Function} the constructor of the type on which the polymorphism will apply
+ * @param typeFunctions {Object<Function>} the functions for each types that are supported
+ * @returns {*} the result of the function called
+ */
+pandora.polymorphic = function (type, typeFunctions) {
+    var name = pandora.typename(type);
+    if (typeFunctions[name] === undefined) {
+        if (typeFunctions._ === undefined) {
+            throw new pandora.MissingOverloadError(name);
+        }
+        return typeFunctions._();
+    }
+    return typeFunctions[name]();
+};
+
+/**
+ * Looks like cg.polymorphic. However, instead of giving the functions in parameters, to give an instance and a method
+ * name and it will look for the methods within the class. For instance, if you create a polymorphic method "render"
+ * like so:
+ *      return cg.polymorphicMethod(this, "render", node, element);
+ * it will look for all the method named _renderType (_renderVec2, _renderGraph for instance), and return it.
+ * Note that the polymorphism will apply according to the first parameter.
+ * @param instance {Object} the instance of the object on which the method exists
+ * @param name {Object} the name of the polymorphic method (used to find the private methods for each type)
+ * @param value {*} the value on which the polymorphism will apply
+ * @param {...} arguments to call the function.
+ */
+pandora.polymorphicMethod = function (instance, name, value) {
+    var suffix = pandora.typename(value);
+    var method = instance["_" + name + suffix];
+    if (method === undefined) {
+        throw new pandora.MissingOverloadError(name + suffix, pandora.typename(instance));
+    }
+    return method.apply(instance, Array.prototype.slice.call(arguments, 2));
+};
+/**
+ * Default function to prevent events.
+ */
+pandora.preventCallback = function (x, y, e) {
+    if (x.preventDefault !== undefined &&
+        x.stopPropagation !== undefined &&
+        x.stopImmediatePropagation !== undefined) {
+        e = x;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+};
+
+/**
+ * Empty callback for default event behavior.
+ */
+pandora.defaultCallback = function () {
+
+};
+
+/**
+ * Cross-platform mouse wheel event
+ * @param {Element} el
+ * @param {Function} callback
+ */
+// http://stackoverflow.com/questions/5527601/normalizing-mousewheel-speed-across-browsers
+pandora.mouseWheel = function (el, callback) {
+    var handleScroll = function (e) {
+        if (!e) {
+            e = event;
+        }
+        var delta = 0;
+        if (e.wheelDelta) {
+            delta = e.wheelDelta / 360; // Chrome/Safari
+        } else {
+            delta = e.detail / -9; // Mozilla
+        }
+        callback(e, delta);
+    };
+    el.addEventListener('DOMMouseScroll', handleScroll, false); // for Firefox
+    el.addEventListener('mousewheel', handleScroll, false); // for everyone else
+};
+pandora.EventEmitter = (function () {
+
+    /**
+     * Handle pub-sub events.
+     * @constructor
+     */
+    var EventEmitter = pandora.class_("EventEmitter", function () {
+
+        /**
+         * Contain all listeners functions of the emitter.
+         * @type {{}}
+         * @private
+         */
+        this._listeners = {};
+
+    });
+
+    /**
+     * Add a listener for the given name.
+     * @param name
+     * @param fn
+     */
+    EventEmitter.prototype.on = function (name, fn) {
+        if (this._listeners[name] === undefined) {
+            this._listeners[name] = [];
+        }
+        this._listeners[name].push(fn);
+    };
+
+    /**
+     * Remove all listeners for the given name.
+     */
+    EventEmitter.prototype.off = function (name) {
+        this._listeners[name] = [];
+    };
+
+    /**
+     * Emit an event for the given name.
+     * @param name
+     */
+    EventEmitter.prototype.emit = function (name) {
+        if (this._listeners[name] === undefined) {
+            return;
+        }
+        for (var i = 0; i < this._listeners[name].length; ++i) {
+            this._listeners[name][i].apply(this, Array.prototype.slice.call(arguments, 1));
+        }
+    };
+
+    return EventEmitter;
+
+})();
+/**
+ * Polymorphic format string.
+ * @return {String}
+ */
+pandora.formatString = function () {
+    var format = arguments[0];
+    var firstOption = arguments[1];
+    if (arguments.length === 1) {
+        return format;
+    } else if (firstOption && typeof firstOption === "object") {
+        return pandora.formatDictionary.apply(this, arguments);
+    } else {
+        return pandora.formatArray.apply(this, arguments);
+    }
+};
+
+/**
+ * Return the formatted string
+ * eg. pandora.formatArray("I <3 {0} and {1}", "Chocolate", "Linux") will return "I <3 Chocolate and Linux"
+ * @return {String}
+ */
+// http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+pandora.formatArray = function () {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return arguments[0].replace(/{(\d+)}/g, function (match, number) {
+        return args[number];
+    });
+};
+
+/**
+ * Replaces construction of type `{<name>}` to the corresponding argument
+ * eg. pandora.formatString("I <3 {loves.first} and {loves["second"]}", {"loves": {"first": "Chocolate", second: "Linux"}}) will return "I <3 Chocolate and Linux"
+ * @return {String}
+ */
+// Borrowed from SnapSvg
+pandora.formatDictionary = (function () {
+    var tokenRegex = /\{([^\}]+)\}/g;
+    var objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g;
+    var replacer = function (all, key, obj) {
+        var res = obj;
+        key.replace(objNotationRegex, function (all, name, quote, quotedName, isFunc) {
+            name = name || quotedName;
+            if (res !== undefined) {
+                if (name in res) {
+                    res = res[name];
+                }
+                if (typeof res === "function" && isFunc) {
+                    res = res();
+                }
+            }
+        });
+        res = (res === null || res === obj ? all : res) + "";
+        return res;
+    };
+    return function (str, obj) {
+        return String(str).replace(tokenRegex, function (all, key) {
+            return replacer(all, key, obj);
+        });
+    };
+})();
+/**
+ * Convert the given input string to camelcase. Example: my-class-name -> MyClassName.
+ * @param str {String} The string to convert.
+ * @param sep {String?} The separator to use for the non-camelcase version of the string ("-" by default).
+ * @returns {String}
+ */
+pandora.camelcase = function (str, sep) {
+    sep = sep || "-";
+    return str[0].toUpperCase() + str.replace(new RegExp("(" + sep + "[a-z])", "g"), function (m) {
+            return m.toUpperCase().replace(sep,'');
+        }).substr(1);
+};
+
+/**
+ * Convert the given input string to camelcase. Example: my-class-name -> MyClassName.
+ * @param str {String} The string to convert.
+ * @param sep {String?} The separator to use for the non-camelcase version of the string ("-" by default).
+ * @returns {String}
+ */
+pandora.uncamelcase = function (str, sep) {
+    return str.replace(/([A-Z])/g, function (m) {
+        return sep + m.toLowerCase();
+    }).substr(1);
+};
+/**
+ * Iterates on the given container.
+ * @param container {Array|Object} the container
+ * @param fn {Function} a predicate to apply on each element, the loop breaks if the predicate returns true
+ */
+pandora.forEach = function (container, fn) {
+    pandora.polymorphic(container, {
+        "Array": function () {
+            for (var i = 0; i < container.length; ++i) {
+                if (fn(container[i], i) === true) {
+                    return;
+                }
+            }
+        },
+        "Object": function () {
+            for (var key in container) {
+                if (container.hasOwnProperty(key)) {
+                    if (fn(container[key], key) === true) {
+                        return;
+                    }
+                }
+            }
+        }
+    });
+};
+
+/**
+ * Merge the source object into the destination.
+ * @param destination {Object}
+ * @param source {Object}
+ * @param recurse {Boolean?}
+ * @param override {Boolean?}
+ */
+pandora.mergeObjects = function (destination, source, recurse, override) {
+    for (var k in source) {
+        if (source.hasOwnProperty(k)) {
+            if (recurse && typeof source[k] === "object") {
+                destination[k] = destination[k] || {};
+                pandora.mergeObjects(destination[k], source[k], recurse);
+            } else if (override || destination[k] === undefined) {
+                destination[k] = source[k];
+            }
+        }
+    }
+    return destination;
+};
+pandora.Exception = (function () {
+
+    /**
+     * @returns {Error}
+     * @constructor
+     */
+    return pandora.class_("Exception", function () {
+        var error = new Error(pandora.formatString.apply(null, arguments));
+        error.name = pandora.typename(this);
+        return error;
+    });
+
+})();
+pandora.MissingOverloadError = (function () {
+
+    /**
+     * Custom Error to handle missing overloads.
+     * @param method {String} The name of the missing method.
+     * @param cls {String} The class in which the method in missing.
+     * @constructor
+     */
+    return pandora.class_("MissingOverloadError", pandora.Exception, function (method, cls) {
+        var clsName = cls !== undefined ? cls + ".prototype._" : "_";
+        return pandora.Exception.call(this, "{0}{1}() overload is missing", clsName, method);
+    });
+
+})();
+
+/**
+ * Clamp a value between a minimum number and maximum number value.
+ * @param value {Number}
+ * @param min {Number}
+ * @param max {Number}
+ * @return {Number}
+ */
+pandora.clamp = function (value, min, max) {
+    return Math.min(Math.max(value, min), max);
+};
+pandora.Box2 = (function () {
+
+    /**
+     * Represent a 2D box.
+     * @param x {Number|pandora.Vec2|pandora.Box2|Array}
+     * @param y {Number|pandora.Vec2}
+     * @param width {Number}
+     * @param height {Number}
+     * @constructor
+     */
+    var Box2 = pandora.class_("Box2", function (x, y, width, height) {
+        this.assign(x, y, width, height);
+    });
+
+    /**
+     * Set the coordinates of this 2D box from the given one.
+     * @param {...}
+     */
+    Box2.prototype.assign = function () {
+        var x = arguments[0];
+        var y = arguments[1];
+        var width = arguments[2];
+        var height = arguments[3];
+        if (x === undefined) {
+            this.x = 0;
+            this.y = 0;
+            this.width = 0;
+            this.height = 0;
+        } else if (pandora.typename(x) === "Number" && y === undefined) {
+            this.x = x;
+            //noinspection JSSuspiciousNameCombination
+            this.y = x;
+            //noinspection JSSuspiciousNameCombination
+            this.width = x;
+            //noinspection JSSuspiciousNameCombination
+            this.height = x;
+        } else if (pandora.typename(x) === "Vec2" && pandora.typename(y) === "Vec2") {
+            this.x = x.x;
+            this.y = x.y;
+            this.width = y.x;
+            this.height = y.y;
+        } else if (pandora.typename(x) === "Array") {
+            this.x = x[0];
+            this.y = x[1];
+            this.width = x[2];
+            this.height = x[3];
+        } else if (x.x !== undefined && x.y !== undefined && x.width !== undefined && x.height !== undefined) {
+            this.x = x.x;
+            this.y = x.y;
+            this.width = x.width;
+            this.height = x.height;
+        } else if (x.left !== undefined && x.right !== undefined && x.top !== undefined && x.bottom !== undefined) {
+            this.x = x.left;
+            this.y = x.top;
+            this.width = x.right - x.left;
+            this.height = x.bottom - x.top;
+        } else {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+        return this;
+    };
+
+    /**
+     * Return a copy of this box.
+     * @returns {pandora.Box2}
+     */
+    Box2.prototype.clone = function () {
+        return new Box2(this.x, this.y, this.width, this.height);
+    };
+
+    /**
+     * Convert the box into a javascript array.
+     * @returns {[Number, Number, Number, Number]}
+     */
+    Box2.prototype.toArray = function () {
+        return [this.x, this.y, this.width, this.height];
+    };
+
+    /**
+     * Check whether the given other collides with this one.
+     * @param other {pandora.Box2}
+     * @returns {boolean}
+     */
+    Box2.prototype.collide = function (other) {
+        return pandora.polymorphic(other, {
+            "Vec2": function () {
+                return other.x >= this.x && other.x <= this.x + this.width &&
+                    other.y >= this.y && other.y <= this.y + this.height;
+            }.bind(this),
+            "Box2": function () {
+                return this.x < other.x + other.width && this.x + this.width > other.x &&
+                    this.y < other.y + other.height && this.height + this.y > other.y;
+            }.bind(this)
+        });
+    };
+
+    /**
+     * Check whether the given other fit within this one.
+     * @param other {pandora.Box2}
+     * @returns {boolean}
+     */
+    Box2.prototype.contain = function (other) {
+        return pandora.polymorphic(other, {
+            "Vec2": function () {
+                return other.x >= this.x && other.x <= this.x + this.width &&
+                    other.y >= this.y && other.y <= this.y + this.height;
+            }.bind(this),
+            "Box2": function () {
+                return other.x > this.x && other.x + other.width < this.x + this.width &&
+                    other.y > this.y && other.y + other.height < this.y + this.height;
+            }.bind(this)
+        });
+    };
+
+    return Box2;
+
+})();
+
+pandora.Vec2 = (function () {
+
+    /**
+     * Represent a two-dimensional vector.
+     * @param x {Number|Array|pandora.Vec2}
+     * @param y {Number}
+     * @constructor
+     */
+    var Vec2 = pandora.class_("Vec2", function (x, y) {
+        this.assign(x, y);
+    });
+
+    /**
+     * Set the coordinates of this vector from the given one.
+     * @param {...}
+     */
+    Vec2.prototype.assign = function () {
+        var x = arguments[0];
+        var y = arguments[1];
+        if (x === undefined) {
+            this.x = 0;
+            this.y = 0;
+        } else if (typeof x === "number" && y === undefined) {
+            this.x = x;
+            //noinspection JSSuspiciousNameCombination
+            this.y = x;
+        } else if (pandora.typename(x) === "Array") {
+            this.x = x[0];
+            this.y = x[1];
+        } else if ((pandora.typename(x) === "Vec2") || typeof x.x === "number" && typeof x.y === "number") {
+            this.x = x.x;
+            this.y = x.y;
+        } else {
+            this.x = x;
+            this.y = y;
+        }
+        return this;
+    };
+
+    /**
+     * Return a copy of this vector.
+     * @returns {pandora.Box2}
+     */
+    Vec2.prototype.clone = function () {
+        return new Vec2(this.x, this.y);
+    };
+
+    /**
+     * Returns the Vec2 has 2D array
+     * @returns {Number[]}
+     */
+    Vec2.prototype.toArray = function () {
+        return [this.x, this.y];
+    };
+
+    /**
+     * Check collision between this vec2 and the given circle.
+     * @param center {pandora.Vec2|{x: Number, y: Number}}
+     * @param radius {Number}
+     * @returns {boolean}
+     */
+    Vec2.prototype.collideCircle = function (center, radius) {
+        radius = radius || 5;
+        var dx = this.x - center.x;
+        var dy = this.y - center.y;
+        return Math.sqrt(dx * dx + dy * dy) < radius * 2;
+    };
+
+    /**
+     * Add the given object to this Vec2.
+     * @param other {Number|pandora.Vec2}
+     */
+    Vec2.prototype.add = function (other) {
+        pandora.polymorphic(other, {
+            "Number": function () {
+                this.x += other;
+                this.y += other;
+            }.bind(this),
+            "Vec2": function () {
+                this.x += other.x;
+                this.y += other.y;
+            }.bind(this)
+        });
+        return this;
+    };
+
+    /**
+     * Subtract the given object to this Vec2.
+     * @param other {Number|pandora.Vec2}
+     */
+    Vec2.prototype.subtract = function (other) {
+        pandora.polymorphic(other, {
+            "Number": function () {
+                this.x -= other;
+                this.y -= other;
+            }.bind(this),
+            "Vec2": function () {
+                this.x -= other.x;
+                this.y -= other.y;
+            }.bind(this)
+        });
+        return this;
+    };
+
+    /**
+     * Multiply the given object to this Vec2.
+     * @param other {Number|pandora.Vec2}
+     */
+    Vec2.prototype.multiply = function (other) {
+        pandora.polymorphic(other, {
+            "Number": function () {
+                this.x *= other;
+                this.y *= other;
+            }.bind(this),
+            "Vec2": function () {
+                this.x *= other.x;
+                this.y *= other.y;
+            }.bind(this)
+        });
+        return this;
+    };
+
+    /**
+     * Divide the given object to this Vec2.
+     * @param other {Number|pandora.Vec2}
+     */
+    Vec2.prototype.divide = function (other) {
+        pandora.polymorphic(other, {
+            "Number": function () {
+                this.x /= other;
+                this.y /= other;
+            }.bind(this),
+            "Vec2": function () {
+                this.x /= other.x;
+                this.y /= other.y;
+            }.bind(this)
+        });
+        return this;
+    };
+
+    return Vec2;
+
+})();
+
+/**
+ * @namespace dudeGraph
+ * @type {Object}
+ */
+var dudeGraph = (function() {
+    var namespace = {};
+    if (typeof exports !== "undefined") {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = namespace;
+        }
+        exports.dudeGraph = namespace;
+    } else {
+        window.dudeGraph = namespace;
+    }
+    return namespace;
+})();
+(function () {
+
+    /**
+     * Returns the browser.
+     * http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+     * @return {"Opera"|"Firefox"|"Safari"|"Chrome"|"IE"|"Edge"|"Unknown"}
+     */
+    var browser = function () {
+        var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        if (isOpera) {
+            return "Opera";
+        }
+        else if (typeof InstallTrigger !== 'undefined') {
+            return "Firefox";
+        }
+        else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+            return "Safari";
+        }
+        else if (navigator.userAgent.indexOf('Edge') !== -1) {
+            return "Edge";
+        }
+        else if (!!window.chrome && !isOpera) {
+            return "Chrome";
+        }
+        else {
+            //noinspection PointlessBooleanExpressionJS
+            if (false || !!document.documentMode) {
+                return "IE";
+            }
+            else {
+                return "Unknown";
+            }
+        }
+    };
+
+    _.mixin({
+        /**
+         * Returns the browser.
+         * @return {"Opera"|"Firefox"|"Safari"|"Chrome"|"IE"|"Edge"|"Unknown"}
+         */
+        browser: browser,
+
+        /**
+         * Runs the function if the current browser is in the browsers
+         * @param {Array<String>} browsers
+         * @param {Function?} funcOk
+         * @param {Function?} funcKo
+         */
+        browserIf: function (browsers, funcOk, funcKo) {
+            if(_.contains(browsers, browser())) {
+                (funcOk && funcOk || function() {})();
+            } else {
+                (funcKo && funcKo || function() {})();
+            }
+        }
+    });
+})();
+(function () {
+    _.mixin({
+        /**
+         * Clamps a value between a minimum number and a maximum number.
+         * @param value {Number}
+         * @param min {Number}
+         * @param max {Number}
+         * @return {Number}
+         */
+        clamp: function (value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+    });
+})();
+(function () {
+
+    _.mixin({
+        /**
+         * Templates format string with data
+         * e.g: _.templateString("vec2({x}, {y})", {x: 32, y: 64}) => "vec2(32, 64)"
+         * @param {String} format
+         * @param {Object} data
+         * @return {String}
+         */
+        templateString: function (format, data) {
+            var tokenRegex = /\{([^\}]+)\}/g;
+            var objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g;
+            var replacer = function (all, key, obj) {
+                var res = obj;
+                key.replace(objNotationRegex, function (all, name, quote, quotedName, isFunc) {
+                    name = name || quotedName;
+                    if (res !== undefined) {
+                        if (name in res) {
+                            res = res[name];
+                        }
+                        if (typeof res === "function" && isFunc) {
+                            res = res();
+                        }
+                    }
+                });
+                res = (res === null || res === obj ? all : res) + "";
+                return res;
+            };
+            return String(format).replace(tokenRegex, function (all, key) {
+                return replacer(all, key, data);
+            });
+        }
+    });
+
+})();
+(function () {
+    /**
+     * Generate a random bit of a UUID
+     * @returns {String}
+     */
+    var s4 = function () {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
+    /**
+     * The UUID's salt
+     * @type {String}
+     */
+    var salt = s4();
+
+    _.mixin({
+        /**
+         * Generate a random salted UUID
+         * @returns {String}
+         */
+        uuid: function () {
+            return salt + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+        }
+    });
+})();
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Represents the graph whom holds the entities
+ * @extends {pandora.EventEmitter}
+ * @constructor
+ */
+dudeGraph.Graph = function () {
+    pandora.EventEmitter.call(this);
+
+    /**
+     * All existing types for this graph instance, the key being the type name and the value being an array
+     * of all possible conversions.
+     * @type {Object<String, Array>}
+     * @private
+     */
+    this._cgTypes = {
+        "Stream": ["Stream"],
+        "Array": ["Array"],
+        "String": ["String"],
+        "Number": ["Number", "Boolean"],
+        "Boolean": ["Boolean", "Number"],
+        "Vec2": ["Vec2"],
+        "Vec3": ["Vec3"],
+        "Vec4": ["Vec4"],
+        "Color": ["Color", "Vec4"],
+        "Texture2D": ["Texture2D"],
+        "Entity": ["Entity"],
+        "Resource": ["Resource"]
+    };
+
+    /**
+     * All validators attached to types.
+     * @type {Object<String, Function>}
+     * @private
+     */
+    this._validators = {
+        "Array": function (value) {
+            return _.isArray(value);
+        },
+        "String": function (value) {
+            return _.isString(value);
+        },
+        "Number": function (value) {
+            return _.isNumber(value) || /^[0-9]+(\.[0-9]+)?$/.test(value);
+        },
+        "Boolean": function (value) {
+            return _.isBoolean(value) || /^(true|false)/.test(value);
+        },
+        "Resource": function (value) {
+            return _.isObject(value);
+        }
+    };
+
+    /**
+     * Collection of blocks in the graph
+     * @type {Array<dudeGraph.Block>}
+     */
+    Object.defineProperty(this, "cgBlocks", {
+        get: function () {
+            return this._cgBlocks;
+        }.bind(this)
+    });
+    this._cgBlocks = [];
+
+    /**
+     * Map to access a block by its id
+     * @type {Object} {"42": {dudeGraph.Block}}
+     */
+    Object.defineProperty(this, "cgBlocksIds", {
+        get: function () {
+            return this._cgBlocksIds;
+        }.bind(this)
+    });
+    this._cgBlocksIds = {};
+
+    /**
+     * Connections between blocks points
+     * @type {Array<dudeGraph.Connection>}
+     */
+    Object.defineProperty(this, "cgConnections", {
+        get: function () {
+            return this._cgConnections;
+        }.bind(this)
+    });
+    this._cgConnections = [];
+
+};
+
+/**
+ * @extends {pandora.EventEmitter}
+ */
+dudeGraph.Graph.prototype = _.create(pandora.EventEmitter.prototype, {
+    "constructor": dudeGraph.Graph
+});
+
+/**
+ * Adds a block to the graph
+ * @param {dudeGraph.Block} cgBlock - cgBlock to add to the graph
+ * @param {Boolean?} quiet - Whether the event should be emitted
+ * @emit "dude-graph-block-create" {dudeGraph.Block}
+ * @return {dudeGraph.Block}
+ */
+dudeGraph.Graph.prototype.addBlock = function (cgBlock, quiet) {
+    var cgBlockId = cgBlock.cgId;
+    if (cgBlock.cgGraph !== this) {
+        throw new Error("This block does not belong to this graph");
+    }
+    if (cgBlockId === null || _.isUndefined(cgBlockId)) {
+        throw new Error("Block id is null");
+    }
+    if (this._cgBlocksIds[cgBlockId]) {
+        throw new Error("Block with id `" + cgBlockId + "` already exists");
+    }
+    cgBlock.validate();
+    this._cgBlocks.push(cgBlock);
+    this._cgBlocksIds[cgBlockId] = cgBlock;
+    if (!quiet) {
+        this.emit("dude-graph-block-create", cgBlock);
+    }
+    return cgBlock;
+};
+
+/**
+ * Removes a block from the graph
+ * @param {dudeGraph.Block} cgBlock
+ */
+dudeGraph.Graph.prototype.removeBlock = function (cgBlock) {
+    var blockFoundIndex = this._cgBlocks.indexOf(cgBlock);
+    if (blockFoundIndex === -1 || cgBlock.cgGraph !== this) {
+        throw new Error("This block does not belong to this graph");
+    }
+    var cgBlockPoints = cgBlock.cgOutputs.concat(cgBlock.cgInputs);
+    _.forEach(cgBlockPoints, function (cgBlockPoint) {
+        this.disconnectPoint(cgBlockPoint);
+    }.bind(this));
+    this._cgBlocks.splice(blockFoundIndex, 1);
+    delete this._cgBlocksIds[cgBlock.cgId];
+    this.emit("dude-graph-block-remove", cgBlock);
+};
+
+/**
+ * Returns a block by it's unique id
+ * @param {String} cgBlockId
+ * @return {dudeGraph.Block}
+ */
+dudeGraph.Graph.prototype.blockById = function (cgBlockId) {
+    var cgBlock = this._cgBlocksIds[cgBlockId];
+    if (!cgBlock) {
+        throw new Error("Block not found for id `" + cgBlockId + "`");
+    }
+    return cgBlock;
+};
+
+/**
+ * Returns the first block with the given name.
+ * @param {String} cgBlockName
+ * @returns {dudeGraph.Block}
+ */
+dudeGraph.Graph.prototype.blockByName = function (cgBlockName) {
+    var block = null;
+    _.forEach(this.cgBlocks, function (cgBlock) {
+        if (cgBlock.cgName === cgBlockName) {
+            block = cgBlock;
+        }
+    });
+    return block;
+};
+
+/**
+ * Returns an array of blocks which have the given type.
+ * @param {String} blockType
+ * @returns {Array<dudeGraph.Block>}
+ */
+dudeGraph.Graph.prototype.blocksByType = function (blockType) {
+    var blocks = [];
+    _.forEach(this.cgBlocks, function (cgBlock) {
+        if (cgBlock.blockType === blockType) {
+            blocks.push(cgBlock);
+        }
+    });
+    return blocks;
+};
+
+/**
+ * Returns the next unique block id
+ * @returns {String}
+ */
+dudeGraph.Graph.prototype.nextBlockId = function () {
+    return _.uuid();
+};
+
+/**
+ * Creates a connection between two cgPoints
+ * @param {dudeGraph.Point} cgOutputPoint
+ * @param {dudeGraph.Point} cgInputPoint
+ * @emit "dude-graph-connection-create" {dudeGraph.Connection}
+ * @returns {dudeGraph.Connection|null}
+ */
+dudeGraph.Graph.prototype.connectPoints = function (cgOutputPoint, cgInputPoint) {
+    if (this.connectionByPoints(cgOutputPoint, cgInputPoint) !== null) {
+        throw new Error("Connection already exists between these two points: `" +
+            cgOutputPoint.cgName + "` and `" + cgInputPoint.cgName + "`");
+    }
+    if (cgOutputPoint.isOutput === cgInputPoint.isOutput) {
+        throw new Error("Cannot connect either two inputs or two outputs: `" +
+            cgOutputPoint.cgName + "` and `" + cgInputPoint.cgName + "`");
+    }
+    if (!cgOutputPoint.acceptConnect(cgInputPoint)) {
+        throw new Error("Point `" +
+            cgOutputPoint.cgName + "` does not accept to connect to `" + cgInputPoint.cgName + "` (too many connections)");
+    }
+    if (!cgInputPoint.acceptConnect(cgOutputPoint)) {
+        throw new Error("Point `" +
+            cgInputPoint.cgName + "` does not accept to connect to `" + cgOutputPoint.cgName + "` (too many connections)");
+    }
+    if (!this.canConvert(cgOutputPoint.cgValueType, cgInputPoint.cgValueType) &&
+        !this.updateTemplate(cgInputPoint, cgOutputPoint.cgValueType)) {
+        throw new Error("Cannot connect two points of different value types: `" +
+            cgOutputPoint.cgValueType + "` and `" + cgInputPoint.cgValueType + "`");
+    }
+    var cgConnection = new dudeGraph.Connection(cgOutputPoint, cgInputPoint);
+    this._cgConnections.push(cgConnection);
+    cgOutputPoint._cgConnections.push(cgConnection);
+    cgInputPoint._cgConnections.push(cgConnection);
+    this.emit("dude-graph-connection-create", cgConnection);
+    return cgConnection;
+};
+
+/**
+ * Removes a connection between two connected cgPoints
+ * @param {dudeGraph.Point} cgOutputPoint
+ * @param {dudeGraph.Point} cgInputPoint
+ * @emit "dude-graph-connection-create" {dudeGraph.Connection}
+ * @returns {dudeGraph.Connection}
+ */
+dudeGraph.Graph.prototype.disconnectPoints = function (cgOutputPoint, cgInputPoint) {
+    var cgConnection = this.connectionByPoints(cgOutputPoint, cgInputPoint);
+    if (cgConnection === null) {
+        throw new Error("No connections between these two points: `" +
+            cgOutputPoint.cgName + "` and `" + cgInputPoint.cgName + "`");
+    }
+    this._cgConnections.splice(this._cgConnections.indexOf(cgConnection), 1);
+    cgOutputPoint._cgConnections.splice(cgOutputPoint._cgConnections.indexOf(cgConnection), 1);
+    cgInputPoint._cgConnections.splice(cgInputPoint._cgConnections.indexOf(cgConnection), 1);
+    this.emit("dude-graph-connection-remove", cgConnection);
+    return cgConnection;
+};
+
+/**
+ * Disconnect all connections from this point
+ * @param {dudeGraph.Point} cgPoint
+ */
+dudeGraph.Graph.prototype.disconnectPoint = function (cgPoint) {
+    var cgPointConnections = cgPoint.cgConnections;
+    _.forEach(cgPointConnections, function (cgConnection) {
+        this.disconnectPoints(cgConnection.cgOutputPoint, cgConnection.cgInputPoint);
+    }.bind(this));
+};
+
+/**
+ * Returns the list of connections for every points in the given block
+ * @param {dudeGraph.Block} cgBlock
+ * @returns {Array<dudeGraph.Connection>}
+ */
+dudeGraph.Graph.prototype.connectionsByBlock = function (cgBlock) {
+    var cgConnections = [];
+    _.forEach(this._cgConnections, function (cgConnection) {
+        if (cgConnection.cgOutputPoint.cgBlock === cgBlock || cgConnection.cgInputPoint.cgBlock === cgBlock) {
+            cgConnections.push(cgConnection);
+        }
+    });
+    return cgConnections;
+};
+
+/**
+ * Returns a connection between two points
+ * @param {dudeGraph.Point} cgOutputPoint
+ * @param {dudeGraph.Point} cgInputPoint
+ * @returns {dudeGraph.Connection|null}
+ */
+dudeGraph.Graph.prototype.connectionByPoints = function (cgOutputPoint, cgInputPoint) {
+    return _.find(this._cgConnections, function (cgConnection) {
+        return cgConnection.cgOutputPoint === cgOutputPoint && cgConnection.cgInputPoint === cgInputPoint;
+    }) || null;
+};
+
+/**
+ * Returns the list of connections for a given point
+ * @param {dudeGraph.Point} cgPoint
+ * @returns {Array<dudeGraph.Connection>}
+ */
+dudeGraph.Graph.prototype.connectionsByPoint = function (cgPoint) {
+    var cgConnections = [];
+    _.forEach(this._cgConnections, function (cgConnection) {
+        if (cgConnection.cgOutputPoint === cgPoint || cgConnection.cgInputPoint === cgPoint) {
+            cgConnections.push(cgConnection);
+        }
+    });
+    return cgConnections;
+};
+
+/**
+ * Clone all the given blocks
+ * If connections exist between the cloned blocks, this method will try to recreate them
+ * Connections from/to a cloned block to/from a non cloned block won't be duplicated
+ * @param {Array<dudeGraph.Block>} cgBlocks
+ * @returns {Array<dudeGraph.Block>} the cloned blocks
+ */
+dudeGraph.Graph.prototype.cloneBlocks = function (cgBlocks) {
+    var cgCorrespondingBlocks = [];
+    var cgClonedBlocks = [];
+    var cgConnectionsToClone = [];
+    _.forEach(cgBlocks, function (cgBlock) {
+        var cgConnections = this.connectionsByBlock(cgBlock);
+        var cgClonedBlock = cgBlock.clone(this);
+        this.addBlock(cgClonedBlock);
+        cgClonedBlocks.push(cgClonedBlock);
+        cgCorrespondingBlocks[cgBlock.cgId] = cgClonedBlock;
+        _.forEach(cgConnections, function (cgConnection) {
+            if (cgConnectionsToClone.indexOf(cgConnection) === -1 &&
+                cgBlocks.indexOf(cgConnection.cgOutputPoint.cgBlock) !== -1 &&
+                cgBlocks.indexOf(cgConnection.cgInputPoint.cgBlock) !== -1) {
+                cgConnectionsToClone.push(cgConnection);
+            }
+        });
+    }.bind(this));
+    _.forEach(cgConnectionsToClone, function (cgConnectionToClone) {
+        try {
+            cgCorrespondingBlocks[cgConnectionToClone.cgOutputPoint.cgBlock.cgId]
+                    .outputByName(cgConnectionToClone.cgOutputPoint.cgName)
+                .connect(cgCorrespondingBlocks[cgConnectionToClone.cgInputPoint.cgBlock.cgId]
+                    .inputByName(cgConnectionToClone.cgInputPoint.cgName));
+        } catch (exception) {
+            throw new Error("Connection duplication silenced exception: " + exception);
+        }
+    });
+    return cgClonedBlocks;
+};
+
+/**
+ * Add a validator predicate for the given `type`
+ * @param {String} type - The type on which this validator will be applied
+ * @param {Function} validator - A function which takes a value in parameter and returns true if it can be assigned
+ */
+dudeGraph.Graph.prototype.addValidator = function (type, validator) {
+    this._validators[type] = validator;
+};
+
+/**
+ * Checks whether the first type can be converted into the second one.
+ * @param {String} firstType
+ * @param {String} secondType
+ * @returns {Boolean}
+ */
+dudeGraph.Graph.prototype.canConvert = function (firstType, secondType) {
+    return firstType === secondType || (this._cgTypes[firstType] &&
+        this._cgTypes[firstType].indexOf(secondType) !== -1);
+};
+
+/**
+ * Checks whether the given `value` is assignable to the given `type`.
+ * @param {*} value - A value to check.
+ * @param {String} type - The type that the value should have
+ */
+dudeGraph.Graph.prototype.canAssign = function (value, type) {
+    return value === null || (this._validators[type] && this._validators[type](value));
+};
+
+/**
+ * Tries to update the blocks types from templates parameters to match the `cgPoint` type with the given `type`.
+ * @param {dudeGraph.Point} cgPoint - The point on which the connection will be created
+ * @param {String} type - The type of the connection that we try to attach
+ * @returns {Boolean}
+ */
+dudeGraph.Graph.prototype.updateTemplate = function (cgPoint, type) {
+    return cgPoint.cgBlock.updateTemplate(cgPoint, type);
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Block is the base class of dude-graph nodes
+ * A Block has a list of inputs and outputs points
+ * @param {dudeGraph.Graph} cgGraph - See Getter definition
+ * @param {{cgId: Number, cgTemplates: Object}} data - See getter definition
+ * @param {String} blockType - See getter definition
+ * @constructor
+ */
+dudeGraph.Block = function (cgGraph, data, blockType) {
+    data = data || {};
+
+    /**
+     * Reference to the graph
+     * @type {dudeGraph.Graph}
+     */
+    Object.defineProperty(this, "cgGraph", {
+        get: function () {
+            return this._cgGraph;
+        }.bind(this)
+    });
+    this._cgGraph = cgGraph;
+    if (!cgGraph) {
+        throw new Error("Block() Cannot create a Block without a graph");
+    }
+
+    /**
+     * The type of this block defined as a string, "Block" by default.
+     * @type {String}
+     */
+    Object.defineProperty(this, "blockType", {
+        get: function () {
+            return this._blockType;
+        }.bind(this)
+    });
+    this._blockType = blockType || "Block";
+
+    /**
+     * Unique id of this block
+     * @type {String}
+     */
+    Object.defineProperty(this, "cgId", {
+        get: function () {
+            return this._cgId;
+        }.bind(this)
+    });
+    this._cgId = data.cgId || cgGraph.nextBlockId();
+
+    /**
+     * Block fancy name
+     * @type {String}
+     * @emit "dude-graph-block-name-changed" {dudeGraph.Block} {String} {String}
+     */
+    Object.defineProperty(this, "cgName", {
+        get: function () {
+            return this._cgName;
+        }.bind(this),
+        set: function (cgName) {
+            var oldCgName = this._cgName;
+            this._cgName = cgName;
+            this._cgGraph.emit("dude-graph-block-name-change", this, oldCgName, cgName);
+        }.bind(this)
+    });
+    this._cgName = data.cgName || this._blockType;
+
+    /**
+     * Template types that can be used on this block points. Each template type contains a list of possibly
+     * applicable types.
+     * @type {Object<String, Array>}
+     */
+    Object.defineProperty(this, "cgTemplates", {
+        get: function () {
+            return this._cgTemplates;
+        }.bind(this)
+    });
+    this._cgTemplates = data.cgTemplates || {};
+
+    /**
+     * Input points
+     * @type {Array<dudeGraph.Point>}
+     */
+    Object.defineProperty(this, "cgInputs", {
+        get: function () {
+            return this._cgInputs;
+        }.bind(this)
+    });
+    this._cgInputs = [];
+
+    /**
+     * Output points
+     * @type {Array<dudeGraph.Point>}
+     */
+    Object.defineProperty(this, "cgOutputs", {
+        get: function () {
+            return this._cgOutputs;
+        }.bind(this)
+    });
+    this._cgOutputs = [];
+};
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Block.prototype.validate = function () {};
+
+/**
+ * Adds an input or an output point
+ * @param {dudeGraph.Point} cgPoint
+ * @emit "cg-point-create" {dudeGraph.Block} {dudeGraph.Point}
+ * @return {dudeGraph.Point}
+ */
+dudeGraph.Block.prototype.addPoint = function (cgPoint) {
+    if (cgPoint.cgBlock !== this) {
+        throw new Error("Point `" + cgPoint.cgName + "` is not bound to this block `" + this._cgId + "`");
+    }
+    if (cgPoint.isOutput && this.outputByName(cgPoint.cgName) || !cgPoint.isOutput && this.inputByName(cgPoint.cgName)) {
+        throw new Error("Block `" + this._cgId + "` has already an " +
+            (cgPoint.isOutput ? "output" : "input") + ": `" + cgPoint.cgName + "`");
+    }
+    if (cgPoint.isOutput) {
+        this._cgOutputs.push(cgPoint);
+    } else {
+        this._cgInputs.push(cgPoint);
+    }
+    this._cgGraph.emit("cg-point-create", this, cgPoint);
+    return cgPoint;
+};
+
+/**
+ * Returns whether this block contains the specified output
+ * @param {String} cgOutputName
+ * @return {dudeGraph.Point|null}
+ */
+dudeGraph.Block.prototype.outputByName = function (cgOutputName) {
+    return _.find(this._cgOutputs, function (cgOutput) {
+        return cgOutput.cgName === cgOutputName;
+    });
+};
+
+/**
+ * Returns whether this block contains the specified input
+ * @param {String} cgInputName
+ * @return {dudeGraph.Point|null}
+ */
+dudeGraph.Block.prototype.inputByName = function (cgInputName) {
+    return _.find(this._cgInputs, function (cgInput) {
+        return cgInput.cgName === cgInputName;
+    });
+};
+
+/**
+ * Tries to update the blocks types from templates parameters to match the `point` type with the given `type`.
+ * @param {dudeGraph.Point} cgPoint - The point on which the connection will be created
+ * @param {String} type - The type of the connection that we try to attach
+ * @returns {boolean}
+ */
+dudeGraph.Block.prototype.updateTemplate = function (cgPoint, type) {
+    if (cgPoint.cgTemplate === null || !this.cgTemplates[cgPoint.cgTemplate] ||
+        this.cgTemplates[cgPoint.cgTemplate].indexOf(type) === -1) {
+        return false;
+    }
+    cgPoint.cgValueType = type;
+    var failToInfer = false;
+    var updateValueType = function (currentPoint) {
+        if (failToInfer) {
+            return true;
+        }
+        if (currentPoint.cgTemplate === cgPoint.cgTemplate) {
+            if (cgPoint.cgConnections.length === 0) {
+                currentPoint.cgValueType = type;
+            } else {
+                failToInfer = true;
+                return true;
+            }
+        }
+    };
+    _.forEach(this._cgInputs, updateValueType.bind(this));
+    _.forEach(this._cgOutputs, updateValueType.bind(this));
+    return !failToInfer;
+};
+
+/**
+ * Returns a copy of this block
+ * @param {dudeGraph.Graph} cgGraph - The graph on which the cloned block will be attached to
+ * @return {dudeGraph.Block}
+ */
+dudeGraph.Block.prototype.clone = function (cgGraph) {
+    if (this._blockType !== "Block") {
+        throw new Error("Method `clone` must be overridden by `" + this._blockType + "`");
+    }
+    var cgBlockClone = new dudeGraph.Block(cgGraph);
+    cgBlockClone.cgName = this._cgName;
+    _.forEach(this._cgOutputs, function (cgOutput) {
+        var cgOutputClone = cgOutput.clone(cgBlockClone);
+        cgBlockClone.addPoint(cgOutputClone);
+    });
+    _.forEach(this._cgInputs, function (cgInput) {
+        var cgInputClone = cgInput.clone(cgBlockClone);
+        cgBlockClone.addPoint(cgInputClone);
+    });
+    return cgBlockClone;
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * A point represents either an input or an output in a block, it has a name and a value type
+ * A point can also have one or many references to other points:
+ *    - The outbound point must be an output
+ *    - The outbound point value type must be accepted by the inbound point
+ *    - The outbound point must have a back reference to this point
+ * Example for an input point:
+ * {
+     *      "cgBlock": "1", // The unique identifier to the block, required
+     *      "cgName": "sum a", // The block input name, required
+     *      "cgValueType": "Number", // The point value type, required
+     *      "cgValue": 32 // The point value for an input, not required
+     * }
+ * Example for an output point:
+ * {
+     *      "cgBlock": "1", // The unique identifier to the block, required
+     *      "cgName": "result", // The block output name, required
+     *      "cgValueType": "Number", // The point value type, required
+     *      // For an output, "cgValue" should be generated by the block and read only
+     * }
+ * @param {dudeGraph.Block} cgBlock - The block this point refers to
+ * @param {Object} data
+ * @param {Boolean} isOutput - True if this point is an output, False for an input
+ * @param {String} pointType - The type of this point represented as a string
+ * @constructor
+ */
+dudeGraph.Point = function (cgBlock, data, isOutput, pointType) {
+
+    /**
+     * The graph of the block
+     * @type {dudeGraph.Graph}
+     */
+    Object.defineProperty(this, "cgGraph", {
+        get: function () {
+            return this._cgGraph;
+        }.bind(this)
+    });
+    this._cgGraph = cgBlock.cgGraph;
+
+    /**
+     * The type of this point represented as a string, default to "Point".
+     */
+    Object.defineProperty(this, "pointType", {
+        get: function () {
+            return this._pointType;
+        }.bind(this)
+    });
+    this._pointType = pointType || "Point";
+
+    /**
+     * The block it belongs to
+     * @type {dudeGraph.Block}
+     */
+    Object.defineProperty(this, "cgBlock", {
+        get: function () {
+            return this._cgBlock;
+        }.bind(this)
+    });
+    this._cgBlock = cgBlock;
+
+    /**
+     * The block input/output name
+     * @type {String}
+     */
+    Object.defineProperty(this, "cgName", {
+        get: function () {
+            return this._cgName;
+        }.bind(this)
+    });
+    this._cgName = data.cgName || this._pointType;
+
+    /**
+     * Point type, True if this point is an output, False for an input
+     * @type {Boolean}
+     */
+    Object.defineProperty(this, "isOutput", {
+        get: function () {
+            return this._isOutput;
+        }.bind(this)
+    });
+    this._isOutput = isOutput;
+
+    /**
+     * Connections from/to this point
+     * @type {Array<dudeGraph.Connection>}
+     */
+    Object.defineProperty(this, "cgConnections", {
+        get: function () {
+            return this._cgConnections;
+        }.bind(this)
+    });
+    this._cgConnections = [];
+
+    /**
+     * Whether this point accept one or several connections.
+     * @type {Boolean}
+     */
+    Object.defineProperty(this, "singleConnection", {
+        get: function () {
+            return this._singleConnection;
+        }.bind(this),
+        set: function (singleConnection) {
+            this._singleConnection = singleConnection;
+        }.bind(this)
+    });
+    this._singleConnection = _.isUndefined(data.singleConnection) ? true : data.singleConnection;
+
+    /**
+     * The name of the template type used (from parent block).
+     * @type {String|null}
+     */
+    Object.defineProperty(this, "cgTemplate", {
+        get: function () {
+            return this._cgTemplate;
+        }.bind(this)
+    });
+    this._cgTemplate = data.cgTemplate || null;
+
+    /**
+     * The point current value type
+     * Example: Number (Yellow color)
+     * @type {String}
+     * @emit "cg-point-value-type-change" {dudeGraph.Point} {Object} {Object}
+     */
+    Object.defineProperty(this, "cgValueType", {
+        get: function () {
+            return this._cgValueType;
+        }.bind(this),
+        set: function (cgValueType) {
+            var old = this._cgValueType;
+            this._cgValueType = cgValueType;
+            this._cgGraph.emit("cg-point-value-type-change", this, old, cgValueType);
+        }.bind(this)
+    });
+    this._cgValueType = data.cgValueType;
+    if (_.isUndefined(data.cgValueType)) {
+        throw new Error("Cannot create the point `" + this._cgName + "` in block `" + this._cgBlock.cgId +
+            "` without specifying a value type");
+    }
+
+    /**
+     * The point current value
+     * @type {Object|null}
+     * @emit "cg-point-value-change" {dudeGraph.Point} {Object} {Object}
+     */
+    Object.defineProperty(this, "cgValue", {
+        configurable: true,
+        get: function () {
+            return this._cgValue;
+        }.bind(this),
+        set: function (cgValue) {
+            if (cgValue !== null && !this.acceptValue(cgValue)) {
+                throw new Error("Cannot set `cgValue`: Point `" + this._cgName + "` cannot accept more than " +
+                    "one connection");
+            }
+            if (this._cgGraph.canAssign(cgValue, this._cgValueType)) {
+                var oldCgValue = this._cgValue;
+                this._cgValue = cgValue;
+                this._cgGraph.emit("cg-point-value-change", this, oldCgValue, cgValue);
+            } else {
+                throw new Error("Invalid value `" + String(cgValue) +
+                    "` for `" + this._cgValueType + "` in `" + this._cgName + "`");
+            }
+        }.bind(this)
+    });
+    this._cgValue = data.cgValue || null;
+    if (!_.isUndefined(data.cgValue) && isOutput) {
+        throw new Error("Shouldn't create output point `" + this._cgName + "` in block `" +
+            this._cgBlock.cgId + "` with a value.");
+    }
+};
+
+/**
+ * Returns whether this cgPoint is empty (no connections and no cgValue)
+ * @returns {Boolean}
+ */
+dudeGraph.Point.prototype.empty = function () {
+    return this._cgConnections.length === 0 && this._cgValue === null;
+};
+
+/**
+ * Returns whether this cgPoint accepts a connection if there is room to the given cgPoint
+ * @param {dudeGraph.Point} cgPoint
+ * @returns {Boolean}
+ */
+dudeGraph.Point.prototype.acceptConnect = function (cgPoint) {
+    return !this._singleConnection || (this._cgConnections.length === 0 && this._cgValue === null);
+};
+
+/**
+ * Returns whether this cgPoint accepts a cgValue
+ * @param {*?} cgValue
+ * @returns {Boolean}
+ */
+dudeGraph.Point.prototype.acceptValue = function (cgValue) {
+    return !this._singleConnection || this._cgConnections.length === 0;
+};
+
+/**
+ * Adds a connection from this cgPoint to the given cgPoint
+ * @param {dudeGraph.Point} cgPoint
+ * @return {dudeGraph.Connection}
+ */
+dudeGraph.Point.prototype.connect = function (cgPoint) {
+    if (this._isOutput) {
+        return this._cgGraph.connectPoints(this, cgPoint);
+    } else {
+        return this._cgGraph.connectPoints(cgPoint, this);
+    }
+};
+
+/**
+ * Removes the connections between this cgPoint and the given cgPoint
+ * @param {dudeGraph.Point} cgPoint
+ */
+dudeGraph.Point.prototype.disconnect = function (cgPoint) {
+    if (this._isOutput) {
+        return this._cgGraph.disconnectPoints(this, cgPoint);
+    } else {
+        return this._cgGraph.disconnectPoints(cgPoint, this);
+    }
+};
+
+/**
+ * Returns a copy of this point
+ * @param {dudeGraph.Block} cgBlock - The block on which this cloned point will be attached to
+ * @return {dudeGraph.Point}
+ */
+dudeGraph.Point.prototype.clone = function (cgBlock) {
+    if (this._pointType !== "Point") {
+        throw new Error("Method `clone` must be overridden by `" + this._pointType + "`");
+    }
+    return new dudeGraph.Point(cgBlock, {
+        cgName: this._cgName,
+        cgValueType: this._cgValueType,
+        cgValue: this._cgValue
+    }, this._isOutput);
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Connection connects one output point to an input point
+ * There can be only one connection for two given output/input points
+ * @param {dudeGraph.Point} outputPoint
+ * @param {dudeGraph.Point} inputPoint
+ * @constructor
+ */
+dudeGraph.Connection = function (outputPoint, inputPoint) {
+
+    /**
+     * The output point where the connection begins
+     * @type {dudeGraph.Point}
+     * @private
+     */
+    Object.defineProperty(this, "cgOutputPoint", {
+        get: function () {
+            return this._cgOutputPoint;
+        }.bind(this)
+    });
+    this._cgOutputPoint = outputPoint;
+    if (!outputPoint.isOutput) {
+        throw new Error("outputPoint is not an output");
+    }
+
+    /**
+     * The input point where the connection ends
+     * @type {dudeGraph.Point}
+     * @private
+     */
+    Object.defineProperty(this, "cgInputPoint", {
+        get: function () {
+            return this._cgInputPoint;
+        }.bind(this)
+    });
+    this._cgInputPoint = inputPoint;
+    if (inputPoint.isOutput) {
+        throw new Error("inputPoint is not an input");
+    }
+
+};
+
+/**
+ * Returns the other point
+ * @param {dudeGraph.Point} cgPoint
+ * returns {dudeGraph.Point}
+ */
+dudeGraph.Connection.prototype.otherPoint = function (cgPoint) {
+    if (cgPoint === this._cgOutputPoint) {
+        return this._cgInputPoint;
+    } else if (cgPoint === this._cgInputPoint) {
+        return this._cgOutputPoint;
+    }
+    throw new Error("Point `" + cgPoint.cgName + "` is not in this connection");
+};
+
+/**
+ * Remove self from the connections
+ */
+dudeGraph.Connection.prototype.remove = function () {
+    // TODO
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This specific point represent a stream. In other words, it's an abstract way to order instruction blocks into
+ * the graph. This type doesn't transform data but represents the execution stream. That's why it can't hold a value
+ * or have a specific value type.
+ * @param {dudeGraph.Block} cgBlock - Reference to the related cgBlock.
+ * @param {Object} data - JSON representation of this stream point
+ * @param {Boolean} isOutput - Defined whether this point is an output or an input
+ * @constructor
+ */
+dudeGraph.Stream = function (cgBlock, data, isOutput) {
+    dudeGraph.Point.call(this, cgBlock, _.merge(data, {
+        "cgName": data.cgName,
+        "cgValueType": "Stream"
+    }), isOutput, "Stream");
+    Object.defineProperty(this, "cgValue", {
+        get: function () {
+            throw new Error("Stream has no `cgValue`.");
+        }.bind(this),
+        set: function () {
+            throw new Error("Stream has no `cgValue`.");
+        }.bind(this)
+    });
+};
+
+/**
+ * @extends {dudeGraph.Point}
+ */
+dudeGraph.Stream.prototype = _.create(dudeGraph.Point.prototype, {
+    "constructor": dudeGraph.Stream
+});
+
+
+/**
+ * Returns a copy of this Stream
+ * @param {dudeGraph.Block} cgBlock - The block on which the cloned stream will be attached to
+ * @returns {dudeGraph.Stream}
+ */
+dudeGraph.Stream.prototype.clone = function (cgBlock) {
+    return new dudeGraph.Stream(cgBlock, this._cgName, this._isOutput);
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This is like function however, it takes a stream in input and output. In code it would represent function
+ * separated by semicolons.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Assignation = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Assignation");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Assignation.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Assignation
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Assignation.prototype.validate = function () {
+    if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
+        throw new Error("Assignation `" + this.cgId + "` must have an input `in` of type `Stream`");
+    }
+    if (!(this.inputByName("this") instanceof dudeGraph.Point)) {
+        throw new Error("Assignation `" + this.cgId + "` must have an input `this` of type `Point`");
+    }
+    if (!(this.inputByName("other") instanceof dudeGraph.Point)) {
+        throw new Error("Assignation `" + this.cgId + "` must have an input `other` of type `Point`");
+    }
+    if (this.inputByName("this")._cgValueType !== this.inputByName("other")._cgValueType) {
+        throw new Error("Assignation `" + this.cgId + "` inputs `this` and `other` must have the same cgValueType");
+    }
+    if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+        throw new Error("Assignation `" + this.cgId + "` must have an output `out` of type `Stream`");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Condition = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Condition");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Condition.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Condition
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Condition.prototype.validate = function () {
+    if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
+        throw new Error("Condition `" + this.cgId + "` must have an input `in` of type `Stream`");
+    }
+    if (!(this.inputByName("test") instanceof dudeGraph.Point) || this.inputByName("test").cgValueType !== "Boolean") {
+        throw new Error("Condition `" + this.cgId + "` must have an input `test` of type `Point` of cgValueType `Boolean`");
+    }
+    if (!(this.outputByName("true") instanceof dudeGraph.Stream)) {
+        throw new Error("Condition `" + this.cgId + "` must have an output `true` of type `Stream`");
+    }
+    if (!(this.outputByName("false") instanceof dudeGraph.Stream)) {
+        throw new Error("Condition `" + this.cgId + "` must have an output `false` of type `Stream`");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This is like function however, it takes a stream in input and output. In code it would represent function
+ * separated by semicolons.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Delegate = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Delegate");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Delegate.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Delegate
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Delegate.prototype.validate = function () {
+    if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+        throw new Error("Delegate `" + this.cgId + "` must have an output `out` of type `Stream`");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Each = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Each");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Each.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Each
+});
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This block represents a simple function that takes some inputs and returns one or zero output.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Function = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Function");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Function.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Function
+});
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This block represents a simple Getter that takes some inputs and returns one or zero output.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Getter = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Getter");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Getter.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Getter
+});
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This is like function however, it takes a stream in input and output. In code it would represent function
+ * separated by semicolons.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Instruction = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Instruction");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Instruction.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Instruction
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Instruction.prototype.validate = function () {
+    if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
+        throw new Error("Instruction `" + this.cgId + "` must have an input `in` of type `Stream`");
+    }
+    if (!(this.outputByName("out") instanceof dudeGraph.Stream)) {
+        throw new Error("Instruction `" + this.cgId + "` must have an output `out` of type `Stream`");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * This block represents a simple Operator that takes some inputs and returns one or zero output.
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Operator = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Operator");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Operator.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Operator
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Operator.prototype.validate = function () {
+    if (this.cgInputs.length !== 2) {
+        throw new Error("Operator `" + this.cgId + "` must only take 2 inputs");
+    }
+    if (this.cgOutputs.length !== 1) {
+        throw new Error("Operator `" + this.cgId + "` must return one value");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Range = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Range");
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Range.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Range
+});
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * @extends {dudeGraph.Block}
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} data
+ * @constructor
+ */
+dudeGraph.Variable = function (cgGraph, data) {
+    dudeGraph.Block.call(this, cgGraph, data, "Variable");
+
+    /**
+     * The type of this variable, the block will return a point of this type.
+     * @type {String}
+     * @private
+     */
+    Object.defineProperty(this, "cgValueType", {
+        get: function () {
+            return this._cgValueType;
+        }.bind(this)
+    });
+    this._cgValueType = data.cgValueType;
+
+    /**
+     * The current value of the Variable.
+     * @type {*}
+     * @private
+     */
+    Object.defineProperty(this, "cgValue", {
+        get: function () {
+            return this._cgValue;
+        }.bind(this),
+        set: function (value) {
+            this._cgValue = value;
+            this.cgOutputs[0].cgValue = value;
+        }.bind(this)
+    });
+    this._cgValue = data.cgValue;
+};
+
+/**
+ * @extends {dudeGraph.Block}
+ */
+dudeGraph.Variable.prototype = _.create(dudeGraph.Block.prototype, {
+    "constructor": dudeGraph.Variable
+});
+
+/**
+ * Validates the block content
+ * Called when the graph adds this block
+ */
+dudeGraph.Variable.prototype.validate = function () {
+    if (!(this.outputByName("value") instanceof dudeGraph.Point)) {
+        throw new Error("Variable `" + this.cgId + "` must have an output `value` of type `Point`");
+    }
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Dude-graph default loader
+ * @constructor
+ */
+dudeGraph.Loader = function () {
+    /**
+     * Registered block types
+     * @type {Object}
+     * @private
+     */
+    this._blockTypes = {
+        "Block": dudeGraph.Block
+    };
+
+    /**
+     * Registered point types
+     * @type {Object}
+     * @private
+     */
+    this._pointTypes = {
+        "Point": dudeGraph.Point
+    };
+};
+
+/**
+ * Registers a new block type
+ * @param {String} blockType
+ * @param {dudeGraph.Block} blockConstructor
+ */
+dudeGraph.Loader.prototype.registerBlockType = function (blockType, blockConstructor) {
+    this._blockTypes[blockType] = blockConstructor;
+};
+
+/**
+ * Registers a new point type
+ * @param {String} pointType
+ * @param {dudeGraph.Point} pointConstructor
+ */
+dudeGraph.Loader.prototype.registerPointType = function (pointType, pointConstructor) {
+    this._pointTypes[pointType] = pointConstructor;
+};
+
+/**
+ * Loads a cgGraph from a json
+ * @param {dudeGraph.Graph} cgGraph - The graph to load
+ * @param {Object} cgGraphData - The graph data
+ * @param {Array<Object>} cgGraphData.blocks - The graph blocks
+ * @param {Array<Object>} cgGraphData.connections - The graph connections
+ */
+dudeGraph.Loader.prototype.load = function (cgGraph, cgGraphData) {
+    var loader = this;
+    _.forEach(cgGraphData.blocks, function (cgBlockData) {
+        loader.loadBlock(cgGraph, cgBlockData);
+    });
+    _.forEach(cgGraphData.connections, function (cgConnectionData) {
+        loader.loadConnection(cgGraph, cgConnectionData);
+    });
+};
+
+/**
+ * @param {dudeGraph.Graph} cgGraph - The graph to load the block to
+ * @param {Object} cgBlockData - The block data
+ * @returns {dudeGraph.Block}
+ */
+dudeGraph.Loader.prototype.loadBlock = function (cgGraph, cgBlockData) {
+    var loader = this;
+    if (!cgBlockData.hasOwnProperty("cgId")) {
+        throw new Error("Block property `cgId` is required");
+    }
+    var blockConstructor = this._blockTypes[cgBlockData.cgType];
+    if (_.isUndefined(blockConstructor)) {
+        throw new Error("Block type `" + cgBlockData.cgType + "` not registered by the loader");
+    }
+    var cgBlock = new blockConstructor(cgGraph, cgBlockData, cgBlockData.cgType);
+    _.forEach(cgBlockData.cgOutputs, function (cgOutputData) {
+        loader.loadPoint(cgBlock, cgOutputData, true);
+    });
+    _.forEach(cgBlockData.cgInputs, function (cgInputData) {
+        loader.loadPoint(cgBlock, cgInputData, false);
+    });
+    cgGraph.addBlock(cgBlock);
+    return cgBlock;
+};
+
+/**
+ * @param {dudeGraph.Block} cgBlock - The block to load the point to
+ * @param {Object} cgPointData - The point data
+ * @param {Boolean} isOutput - Whether the point is an output or an input
+ * @returns {dudeGraph.Point}
+ */
+dudeGraph.Loader.prototype.loadPoint = function (cgBlock, cgPointData, isOutput) {
+    if (!cgPointData.cgName) {
+        throw new Error("Block `" + cgBlock.cgId + "`: Point property `cgName` is required");
+    }
+    var cgPointType = cgPointData.cgType;
+    var cgPointConstructor = this._pointTypes[cgPointType];
+    if (!cgPointConstructor) {
+        throw new Error("Point type `" + cgPointType + "` not registered by the loader");
+    }
+    var cgPoint = new cgPointConstructor(cgBlock, cgPointData, isOutput);
+    cgBlock.addPoint(cgPoint);
+    return cgPoint;
+};
+
+/**
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {Object} cgConnectionData
+ * @private
+ */
+dudeGraph.Loader.prototype.loadConnection = function (cgGraph, cgConnectionData) {
+    var cgOutputBlockId = cgConnectionData.cgOutputBlockId;
+    var cgOutputName = cgConnectionData.cgOutputName;
+    var cgInputBlockId = cgConnectionData.cgInputBlockId;
+    var cgInputName = cgConnectionData.cgInputName;
+    var cgOutputBlock = cgGraph.blockById(cgOutputBlockId);
+    if (!cgOutputBlock) {
+        throw new Error("Output block not found for id `" + cgOutputBlockId + "`");
+    }
+    var cgInputBlock = cgGraph.blockById(cgInputBlockId);
+    if (!cgInputBlock) {
+        throw new Error("Input block not found for id `" + cgInputBlockId + "`");
+    }
+    var cgOutputPoint = cgOutputBlock.outputByName(cgOutputName);
+    if (!cgOutputPoint) {
+        throw new Error("Output point `" + cgOutputName + "` not found in block `" + cgOutputBlockId + "`");
+    }
+    var cgInputPoint = cgInputBlock.inputByName(cgInputName);
+    if (!cgInputPoint) {
+        throw new Error("Input point `" + cgInputName + "` not found in block `" + cgInputBlockId + "`");
+    }
+    cgOutputPoint.connect(cgInputPoint);
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Dude-graph default saver
+ * @constructor
+ */
+dudeGraph.Saver = function () {};
+
+/**
+ * Saves a cgGraph as json
+ * @param {dudeGraph.Graph} cgGraph - The graph to save
+ */
+dudeGraph.Saver.prototype.save = function (cgGraph) {
+    var saver = this;
+    return {
+        "blocks": _.map(cgGraph.cgBlocks, function (cgBlock) {
+            return saver.saveBlock(cgBlock);
+        }),
+        "connections": _.map(cgGraph.cgConnections, function (cgConnection) {
+            return saver.saveConnection(cgConnection);
+        })
+    };
+};
+
+
+/**
+ * Saves the block
+ * @param {dudeGraph.Block} cgBlock
+ * @return {Object}
+ */
+dudeGraph.Saver.prototype.saveBlock = function (cgBlock) {
+    var saver = this;
+    return {
+        "cgType": cgBlock._blockType,
+        "cgId": cgBlock._cgId,
+        "cgName": cgBlock._cgName,
+        "cgInputs": _.map(cgBlock._cgInputs, function (cgPoint) {
+            return saver.savePoint(cgPoint);
+        }),
+        "cgOutputs": _.map(cgBlock._cgOutputs, function (cgPoint) {
+            return saver.savePoint(cgPoint);
+        })
+    };
+};
+
+/**
+ * Saves the point
+ * @param {dudeGraph.Point} cgPoint
+ * @return {Object}
+ */
+dudeGraph.Saver.prototype.savePoint = function (cgPoint) {
+    var pointData = {
+        "cgType": cgPoint.pointType,
+        "cgName": cgPoint._cgName,
+        "cgValueType": cgPoint._cgValueType,
+        "singleConnection": cgPoint._singleConnection
+    };
+    if (!cgPoint._isOutput) {
+        pointData.cgValue = cgPoint._cgValue;
+    }
+    return pointData;
+};
+
+/**
+ * Saves the connection
+ * @param {dudeGraph.Connection} cgConnection
+ * @return {Object}
+ */
+dudeGraph.Saver.prototype.saveConnection = function (cgConnection) {
+    return {
+        "cgOutputName": cgConnection._cgOutputPoint._cgName,
+        "cgOutputBlockId": cgConnection._cgOutputPoint._cgBlock._cgId,
+        "cgInputName": cgConnection._cgInputPoint._cgName,
+        "cgInputBlockId": cgConnection._cgInputPoint._cgBlock._cgId
+    };
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * @constructor
+ */
+dudeGraph.Renderer = function () {
+    /**
+     * The graph to render
+     * @type {dudeGraph.Graph}
+     */
+    this._graph = null;
+    Object.defineProperty(this, "graph", {
+        get: function () {
+            return this._graph;
+        }.bind(this)
+    });
+
+    /**
+     * Renderer configuration
+     * @type {Object}
+     * @private
+     */
+    this._config = null;
+    Object.defineProperty(this, "config", {
+        get: function () {
+            return this._config;
+        }.bind(this)
+    });
+
+    /**
+     * Renderer zoom information
+     * @type {null}
+     * @private
+     */
+    this._zoom = null;
+
+    /**
+     * The root SVG node of the renderer
+     * @type {d3.selection}
+     */
+    this._d3Svg = null;
+
+    /**
+     * The root group node of the renderer
+     * @type {d3.selection}
+     */
+    this._d3Root = null;
+
+    /**
+     * The SVG group for the d3Groups
+     * @type {d3.selection}
+     */
+    this._d3Groups = null;
+
+    /**
+     * The SVG connection for the d3Connections
+     * @type {d3.selection}
+     */
+    this._d3Connections = null;
+
+    /**
+     * The SVG group for the d3Blocks
+     * @type {d3.selection}
+     */
+    this._d3Block = null;
+
+    /**
+     * The SVG point to perform SVG matrix transformations
+     * @type {SVGPoint}
+     * @private
+     */
+    this._svgPoint = null;
+
+    /**
+     * The renderBlocks
+     * @type {Array<dudeGraph.RenderBlock>}
+     * @private
+     */
+    this._renderBlocks = null;
+
+    /**
+     * The renderGroups
+     * @type {Array<dudeGraph.RenderGroup>}
+     * @private
+     */
+    this._renderGroups = null;
+
+    /**
+     * The renderConnections
+     * @type {Array<dudeGraph.RenderConnection>}
+     * @private
+     */
+    this._renderConnections = null;
+
+    /**
+     * The selected renderNodes
+     * @type {Array<dudeGraph.RenderNode>}
+     * @private
+     */
+    this._selectedRenderNodes = null;
+
+    /**
+     * The renderBlock types
+     * @type {d3.map<String, dudeGraph.RenderBlock>}
+     * @private
+     */
+    this._renderBlockTypes = null;
+
+    /**
+     * Association map from id to renderBlock
+     * @type {d3.map<String, dudeGraph.RenderBlock>}
+     * @private
+     */
+    this._renderBlockIds = null;
+
+    /**
+     * Association map from id to renderGroup
+     * @type {d3.map<String, dudeGraph.RenderGroup>}
+     * @private
+     */
+    this._renderGroupIds = null;
+
+    /**
+     * The renderBlocks quadtree
+     * @type {d3.geom.quadtree}
+     * @private
+     */
+    this._renderBlocksQuadtree = null;
+
+    /**
+     * The renderGroups quadtree
+     * @type {d3.geom.quadtree}
+     * @private
+     */
+    this._renderGroupsQuadtree = null;
+
+    /**
+     * The renderPoints quadtree
+     * @type {d3.geom.quadtree}
+     * @private
+     */
+    this._renderPointsQuadtree = null;
+
+    /**
+     * Returns all d3Blocks
+     * @type {d3.selection}
+     */
+    Object.defineProperty(this, "d3Blocks", {
+        get: function () {
+            return this._d3Block.selectAll(".dude-graph-block");
+        }.bind(this)
+    });
+
+    /**
+     * Returns all d3Groups
+     * @type {d3.selection}
+     */
+    Object.defineProperty(this, "d3Groups", {
+        get: function () {
+            return this._d3Groups.selectAll(".dude-graph-group");
+        }.bind(this)
+    });
+
+    /**
+     * Returns all d3Connections
+     * @type {d3.selection}
+     */
+    Object.defineProperty(this, "d3Connections", {
+        get: function () {
+            return this._d3Connections.selectAll(".dude-graph-connection");
+        }.bind(this)
+    });
+};
+
+/**
+ * @extends {EventEmitter}
+ */
+dudeGraph.Renderer.prototype = _.create(EventEmitter.prototype, {
+    "constructor": dudeGraph.Renderer
+});
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+dudeGraph.Renderer.prototype.zoomToFit = function () {
+    this._zoomToBoundingBox(this._rendererNodesBoundingBox(this._renderBlocks.concat(this._renderGroups)));
+};
+
+dudeGraph.Renderer.prototype.zoomToSelection = function () {
+
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Default renderer configuration
+ * @type {Object}
+ */
+dudeGraph.Renderer.defaultConfig = {
+    "zoom": {
+        "min": 0.25,
+        "max": 5,
+        "margin": [10, 10],
+        "transitionSpeed": 800
+    },
+    "block": {
+        "padding": 10,
+        "header": 50,
+        "pointSpacing": 10
+    },
+    "group": {
+        "padding": 10,
+        "header": 30
+    },
+    "point": {
+        "height": 20,
+        "padding": 10,
+        "radius": 3
+    },
+    "connection": {
+        "step": 150
+    }
+};
+
+/**
+ * Default renderer zoom
+ * @type {Object}
+ */
+dudeGraph.Renderer.defaultZoom = {
+    "translate": [0, 0],
+    "scale": 1
+};
+//
+// Copyright (c) 2015 DudeTeam. All rights reserved.
+//
+
+/**
+ * Initializes the renderer
+ * @param {dudeGraph.Graph} cgGraph
+ * @param {SVGElement} svgElement
+ * @param {Object?} config
+ */
+dudeGraph.Renderer.prototype.initialize = function (cgGraph, svgElement, config) {
+    this._graph = cgGraph;
+    this._d3Svg = d3.select(svgElement);
+    this._d3Root = this._d3Svg.append("svg:g").attr("id", "dude-graph-renderer");
+    this._d3Groups = this._d3Root.append("svg:g").attr("id", "dude-graph-groups");
+    this._d3Connections = this._d3Root.append("svg:g").attr("id", "dude-graph-connections");
+    this._d3Block = this._d3Root.append("svg:g").attr("id", "dude-graph-blocks");
+    this._svgPoint = svgElement.createSVGPoint();
+    this._renderBlocks = [];
+    this._renderGroups = [];
+    this._renderConnections = [];
+    this._selectedRenderNodes = [];
+    this._renderBlockTypes = {
+        "Block": dudeGraph.RenderBlock
+    };
+    this._renderBlockIds = {};
+    this._renderGroupIds = {};
+    this._renderBlocksQuadtree = null;
+    this._renderGroupsQuadtree = null;
+    this._renderPointsQuadtree = null;
+    this._config = _.defaultsDeep(config || {}, dudeGraph.Renderer.defaultConfig);
+    this._zoom = dudeGraph.Renderer.defaultZoom;
+    this._createSelectionBehavior();
+    this._createZoomBehavior();
+};
+
+/**
+ * Registers a renderBlock
+ * @param {String} renderBlockType
+ * @param {dudeGraph.RenderBlock} renderBlockConstructor
+ */
+dudeGraph.Renderer.prototype.registerRenderBlock = function (renderBlockType, renderBlockConstructor) {
+    this._renderBlockTypes[renderBlockType] = renderBlockConstructor;
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {String} nodeId
+ * @constructor
+ */
+dudeGraph.RenderNode = function (renderer, nodeId) {
+    /**
+     * Reference on the renderer
+     * @type {dudeGraph.Renderer}
+     * @protected
+     */
+    this._renderer = renderer;
+
+    /**
+     * The node id
+     * @type {String}
+     * @protected
+     */
+    this._nodeId = nodeId;
+    Object.defineProperty(this, "nodeId", {
+        configurable: true,
+        get: function () {
+            return this._nodeId;
+        }.bind(this)
+    });
+
+    /**
+     * The node name
+     * @type {String}
+     * @protected
+     */
+    this._nodeName = null;
+    Object.defineProperty(this, "nodeName", {
+        configurable: true,
+        get: function () {
+            return this._nodeName;
+        }.bind(this),
+        set: function (nodeName) {
+            this._nodeName = nodeName;
+        }.bind(this)
+    });
+
+    /**
+     * Returns the node fancyName
+     * @type {String}
+     */
+    Object.defineProperty(this, "nodeFancyName", {
+        configurable: true,
+        get: function () {
+            return this._nodeName + " (#" + this._nodeId + ")";
+        }.bind(this)
+    });
+
+    /**
+     * The node renderGroup parent
+     * @type {dudeGraph.RenderGroup}
+     * @protected
+     */
+    this._nodeParent = null;
+    Object.defineProperty(this, "nodeParent", {
+        configurable: true,
+        get: function () {
+            return this._nodeParent;
+        }.bind(this),
+        set: function (nodeParent) {
+            if (this._nodeParent !== null) {
+                this._nodeParent.removeChildRenderNode(this);
+            }
+            nodeParent.addChildRenderNode(this);
+            this._nodeParent = nodeParent;
+        }.bind(this)
+    });
+
+    /**
+     * The node position
+     * @type {[Number, Number]}
+     * @protected
+     */
+    this._nodePosition = [0, 0];
+    Object.defineProperty(this, "nodePosition", {
+        configurable: true,
+        get: function () {
+            return this._nodePosition;
+        }.bind(this),
+        set: function (nodePosition) {
+            this._nodePosition = nodePosition;
+        }.bind(this)
+    });
+
+    /**
+     * The node size
+     * @type {[Number, Number]}
+     * @protected
+     */
+    this._nodeSize = [0, 0];
+    Object.defineProperty(this, "nodeSize", {
+        configurable: true,
+        get: function () {
+            return this._nodeSize;
+        }.bind(this),
+        set: function (nodeSize) {
+            this._nodeSize = nodeSize;
+        }.bind(this)
+    });
+
+    /**
+     * The d3Node that holds this renderNode
+     * @type {d3.selection}
+     * @protected
+     */
+    this._d3Node = null;
+    Object.defineProperty(this, "d3Node", {
+        configurable: true,
+        get: function () {
+            return this._d3Node;
+        }.bind(this)
+    });
+};
+
+/**
+ * Creates the svg representation of this renderNode
+ * @param {d3.selection} d3Node
+ */
+dudeGraph.RenderNode.prototype.create = function (d3Node) {
+    this._d3Node = d3Node;
+};
+
+/**
+ * Moves the svg representation of this renderNode
+ */
+dudeGraph.RenderNode.prototype.move = function () {
+    this._d3Node
+        .attr("transform", "translate(" + this._nodePosition + ")");
+};
+
+/**
+ * Updates the svg representation of this renderNode
+ */
+dudeGraph.RenderNode.prototype.update = function () {
+    this.move();
+};
+
+/**
+ * Removes the svg representation of this renderNode
+ */
+dudeGraph.RenderNode.prototype.remove = function () {
+};
+
+/**
+ * Called when the renderNode is selected
+ * @callback
+ */
+dudeGraph.RenderNode.prototype.select = function () {
+    this._d3Folie = this._d3Node.append("svg:polygon");
+    this._d3Folie.attr("points", function () {
+        var starPoints = [];
+        var pins = 5;
+        var angle = Math.PI / pins;
+        for (var i = 0; i < pins * 2; i++) {
+            var radius = (i % 2) === 0 ? 5 : 10;
+            var x = 5 + Math.cos(i * angle) * radius;
+            var y = 5 + Math.sin(i * angle) * radius;
+            starPoints.push([x, y]);
+        }
+        return starPoints;
+    });
+};
+
+/**
+ * Called when the renderNode is unselected
+ * @callback
+ */
+dudeGraph.RenderNode.prototype.unselect = function () {
+    this._d3Folie.remove();
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {String} rendererBlockId
+ * @param {dudeGraph.Block} block
+ * @extends {dudeGraph.RenderNode}
+ * @constructor
+ */
+dudeGraph.RenderBlock = function (renderer, rendererBlockId, block) {
+    dudeGraph.RenderNode.call(this, renderer, rendererBlockId);
+
+    /**
+     * The dudeGraph.Block this renderBlock is linked to
+     * @type {dudeGraph.Block}
+     * @private
+     */
+    this._block = block;
+    Object.defineProperty(this, "block", {
+        get: function () {
+            return this._block;
+        }.bind(this)
+    });
+
+    /**
+     * The renderPoints of this renderBlock
+     * @type {Array<dudeGraph.RenderPoint>}
+     * @private
+     */
+    this._renderPoints = [];
+    Object.defineProperty(this, "renderPoints", {
+        get: function () {
+            return this._renderPoints;
+        }.bind(this),
+        set: function (renderPoints) {
+            this._renderPoints = renderPoints;
+            this._renderOutputPoints = _.filter(this.renderPoints, function (renderPoint) {
+                return renderPoint.point.isOutput;
+            });
+            this._renderInputPoints = _.filter(this.renderPoints, function (renderPoint) {
+                return !renderPoint.point.isOutput;
+            });
+        }.bind(this)
+    });
+
+    /**
+     * The d3Points
+     * @type {d3.selection}
+     */
+    this._d3Points = null;
+    Object.defineProperty(this, "d3Points", {
+        get: function () {
+            return this._d3Points.selectAll(".dude-graph-point");
+        }.bind(this)
+    });
+};
+
+/**
+ * RenderBlock factory
+ * @param {dudeGraph.Renderer} renderer
+ * @param {Object} renderBlockData
+ */
+dudeGraph.RenderBlock.buildRenderBlock = function (renderer, renderBlockData) {
+    var block = renderer.graph.blockById(renderBlockData.cgBlock);
+    if (!block) {
+        throw new Error("Unknown block `" + renderBlockData.cgBlock + "` for renderBlock `" + renderBlockData.id + "`");
+    }
+    var renderBlock = new dudeGraph.RenderBlock(renderer, renderBlockData.id, block);
+    renderBlock.nodeName = renderBlockData.description || block.cgName || "";
+    renderBlock.nodePosition = renderBlockData.position || [0, 0];
+    renderBlock.parentGroup = renderBlockData.parent || null;
+    renderBlock.renderPoints = Array.prototype.concat(
+        _.map(block.cgOutputs, function (output, i) {
+            return new dudeGraph.RenderPoint(renderer, renderBlock, output, i);
+        }),
+        _.map(block.cgInputs, function (input, i) {
+            return new dudeGraph.RenderPoint(renderer, renderBlock, input, i);
+        })
+    );
+    return renderBlock;
+};
+
+/**
+ * @extends {dudeGraph.RenderNode}
+ */
+dudeGraph.RenderBlock.prototype = _.create(dudeGraph.RenderNode.prototype, {
+    "constructor": dudeGraph.RenderBlock
+});
+
+/**
+ * Creates the d3Block for this renderBlock
+ * @param {d3.selection} d3Block
+ * @override
+ */
+dudeGraph.RenderBlock.prototype.create = function (d3Block) {
+    dudeGraph.RenderNode.prototype.create.call(this, d3Block);
+    this._d3Rect = d3Block.append("svg:rect");
+    this._d3Title = d3Block.append("svg:text")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
+    this._d3Points = d3Block
+        .append("svg:g")
+        .classed("dude-graph-points", true);
+    this.d3Points
+        .data(this.renderPoints, function (renderPoint) {
+            return renderPoint.point.cgName;
+        })
+        .enter()
+        .append("g")
+        .classed("dude-graph-point", true);
+    this.d3Points
+        .each(function (renderPoint) {
+            renderPoint.create(d3.select(this));
+        });
+    this.updateSize();
+    this.d3Points
+        .each(function (renderPoint) {
+            renderPoint.updatePosition();
+        });
+    this.update();
+};
+
+/**
+ * Updates the d3Block for this renderBlock
+ * @override
+ */
+dudeGraph.RenderBlock.prototype.update = function () {
+    var renderBlock = this;
+    dudeGraph.RenderNode.prototype.update.call(this);
+    this._d3Rect
+        .attr({
+            "x": 0,
+            "y": 0,
+            "width": this._nodeSize[0],
+            "height": this._nodeSize[1]
+        });
+    this._d3Title
+        .text(this._nodeName)
+        .attr({
+            "x": this._nodeSize[0] / 2,
+            "y": this._renderer.config.block.padding
+        });
+    _.browserIf(["IE", "Edge"], function () {
+        renderBlock._d3Title.attr("y",
+            renderBlock._renderer.config.block.padding +
+            renderBlock._renderer._textBoundingBox(renderBlock._d3Title)[1] / 2);
+    });
+    this.d3Points
+        .each(function (renderPoint) {
+            renderPoint.update();
+        });
+    this.move();
+};
+
+/**
+ * Computes the renderBlock size
+ */
+dudeGraph.RenderBlock.prototype.updateSize = function () {
+    var widerOutput = _.max(this._renderOutputPoints, function (renderPoint) {
+        return renderPoint.pointSize[0];
+    });
+    var widerInput = _.max(this._renderInputPoints, function (renderPoint) {
+        return renderPoint.pointSize[0];
+    });
+    var titleWidth = this._renderer._textBoundingBox(this._nodeName)[0];
+    var maxOutputWidth = widerOutput !== -Infinity ? widerOutput.pointSize[0] : 0;
+    var maxInputWidth = widerInput !== -Infinity ? widerInput.pointSize[0] : 0;
+    var maxPoints = this._renderOutputPoints.length > this._renderInputPoints.length;
+    var maxPointsHeight = _.sum(maxPoints ? this._renderOutputPoints : this._renderInputPoints, function (renderPoint) {
+        return renderPoint.pointSize[1];
+    });
+    var maxWidth = Math.max(
+        titleWidth + this._renderer.config.block.padding * 2,
+        maxOutputWidth + maxInputWidth + this._renderer.config.block.pointSpacing
+    );
+    this._nodeSize = [
+        maxWidth,
+        maxPointsHeight + this._renderer.config.block.header
+    ];
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {dudeGraph.Connection} connection
+ * @param {dudeGraph.RenderPoint} outputRenderPoint
+ * @param {dudeGraph.RenderPoint} inputRenderPoint
+ * @constructor
+ */
+dudeGraph.RenderConnection = function (renderer, connection, outputRenderPoint, inputRenderPoint) {
+    /**
+     * Reference on the renderer
+     * @type {dudeGraph.Renderer}
+     * @private
+     */
+    this._renderer = renderer;
+
+    /**
+     * The connection
+     * @type {dudeGraph.Connection}
+     * @private
+     */
+    this._connection = connection;
+    Object.defineProperty(this, "connection", {
+        get: function () {
+            return this._connection;
+        }.bind(this)
+    });
+
+    /**
+     * The output renderPoint
+     * @type {dudeGraph.RenderPoint}
+     * @private
+     */
+    this._outputRenderPoint = outputRenderPoint;
+    Object.defineProperty(this, "outputRenderPoint", {
+        get: function () {
+            return this._outputRenderPoint;
+        }.bind(this)
+    });
+
+    /**
+     * The input renderPoint
+     * @type {dudeGraph.RenderPoint}
+     * @private
+     */
+    this._inputRenderPoint = inputRenderPoint;
+    Object.defineProperty(this, "inputRenderPoint", {
+        get: function () {
+            return this._inputRenderPoint;
+        }.bind(this)
+    });
+
+    /**
+     * The connection unique id
+     * @type {String}
+     */
+    Object.defineProperty(this, "connectionId", {
+        get: function () {
+            return this.outputRenderPoint.renderBlock.nodeId + ":" + this.outputRenderPoint.point.cgName + "," +
+                this.inputRenderPoint.renderBlock.nodeId + ":" + this.inputRenderPoint.point.cgName;
+        }.bind(this)
+    });
+
+    /**
+     * The d3Connection that holds this renderConnection
+     * @type {d3.selection}
+     * @private
+     */
+    this._d3Connection = null;
+    Object.defineProperty(this, "d3Connection", {
+        get: function () {
+            return this._d3Connection;
+        }.bind(this)
+    });
+};
+
+/**
+ * RenderConnection factory
+ * @param {dudeGraph.Renderer} renderer
+ * @param {Object} renderConnectionData
+ */
+dudeGraph.RenderConnection.buildRenderConnection = function (renderer, renderConnectionData) {
+    var connection = renderer._graph.cgConnections[renderConnectionData.cgConnectionIndex];
+    if (!connection) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex + "` does not exists");
+    }
+    var outputRenderBlock = renderer.getRenderBlockById(renderConnectionData.outputRendererBlockId);
+    var inputRenderBlock = renderer.getRenderBlockById(renderConnectionData.inputRendererBlockId);
+    if (outputRenderBlock === null) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: Cannot find outputRenderBlock `" + renderConnectionData.outputRendererBlockId + "`");
+    }
+    if (inputRenderBlock === null) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: Cannot find inputRenderBlock `" + renderConnectionData.inputRendererBlockId + "`");
+    }
+    if (outputRenderBlock.block !== connection.cgOutputPoint.cgBlock) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: output render block `" + outputRenderBlock.nodeFancyName +
+            "` is not holding a reference to the output block `" + connection.cgOutputPoint.cgBlock.cgId + "`");
+    }
+    if (inputRenderBlock.block !== connection.cgInputPoint.cgBlock) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: input render block `" + inputRenderBlock.nodeFancyName +
+            "` is not holding a reference to the input block `" + connection.cgInputPoint.cgBlock.cgId + "`");
+    }
+    var outputRendererPoint = renderer.getRenderPointByName(outputRenderBlock, connection.cgOutputPoint.cgName);
+    var inputRendererPoint = renderer.getRenderPointByName(inputRenderBlock, connection.cgInputPoint.cgName);
+    if (!outputRendererPoint) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: Cannot find outputRenderPoint `" + connection.cgOutputPoint.cgName + "`");
+    }
+    if (!inputRendererPoint) {
+        throw new Error("Connection at index `" + renderConnectionData.cgConnectionIndex +
+            "`: Cannot find inputRenderPoint `" + connection.cgInputPoint.cgName + "`");
+    }
+    return new dudeGraph.RenderConnection(renderer, connection, outputRendererPoint, inputRendererPoint);
+};
+
+/**
+ * Creates the svg representation of this renderConnection
+ * @param {d3.selection} d3Connection
+ */
+dudeGraph.RenderConnection.prototype.create = function (d3Connection) {
+    this._d3Connection = d3Connection;
+};
+
+/**
+ * Updates the svg representation of this renderConnection
+ */
+dudeGraph.RenderConnection.prototype.update = function () {
+    this._d3Connection
+        .attr("d", this.computePath());
+};
+
+/**
+ * Removes the svg representation of this renderConnection
+ */
+dudeGraph.RenderConnection.prototype.remove = function () {
+};
+
+/**
+ * Computes the connection path
+ * @returns {String}
+ */
+dudeGraph.RenderConnection.prototype.computePath = function () {
+    var outputRenderPointPosition = this._outputRenderPoint.absolutePointPosition;
+    var inputRenderPointPosition = this._inputRenderPoint.absolutePointPosition;
+    var step = this._renderer.config.connection.step;
+    if (outputRenderPointPosition[0] - inputRenderPointPosition[0] < 0) {
+        step += Math.max(-100, outputRenderPointPosition[0] - inputRenderPointPosition[0]);
+    }
+    return _.templateString("M{x},{y}C{x1},{y1} {x2},{y2} {x3},{y3}", {
+        x: outputRenderPointPosition[0], y: outputRenderPointPosition[1],
+        x1: outputRenderPointPosition[0] + step, y1: outputRenderPointPosition[1],
+        x2: inputRenderPointPosition[0] - step, y2: inputRenderPointPosition[1],
+        x3: inputRenderPointPosition[0], y3: inputRenderPointPosition[1]
+    });
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {String} groupId
+ * @extends {dudeGraph.RenderNode}
+ * @constructor
+ */
+dudeGraph.RenderGroup = function (renderer, groupId) {
+    dudeGraph.RenderNode.call(this, renderer, groupId);
+
+    /**
+     * The group children
+     * @type {Array<dudeGraph.RenderNode>}
+     * @private
+     */
+    this._childrenRenderNodes = [];
+};
+
+/**
+ * RenderGroup factory
+ * @param {dudeGraph.Renderer} renderer
+ * @param {Object} renderGroupData
+ */
+dudeGraph.RenderGroup.buildRenderGroup = function (renderer, renderGroupData) {
+    return new dudeGraph.RenderGroup(renderer, renderGroupData.id);
+};
+
+/**
+ * @extends {dudeGraph.RenderNode}
+ */
+dudeGraph.RenderGroup.prototype = _.create(dudeGraph.RenderNode.prototype, {
+    "constructor": dudeGraph.RenderGroup
+});
+
+/**
+ * Creates the svg representation of this renderGroup
+ * @param {d3.selection} d3Group
+ * @override
+ */
+dudeGraph.RenderGroup.prototype.create = function (d3Group) {
+    dudeGraph.RenderNode.prototype.create.call(this, d3Group);
+    this.update();
+};
+
+/**
+ * Adds the render node as child
+ * @param {dudeGraph.RenderNode} renderNode
+ */
+dudeGraph.RenderGroup.prototype.addChildRenderNode = function (renderNode) {
+    var renderNodeChildFound = _.find(this._childrenRenderNodes, renderNode);
+    if (!_.isUndefined(renderNodeChildFound)) {
+        throw new Error("`" + renderNode.nodeFancyName + "` is already a child of `" + this.nodeFancyName + "`");
+    }
+    this._childrenRenderNodes.push(renderNode);
+};
+
+/**
+ * Removes the render node from children
+ * @param {dudeGraph.RenderNode} renderNode
+ */
+dudeGraph.RenderGroup.prototype.removeChildRenderNode = function (renderNode) {
+    var renderNodeChildFound = _.find(this._childrenRenderNodes, renderNode);
+    if (_.isUndefined(renderNodeChildFound)) {
+        throw new Error("`" + renderNode.nodeFancyName + "` is not a child of `" + this.nodeFancyName + "`");
+    }
+    _.pull(this._childrenRenderNodes, renderNode);
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {dudeGraph.RenderBlock} renderBlock
+ * @param {dudeGraph.Point} point
+ * @param {Number} index
+ * @constructor
+ */
+dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
+    /**
+     * Reference on the renderer
+     * @type {dudeGraph.Renderer}
+     * @private
+     */
+    this._renderer = renderer;
+
+    /**
+     * The host renderBlock
+     * @type {dudeGraph.RenderBlock}
+     * @private
+     */
+    this._renderBlock = renderBlock;
+    Object.defineProperty(this, "renderBlock", {
+        get: function () {
+            return this._renderBlock;
+        }.bind(this)
+    });
+
+    /**
+     * The point index in the renderBlock
+     * @type {Number}
+     * @private
+     */
+    this._index = index;
+    Object.defineProperty(this, "index", {
+        get: function () {
+            return this._index;
+        }.bind(this)
+    });
+
+    /**
+     * The point
+     * @type {dudeGraph.Point}
+     * @private
+     */
+    this._point = point;
+    Object.defineProperty(this, "point", {
+        get: function () {
+            return this._point;
+        }.bind(this)
+    });
+
+    /**
+     * The point position in the d3Block
+     * @type {[Number, Number]}
+     * @private
+     */
+    this._pointPosition = [0, 0];
+    Object.defineProperty(this, "pointPosition", {
+        get: function () {
+            return this._pointPosition;
+        }.bind(this)
+    });
+
+    /**
+     * The point size in the d3Block
+     * @type {[Number, Number]}
+     * @private
+     */
+    this._pointSize = [0, 0];
+    Object.defineProperty(this, "pointSize", {
+        get: function () {
+            return this._pointSize;
+        }.bind(this)
+    });
+
+    /**
+     * The point position in the d3Svg
+     * @type {[Number, Number]}
+     * @private
+     */
+    Object.defineProperty(this, "absolutePointPosition", {
+        get: function () {
+            var s = this._renderBlock.nodePosition;
+            var v = this._pointPosition;
+            return [
+                s[0] + v[0],
+                s[1] + v[1]
+            ];
+        }.bind(this)
+    });
+
+    /**
+     * The d3Point that holds this renderPoint
+     * @type {d3.selection}
+     * @private
+     */
+    this._d3Point = null;
+    Object.defineProperty(this, "d3Point", {
+        get: function () {
+            return this._d3Point;
+        }.bind(this)
+    });
+};
+
+/**
+ * Creates the svg representation of this renderPoint
+ * @param d3PointGroup
+ */
+dudeGraph.RenderPoint.prototype.create = function (d3PointGroup) {
+    this._d3Point = d3PointGroup;
+    this._d3Circle = d3PointGroup
+        .append("svg:circle");
+    this._d3Title = d3PointGroup
+        .append("svg:text")
+        .attr("text-anchor", this._point.isOutput ? "end" : "start")
+        .attr("dominant-baseline", "middle");
+    this.updateSize();
+};
+
+/**
+ * Updates the svg representation of this renderPoint
+ */
+dudeGraph.RenderPoint.prototype.update = function () {
+    var renderPoint = this;
+    this._d3Circle
+        .attr({
+            "cx": this._pointPosition[0] + (this.point.isOutput ? -1 : 1) * this._renderer.config.point.radius / 2,
+            "cy": this._pointPosition[1],
+            "r": this._renderer.config.point.radius
+        });
+    this._d3Title
+        .text(this._point.cgName)
+        .attr({
+            "x": this._pointPosition[0] + (this.point.isOutput ? -1 : 1) * this._renderer.config.point.padding,
+            "y": this._pointPosition[1]
+        });
+    _.browserIf(["IE", "Edge"], function () {
+        renderPoint._d3Title.attr("y",
+            renderPoint._pointPosition[1] + renderPoint._renderer._textBoundingBox(renderPoint._d3Title)[1] / 4);
+    });
+};
+
+/**
+ * Removes the svg representation of this renderPoint
+ */
+dudeGraph.RenderPoint.prototype.remove = function () {
+
+};
+
+/**
+ * Computes the renderPoint size
+ */
+dudeGraph.RenderPoint.prototype.updateSize = function () {
+    var textBoundingBox = this._renderer._textBoundingBox(this._point.cgName);
+    this._pointSize = [
+        textBoundingBox[0] + this._renderer.config.point.padding * 2,
+        this._renderer.config.point.height
+    ];
+};
+
+/**
+ * Computes the renderPoint position
+ */
+dudeGraph.RenderPoint.prototype.updatePosition = function () {
+    if (this.point.isOutput) {
+        this._pointPosition = [
+            this._renderBlock.nodeSize[0] - this._renderer.config.point.padding,
+            this._renderer.config.block.header + this._renderer.config.point.height * this._index
+        ];
+    } else {
+        this._pointPosition = [
+            this._renderer.config.point.padding,
+            this._renderer.config.block.header + this._renderer.config.point.height * this._index
+        ];
+    }
+};
+/**
+ * @param {dudeGraph.Renderer} renderer
+ * @param {dudeGraph.Block} block
+ * @param {String} blockId
+ * @extends {dudeGraph.RenderBlock}
+ * @constructor
+ */
+dudeGraph.RenderVariable = function (renderer, block, blockId) {
+    dudeGraph.RenderBlock.call(this, renderer, block, blockId);
+};
+
+/**
+ * RenderVariable factory
+ * @param {dudeGraph.Renderer} renderer
+ * @param {Object} renderBlockData
+ */
+dudeGraph.RenderVariable.buildRenderBlock = function (renderer, renderBlockData) {
+    return dudeGraph.RenderBlock.buildRenderBlock.call(this, renderer, renderBlockData);
+};
+
+/**
+ * @extends {dudeGraph.RenderBlock}
+ */
+dudeGraph.RenderVariable.prototype = _.create(dudeGraph.RenderBlock.prototype, {
+    "constructor": dudeGraph.RenderBlock
+});
+/**
+ * Creates the renderBlocks collision quadtree
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRenderBlocksCollisions = function () {
+    this._renderBlocksQuadtree = d3.geom.quadtree()
+        .x(function (renderBlock) {
+            return renderBlock.nodePosition[0];
+        })
+        .y(function (renderBlock) {
+            return renderBlock.nodePosition[1];
+        })(this._renderBlocks);
+};
+
+/**
+ * Returns all RendererNodes overlapping the given area
+ * @param {Number} x0 - Top left x
+ * @param {Number} y0 - Top left y
+ * @param {Number} x3 - Bottom right x
+ * @param {Number} y3 - Bottom right y
+ * @return {Array<dudeGraph.RenderBlock>}
+ * @private
+ */
+dudeGraph.Renderer.prototype._getNearestRenderBlocks = function (x0, y0, x3, y3) {
+    this._createRenderBlocksCollisions(); // TODO: Update the quadtree only when needed
+    var renderBlocks = [];
+    this._renderBlocksQuadtree.visit(function (d3QuadtreeNode, x1, y1, x2, y2) {
+        var renderBlock = d3QuadtreeNode.point;
+        if (renderBlock) {
+            var bounds = [
+                renderBlock.nodePosition[0],
+                renderBlock.nodePosition[1],
+                renderBlock.nodePosition[0] + renderBlock.nodeSize[0],
+                renderBlock.nodePosition[1] + renderBlock.nodeSize[1]
+            ];
+            if (!(x0 > bounds[2] || y0 > bounds[3] || x3 < bounds[0] || y3 < bounds[1])) {
+                renderBlocks.push(renderBlock);
+            }
+        }
+        return x1 - 50 >= x3 || y1 - 35 >= y3 || x2 + 50 < x0 || y2 + 35 < y0;
+    });
+    return renderBlocks;
+};
+/**
+ * Creates the select brush
+ * @private
+ */
+dudeGraph.Renderer.prototype._createSelectionBehavior = function () {
+    var renderer = this;
+    var selectBrush = null;
+    this._d3Svg.call(d3.behavior.drag()
+        .on("dragstart", function () {
+            if (d3.event.sourceEvent.shiftKey) {
+                d3.event.sourceEvent.stopImmediatePropagation();
+                selectBrush = renderer._d3Svg
+                    .append("svg:rect")
+                    .classed("dude-graph-select", true)
+                    .datum(d3.mouse(this));
+            } else {
+                renderer._clearSelection();
+            }
+        })
+        .on("drag", function () {
+            if (selectBrush) {
+                var position = d3.mouse(this);
+                selectBrush.attr({
+                    "x": function (origin) {
+                        return Math.min(origin[0], position[0]);
+                    },
+                    "y": function (origin) {
+                        return Math.min(origin[1], position[1]);
+                    },
+                    "width": function (origin) {
+                        return Math.max(position[0] - origin[0], origin[0] - position[0]);
+                    },
+                    "height": function (origin) {
+                        return Math.max(position[1] - origin[1], origin[1] - position[1]);
+                    }
+                });
+            }
+        })
+        .on("dragend", function () {
+            if (selectBrush !== null) {
+                var selectTopLeft = [parseInt(selectBrush.attr("x")), parseInt(selectBrush.attr("y"))];
+                var selectBottomRight = [
+                    selectTopLeft[0] + parseInt(selectBrush.attr("width")),
+                    selectTopLeft[1] + parseInt(selectBrush.attr("height"))
+                ];
+                var selectTopLeftWorld = renderer._screenToWorld(selectTopLeft);
+                var selectBottomRightWorld = renderer._screenToWorld(selectBottomRight);
+                var selectedRenderBlocks = renderer._getNearestRenderBlocks(
+                    selectTopLeftWorld[0], selectTopLeftWorld[1],
+                    selectBottomRightWorld[0], selectBottomRightWorld[1]
+                );
+                if (d3.event.sourceEvent.altKey) {
+                    renderer._removeSelection(selectedRenderBlocks);
+                } else {
+                    renderer._addSelection(selectedRenderBlocks);
+                }
+                selectBrush.remove();
+                selectBrush = null;
+            }
+        })
+    );
+};
+/**
+ * Adds the given renderNodes to the current selection
+ * @param {Array<dudeGraph.RenderNode>} renderNodes - The renderNodes to add to the selection
+ * @private
+ */
+dudeGraph.Renderer.prototype._addSelection = function (renderNodes) {
+    var renderer = this;
+    _.forEach(renderNodes, function (renderNode) {
+        if (!_.includes(renderer._selectedRenderNodes, renderNode)) {
+            renderNode.select();
+            renderNode.d3Node.classed("dude-graph-selected", true);
+            renderer._selectedRenderNodes.push(renderNode);
+        }
+    });
+};
+
+/**
+ * Removes the given renderNodes from the current selection
+ * @param {Array<dudeGraph.RenderNode>} renderNodes - The renderNodes to remove from the selection
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeSelection = function (renderNodes) {
+    var renderer = this;
+    _.forEach(renderNodes, function (renderNode) {
+        if (_.includes(renderer._selectedRenderNodes, renderNode)) {
+            renderNode.unselect();
+            renderNode.d3Node.classed("dude-graph-selected", false);
+            _.pull(renderer._selectedRenderNodes, renderNode);
+        }
+    });
+};
+
+/**
+ * Clears the selection
+ * @private
+ */
+dudeGraph.Renderer.prototype._clearSelection = function () {
+    this._removeSelection(this._selectedRenderNodes);
+};
+/**
+ * Creates zoom and pan
+ * @private
+ */
+dudeGraph.Renderer.prototype._createZoomBehavior = function () {
+    var renderer = this;
+    this._zoomBehavior = d3.behavior.zoom()
+        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
+        .on("zoom", function () {
+            if (d3.event.sourceEvent) {
+                _.browserIf(["IE"], function () {
+                    d3.event.sourceEvent.defaultPrevented = true;
+                }, function () {
+                    d3.event.sourceEvent.preventDefault();
+                });
+            }
+            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._zoom.translate = renderer._zoomBehavior.translate();
+            renderer._zoom.scale = renderer._zoomBehavior.scale();
+        }.bind(this));
+    this._d3Svg.call(this._zoomBehavior);
+};
+
+/**
+ * Updates the zoom and pan location
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateZoom = function () {
+    this._d3Svg
+        .transition()
+        .duration(this._config.zoom.transitionSpeed)
+        .call(this._zoomBehavior.translate(this._zoom.translate).scale(this._zoom.scale).event);
+};
+
+/**
+ * Zoom to best fit the given bounding box
+ * @param {[[Number, Number], [Number, Number]]} boundingBox
+ * @private
+ */
+dudeGraph.Renderer.prototype._zoomToBoundingBox = function (boundingBox) {
+    var svgBBox = this._d3Svg.node().getBoundingClientRect();
+    var scaleExtent = this._zoomBehavior.scaleExtent();
+    var dx = boundingBox[0][1] - boundingBox[0][0];
+    var dy = boundingBox[1][1] - boundingBox[0][1];
+    var x = (boundingBox[0][0] + boundingBox[1][0]) / 2;
+    var y = (boundingBox[0][1] + boundingBox[1][1]) / 2;
+    this._zoom.scale = _.clamp(0.9 / Math.max(dx / svgBBox.width, dy / svgBBox.height), scaleExtent[0], scaleExtent[1]);
+    this._zoom.translate = [svgBBox.width / 2 - this._zoom.scale * x, svgBBox.height / 2 - this._zoom.scale * y];
+    this._updateZoom();
+};
+/**
+ * Returns the renderBlock associated with the given id
+ * @param {String} blockId
+ * @returns {dudeGraph.RenderBlock|null}
+ */
+dudeGraph.Renderer.prototype.getRenderBlockById = function (blockId) {
+    return this._renderBlockIds[blockId] || null;
+};
+
+/**
+ * Creates a render block bound to a block
+ * @param {Object} renderBlockData
+ * @returns {dudeGraph.RenderBlock}
+ */
+dudeGraph.Renderer.prototype.createRenderBlock = function (renderBlockData) {
+    var block = this._graph.blockById(renderBlockData.cgBlock);
+    if (block === null) {
+        throw 42; // TODO: remove
+    }
+    var rendererBlockType = this._renderBlockTypes[block.blockType];
+    if (!rendererBlockType) {
+        throw new Error("Render block type `" + block.blockType + "` not registered in the renderer");
+    }
+    var renderBlock = rendererBlockType.buildRenderBlock(this, renderBlockData);
+    if (renderBlock.nodeId === null) {
+        throw new Error("Cannot create a renderBlock without an id");
+    }
+    var renderBlockFound = this.getRenderBlockById(renderBlock.nodeId);
+    if (renderBlockFound !== null) {
+        throw new Error("Duplicate renderBlocks for id `" + renderBlock.nodeId + "`: `" +
+            renderBlockFound.nodeFancyName + "` was here before `" + renderBlock.nodeFancyName + "`");
+    }
+    this._renderBlocks.push(renderBlock);
+    this._renderBlockIds[renderBlock.nodeId] = renderBlock;
+    return renderBlock;
+};
+/**
+ * @param {Object} rendererConnectionData
+ */
+dudeGraph.Renderer.prototype.createRendererConnection = function (rendererConnectionData) {
+    var renderConnection = dudeGraph.RenderConnection.buildRenderConnection(this, rendererConnectionData);
+    this._renderConnections.push(renderConnection);
+    return renderConnection;
+};
+/**
+ * Returns the renderGroup associated with the given id
+ * @param {String} groupId
+ * @returns {dudeGraph.RenderGroup|null}
+ */
+dudeGraph.Renderer.prototype.getRenderGroupById = function (groupId) {
+    return this._renderGroupIds[groupId] || null;
+};
+
+/**
+ * Creates a renderer group bound to a cgGroup
+ * @param {Object} renderGroupData
+ * @returns {dudeGraph.RenderGroup}
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRenderGroup = function (renderGroupData) {
+    var renderGroup = dudeGraph.RenderGroup.buildRenderGroup(this, renderGroupData);
+    if (renderGroup.nodeId === null) {
+        throw new Error("Cannot create a renderGroup without an id");
+    }
+    var renderGroupFound = this.getRenderGroupById(renderGroup.nodeId);
+    if (renderGroupFound !== null) {
+        throw new Error("Duplicate renderGroups for id `" + renderGroup.nodeId + "`: `" +
+            renderGroupFound.nodeFancyName + "` was here before `" + renderGroup.nodeFancyName + "`");
+    }
+    this._renderGroups.push(renderGroup);
+    this._renderGroupIds[renderGroup.nodeId] = renderGroup;
+    return renderGroup;
+};
+/**
+ * Returns the renderPoint associated with the given name in the given renderBlock
+ * @param {dudeGraph.RenderBlock} renderBlock
+ * @param {String} renderPointName
+ * @returns {dudeGraph.RenderPoint|null}
+ */
+dudeGraph.Renderer.prototype.getRenderPointByName = function (renderBlock, renderPointName) {
+    return _.find(renderBlock.renderPoints, function (rendererPoint) {
+            return rendererPoint.point.cgName === renderPointName;
+        }
+    );
+};
+/**
+ * Creates d3Blocks with the existing renderBlocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Blocks = function () {
+    this.d3Blocks
+        .data(this._renderBlocks, function (renderBlock) {
+            return renderBlock.nodeId;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (renderBlock) {
+            return renderBlock.nodeId;
+        })
+        .classed("dude-graph-block", true)
+        .each(function (renderBlock) {
+            renderBlock.create(d3.select(this));
+        });
+    this._updateD3Blocks();
+};
+
+/**
+ * Creates d3Blocks with the existing renderBlocks
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateD3Blocks = function () {
+    this.d3Blocks.each(function (renderBlock) {
+        renderBlock.update();
+    });
+};
+
+/**
+ * Removes d3Blocks when rendererBlocks are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Blocks = function () {
+    this.d3Blocks
+        .data(this._renderBlocks, function (renderBlock) {
+            return renderBlock.nodeId;
+        })
+        .exit()
+        .each(function (renderBlock) {
+            renderBlock.remove();
+        })
+        .remove();
+};
+/**
+ * Creates d3Connections with the existing renderConnections
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Connections = function () {
+    this.d3Connections
+        .data(this._renderConnections, function (renderConnection) {
+            return renderConnection.connectionId;
+        })
+        .enter()
+        .append("svg:path")
+        .attr("id", function (renderConnection) {
+            return renderConnection.connectionId;
+        })
+        .classed("dude-graph-connection", true)
+        .each(function (renderConnection) {
+            renderConnection.create(d3.select(this));
+        });
+    this._updateD3Connections();
+};
+
+/**
+ * Creates d3Connections with the existing renderConnections
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateD3Connections = function () {
+    this.d3Connections.each(function (renderConnection) {
+        renderConnection.update();
+    });
+};
+
+/**
+ * Removes d3Connections when renderConnections are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Connections = function () {
+    this.d3Connections
+        .data(this._renderConnections, function (renderConnection) {
+            return renderConnection.connectionId;
+        })
+        .exit()
+        .each(function (renderConnection) {
+            renderConnection.remove();
+        })
+        .remove();
+};
+/**
+ * Creates d3Groups with the existing renderGroups
+ * @private
+ */
+dudeGraph.Renderer.prototype._createD3Groups = function () {
+    this.d3Groups
+        .data(this._renderGroups, function (renderGroup) {
+            return renderGroup.nodeId;
+        })
+        .enter()
+        .append("svg:g")
+        .attr("id", function (renderGroup) {
+            return renderGroup.nodeId;
+        })
+        .classed("dude-graph-group", true)
+        .each(function (renderGroup) {
+        renderGroup.create(d3.select(this));
+    });
+    this._updateD3Groups();
+};
+
+/**
+ * Creates d3Groups with the existing renderGroups
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateD3Groups = function () {
+    this.d3Groups.each(function (renderGroup) {
+        renderGroup.update();
+    });
+};
+
+/**
+ * Removes d3Groups when renderGroups are removed
+ * @private
+ */
+dudeGraph.Renderer.prototype._removeD3Groups = function () {
+    this.d3Groups
+        .data(this._renderGroups, function (renderGroup) {
+            return renderGroup.nodeId;
+        })
+        .exit()
+        .each(function (renderGroup) {
+            renderGroup.remove();
+        })
+        .remove();
+};
+/**
+ * Loads the renderer from data
+ * @param {Object} data
+ * @param {Array<Object>} data.blocks
+ * @param {Array<Object>} data.groups
+ * @param {Array<Object>} data.connections
+ */
+dudeGraph.Renderer.prototype.load = function (data) {
+    var renderer = this;
+    _.forEach(data.blocks, function (renderBlockData) {
+        renderer.createRenderBlock(renderBlockData);
+    });
+    _.forEach(data.groups, function (renderGroupData) {
+        renderer._createRenderGroup(renderGroupData);
+    });
+    _.forEach(data.connections, function (renderConnectionData) {
+        renderer.createRendererConnection(renderConnectionData);
+    });
+    _.forEach(data.blocks, function (renderBlockData) {
+        var renderBlock = renderer.getRenderBlockById(renderBlockData.id);
+        if (renderBlockData.parent) {
+            var renderGroupParent = renderer.getRenderGroupById(renderBlockData.parent);
+            if (renderGroupParent === null) {
+                throw new Error("Cannot find renderBlock `" + renderBlock.nodeFancyName + "` parent id `" + renderBlockData.parent + "`");
+            }
+            renderBlock.nodeParent = renderGroupParent;
+        }
+    });
+    _.forEach(data.groups, function (renderGroupData) {
+        var renderGroup = renderer.getRenderGroupById(renderGroupData.id);
+        if (renderGroupData.parent) {
+            var renderGroupParent = renderer.getRenderGroupById(renderGroupData.parent);
+            if (renderGroupParent === null) {
+                throw new Error("Cannot find renderGroup `" + renderGroup.nodeFancyName + "` parent id `" + renderGroupData.parent + "`");
+            }
+            renderGroup.nodeParent = renderGroupParent;
+        }
+    });
+    this._createD3Blocks();
+    this._createD3Groups();
+    this._createD3Connections();
+};
+
+/**
+ * Returns the text bounding box, prediction can be done accurately while using a monospace font
+ * Always use a monospace font for fast prediction of the text size, unless you'd like to deal with FOUT and getBBox...
+ * @param {String|d3.selection} text
+ * @private
+ */
+dudeGraph.Renderer.prototype._textBoundingBox = function (text) {
+    if (text instanceof d3.selection) {
+        // Use this for perfect text bounding box
+        // var boundingBox = text.node().getBBox();
+        // return [boundingBox.width, boundingBox.height];
+        text = text.text();
+    }
+    return [text.length * 8, 17];
+};
+
+/**
+ * Returns the bounding box for all the given renderNodes
+ * @param {Array<dudeGraph.RenderNode>} renderNodes
+ * @returns {[[Number, Number], [Number, Number]]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._rendererNodesBoundingBox = function (renderNodes) {
+    var topLeft = null;
+    var bottomRight = null;
+    _.forEach(renderNodes, function (renderNode) {
+        if (topLeft === null) {
+            topLeft = [renderNode.nodePosition[0], renderNode.nodePosition[1]];
+        }
+        if (bottomRight === null) {
+            bottomRight = [topLeft[0] + renderNode.nodeSize[0], topLeft[1] + renderNode.nodeSize[1]];
+        }
+        topLeft[0] = Math.min(topLeft[0], renderNode.nodePosition[0]);
+        topLeft[1] = Math.min(topLeft[1], renderNode.nodePosition[1]);
+        bottomRight[0] = Math.max(bottomRight[0], renderNode.nodePosition[0] + renderNode.nodeSize[0]);
+        bottomRight[1] = Math.max(bottomRight[1], renderNode.nodePosition[1] + renderNode.nodeSize[1]);
+    });
+    return [topLeft, bottomRight];
+};
+
+/**
+ * Returns world coordinates from screen coordinates
+ * Example: renderer._getAbsolutePosition(d3.mouse(this));
+ * @param {[Number, Number]} point
+ * @return {[Number, Number]}
+ * @private
+ */
+dudeGraph.Renderer.prototype._screenToWorld = function (point) {
+    this._svgPoint.x = point[0];
+    this._svgPoint.y = point[1];
+    var position = this._svgPoint.matrixTransform(this._d3Root.node().getCTM().inverse());
+    return [position.x, position.y];
+};
