@@ -2336,6 +2336,8 @@ dudeGraph.Renderer.prototype.initialize = function (cgGraph, svgElement, config)
     this._renderGroupsQuadtree = null;
     this._renderPointsQuadtree = null;
     this._config = _.defaultsDeep(config || {}, dudeGraph.Renderer.defaultConfig);
+    this._zoom = dudeGraph.Renderer.defaultZoom;
+    this._createZoomBehavior();
 };
 
 /**
@@ -2991,6 +2993,28 @@ dudeGraph.Renderer.prototype._createRenderGroup = function (renderGroupData) {
     this._renderGroups.push(renderGroup);
     this._renderGroupIds[renderGroup.nodeId] = renderGroup;
     return renderGroup;
+};
+/**
+ * Creates zoom and pan
+ * @private
+ */
+dudeGraph.Renderer.prototype._createZoomBehavior = function () {
+    var renderer = this;
+    this._zoomBehavior = d3.behavior.zoom()
+        .scaleExtent([this._config.zoom.min, this._config.zoom.max])
+        .on("zoom", function () {
+            if (d3.event.sourceEvent) {
+                d3.event.sourceEvent.preventDefault();
+            }
+            renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            renderer._zoom.translate = renderer._zoomBehavior.translate();
+            renderer._zoom.scale = renderer._zoomBehavior.scale();
+        }.bind(this));
+    this._d3Svg.call(this._zoomBehavior);
+    this._d3Svg
+        .transition()
+        .duration(this._config.zoom.transitionSpeed)
+        .call(this._zoomBehavior.translate(this._zoom.translate).scale(this._zoom.scale).event);
 };
 /**
  * Creates d3Blocks with the existing renderBlocks
