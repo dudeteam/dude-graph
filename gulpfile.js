@@ -8,7 +8,7 @@ var shell = require("gulp-shell");
 
 var SOURCES = [
     "lib/index.js",
-    "lib/utils/*.js",
+    "lib/utilities/*.js",
     "lib/graph/graph.js",
     "lib/graph/block.js",
     "lib/graph/point.js",
