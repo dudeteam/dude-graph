@@ -653,6 +653,102 @@ var dudeGraph = (function() {
     }
     return namespace;
 })();
+(function () {
+
+    /**
+     * Returns the browser.
+     * http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+     * @return {"Opera"|"Firefox"|"Safari"|"Chrome"|"IE"|"Edge"|"Unknown"}
+     */
+    var browser = function () {
+        var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        if (isOpera) {
+            return "Opera";
+        }
+        else if (typeof InstallTrigger !== 'undefined') {
+            return "Firefox";
+        }
+        else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+            return "Safari";
+        }
+        else if (navigator.userAgent.indexOf('Edge') !== -1) {
+            return "Edge";
+        }
+        else if (!!window.chrome && !isOpera) {
+            return "Chrome";
+        }
+        else {
+            //noinspection PointlessBooleanExpressionJS
+            if (false || !!document.documentMode) {
+                return "IE";
+            }
+            else {
+                return "Unknown";
+            }
+        }
+    };
+
+    _.mixin({
+        /**
+         * Returns the browser.
+         * @return {"Opera"|"Firefox"|"Safari"|"Chrome"|"IE"|"Edge"|"Unknown"}
+         */
+        browser: browser,
+
+        /**
+         * Runs the function if the current browser is in the browsers
+         * @param {Array<String>} browsers
+         * @param {Function?} funcOk
+         * @param {Function?} funcKo
+         */
+        browserIf: function (browsers, funcOk, funcKo) {
+            if(_.contains(browsers, browser())) {
+                (funcOk && funcOk || function() {})();
+            } else {
+                (funcKo && funcKo || function() {})();
+            }
+        }
+    });
+})();
+(function () {
+    _.mixin({
+        /**
+         * Clamps a value between a minimum number and a maximum number.
+         * @param value {Number}
+         * @param min {Number}
+         * @param max {Number}
+         * @return {Number}
+         */
+        clamp: function (value, min, max) {
+            return Math.min(Math.max(value, min), max);
+        }
+    });
+})();
+(function () {
+    /**
+     * Generate a random bit of a UUID
+     * @returns {String}
+     */
+    var s4 = function () {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    };
+
+    /**
+     * The UUID's salt
+     * @type {String}
+     */
+    var salt = s4();
+
+    _.mixin({
+        /**
+         * Generate a random salted UUID
+         * @returns {String}
+         */
+        uuid: function () {
+            return salt + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
+        }
+    });
+})();
 //
 // Copyright (c) 2015 DudeTeam. All rights reserved.
 //
@@ -2597,7 +2693,7 @@ dudeGraph.RenderBlock = function (renderer, rendererBlockId, block) {
 dudeGraph.RenderBlock.buildRenderBlock = function (renderer, renderBlockData) {
     var block = renderer.graph.blockById(renderBlockData.cgBlock);
     if (!block) {
-        throw new Error("Unknown block `" + renderBlockData.cgBlock +"` for renderBlock `" + renderBlockData.id + "`");
+        throw new Error("Unknown block `" + renderBlockData.cgBlock + "` for renderBlock `" + renderBlockData.id + "`");
     }
     var renderBlock = new dudeGraph.RenderBlock(renderer, renderBlockData.id, block);
     renderBlock.nodeName = renderBlockData.description || block.cgName || "";
@@ -2627,11 +2723,19 @@ dudeGraph.RenderBlock.prototype = _.create(dudeGraph.RenderNode.prototype, {
  * @override
  */
 dudeGraph.RenderBlock.prototype.create = function (d3Block) {
+    var renderBlock = this;
     dudeGraph.RenderNode.prototype.create.call(this, d3Block);
     this._d3Rect = d3Block.append("svg:rect");
     this._d3Title = d3Block.append("svg:text")
-        .attr("text-anchor", "middle")
-        .attr("dominant-baseline", "text-before-edge");
+        .attr("dominant-baseline", "text-before-edge")
+        .attr("text-anchor", "middle");
+    _.browserIf(["IE", "Edge"], function () {
+        renderBlock._d3Title
+            .attr("dy", "0.4em");
+    }, function () {
+        renderBlock._d3Title
+            .attr("dominant-baseline", "text-before-edge");
+    });
     this._d3Points = d3Block
         .append("svg:g")
         .classed("dude-graph-points", true);
@@ -2869,13 +2973,20 @@ dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
  * @param d3PointGroup
  */
 dudeGraph.RenderPoint.prototype.create = function (d3PointGroup) {
+    var renderPoint = this;
     this._d3PointGroup = d3PointGroup;
     this._d3Circle = d3PointGroup
         .append("svg:circle");
     this._d3Text = d3PointGroup
         .append("svg:text")
-        .attr("alignment-baseline", "middle")
         .attr("text-anchor", this._point.isOutput ? "end" : "start");
+    _.browserIf(["IE", "Edge", "Firefox"], function () {
+        renderPoint._d3Text
+            .attr("dy", "0.25em");
+    }, function () {
+        renderPoint._d3Text
+            .attr("alignment-baseline", "middle");
+    });
 };
 
 /**
@@ -3004,13 +3115,24 @@ dudeGraph.Renderer.prototype._createZoomBehavior = function () {
         .scaleExtent([this._config.zoom.min, this._config.zoom.max])
         .on("zoom", function () {
             if (d3.event.sourceEvent) {
-                d3.event.sourceEvent.preventDefault();
+                _.browserIf(["IE"], function () {
+                    d3.event.sourceEvent.defaultPrevented = true;
+                }, function () {
+                    d3.event.sourceEvent.preventDefault();
+                });
             }
             renderer._d3Root.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
             renderer._zoom.translate = renderer._zoomBehavior.translate();
             renderer._zoom.scale = renderer._zoomBehavior.scale();
         }.bind(this));
     this._d3Svg.call(this._zoomBehavior);
+};
+
+/**
+ * Updates the zoom and pan location
+ * @private
+ */
+dudeGraph.Renderer.prototype._updateZoom = function () {
     this._d3Svg
         .transition()
         .duration(this._config.zoom.transitionSpeed)
