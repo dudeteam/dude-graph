@@ -3,7 +3,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <script src="../d3/d3.js"></script>
-<script src="../lodash/lodash.js"></script>
+<script src="../lodash/lodash.min.js"></script>
+<script src="../eventEmitter/EventEmitter.min.js"></script>
 <script src="dude-graph.js"></script>
 <!--
 `dude-graph-editor` is a Polymer element which creates a dudeGraph svg renderer which can be manipulated using several methods and properties.
@@ -53,31 +54,31 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Groups
          */
         ::content .dude-graph-group > rect {
-        @apply(--dude-graph-group);
+            @apply(--dude-graph-group);
         }
 
         ::content .dude-graph-group:hover > rect {
-        @apply(--dude-graph-group-hover)
+            @apply(--dude-graph-group-hover)
         }
 
         ::content .dude-graph-group.dude-graph-selected > rect,
         ::content .dude-graph-group.dude-graph-active > rect {
-        @apply(--dude-graph-group-selected);
+            @apply(--dude-graph-group-selected);
         }
 
         /**
          * Blocks
          */
         ::content .dude-graph-block > rect {
-        @apply(--dude-graph-block);
+            @apply(--dude-graph-block);
         }
 
         ::content .dude-graph-block:hover > rect {
-        @apply(--dude-graph-block-hover);
+            @apply(--dude-graph-block-hover);
         }
 
         ::content .dude-graph-block.dude-graph-selected > rect {
-        @apply(--dude-graph-block-selected);
+            @apply(--dude-graph-block-selected);
         }
 
         /**
@@ -205,6 +206,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * The renderer block types
+             */
+            "renderBlockTypes": {
+                "type": Array,
+                "value": [
+                    {"rendererBlock": "Assignation", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Condition", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Delegate", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Each", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Function", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Getter", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Instruction", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Operator", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Range", "type": dudeGraph.RenderBlock},
+                    {"rendererBlock": "Variable", "type": dudeGraph.RenderVariable}
+                ]
+            },
+
+            /**
              * The point types
              */
             "pointTypes": {
@@ -220,7 +240,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         load: function () {
             this.graph = new dudeGraph.Graph();
-            this.renderer = new dudeGraph.Renderer(this.$.svg);
+            this.renderer = new dudeGraph.Renderer();
             this.loader = new dudeGraph.Loader();
             this.saver = new dudeGraph.Saver();
             _.forEach(this.blockTypes, function (blockType) {
@@ -230,7 +250,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.loader.registerPointType(pointType.point, pointType.type);
             }.bind(this));
             this.loader.load(this.graph, this.graphData);
-            this.renderer.load(this.graph, this.rendererData, this.rendererConfig);
+            this.renderer.initialize(this.graph, this.$.svg, this.rendererConfig);
+            _.forEach(this.renderBlockTypes, function (renderBlockType) {
+                this.renderer.registerRenderBlock(renderBlockType.rendererBlock, renderBlockType.type);
+            }.bind(this));
+            this.renderer.load(this.rendererData);
             this.renderer.on("error", function (error) {
                 this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
             }.bind(this));

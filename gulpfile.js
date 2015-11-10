@@ -18,6 +18,8 @@ var SOURCES = [
     "lib/graph/**/*.js",
     "lib/renderer/renderer.js",
     "lib/renderer/*.js",
+    "lib/renderer/nodes/node.js",
+    "lib/renderer/nodes/*.js",
     "lib/renderer/**/*.js"
 ];
 
