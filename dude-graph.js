@@ -2723,19 +2723,11 @@ dudeGraph.RenderBlock.prototype = _.create(dudeGraph.RenderNode.prototype, {
  * @override
  */
 dudeGraph.RenderBlock.prototype.create = function (d3Block) {
-    var renderBlock = this;
     dudeGraph.RenderNode.prototype.create.call(this, d3Block);
     this._d3Rect = d3Block.append("svg:rect");
     this._d3Title = d3Block.append("svg:text")
-        .attr("dominant-baseline", "text-before-edge")
-        .attr("text-anchor", "middle");
-    _.browserIf(["IE", "Edge"], function () {
-        renderBlock._d3Title
-            .attr("dy", "0.4em");
-    }, function () {
-        renderBlock._d3Title
-            .attr("dominant-baseline", "text-before-edge");
-    });
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "text-before-edge");
     this._d3Points = d3Block
         .append("svg:g")
         .classed("dude-graph-points", true);
@@ -2758,6 +2750,7 @@ dudeGraph.RenderBlock.prototype.create = function (d3Block) {
  * @override
  */
 dudeGraph.RenderBlock.prototype.update = function () {
+    var renderBlock = this;
     dudeGraph.RenderNode.prototype.update.call(this);
     this._d3Rect
         .attr({
@@ -2768,7 +2761,15 @@ dudeGraph.RenderBlock.prototype.update = function () {
         });
     this._d3Title
         .text(this._nodeName)
-        .attr("transform", "translate(" + [this._nodeSize[0] / 2, this._renderer.config.block.padding] + ")");
+        .attr({
+            "x": this._nodeSize[0] / 2,
+            "y": this._renderer.config.block.padding
+        });
+    _.browserIf(["IE", "Edge"], function () {
+        renderBlock._d3Title.attr("y",
+            renderBlock._renderer.config.block.padding +
+            renderBlock._renderer.textBoundingBox(renderBlock._d3Title)[1] / 2);
+    });
     this.d3Points
         .each(function (renderPoint) {
             renderPoint.update();
@@ -2950,7 +2951,7 @@ dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
             var textBoundingBox = this._renderer.textBoundingBox(this._point.cgName);
             return [
                 textBoundingBox[0] + this._renderer.config.point.padding * 2,
-                Math.max(textBoundingBox[1], this._renderer.config.point.height)
+                this._renderer.config.point.height
             ];
         }.bind(this)
     });
@@ -2973,26 +2974,20 @@ dudeGraph.RenderPoint = function (renderer, renderBlock, point, index) {
  * @param d3PointGroup
  */
 dudeGraph.RenderPoint.prototype.create = function (d3PointGroup) {
-    var renderPoint = this;
     this._d3PointGroup = d3PointGroup;
     this._d3Circle = d3PointGroup
         .append("svg:circle");
-    this._d3Text = d3PointGroup
+    this._d3Title = d3PointGroup
         .append("svg:text")
-        .attr("text-anchor", this._point.isOutput ? "end" : "start");
-    _.browserIf(["IE", "Edge", "Firefox"], function () {
-        renderPoint._d3Text
-            .attr("dy", "0.25em");
-    }, function () {
-        renderPoint._d3Text
-            .attr("alignment-baseline", "middle");
-    });
+        .attr("text-anchor", this._point.isOutput ? "end" : "start")
+        .attr("dominant-baseline", "middle");
 };
 
 /**
  * Updates the svg representation of this renderPoint
  */
 dudeGraph.RenderPoint.prototype.update = function () {
+    var renderPoint = this;
     var position = this.pointPosition;
     this._d3Circle
         .attr({
@@ -3000,12 +2995,16 @@ dudeGraph.RenderPoint.prototype.update = function () {
             "cy": position[1],
             "r": this._renderer.config.point.radius
         });
-    this._d3Text
+    this._d3Title
         .text(this._point.cgName)
         .attr({
             "x": position[0] + (this.point.isOutput ? -1 : 1) * this._renderer.config.point.padding,
             "y": position[1]
         });
+    _.browserIf(["IE", "Edge"], function () {
+        renderPoint._d3Title.attr("y",
+            position[1] + renderPoint._renderer.textBoundingBox(renderPoint._d3Title)[1] / 4);
+    });
 };
 
 /**
@@ -3272,11 +3271,14 @@ dudeGraph.Renderer.prototype.load = function (data) {
 /**
  * Returns the text bounding box, prediction can be done accurately while using a monospace font
  * Always use a monospace font for fast prediction of the text size, unless you'd like to deal with FOUT and getBBox...
- * @param {String|SVGTextElement} text
+ * @param {String|d3.selection} text
  */
 dudeGraph.Renderer.prototype.textBoundingBox = function (text) {
-    if (text instanceof SVGTextElement) {
-        text = text.textContent;
+    if (text instanceof d3.selection) {
+        // Use this for perfect text bounding box
+        var boundingBox = text.node().getBBox();
+        return [boundingBox.width, boundingBox.height];
+        // text = text.text();
     }
     return [text.length * 8, 17];
 };
