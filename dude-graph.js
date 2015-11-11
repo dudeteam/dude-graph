@@ -3155,11 +3155,11 @@ dudeGraph.RenderGroup.prototype.update = function () {
         .text(this._nodeName)
         .attr({
             "x": this._nodePosition[0] + this._nodeSize[0] / 2,
-            "y": this._nodePosition[1]
+            "y": this._nodePosition[1] + renderGroup._renderer.config.group.padding
         });
     _.browserIf(["IE", "Edge"], function () {
         renderGroup._d3Title.attr("y",
-            renderGroup._renderer.config.block.padding +
+            renderGroup._renderer.config.group.padding +
             renderGroup._renderer.measureText(renderGroup._d3Title)[1] / 2);
     });
 };
@@ -3412,6 +3412,91 @@ dudeGraph.RenderVariable.prototype = _.create(dudeGraph.RenderBlock.prototype, {
     "constructor": dudeGraph.RenderBlock
 });
 /**
+ * Returns the renderBlock associated with the given id
+ * @param {String} blockId
+ * @returns {dudeGraph.RenderBlock|null}
+ */
+dudeGraph.Renderer.prototype.getRenderBlockById = function (blockId) {
+    return this._renderBlockIds[blockId] || null;
+};
+
+/**
+ * Creates a render block bound to a block
+ * @param {Object} renderBlockData
+ * @returns {dudeGraph.RenderBlock}
+ */
+dudeGraph.Renderer.prototype.createRenderBlock = function (renderBlockData) {
+    var block = this._graph.blockById(renderBlockData.cgBlock);
+    if (block === null) {
+        throw 42; // TODO: remove
+    }
+    var rendererBlockType = this._renderBlockTypes[block.blockType];
+    if (!rendererBlockType) {
+        throw new Error("Render block type `" + block.blockType + "` not registered in the renderer");
+    }
+    var renderBlock = rendererBlockType.buildRenderBlock(this, renderBlockData);
+    if (renderBlock.nodeId === null) {
+        throw new Error("Cannot create a renderBlock without an id");
+    }
+    var renderBlockFound = this.getRenderBlockById(renderBlock.nodeId);
+    if (renderBlockFound !== null) {
+        throw new Error("Duplicate renderBlocks for id `" + renderBlock.nodeId + "`: `" +
+            renderBlockFound.nodeFancyName + "` was here before `" + renderBlock.nodeFancyName + "`");
+    }
+    this._renderBlocks.push(renderBlock);
+    this._renderBlockIds[renderBlock.nodeId] = renderBlock;
+    return renderBlock;
+};
+/**
+ * @param {Object} rendererConnectionData
+ */
+dudeGraph.Renderer.prototype.createRendererConnection = function (rendererConnectionData) {
+    var renderConnection = dudeGraph.RenderConnection.buildRenderConnection(this, rendererConnectionData);
+    this._renderConnections.push(renderConnection);
+    return renderConnection;
+};
+/**
+ * Returns the renderGroup associated with the given id
+ * @param {String} groupId
+ * @returns {dudeGraph.RenderGroup|null}
+ */
+dudeGraph.Renderer.prototype.getRenderGroupById = function (groupId) {
+    return this._renderGroupIds[groupId] || null;
+};
+
+/**
+ * Creates a renderer group bound to a cgGroup
+ * @param {Object} renderGroupData
+ * @returns {dudeGraph.RenderGroup}
+ * @private
+ */
+dudeGraph.Renderer.prototype._createRenderGroup = function (renderGroupData) {
+    var renderGroup = dudeGraph.RenderGroup.buildRenderGroup(this, renderGroupData);
+    if (renderGroup.nodeId === null) {
+        throw new Error("Cannot create a renderGroup without an id");
+    }
+    var renderGroupFound = this.getRenderGroupById(renderGroup.nodeId);
+    if (renderGroupFound !== null) {
+        throw new Error("Duplicate renderGroups for id `" + renderGroup.nodeId + "`: `" +
+            renderGroupFound.nodeFancyName + "` was here before `" + renderGroup.nodeFancyName + "`");
+    }
+    this._renderGroups.push(renderGroup);
+    this._renderGroupIds[renderGroup.nodeId] = renderGroup;
+    return renderGroup;
+};
+/**
+ * Returns the renderPoint associated with the given name in the given renderBlock
+ * @param {dudeGraph.RenderBlock} renderBlock
+ * @param {String} renderPointName
+ * @returns {dudeGraph.RenderPoint|null}
+ */
+dudeGraph.Renderer.prototype.getRenderPointByName = function (renderBlock, renderPointName) {
+    return _.find(renderBlock.renderPoints, function (rendererPoint) {
+            return rendererPoint.point.cgName === renderPointName;
+        }
+    );
+};
+/**
  * Creates the renderBlocks collision quadtree
  * @private
  */
@@ -3603,91 +3688,6 @@ dudeGraph.Renderer.prototype._zoomToBoundingBox = function (boundingBox) {
         .transition()
         .duration(this._config.zoom.transitionSpeed)
         .call(this._zoomBehavior.translate(translate).scale(scale).event);
-};
-/**
- * Returns the renderBlock associated with the given id
- * @param {String} blockId
- * @returns {dudeGraph.RenderBlock|null}
- */
-dudeGraph.Renderer.prototype.getRenderBlockById = function (blockId) {
-    return this._renderBlockIds[blockId] || null;
-};
-
-/**
- * Creates a render block bound to a block
- * @param {Object} renderBlockData
- * @returns {dudeGraph.RenderBlock}
- */
-dudeGraph.Renderer.prototype.createRenderBlock = function (renderBlockData) {
-    var block = this._graph.blockById(renderBlockData.cgBlock);
-    if (block === null) {
-        throw 42; // TODO: remove
-    }
-    var rendererBlockType = this._renderBlockTypes[block.blockType];
-    if (!rendererBlockType) {
-        throw new Error("Render block type `" + block.blockType + "` not registered in the renderer");
-    }
-    var renderBlock = rendererBlockType.buildRenderBlock(this, renderBlockData);
-    if (renderBlock.nodeId === null) {
-        throw new Error("Cannot create a renderBlock without an id");
-    }
-    var renderBlockFound = this.getRenderBlockById(renderBlock.nodeId);
-    if (renderBlockFound !== null) {
-        throw new Error("Duplicate renderBlocks for id `" + renderBlock.nodeId + "`: `" +
-            renderBlockFound.nodeFancyName + "` was here before `" + renderBlock.nodeFancyName + "`");
-    }
-    this._renderBlocks.push(renderBlock);
-    this._renderBlockIds[renderBlock.nodeId] = renderBlock;
-    return renderBlock;
-};
-/**
- * @param {Object} rendererConnectionData
- */
-dudeGraph.Renderer.prototype.createRendererConnection = function (rendererConnectionData) {
-    var renderConnection = dudeGraph.RenderConnection.buildRenderConnection(this, rendererConnectionData);
-    this._renderConnections.push(renderConnection);
-    return renderConnection;
-};
-/**
- * Returns the renderGroup associated with the given id
- * @param {String} groupId
- * @returns {dudeGraph.RenderGroup|null}
- */
-dudeGraph.Renderer.prototype.getRenderGroupById = function (groupId) {
-    return this._renderGroupIds[groupId] || null;
-};
-
-/**
- * Creates a renderer group bound to a cgGroup
- * @param {Object} renderGroupData
- * @returns {dudeGraph.RenderGroup}
- * @private
- */
-dudeGraph.Renderer.prototype._createRenderGroup = function (renderGroupData) {
-    var renderGroup = dudeGraph.RenderGroup.buildRenderGroup(this, renderGroupData);
-    if (renderGroup.nodeId === null) {
-        throw new Error("Cannot create a renderGroup without an id");
-    }
-    var renderGroupFound = this.getRenderGroupById(renderGroup.nodeId);
-    if (renderGroupFound !== null) {
-        throw new Error("Duplicate renderGroups for id `" + renderGroup.nodeId + "`: `" +
-            renderGroupFound.nodeFancyName + "` was here before `" + renderGroup.nodeFancyName + "`");
-    }
-    this._renderGroups.push(renderGroup);
-    this._renderGroupIds[renderGroup.nodeId] = renderGroup;
-    return renderGroup;
-};
-/**
- * Returns the renderPoint associated with the given name in the given renderBlock
- * @param {dudeGraph.RenderBlock} renderBlock
- * @param {String} renderPointName
- * @returns {dudeGraph.RenderPoint|null}
- */
-dudeGraph.Renderer.prototype.getRenderPointByName = function (renderBlock, renderPointName) {
-    return _.find(renderBlock.renderPoints, function (rendererPoint) {
-            return rendererPoint.point.cgName === renderPointName;
-        }
-    );
 };
 /**
  * Creates d3Blocks with the existing renderBlocks
