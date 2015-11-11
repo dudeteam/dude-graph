@@ -31,6 +31,7 @@
     "d3": "~3.5.7",
     "lodash": "~3.10.1",
     "pandora": "~0.0.11",
+    "eventEmitter": "~4.3.0",
     "font-awesome": "~4.4.0",
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-input": "PolymerElements/iron-input#~1.0.4",
