@@ -23,13 +23,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         /**
-         * Non clickable
-         */
-        ::content .dude-graph-non-clickable {
-            pointer-events: none;
-        }
-
-        /**
          * Typography
          */
         ::content text {
@@ -45,9 +38,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Selection brush
          */
-        ::content .dude-graph-selection {
+        ::content .dude-graph-select {
             fill: hsla(0, 0%, 80%, 0.1);
             stroke: hsla(0, 0%, 80%, 0.2);
+        }
+
+        /**
+         * Blocks
+         */
+        ::content .dude-graph-block > rect {
+            @apply(--dude-graph-block);
+        }
+
+        ::content .dude-graph-block:hover > rect {
+            @apply(--dude-graph-block-hover);
+        }
+
+        ::content .dude-graph-block.dude-graph-selected > rect {
+            @apply(--dude-graph-block-selected);
         }
 
         /**
@@ -67,55 +75,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         /**
-         * Blocks
-         */
-        ::content .dude-graph-block > rect {
-            @apply(--dude-graph-block);
-        }
-
-        ::content .dude-graph-block:hover > rect {
-            @apply(--dude-graph-block-hover);
-        }
-
-        ::content .dude-graph-block.dude-graph-selected > rect {
-            @apply(--dude-graph-block-selected);
-        }
-
-        /**
-         * Blocks and groups
-         */
-        ::content .dude-graph-block,
-        ::content .dude-graph-group {
-            cursor: move;
-        }
-
-        /**
-         * Points
-         */
-        ::content .dude-graph-input,
-        ::content .dude-graph-output {
-            cursor: pointer;
-        }
-
-        ::content .dude-graph-input path,
-        ::content .dude-graph-output path {
-            stroke-width: 1;
-            stroke: var(--dude-type-color);
-            fill: var(--dude-type-color);
-        }
-
-        ::content .dude-graph-input.dude-graph-empty path,
-        ::content .dude-graph-output.dude-graph-empty path {
-            fill: transparent !important;
-        }
-
-        /**
          * Connections
          */
         ::content .dude-graph-connection {
             stroke-width: 2px;
             stroke: var(--dude-type-color);
             fill: transparent;
+        }
+
+        /**
+         * Cursors block, groups and points
+         */
+        ::content .dude-graph-block,
+        ::content .dude-graph-group {
+            cursor: move;
+        }
+
+        ::content .dude-graph-point,
+        ::content .dude-graph-point {
+            cursor: pointer;
         }
     </style>
     <template>
