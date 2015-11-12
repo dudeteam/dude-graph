@@ -450,7 +450,12 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         },
         {
             "id": "2",
-            "description": "Shows the current number of FPS"
+            "description": "Shows the current number of FPS",
+            "parent": 3
+        },
+        {
+            "id": "3",
+            "description": "This group must be updated as well ..."
         }
     ],
     "connections": [
