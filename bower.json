@@ -35,7 +35,6 @@
     "font-awesome": "~4.4.0",
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-input": "PolymerElements/iron-input#~1.0.4",
-    "paper-item": "PolymerElements/paper-item#~1.0.7",
     "paper-input": "PolymerElements/paper-input#~1.0.10",
     "paper-button": "PolymerElements/paper-button#~1.0.3",
     "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
