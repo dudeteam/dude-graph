@@ -318,7 +318,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _zoomToSelection: function (e) {
-                this.dudeGraphEditor.zoomToSelection();
+                this.dudeGraphEditor.zoomToFitSelection();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }

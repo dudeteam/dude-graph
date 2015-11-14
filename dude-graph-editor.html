@@ -253,9 +253,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * @param {Object} cgBlockData
          */
         createBlock: function (cgBlockData) {
-            this.loader.loadBlock(this.graph, _.merge(cgBlockData, {
+            /*
+            var cgBlock = this.loader.loadBlock(this.graph, _.merge(cgBlockData, {
                 "cgId": _.uuid()
             }));
+            var renderBlock = this.renderer.createRenderBlock({
+                "id": cgBlock.cgId,
+                "cgBlock": cgBlock.cgId
+            }, true);
+            this.renderer.panToFitRenderNode(renderBlock);
+            */
         },
 
         /***
@@ -263,7 +270,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * @param {String} name - the rendererGroup name
          */
         createGroup: function (name) {
-            this.renderer.createRendererGroupFromSelection(name);
+            this.renderer.createRenderGroupForSelection(name);
         },
 
         /**
@@ -292,8 +299,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Zoom to best fit all blocks and groups
          */
-        zoomToSelection: function () {
-            this.renderer.zoomToSelection();
+        zoomToFitSelection: function () {
+            this.renderer.zoomToFitSelection();
         }
     });
 </script>
