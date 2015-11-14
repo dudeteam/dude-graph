@@ -86,14 +86,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                             on-dude-hierarchy-item-submit="_createBlockFromModel">
                     </dude-hierarchy>
                 </dude-collapse>
-                <template is="dom-if" if="[[ _rendererBlock ]]" restamp>
+                <template is="dom-if" if="[[ _renderBlock ]]" restamp>
                     <dude-collapse heading="Edit Block">
                         <dude-property property-type="string"
                                        property-name="block name"
-                                       property-value="{{ _rendererBlock.cgBlock.cgName }}"
+                                       property-value="{{ _renderBlock.cgBlock.cgName }}"
                                        no-menu>
                         </dude-property>
-                        <template is="dom-repeat" items="[[ _getInputs(_rendererBlock) ]]" as="cgPoint">
+                        <template is="dom-repeat" items="[[ _getInputs(_renderBlock) ]]" as="cgPoint">
                             <dude-property property-type="{{ _getType(cgPoint) }}"
                                            property-name="{{ cgPoint.cgName }}"
                                            property-value="{{ cgPoint.cgValue }}"
@@ -103,11 +103,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         </template>
                     </dude-collapse>
                 </template>
-                <template is="dom-if" if="[[ _rendererGroup ]]" restamp>
+                <template is="dom-if" if="[[ _renderGroup ]]" restamp>
                     <dude-collapse heading="Edit Group">
                         <dude-property property-type="string"
                                        property-name="group name"
-                                       property-value="{{ _rendererGroup.description }}"
+                                       property-value="{{ _renderGroup.description }}"
                                        no-menu>
                         </dude-property>
                     </dude-collapse>
@@ -155,16 +155,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _loaded: false,
 
             /**
-             * The current selected rendererBlock
+             * The current selected renderBlock
              * @type {dudeGraph.RenderBlock}
              */
-            _rendererBlock: null,
+            _renderBlock: null,
 
             /**
-             * The current selected rendererBlock
+             * The current selected renderGroup
              * @type {dudeGraph.RenderGroup}
              */
-            _rendererGroup: null,
+            _renderGroup: null,
 
             /**
              * Whether the createGroup should be displayed
@@ -182,18 +182,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Call this when the inspected dudeGraphEditor is loaded
              */
             load: function () {
-                this.dudeGraphEditor.renderer.on("cg-select", function (rendererNode) {
-                    if (rendererNode.type === "block") {
-                        this.set("_rendererBlock", rendererNode);
-                        this.set("_rendererGroup", null);
-                    } else if (rendererNode.type === "group") {
-                        this.set("_rendererGroup", rendererNode);
-                        this.set("_rendererBlock", null);
+                this.dudeGraphEditor.renderer.on("select", function (renderNode) {
+                    if (renderNode instanceof dudeGraph.RenderBlock) {
+                        this.set("_renderBlock", renderNode);
+                        this.set("_renderGroup", null);
+                    } else if (renderNode instanceof dudeGraph.RenderGroup) {
+                        this.set("_renderGroup", renderNode);
+                        this.set("_renderBlock", null);
                     }
                 }.bind(this));
-                this.dudeGraphEditor.renderer.on("cg-unselect", function () {
-                    this.set("_rendererBlock", null);
-                    this.set("_rendererGroup", null);
+                this.dudeGraphEditor.renderer.on("unselect", function (renderNode) {
+                    if (this.get("_renderBlock") === renderNode) {
+                        this.set("_renderBlock", null);
+                    } else if (this.get("_renderGroup") === renderNode) {
+                        this.set("_renderGroup", null);
+                    }
+                }.bind(this));
+                this.dudeGraphEditor.renderer.on("unselect-all", function () {
+                    this.set("_renderBlock", null);
+                    this.set("_renderGroup", null);
                 }.bind(this));
                 this.set("_loaded", true);
                 this.keyEventTarget = document.body;
@@ -247,7 +254,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Called when clicking on the remove selection button
-             * Removes the selected rendererNodes
+             * Removes the selected renderNodes
              * @param {CustomEvent} e
              * @delegate
              * @private
@@ -329,7 +336,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Called when clicking on the create group button
-             * Creates a rendererGroup
+             * Creates a renderGroup
              * @delegate
              * @private
              */
@@ -353,15 +360,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Returns the list of cgInputs that accept property
-             * @param {dudeGraph.RendererBlock} rendererBlock
-             * @returns {Array<dudeGraph.cgPoint>}
+             * @param {dudeGraph.RenderBlock} renderBlock
+             * @returns {Array<dudeGraph.Point>}
              * @private
              */
-            _getInputs: function (rendererBlock) {
-                if (rendererBlock === null) {
+            _getInputs: function (renderBlock) {
+                if (renderBlock === null) {
                     return null;
                 }
-                return _.filter(rendererBlock.cgBlock.cgInputs, function (cgPoint) {
+                return _.filter(renderBlock.block.cgInputs, function (cgPoint) {
                     return cgPoint.acceptValue() && cgPoint.cgValueType !== "Stream";
                 });
             },
