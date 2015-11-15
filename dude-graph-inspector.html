@@ -8,6 +8,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-property/dude-property.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../dude-popup/dude-popup.html">
 <link rel="import" href="dude-graph-tool.html">
 <link rel="stylesheet" href="../font-awesome/css/font-awesome.css">
 <!--
@@ -34,6 +35,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
         dude-collapse {
             padding-top: 5px;
+        }
+        #completionHierarchy {
+            padding: 10px;
+            background: rgba(30, 30, 30, .8);
         }
     </style>
     <template>
@@ -114,6 +119,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 </template>
             </div>
         </template>
+        <dude-popup id="completionPopup">
+            <dude-hierarchy id="completionHierarchy"
+                            items="{{ _completionItems }}"
+                            on-dude-hierarchy-item-submit="_createBlockFromModelAndPoint">
+            </dude-hierarchy>
+        </dude-popup>
     </template>
     <script>
         var DudeGraphInspector = Polymer({
@@ -182,6 +193,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Call this when the inspected editor is loaded
              */
             load: function () {
+                this.editor.renderer.on("drop-connection", function (renderConnection, position) {
+                    this._lastConnectionPoint = renderConnection.outputRenderPoint.point;
+                    var blocks = _.filter(this.editor.graph.cgBlocks, function (block) {
+                        return _.find(block.cgInputs, function (input) {
+                            return input.cgValueType === renderConnection.outputRenderPoint.point.cgValueType;
+                        });
+                    });
+                    this.set("_completionItems", _.map(blocks, function (block) {
+                        return {item: {name: block.cgName}};
+                    }));
+                    this.$["completionPopup"].open(position[0], position[1]);
+                    this.$["completionHierarchy"].focus();
+                }.bind(this));
                 this.editor.renderer.on("select", function (renderNode) {
                     if (renderNode instanceof dudeGraph.RenderBlock) {
                         this.set("_renderBlock", renderNode);
@@ -224,6 +248,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
                 }
                 this.addOwnKeyBinding("del", "_removeSelection");
+                this.addOwnKeyBinding("esc", "_closePopup");
+            },
+
+            /**
+             * Closes the completion popup if open.
+             */
+            _closePopup: function () {
+                this.$["completionPopup"].close();
             },
 
             /**
@@ -356,6 +388,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (e.detail.item.data) {
                     this.editor.createBlock(e.detail.item.data);
                 }
+            },
+
+            /**
+             * Called when an item is submitted in dude-hierarchy
+             * Creates a block in dudeGraph
+             * @param {CustomEvent} e
+             * @private
+             */
+            _createBlockFromModelAndPoint: function (e) {
+                if (e.detail.item.data) {
+                    this.editor.createBlock(e.detail.item.data);
+                }
+//                console.log(this._lastConnectionPoint);
+//                var connection = renderPointFound.point.connect(renderPoint._point);
+//                renderPoint._renderer.createRenderConnection({
+//                    "cgConnectionIndex": renderPoint._renderer.graph.cgConnections.indexOf(connection),
+//                    "outputRendererBlockId": renderPoint._point.isOutput ? renderPoint._renderBlock.nodeId : renderPointFound.renderBlock.nodeId,
+//                    "inputRendererBlockId": renderPoint._point.isOutput ? renderPointFound.renderBlock.nodeId : renderPoint._renderBlock.nodeId
+//                });
             },
 
             /**

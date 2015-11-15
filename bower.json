@@ -40,7 +40,8 @@
     "dude-style": "~0.0.6",
     "dude-property": "~0.0.9",
     "dude-collapse": "~0.0.3",
-    "dude-hierarchy": "~0.1.1"
+    "dude-hierarchy": "~0.1.1",
+    "dude-popup": "*"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
