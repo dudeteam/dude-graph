@@ -127,7 +127,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Holds a reference on the loader.
              */
             "loader": {
-                "type": dudeGraph.Loader,
+                "type": dudeGraph.GraphLoader,
                 "value": null
             },
 
@@ -135,7 +135,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Holds a reference on the saver.
              */
             "saver": {
-                "type": dudeGraph.Saver,
+                "type": dudeGraph.GraphSaver,
                 "value": null
             },
 
@@ -218,8 +218,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         load: function () {
             this.graph = new dudeGraph.Graph();
             this.renderer = new dudeGraph.Renderer();
-            this.loader = new dudeGraph.Loader();
-            this.saver = new dudeGraph.Saver();
+            this.loader = new dudeGraph.GraphLoader();
+            this.saver = new dudeGraph.GraphSaver();
             _.forEach(this.blockTypes, function (blockType) {
                 this.loader.registerBlockType(blockType.block, blockType.type);
             }.bind(this));
