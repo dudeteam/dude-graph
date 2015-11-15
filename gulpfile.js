@@ -5,6 +5,7 @@ var jshint = require("gulp-jshint");
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
 var shell = require("gulp-shell");
+var jsdoc = require("gulp-jsdoc");
 
 var SOURCES = [
     "lib/index.js",
@@ -22,6 +23,12 @@ var SOURCES = [
     "lib/renderer/nodes/*.js",
     "lib/renderer/**/*.js"
 ];
+
+gulp.task("jsdoc", function () {
+    return gulp.src(SOURCES)
+        .pipe(jsdoc.parser())
+        .pipe(jsdoc.generator("documentation"));
+});
 
 gulp.task("jshint", function () {
     return gulp.src(SOURCES)
