@@ -124,7 +124,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 /**
                  * The DudeGraph element to inspect
                  */
-                "dudeGraphEditor": {
+                "editor": {
                     "type": DudeGraphEditor,
                     "value": null
                 },
@@ -149,7 +149,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             behaviors: [Polymer.IronA11yKeysBehavior],
 
             /**
-             * Whether the inspector is ready to inspect the dudeGraphEditor
+             * Whether the inspector is ready to inspect the editor
              * @type {Boolean}
              */
             _loaded: false,
@@ -179,10 +179,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _groupName: null,
 
             /**
-             * Call this when the inspected dudeGraphEditor is loaded
+             * Call this when the inspected editor is loaded
              */
             load: function () {
-                this.dudeGraphEditor.renderer.on("select", function (renderNode) {
+                this.editor.renderer.on("select", function (renderNode) {
                     if (renderNode instanceof dudeGraph.RenderBlock) {
                         this.set("_renderBlock", renderNode);
                         this.set("_renderGroup", null);
@@ -191,14 +191,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         this.set("_renderBlock", null);
                     }
                 }.bind(this));
-                this.dudeGraphEditor.renderer.on("unselect", function (renderNode) {
+                this.editor.renderer.on("unselect", function (renderNode) {
                     if (this.get("_renderBlock") === renderNode) {
                         this.set("_renderBlock", null);
                     } else if (this.get("_renderGroup") === renderNode) {
                         this.set("_renderGroup", null);
                     }
                 }.bind(this));
-                this.dudeGraphEditor.renderer.on("unselect-all", function () {
+                this.editor.renderer.on("unselect-all", function () {
                     this.set("_renderBlock", null);
                     this.set("_renderGroup", null);
                 }.bind(this));
@@ -233,7 +233,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _saveGraph: function (e) {
-                this.fire("dude-graph-inspector-save", this.dudeGraphEditor.save());
+                this.fire("dude-graph-inspector-save", this.editor.save());
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
@@ -260,7 +260,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _removeSelection: function (e) {
-                this.dudeGraphEditor.removeSelection();
+                this.editor.removeSelection();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
@@ -281,7 +281,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     alt = e.detail.keyboardEvent.altKey;
                     e.detail.keyboardEvent.preventDefault();
                 }
-                this.dudeGraphEditor.selectAll(shift, alt);
+                this.editor.selectAll(shift, alt);
             },
 
             /**
@@ -305,7 +305,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _zoomToFit: function (e) {
-                this.dudeGraphEditor.zoomToFit();
+                this.editor.zoomToFit();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
@@ -318,7 +318,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _zoomToSelection: function (e) {
-                this.dudeGraphEditor.zoomToFitSelection();
+                this.editor.zoomToFitSelection();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
@@ -341,7 +341,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _createGroup: function () {
-                this.dudeGraphEditor.createGroup(this._groupName);
+                this.editor.createGroup(this._groupName);
                 this.set("_groupName", null);
                 this.set("_createGroupState", false);
             },
@@ -354,7 +354,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createBlockFromModel: function (e) {
                 if (e.detail.item.data) {
-                    this.dudeGraphEditor.createBlock(e.detail.item.data);
+                    this.editor.createBlock(e.detail.item.data);
                 }
             },
 

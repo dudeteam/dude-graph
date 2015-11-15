@@ -1,46 +1,13 @@
-DudeGraph
-=========
-
-DudeGraph is a graphic tool to allow users to create content from a simple node-based interface.
-You can use dude-graph to create your own graphical language! And offer the ability to create new content without programming.
-
-![Graph](dude-graph.png)
-
-# Overview
-
-DudeGraph is a set of two Polymer elements: `dude-graph-editor` and `dude-graph-inspector`
-
-`dude-graph-editor` represents the SVG node-based interface, handles groups and blocks drag and drop and connection linking between block points.
-`dude-graph-inspector` manipulates the editor and allows to create/remove groups and blocks, zoom to fit and edit selected block properties.
-
-## Installation
-
-``` bash
-bower install --save dude-graph
-```
-
-## Example
-
-index.html
-``` html
-<!DOCTYPE html>
-<html>
-<head>
-    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link rel="import" href="dude-graph-example.html">
-</head>
-<body>
-<dude-graph-example></dude-graph-example>
-</body>
-</html>
-```
-dude-graph-example.html
-``` html
-<link rel="import" href="bower_components/polymer/polymer.html">
-<link rel="import" href="bower_components/dude-style/dude-style.html">
-<link rel="import" href="bower_components/dude-graph/dude-graph-editor.html">
-<link rel="import" href="bower_components/dude-graph/dude-graph-inspector.html">
-<dom-module id="dude-graph-example">
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../dude-graph-editor.html">
+<link rel="import" href="../../dude-graph-inspector.html">
+<!--
+`demo-basic` is a Polymer element to wrap a dude-graph demo
+-->
+<dom-module id="demo-basic">
     <template>
         <div class="layout horizontal fit">
             <dude-graph-editor id="editor"
@@ -56,7 +23,7 @@ dude-graph-example.html
     </template>
     <script>
         Polymer({
-            is: "dude-graph-example",
+            is: "demo-basic",
             properties: {
                 "graphData": {
                     "type": Object,
@@ -145,23 +112,3 @@ dude-graph-example.html
         });
     </script>
 </dom-module>
-```
-
-## I don't want to use Polymer
-
-That's perfectly fine, you can achieve the same result as with Polymer, feel free to explore the elements `dude-graph-editor` and `dude-graph-inspector` to see what's under the hood.
-
-## Contribute
-
-If you want to contribute, run the following command to test dude-graph:
-``` gulp ```
-
-Then open your favorite browser:
-``` http:://localhost:8080/components/dude-graph/ ``` for the Polymer documentation
-``` http:://localhost:8080/components/dude-graph/demo/ ``` for the demo.
-
-Note: ``` gulp ``` will minify and concat all the sources in lib/ into the root script file ``` dude-graph.js ``` and will start ``` polyserve ``` on the default port (8080)
-
-## Is it any good?
-
-[Yes](http://news.ycombinator.com/item?id=3067434)

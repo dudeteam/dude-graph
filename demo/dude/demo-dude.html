@@ -1,15 +1,15 @@
 <!--
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../iron-localstorage/iron-localstorage.html">
-<link rel="import" href="../dude-graph-editor.html">
-<link rel="import" href="../dude-graph-inspector.html">
-<script src="demo-shoot-behavior.js"></script>
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../dude-graph-editor.html">
+<link rel="import" href="../../dude-graph-inspector.html">
+<script src="demo-dude.js"></script>
 <!--
-`demo-wrapper` is a Polymer element to wrap dude-graph demos
+`demo-dude` is a Polymer element to wrap a dude-graph demo
 -->
-<dom-module id="demo-wrapper">
+<dom-module id="demo-dude">
     <style>
         #wrapper {
             border: 2px solid #222222;
@@ -30,63 +30,66 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 on-iron-localstorage-load-empty="_graphRendererDataEmpty">
         </iron-localstorage>
         <div id="wrapper" class="layout horizontal fit">
-            <dude-graph-editor id="dudeGraphEditor"
+            <dude-graph-editor id="editor"
                                class="panel layout horizontal flex-2"
                                graph-data="[[ graphData ]]"
                                renderer-data="[[ rendererData ]]"
                                renderer-config="[[ rendererConfig ]]"
-                               on-dude-graph-editor-error="_handleDudeGraphEditorError">
+                               on-dude-graph-editor-error="_editorError">
             </dude-graph-editor>
-            <dude-graph-inspector id="dudeGraphInspector"
+            <dude-graph-inspector id="inspector"
                                   class="panel layout horizontal flex"
                                   model-data="[[ modelData ]]"
-                                  on-dude-graph-inspector-save="_dudeGraphInspectorSave">
+                                  on-dude-graph-inspector-save="_inspectorSave">
             </dude-graph-inspector>
         </div>
     </template>
     <script>
         Polymer({
-            is: "demo-wrapper",
+            is: "demo-dude",
             properties: {
                 /**
                  * The graph data
                  */
                 "graphData": {
                     "type": Object,
-                    "value": DEMO_SHOOT_BEHAVIOR_GRAPH_DATA
+                    "value": DEMO_DUDE_GRAPH_DATA
                 },
 
+                /**
+                 * The renderer config
+                 */
                 "rendererConfig": {
                     "type": Object,
                     "value": {}
                 },
 
                 /**
-                 * The renderer
+                 * The renderer data
                  */
                 "rendererData": {
                     "type": Object,
-                    "value": DEMO_SHOOT_BEHAVIOR_RENDERER_DATA
+                    "value": DEMO_DUDE_RENDERER_DATA
                 },
 
                 /**
-                 * The blocks
+                 * The model data
                  */
                 "modelData": {
                     "type": Array,
-                    "value": DEMO_SHOOT_BEHAVIOR_MODEL_DATA
+                    "value": DEMO_DUDE_MODEL_DATA
                 }
             },
 
             /**
-             * Called when the demo-wrapper element is attached
+             * Called when the demo-dude element is attached
              * LocalStorage data needs to be loaded before this gets called
              * @delegate
              */
             attached: function () {
-                this.$.dudeGraphInspector.dudeGraphEditor = this.$.dudeGraphEditor;
-                this.$.dudeGraphEditor.load();
-                this.$.dudeGraphInspector.load();
+                this.$.inspector.editor = this.$.editor;
+                this.$.editor.load();
+                this.$.inspector.load();
             },
 
             /**
@@ -95,26 +98,26 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _graphRendererDataEmpty: function () {
-                this.set("graphData", DEMO_SHOOT_BEHAVIOR_GRAPH_DATA);
-                this.set("rendererData", DEMO_SHOOT_BEHAVIOR_RENDERER_DATA);
+                this.set("graphData", DEMO_DUDE_GRAPH_DATA);
+                this.set("rendererData", DEMO_DUDE_RENDERER_DATA);
             },
 
             /**
-             * Called when a error occurs in dudeGraphEditor
+             * Called when a error occurs in the editor
              * @param {CustomEvent} e
              * @private
              */
-            _handleDudeGraphEditorError: function (e) {
+            _editorError: function (e) {
                 console.error(e.detail.error);
             },
 
             /**
-             * Called when the cgRenderer and the cgGraph is saved
+             * Called when the renderer and the graph are saved
              * Updates the localStorage
              * @param {CustomEvent} e
              * @private
              */
-            _dudeGraphInspectorSave: function (e) {
+            _inspectorSave: function (e) {
                 this.set("graphData", e.detail.graphData);
                 this.set("rendererData", e.detail.rendererData);
             }

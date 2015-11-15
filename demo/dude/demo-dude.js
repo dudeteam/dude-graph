@@ -1,4 +1,4 @@
-var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
+var DEMO_DUDE_GRAPH_DATA = {
     "blocks": [
         {
             "cgType": "Delegate",
@@ -286,7 +286,7 @@ var DEMO_SHOOT_BEHAVIOR_GRAPH_DATA = {
         {"cgOutputName": "value", "cgOutputBlockId": "6", "cgInputName": "this", "cgInputBlockId": "3"}
     ]
 };
-var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
+var DEMO_DUDE_RENDERER_DATA = {
     "config": {
         "zoom": {
             "translate": [0, 0],
@@ -468,7 +468,7 @@ var DEMO_SHOOT_BEHAVIOR_RENDERER_DATA = {
         {"cgConnectionIndex": 6, "outputRendererBlockId": "6", "inputRendererBlockId": "3"}
     ]
 };
-var DEMO_SHOOT_BEHAVIOR_MODEL_DATA = [
+var DEMO_DUDE_MODEL_DATA = [
     {
         "item": {
             "name": "Entity.add_entity",
