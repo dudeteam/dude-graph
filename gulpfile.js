@@ -42,7 +42,7 @@ gulp.task("jshint", function () {
 });
 
 gulp.task("build", ["jshint"], function () {
-    return gulp.src(["./bower_components/pandora/lib/pandora.js"].concat(SOURCES))
+    return gulp.src(SOURCES)
         .pipe(concat("dude-graph.js"))
         .pipe(uglify())
         .pipe(gulp.dest("."));
