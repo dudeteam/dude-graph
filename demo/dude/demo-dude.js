@@ -450,8 +450,7 @@ var DEMO_DUDE_RENDERER_DATA = {
         },
         {
             "id": "2",
-            "description": "Shows the current number of FPS",
-            "parent": 3
+            "description": "Shows the current number of FPS"
         },
         {
             "id": "3",
