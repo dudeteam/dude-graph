@@ -6,6 +6,7 @@ var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
 var shell = require("gulp-shell");
 var jsdoc = require("gulp-jsdoc");
+var sourcemaps = require('gulp-sourcemaps');
 
 var SOURCES = [
     "lib/index.js",
@@ -44,7 +45,9 @@ gulp.task("jshint", function () {
 gulp.task("build", ["jshint"], function () {
     return gulp.src(SOURCES)
         .pipe(concat("dude-graph.js"))
+        .pipe(sourcemaps.init())
         .pipe(uglify())
+        .pipe(sourcemaps.write("."))
         .pipe(gulp.dest("."));
 });
 

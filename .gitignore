@@ -4,3 +4,6 @@
 # Node and bower
 bower_components
 node_modules
+
+# Javascript source map
+dude-graph.js.map
