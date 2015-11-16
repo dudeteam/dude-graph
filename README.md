@@ -157,8 +157,8 @@ If you want to contribute, run the following command to test dude-graph:
 ``` gulp ```
 
 Then open your favorite browser:
-``` http:://localhost:8080/components/dude-graph/ ``` for the Polymer documentation
-``` http:://localhost:8080/components/dude-graph/demo/ ``` for the demo.
+``` http://localhost:8080/components/dude-graph/ ``` for the Polymer documentation
+``` http://localhost:8080/components/dude-graph/demo/ ``` for the demo.
 
 Note: ``` gulp ``` will minify and concat all the sources in lib/ into the root script file ``` dude-graph.js ``` and will start ``` polyserve ``` on the default port (8080)
 
