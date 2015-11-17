@@ -451,10 +451,6 @@ var DEMO_DUDE_RENDERER_DATA = {
         {
             "id": "2",
             "description": "Shows the current number of FPS"
-        },
-        {
-            "id": "3",
-            "description": "This group must be updated as well ..."
         }
     ],
     "connections": [
