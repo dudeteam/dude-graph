@@ -96,13 +96,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-collapse heading="Edit Block">
                         <dude-property property-type="string"
                                        property-name="block name"
-                                       property-value="{{ _renderBlock.cgBlock.cgName }}"
+                                       property-value="{{ _renderBlock.block.cgName }}"
                                        no-menu>
                         </dude-property>
-                        <template is="dom-repeat" items="[[ _getInputs(_renderBlock) ]]" as="cgPoint">
-                            <dude-property property-type="{{ _getType(cgPoint) }}"
-                                           property-name="{{ cgPoint.cgName }}"
-                                           property-value="{{ cgPoint.cgValue }}"
+                        <template is="dom-repeat" items="[[ _getInputs(_renderBlock) ]]" as="renderPoint">
+                            <dude-property property-type="{{ _getType(renderPoint) }}"
+                                           property-name="{{ renderPoint.point.cgName }}"
+                                           property-value="{{ renderPoint.point.cgValue }}"
                                            property-resources="{{ resources }}"
                                            no-reference>
                             </dude-property>
@@ -113,7 +113,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-collapse heading="Edit Group">
                         <dude-property property-type="string"
                                        property-name="group name"
-                                       property-value="{{ _renderGroup.description }}"
+                                       property-value="{{ _renderGroup.nodeName }}"
                                        no-menu>
                         </dude-property>
                     </dude-collapse>
@@ -411,28 +411,28 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Returns the list of cgInputs that accept property
+             * Returns the list of renderPoints og the given renderBlock that accept property
              * @param {dudeGraph.RenderBlock} renderBlock
-             * @returns {Array<dudeGraph.Point>}
+             * @returns {Array<dudeGraph.RenderPoint>}
              * @private
              */
             _getInputs: function (renderBlock) {
                 if (renderBlock === null) {
                     return null;
                 }
-                return _.filter(renderBlock.block.cgInputs, function (cgPoint) {
-                    return cgPoint.acceptValue() && cgPoint.cgValueType !== "Stream";
+                return _.filter(renderBlock.renderPoints, function (renderPoint) {
+                    return !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
                 });
             },
 
             /**
-             * Returns lowercase type of cgPoint
-             * @param {dudeGraph.Point} cgPoint
+             * Returns lowercase type of renderPoint
+             * @param {dudeGraph.RenderPoint} renderPoint
              * @returns {String}
              * @private
              */
-            _getType: function (cgPoint) {
-                return cgPoint.cgValueType.toLowerCase();
+            _getType: function (renderPoint) {
+                return renderPoint.point.cgValueType.toLowerCase();
             }
         })
     </script>
