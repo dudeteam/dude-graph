@@ -130,6 +130,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <script>
         var DudeGraphInspector = Polymer({
 
+
             is: "dude-graph-inspector",
 
             properties: {
@@ -140,7 +141,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": DudeGraphEditor,
                     "value": null
                 },
-
                 /**
                  * The list of blocks that can be added to the dudeGraph
                  */
@@ -155,11 +155,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "resources": {
                     "type": Array,
                     "value": []
-                }
+                },
+
             },
 
             behaviors: [Polymer.IronA11yKeysBehavior],
-
             /**
              * Whether the inspector is ready to inspect the editor
              * @type {Boolean}
@@ -227,7 +227,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.set("_renderBlock", null);
                     this.set("_renderGroup", null);
                 }.bind(this));
-                this.set("_loaded", true);
+                var resetRenderBlockPoints = function () {
+                    var renderBlock = this.get("_renderBlock");
+                    var renderGroup = this.get("_renderGroup");
+                    this.set("_renderBlock", null);
+                    this.set("_renderGroup", null);
+                    this.set("_renderBlock", renderBlock);
+                    this.set("_renderGroup", renderGroup);
+                }.bind(this);
+                this.editor.graph.on("dude-graph-connection-create", resetRenderBlockPoints);
+                this.editor.graph.on("dude-graph-connection-remove", resetRenderBlockPoints);
                 this.keyEventTarget = document.body;
                 if (navigator.platform.toUpperCase().indexOf("MAC") !== -1) {
                     this.addOwnKeyBinding("meta+s", "_saveGraph");
@@ -250,6 +259,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
                 this.addOwnKeyBinding("del", "_removeSelection");
                 this.addOwnKeyBinding("esc", "_closePopup");
+                this.set("_loaded", true);
             },
 
             /**
@@ -421,7 +431,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     return null;
                 }
                 return _.filter(renderBlock.renderPoints, function (renderPoint) {
-                    return !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
+                    return renderPoint.point.empty() && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
                 });
             },
 
