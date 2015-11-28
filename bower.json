@@ -47,6 +47,6 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-localstorage": "PolymerElements/iron-localstorage#~1.0.4",
     "paper-toast": "PolymerElements/paper-toast#~1.0.0",
-    "web-component-tester": "*"
+    "web-component-tester": "~3.4.0"
   }
 }

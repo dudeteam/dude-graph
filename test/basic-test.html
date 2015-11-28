@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>dude-graph - Basic test</title>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../d3/d3.min.js"></script>
+    <script src="../../eventEmitter/EventEmitter.min.js"></script>
+    <script src="../../dude-graph/dude-graph.js"></script>
+</head>
+<body>
+<script>
+    var graph = new dudeGraph.Graph();
+    var block = new dudeGraph.Block(graph, {}, "Block");
+    graph.addBlock(block);
+</script>
+</body>
+</html>
