@@ -138,7 +138,7 @@ dude-graph-example.html
             },
 
             ready: function () {
-                this.$.inspector.dudeGraphEditor = this.$.editor; // Attach the editor to inspect
+                this.$.inspector.editor = this.$.editor; // Attach the editor to the inspector
                 this.$.editor.load();
                 this.$.inspector.load();
             }
