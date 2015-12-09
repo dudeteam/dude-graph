@@ -255,7 +255,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.addOwnKeyBinding("ctrl+alt+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+shift+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
-                    this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
+                    if (navigator.platform.toUpperCase().indexOf("WIN") !== -1) {
+                        this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
+                    } else {
+                        this.addOwnKeyBinding("ctrl+shift+0", "_zoomToSelection");
+                    }
                 }
                 this.addOwnKeyBinding("del", "_removeSelection");
                 this.addOwnKeyBinding("esc", "_closePopup");
@@ -324,7 +328,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     alt = e.detail.keyboardEvent.altKey;
                     e.detail.keyboardEvent.preventDefault();
                 }
-                this.editor.selectAll(shift, alt);
+                this.editor.selectAll(alt, shift);
             },
 
             /**
