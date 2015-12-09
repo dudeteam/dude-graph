@@ -435,7 +435,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Returns the list of renderPoints og the given renderBlock that accept property
+             * Returns the list of renderPoints og the given renderBlock that accept properties
              * @param {dudeGraph.RenderBlock} renderBlock
              * @returns {Array<dudeGraph.RenderPoint>}
              * @private
@@ -445,7 +445,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     return null;
                 }
                 return _.filter(renderBlock.renderPoints, function (renderPoint) {
-                    return _.isEmpty(renderPoint.point.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
+                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
                 });
             },
 
