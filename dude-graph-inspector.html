@@ -99,13 +99,23 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                        property-value="{{ _renderBlock.nodeName }}"
                                        no-menu>
                         </dude-property>
-                        <template is="dom-repeat" items="[[ _getInputs(_renderBlock) ]]" as="renderPoint">
-                            <dude-property property-type="{{ _getType(renderPoint) }}"
-                                           property-name="{{ renderPoint.point.cgName }}"
-                                           property-value="{{ renderPoint.point.cgValue }}"
-                                           property-resources="{{ resources }}"
-                                           no-reference>
-                            </dude-property>
+                        <template is="dom-repeat" items="[[ _getPointInputs(_renderBlock) ]]" as="renderPoint">
+                            <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
+                                <dude-property property-type="choice"
+                                               property-name="{{ renderPoint.point.cgName }}"
+                                               property-value="{{ renderPoint.point.value }}"
+                                               property-choice="{{ renderPoint.point.choices }}"
+                                               no-reference>
+                                </dude-property>
+                            </template>
+                            <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
+                                <dude-property property-type="{{ _getPointType(renderPoint) }}"
+                                               property-name="{{ renderPoint.point.cgName }}"
+                                               property-value="{{ renderPoint.point.cgValue }}"
+                                               property-resources="{{ resources }}"
+                                               no-reference>
+                                </dude-property>
+                            </template>
                         </template>
                     </dude-collapse>
                 </template>
@@ -430,7 +440,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @returns {Array<dudeGraph.RenderPoint>}
              * @private
              */
-            _getInputs: function (renderBlock) {
+            _getPointInputs: function (renderBlock) {
                 if (renderBlock === null) {
                     return null;
                 }
@@ -445,8 +455,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @returns {String}
              * @private
              */
-            _getType: function (renderPoint) {
+            _getPointType: function (renderPoint) {
                 return renderPoint.point.cgValueType.toLowerCase();
+            },
+
+            /**
+             * Returns whether the renderPoint is of the given type
+             * @param {dudeGraph.RenderPoint} renderPoint
+             * @param {String} cgValueType
+             * @returns {Boolean}
+             * @private
+             */
+            _isPointType: function (renderPoint, cgValueType) {
+                return renderPoint.point.cgValueType === cgValueType;
             }
         })
     </script>

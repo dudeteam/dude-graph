@@ -4,7 +4,17 @@ var DEMO_DUDE_GRAPH_DATA = {
             "cgType": "Delegate",
             "cgId": "0",
             "cgName": "on_key_down",
-            "cgInputs": [],
+            "cgInputs": [
+                {
+                    "cgType": "Choice",
+                    "cgName": "key",
+                    "cgValueType": "Choice",
+                    "cgValue": {
+                        "choice": "X",
+                        "choices": ["A", "B", "X", "Y", "Joystick 1", "Joystick 2"]
+                    }
+                }
+            ],
             "cgOutputs": [
                 {
                     "cgType": "Stream",
