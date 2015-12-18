@@ -45,35 +45,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <template is="dom-if" if="[[ _loaded ]]">
             <div class="layout vertical flex">
-                <dude-collapse heading="Tools">
-                    <div class="layout horizontal">
-                        <dude-graph-tool class="flex"
-                                         icon="fa fa-save"
-                                         description="Save"
-                                         on-click="_saveGraph">
-                        </dude-graph-tool>
-                        <dude-graph-tool class="flex"
-                                         icon="fa fa-play"
-                                         description="Play"
-                                         on-click="_playGraph">
-                        </dude-graph-tool>
-                        <dude-graph-tool class="flex"
-                                         icon="fa fa-remove"
-                                         description="Remove selection"
-                                         on-click="_removeSelection">
-                        </dude-graph-tool>
-                        <dude-graph-tool class="flex"
-                                         icon="fa fa-square-o"
-                                         description="Create group for selection"
-                                         on-click="_showCreateGroup">
-                        </dude-graph-tool>
-                        <dude-graph-tool class="flex"
-                                         icon="fa fa-compress"
-                                         description="Zoom to fit"
-                                         on-click="_zoomToFit">
-                        </dude-graph-tool>
-                    </div>
-                </dude-collapse>
                 <template is="dom-if" if="[[ _createGroupState ]]">
                     <dude-collapse heading="Create group">
                         <dude-property property-type="string"
@@ -248,22 +219,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.editor.graph.on("dude-graph-connection-remove", resetRenderBlockPoints);
                 this.keyEventTarget = document.body;
                 if (navigator.platform.toUpperCase().indexOf("MAC") !== -1) {
-                    this.addOwnKeyBinding("meta+s", "_saveGraph");
-                    this.addOwnKeyBinding("meta+b", "_playGraph");
-                    this.addOwnKeyBinding("meta+g", "_showCreateGroup");
+//                    this.addOwnKeyBinding("meta+s", "_saveGraph");
+//                    this.addOwnKeyBinding("meta+b", "_playGraph");
+//                    this.addOwnKeyBinding("meta+g", "_showCreateGroup");
                     this.addOwnKeyBinding("meta+a", "_selectAll");
                     this.addOwnKeyBinding("meta+alt+a", "_selectAll");
                     this.addOwnKeyBinding("meta+shift+a", "_selectAll");
-                    this.addOwnKeyBinding("meta+0", "_zoomToFit");
+//                    this.addOwnKeyBinding("meta+0", "_zoomToFit");
                     this.addOwnKeyBinding("meta+shift+0", "_zoomToSelection");
                 } else {
-                    this.addOwnKeyBinding("ctrl+s", "_saveGraph");
-                    this.addOwnKeyBinding("ctrl+b", "_playGraph");
-                    this.addOwnKeyBinding("ctrl+g", "_showCreateGroup");
+//                    this.addOwnKeyBinding("ctrl+s", "_saveGraph");
+//                    this.addOwnKeyBinding("ctrl+b", "_playGraph");
+//                    this.addOwnKeyBinding("ctrl+g", "_showCreateGroup");
                     this.addOwnKeyBinding("ctrl+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+alt+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+shift+a", "_selectAll");
-                    this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
+//                    this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
                     if (navigator.platform.toUpperCase().indexOf("WIN") !== -1) {
                         this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
                     } else {
@@ -280,46 +251,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _closePopup: function () {
                 this.$["completionPopup"].close();
-            },
-
-            /**
-             * Called when clicking on the save button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _saveGraph: function (e) {
-                this.fire("dude-graph-inspector-save", this.editor.save());
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the play button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _playGraph: function (e) {
-                this.fire("dude-graph-inspector-play");
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the remove selection button
-             * Removes the selected renderNodes
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _removeSelection: function (e) {
-                this.editor.removeSelection();
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
             },
 
             /**
@@ -349,19 +280,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _showCreateGroup: function (e) {
                 this.set("_createGroupState", true);
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the zoom to fit button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _zoomToFit: function (e) {
-                this.editor.zoomToFit();
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }

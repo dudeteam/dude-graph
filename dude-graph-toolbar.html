@@ -1,0 +1,139 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="dude-graph-tool.html">
+<dom-module id="dude-graph-toolbar">
+    <style>
+        :host {
+            background: var(--dude-primary-background-color);
+        }
+    </style>
+    <template>
+        <div class="layout horizontal">
+            <dude-graph-tool class="flex"
+                             icon="fa fa-save"
+                             description="Save"
+                             on-click="_saveGraph">
+            </dude-graph-tool>
+            <dude-graph-tool class="flex"
+                             icon="fa fa-play"
+                             description="Play"
+                             on-click="_playGraph">
+            </dude-graph-tool>
+            <dude-graph-tool class="flex"
+                             icon="fa fa-trash"
+                             description="Remove selection"
+                             on-click="_removeSelection">
+            </dude-graph-tool>
+            <dude-graph-tool class="flex"
+                             icon="fa fa-square-o"
+                             description="Create group for selection"
+                             on-click="_showCreateGroup">
+            </dude-graph-tool>
+            <dude-graph-tool class="flex"
+                             icon="fa fa-compress"
+                             description="Zoom to fit"
+                             on-click="_zoomToFit">
+            </dude-graph-tool>
+        </div>
+    </template>
+    <script>
+        var DudeGraphToolbar = Polymer({
+
+            is: "dude-graph-toolbar",
+
+            properties: {
+
+                /**
+                 * The list of tools accessible from the toolbar.
+                 */
+                "tools": {
+                    "type": "Array",
+                    "value": [
+                        {}
+                    ]
+                },
+
+                /**
+                 * The DudeGraph element to inspect
+                 */
+                "editor": {
+                    "type": DudeGraphEditor,
+                    "value": null
+                },
+
+                /**
+                 * The DudeGraph element to inspect
+                 */
+                "inspector": {
+                    "type": DudeGraphInspector,
+                    "value": null
+                }
+
+            },
+
+            _toolClicked: function () {
+                console.log(e.target.getAttribute("index"));
+            },
+
+            /**
+             * Called when clicking on the save button
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _saveGraph: function (e) {
+                this.fire("dude-graph-inspector-save", this.editor.save());
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * Called when clicking on the play button
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _playGraph: function (e) {
+                this.fire("dude-graph-inspector-play");
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * Called when clicking on the remove selection button
+             * Removes the selected renderNodes
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _removeSelection: function (e) {
+                this.editor.removeSelection();
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * Called when clicking on the zoom to fit button
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _zoomToFit: function (e) {
+                this.editor.zoomToFit();
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
+            },
+
+            /**
+             * @private
+             */
+            _showCreateGroup: function () {
+                this.inspector._showCreateGroup();
+            }
+
+        });
+    </script>
+</dom-module>
