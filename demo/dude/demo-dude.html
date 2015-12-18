@@ -14,13 +14,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <dom-module id="demo-dude">
     <style>
         #wrapper {
-            border: 2px solid #222222;
+            background: var(--dude-primary-background-color);
+            /*border: 2px solid var(--dude-secondary-background-color);*/
         }
-
-        .panel {
-            border: 2px solid #222222;
+        dude-graph-inspector {
+            border-radius: 5px;
+            background: var(--dude-secondary-background-color);
+            margin: 10px;
         }
-
         #error {
             color: var(--text-primary-color);
             background: var(--paper-red-500);
@@ -42,14 +43,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <div class="layout vertical flex">
                 <div class="layout horizontal flex">
                     <dude-graph-editor id="editor"
-                                       class="panel layout horizontal flex-2"
+                                       class="layout horizontal flex-2"
                                        graph-data="[[ graphData ]]"
                                        renderer-data="[[ rendererData ]]"
                                        renderer-config="[[ rendererConfig ]]"
                                        on-dude-graph-editor-error="_editorError">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
-                                          class="panel layout horizontal flex"
+                                          class="layout horizontal flex"
                                           model-data="[[ modelData ]]">
                     </dude-graph-inspector>
                 </div>
