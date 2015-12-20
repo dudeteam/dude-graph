@@ -39,7 +39,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
         #completionHierarchy {
             padding: 10px;
-            background: rgba(30, 30, 30, .8);
+            background: rgba(30, 34, 47, 0.8);
+            border-radius: 5px;
         }
     </style>
     <template>
@@ -104,7 +105,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <dude-popup id="completionPopup">
             <dude-hierarchy id="completionHierarchy"
                             items="{{ _completionItems }}"
-                            on-dude-hierarchy-item-submit="_createBlockFromModelAndPoint">
+                            on-dude-hierarchy-item-submit="_createBlockFromModelAndPoint"
+                            on-dude-hierarchy-blur="_closeCompletion">
             </dude-hierarchy>
         </dude-popup>
     </template>
@@ -175,14 +177,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             load: function () {
                 this.editor.renderer.on("drop-connection", function (renderConnection, position) {
-                    this._lastConnectionPoint = renderConnection.outputRenderPoint.point;
-                    var blocks = _.filter(this.editor.graph.cgBlocks, function (block) {
-                        return _.find(block.cgInputs, function (input) {
-                            return input.cgValueType === renderConnection.outputRenderPoint.point.cgValueType;
-                        });
-                    });
-                    this.set("_completionItems", _.map(blocks, function (block) {
-                        return {item: {name: block.cgName}};
+                    this._lastConnection = renderConnection;
+                    var models = this.filterModels(this.modelData, renderConnection.outputRenderPoint.point.cgValueType);
+                    this.set("_completionItems", _.map(models, function (model) {
+                        return {item: {name: model.cgName, data: model}};
                     }));
                     this.$["completionPopup"].open(position[0], position[1]);
                     this.$["completionHierarchy"].focus();
@@ -246,6 +244,26 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 //                this.addOwnKeyBinding("del", "_removeSelection");
                 this.addOwnKeyBinding("esc", "_closePopup");
                 this.set("_loaded", true);
+            },
+
+            /**
+             * Filters the models from the given type. It will only return models with an input of this value type.
+             * @param {Array} node a list of models
+             * @param {String} type a value type
+             */
+            filterModels: function (node, type) {
+                var result = [];
+                _.forEach(node, function (model) {
+                    console.log(model.item);
+                    if (model.item && _.find(model.item.data.cgInputs, function (input) {
+                            return input.cgValueType === type || input.cgType === type;
+                            })) {
+                        result.push(model.item.data);
+                    } else if (model.group) {
+                        result = result.concat(this.filterModels(model.group.items, type));
+                    }
+                }.bind(this));
+                return result
             },
 
             /**
@@ -358,15 +376,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createBlockFromModelAndPoint: function (e) {
                 if (e.detail.item.data) {
-                    this.editor.createBlock(e.detail.item.data);
+                    var newBlock = this.editor.createBlock(e.detail.item.data);
+                    var otherPoint = _.filter(newBlock.renderPoints, function (renderPoint) {
+                        return !renderPoint.isOutput && renderPoint.point.cgValueType === this._lastConnection.outputRenderPoint.point.cgValueType;
+                    }.bind(this))[0];
+                    if (!otherPoint) {
+                        throw new Error("This shouldn't happened, it means that the created block can't be connected to the other one.");
+                    }
+                    var connection = this._lastConnection.outputRenderPoint.point.connect(otherPoint.point);
+                    console.log({
+                        connection: connection,
+                        outputRenderBlock: newBlock,
+                        inputRenderBlock: this._lastConnection.outputRenderPoint.renderBlock
+                    });
+                    this.editor.renderer.createRenderConnection({
+                        connection: connection,
+                        outputRenderBlock: newBlock,
+                        inputRenderBlock: this._lastConnection.outputRenderPoint.renderBlock
+                    }, true);
                 }
-//                console.log(this._lastConnectionPoint);
-//                var connection = renderPointFound.point.connect(renderPoint._point);
-//                renderPoint._renderer.createRenderConnection({
-//                    "cgConnectionIndex": renderPoint._renderer.graph.cgConnections.indexOf(connection),
-//                    "outputRendererBlockId": renderPoint._point.isOutput ? renderPoint._renderBlock.nodeId : renderPointFound.renderBlock.nodeId,
-//                    "inputRendererBlockId": renderPoint._point.isOutput ? renderPointFound.renderBlock.nodeId : renderPoint._renderBlock.nodeId
-//                });
             },
 
             /**
@@ -403,6 +431,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _isPointType: function (renderPoint, cgValueType) {
                 return renderPoint.point.cgValueType === cgValueType;
+            },
+
+            _closeCompletion: function () {
+                this.$["completionPopup"].close();
             }
         })
     </script>
