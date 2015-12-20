@@ -252,14 +252,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Creates a block from data
          * @param {Object} cgBlockData
+         * @returns {dudeGraph.RenderBlock}
          */
         createBlock: function (cgBlockData) {
             var cgBlock = this.loader.loadBlock(this.graph, _.merge(cgBlockData, {
                 "cgId": _.uuid()
             }));
-            this.renderer.createRenderBlock({
+            return this.renderer.createRenderBlock({
                 "id": cgBlock.cgId,
                 "cgBlock": cgBlock.cgId
+            }, true);
+        },
+
+        /**
+         * Clones the given cgBlock
+         * @param {dudeGraph.Block} cgBlock
+         * @returns {dudeGraph.RenderBlock}
+         */
+        cloneBlock: function (cgBlock) {
+            var newCgBlock = cgBlock.clone();
+            this.graph.addBlock(newCgBlock);
+            return this.renderer.createRenderBlock({
+                "id": newCgBlock.cgId,
+                "cgBlock": newCgBlock.cgId
             }, true);
         },
 

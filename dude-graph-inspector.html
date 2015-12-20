@@ -225,6 +225,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.addOwnKeyBinding("meta+a", "_selectAll");
                     this.addOwnKeyBinding("meta+alt+a", "_selectAll");
                     this.addOwnKeyBinding("meta+shift+a", "_selectAll");
+                    this.addOwnKeyBinding("meta+y", "_cloneBlock");
 //                    this.addOwnKeyBinding("meta+0", "_zoomToFit");
                     this.addOwnKeyBinding("meta+shift+0", "_zoomToSelection");
                 } else {
@@ -234,6 +235,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.addOwnKeyBinding("ctrl+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+alt+a", "_selectAll");
                     this.addOwnKeyBinding("ctrl+shift+a", "_selectAll");
+                    this.addOwnKeyBinding("ctrl+y", "_cloneBlock");
 //                    this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
                     if (navigator.platform.toUpperCase().indexOf("WIN") !== -1) {
                         this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
@@ -269,6 +271,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     e.detail.keyboardEvent.preventDefault();
                 }
                 this.editor.selectAll(alt, shift);
+            },
+
+            /**
+             * Called when pressing (cmd+y/ctrl+y)
+             * Clone the selected block
+             * @param {CustomEvent} e
+             * @delegate
+             * @private
+             */
+            _cloneBlock: function (e) {
+                if (this.get("_renderBlock") !== null) {
+                    this.editor.cloneBlock(this.get("_renderBlock").block);
+                }
+                if (e && e.detail && e.detail.keyboardEvent) {
+                    e.detail.keyboardEvent.preventDefault();
+                }
             },
 
             /**
