@@ -397,6 +397,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         outputRenderBlock: newRenderPoint.point.isOutput ? newRenderBlock : connectRenderBlock,
                         inputRenderBlock: newRenderPoint.point.isOutput ? connectRenderBlock : newRenderBlock
                     }, true);
+                    this.$["completionPopup"].close();
                 }
             },
 
