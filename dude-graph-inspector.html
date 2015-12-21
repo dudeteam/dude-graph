@@ -178,7 +178,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             load: function () {
                 this.editor.renderer.on("drop-connection", function (renderConnection, position) {
                     this._lastConnection = renderConnection;
-                    var models = this.filterModels(this.modelData, renderConnection.outputRenderPoint.point.cgValueType);
+                    var models = this.filterModels(this.get("modelData"), renderConnection.outputRenderPoint.point.cgValueType);
                     this.set("_completionItems", _.map(models, function (model) {
                         return {item: {name: model.cgName, data: model}};
                     }));
@@ -248,8 +248,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Filters the models from the given type. It will only return models with an input of this value type.
-             * @param {Array} node a list of models
-             * @param {String} type a value type
+             * @param {Array} node - a list of models
+             * @param {String} type - a value type
              */
             filterModels: function (node, type) {
                 var result = [];
@@ -368,15 +368,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when an item is submitted in dude-hierarchy
-             * Creates a block in dudeGraph
+             * TODO: Documentation
              * @param {CustomEvent} e
              * @private
              */
             _createBlockFromModelAndPoint: function (e) {
                 if (e.detail.item.data) {
-                    var connectRenderPoint = this._lastConnection.outputRenderPoint || this._lastConnection.inputRenderPoint;
+                    var connectRenderPoint = this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
+                            this._lastConnection.inputRenderPoint : this._lastConnection.outputRenderPoint;
+                    var connectRenderBlock = connectRenderPoint.renderBlock;
                     var newRenderBlock = this.editor.createBlock(e.detail.item.data);
+                    // TODO: Adapt the new block position
+                    var renderPointToReplace = this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
+                            this._lastConnection.outputRenderPoint : this._lastConnection.inputRenderPoint;
+                    newRenderBlock.nodePosition = _.clone(renderPointToReplace.pointAbsolutePosition);
+                    newRenderBlock.update();
+                    // TODO: End
                     var newRenderPoint = _.find(newRenderBlock.renderPoints, function (renderPoint) {
                                 return renderPoint.point.isOutput !== connectRenderPoint.point.isOutput &&
                                         renderPoint.point.cgValueType === connectRenderPoint.point.cgValueType;
@@ -385,19 +392,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         throw new Error();
                     }
                     var connection = connectRenderPoint.point.connect(newRenderPoint.point);
-                    if (newRenderPoint.point.isOutput) {
-                        this.editor.renderer.createRenderConnection({
-                            connection: connection,
-                            outputRenderBlock: newRenderBlock,
-                            inputRenderBlock: connectRenderPoint.renderBlock
-                        }, true);
-                    } else {
-                        this.editor.renderer.createRenderConnection({
-                            connection: connection,
-                            outputRenderBlock: connectRenderPoint.renderBlock,
-                            inputRenderBlock: newRenderBlock
-                        }, true);
-                    }
+                    this.editor.renderer.createRenderConnection({
+                        connection: connection,
+                        outputRenderBlock: newRenderPoint.point.isOutput ? newRenderBlock : connectRenderBlock,
+                        inputRenderBlock: newRenderPoint.point.isOutput ? connectRenderBlock : newRenderBlock
+                    }, true);
                 }
             },
 
