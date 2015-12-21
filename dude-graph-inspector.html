@@ -254,9 +254,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             filterModels: function (node, type) {
                 var result = [];
                 _.forEach(node, function (model) {
-                    console.log(model.item);
                     if (model.item && _.find(model.item.data.cgInputs, function (input) {
-                            return input.cgValueType === type || input.cgType === type;
+                                return input.cgValueType === type || input.cgType === type;
                             })) {
                         result.push(model.item.data);
                     } else if (model.group) {
@@ -376,24 +375,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createBlockFromModelAndPoint: function (e) {
                 if (e.detail.item.data) {
-                    var newBlock = this.editor.createBlock(e.detail.item.data);
-                    var otherPoint = _.filter(newBlock.renderPoints, function (renderPoint) {
-                        return !renderPoint.isOutput && renderPoint.point.cgValueType === this._lastConnection.outputRenderPoint.point.cgValueType;
-                    }.bind(this))[0];
-                    if (!otherPoint) {
-                        throw new Error("This shouldn't happened, it means that the created block can't be connected to the other one.");
+                    var connectRenderPoint = this._lastConnection.outputRenderPoint || this._lastConnection.inputRenderPoint;
+                    var newRenderBlock = this.editor.createBlock(e.detail.item.data);
+                    var newRenderPoint = _.find(newRenderBlock.renderPoints, function (renderPoint) {
+                                return renderPoint.point.isOutput !== connectRenderPoint.point.isOutput &&
+                                        renderPoint.point.cgValueType === connectRenderPoint.point.cgValueType;
+                            }) || null;
+                    if (newRenderPoint === null) {
+                        throw new Error();
                     }
-                    var connection = this._lastConnection.outputRenderPoint.point.connect(otherPoint.point);
-                    console.log({
-                        connection: connection,
-                        outputRenderBlock: newBlock,
-                        inputRenderBlock: this._lastConnection.outputRenderPoint.renderBlock
-                    });
-                    this.editor.renderer.createRenderConnection({
-                        connection: connection,
-                        outputRenderBlock: newBlock,
-                        inputRenderBlock: this._lastConnection.outputRenderPoint.renderBlock
-                    }, true);
+                    var connection = connectRenderPoint.point.connect(newRenderPoint.point);
+                    if (newRenderPoint.point.isOutput) {
+                        this.editor.renderer.createRenderConnection({
+                            connection: connection,
+                            outputRenderBlock: newRenderBlock,
+                            inputRenderBlock: connectRenderPoint.renderBlock
+                        }, true);
+                    } else {
+                        this.editor.renderer.createRenderConnection({
+                            connection: connection,
+                            outputRenderBlock: connectRenderPoint.renderBlock,
+                            inputRenderBlock: newRenderBlock
+                        }, true);
+                    }
                 }
             },
 
