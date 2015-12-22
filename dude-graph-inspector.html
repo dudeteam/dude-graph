@@ -178,7 +178,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             load: function () {
                 this.editor.renderer.on("drop-connection", function (renderConnection, position) {
                     this._lastConnection = renderConnection;
-                    var models = this.filterModels(this.get("modelData"), renderConnection.outputRenderPoint.point.cgValueType);
+                    var models = this.filterModels(
+                            this.get("modelData"),
+                            this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
+                                    this._lastConnection.outputRenderPoint.cgValueType : this._lastConnection.inputRenderPoint.cgValueType,
+                            this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock
+                    );
                     this.set("_completionItems", _.map(models, function (model) {
                         return {item: {name: model.cgName, data: model}};
                     }));
@@ -250,16 +255,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Filters the models from the given type. It will only return models with an input of this value type.
              * @param {Array} node - a list of models
              * @param {String} type - a value type
+             * @param {Boolean} isOutput - whether this is an input or an output
              */
-            filterModels: function (node, type) {
+            filterModels: function (node, type, isOutput) {
                 var result = [];
                 _.forEach(node, function (model) {
-                    if (model.item && _.find(model.item.data.cgInputs, function (input) {
-                                return input.cgValueType === type || input.cgType === type;
+                    if (model.item && _.find(isOutput ? model.item.data.cgInputs : model.item.data.cgOutputs, function (point) {
+                                return point.cgValueType === type || point.cgType === type;
                             })) {
                         result.push(model.item.data);
                     } else if (model.group) {
-                        result = result.concat(this.filterModels(model.group.items, type));
+                        result = result.concat(this.filterModels(model.group.items, type, isOutput));
                     }
                 }.bind(this));
                 return result
