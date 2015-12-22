@@ -181,7 +181,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     var models = this.filterModels(
                             this.get("modelData"),
                             this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
-                                    this._lastConnection.outputRenderPoint.cgValueType : this._lastConnection.inputRenderPoint.cgValueType,
+                                    this._lastConnection.outputRenderPoint.point.cgValueType :
+                                    this._lastConnection.inputRenderPoint.point.cgValueType,
                             this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock
                     );
                     this.set("_completionItems", _.map(models, function (model) {
