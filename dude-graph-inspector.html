@@ -180,11 +180,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this._lastConnection = renderConnection;
                     var models = this.filterModels(
                             this.get("modelData"),
-                            this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
-                                    this._lastConnection.outputRenderPoint.point.cgValueType :
-                                    this._lastConnection.inputRenderPoint.point.cgValueType,
-                            this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock
-                    );
+                            this._lastConnection.realRenderPoint.point.cgValueType,
+                            this._lastConnection.realRenderPoint.isOutput);
                     this.set("_completionItems", _.map(models, function (model) {
                         return {item: {name: model.cgName, data: model}};
                     }));
@@ -381,28 +378,27 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createBlockFromModelAndPoint: function (e) {
                 if (e.detail.item.data) {
-                    var connectRenderPoint = this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
-                            this._lastConnection.inputRenderPoint : this._lastConnection.outputRenderPoint;
-                    var connectRenderBlock = connectRenderPoint.renderBlock;
-                    var newRenderBlock = this.editor.createBlock(e.detail.item.data);
-                    // TODO: Adapt the new block position
-                    var renderPointToReplace = this._lastConnection.outputRenderPoint instanceof dudeGraph.RenderBlock ?
-                            this._lastConnection.outputRenderPoint : this._lastConnection.inputRenderPoint;
-                    newRenderBlock.nodePosition = _.clone(renderPointToReplace.pointAbsolutePosition);
-                    newRenderBlock.update();
-                    // TODO: End
-                    var newRenderPoint = _.find(newRenderBlock.renderPoints, function (renderPoint) {
-                                return renderPoint.point.isOutput !== connectRenderPoint.point.isOutput &&
-                                        renderPoint.point.cgValueType === connectRenderPoint.point.cgValueType;
+                    var draggingRenderPoint = this._lastConnection.draggingRenderPoint;
+                    var fromRenderPoint = this._lastConnection.realRenderPoint;
+                    var fromRenderBlock = fromRenderPoint.renderBlock;
+                    var toRenderBlock = this.editor.createBlock(e.detail.item.data);
+                    var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
+                                // Tries to find the best suitable point
+                                return renderPoint.point.isOutput !== fromRenderPoint.point.isOutput &&
+                                        renderPoint.point.cgValueType === fromRenderPoint.point.cgValueType;
                             }) || null;
-                    if (newRenderPoint === null) {
-                        throw new Error("Jonathan suce des bites.");
+                    if (toRenderPoint === null) {
+                        throw new Error("Cannot find suitable point for `" + fromRenderPoint.pointFancyName +
+                                "` in `" + toRenderBlock.nodeFancyName + "`");
                     }
-                    var connection = connectRenderPoint.point.connect(newRenderPoint.point);
+                    // TODO: Move the block at the mouse position
+                    toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
+                    toRenderBlock.update();
+                    var connection = fromRenderPoint.point.connect(toRenderPoint.point);
                     this.editor.renderer.createRenderConnection({
                         connection: connection,
-                        outputRenderBlock: newRenderPoint.point.isOutput ? newRenderBlock : connectRenderBlock,
-                        inputRenderBlock: newRenderPoint.point.isOutput ? connectRenderBlock : newRenderBlock
+                        outputRenderBlock: fromRenderPoint.point.isOutput ? fromRenderBlock : toRenderBlock,
+                        inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
                     }, true);
                     this.$["completionPopup"].close();
                 }
