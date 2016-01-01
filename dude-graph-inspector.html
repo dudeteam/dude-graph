@@ -176,7 +176,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Call this when the inspected editor is loaded
              */
             load: function () {
-                this.editor.renderer.on("drop-connection", function (renderConnection, position) {
+                this.editor.renderer.on("drop-connection", function (renderConnection, svgPosition, screenPosition) {
                     this._lastConnection = renderConnection;
                     var models = this.filterModels(
                             this.get("modelData"),
@@ -185,7 +185,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.set("_completionItems", _.map(models, function (model) {
                         return {item: {name: model.cgName, data: model}};
                     }));
-                    this.$["completionPopup"].open(position[0], position[1]);
+                    this.$["completionPopup"].open(screenPosition[0], screenPosition[1]);
                     this.$["completionHierarchy"].focus();
                 }.bind(this));
                 this.editor.renderer.on("select", function (renderNode) {
