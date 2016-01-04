@@ -401,6 +401,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
                     }, true);
                     this.$["completionPopup"].close();
+                    this.editor.renderer.clearSelection();
+                    this.editor.renderer.addToSelection([toRenderBlock]);
+                    this.editor.renderer.panToFitRenderNodes([toRenderBlock]);
                 }
             },
 
