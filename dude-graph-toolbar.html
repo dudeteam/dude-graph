@@ -81,7 +81,7 @@
              * @private
              */
             _saveGraph: function (e) {
-                this.fire("dude-graph-inspector-save", this.editor.save());
+                this.fire("dude-graph-toolbar-save", this.editor.save());
                 if (e && e.detail && e.detail.keyboardEvent) {
                     e.detail.keyboardEvent.preventDefault();
                 }
