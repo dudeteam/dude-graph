@@ -2,17 +2,12 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
-<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
-<link rel="import" href="../dude-property/dude-property.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
-<link rel="import" href="../dude-popup/dude-popup.html">
-<link rel="import" href="dude-graph-tool.html">
-<link rel="stylesheet" href="../font-awesome/css/font-awesome.css">
 <!--
-`dude-graph-inspector` is a Polymer element which creates the inspector for dude-graph. In other words, it creates the sidebar that will be used for setting methods and properties.
+`dude-graph-inspector` is a Polymer element which creates the inspector for a dudeGraphEditor.
 
 @group dude-graph
 @element dude-graph-inspector
@@ -28,7 +23,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         :host {
-            background: var(--dude-primary-background-color);
+            background: var(--dude-secondary-background-color);
             overflow: auto;
             padding: 10px 5px 5px;
         }
@@ -39,412 +34,90 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
         #completionHierarchy {
             padding: 10px;
-            background: rgba(30, 34, 47, 0.8);
-            border-radius: 5px;
+            background: rgba(30, 30, 30, .8);
         }
     </style>
     <template>
-        <template is="dom-if" if="[[ _loaded ]]">
-            <div class="layout vertical flex">
-                <template is="dom-if" if="[[ _createGroupState ]]">
-                    <dude-collapse heading="Create group">
-                        <dude-property property-type="string"
-                                       property-name="group name"
-                                       property-value="{{ _groupName }}"
-                                       no-menu>
-                        </dude-property>
-                        <paper-button on-click="_createGroup">Create</paper-button>
-                        <paper-button on-click="_hideCreateGroup">Cancel</paper-button>
-                    </dude-collapse>
-                </template>
-                <dude-collapse heading="Add Block">
-                    <dude-hierarchy
-                            items="[[ modelData ]]"
-                            placeholder="Search blocks to create..."
-                            on-dude-hierarchy-item-submit="_createBlockFromModel">
-                    </dude-hierarchy>
-                </dude-collapse>
-                <template is="dom-if" if="[[ _renderBlock ]]" restamp>
-                    <dude-collapse heading="Edit Block">
-                        <dude-property property-type="string"
-                                       property-name="block name"
-                                       property-value="{{ _renderBlock.nodeName }}"
-                                       no-menu>
-                        </dude-property>
-                        <template is="dom-repeat" items="[[ _getPointInputs(_renderBlock) ]]" as="renderPoint">
-                            <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
-                                <dude-property property-type="choice"
-                                               property-name="{{ renderPoint.point.cgName }}"
-                                               property-value="{{ renderPoint.point.choice }}"
-                                               property-choice="{{ renderPoint.point.choices }}"
-                                               no-reference>
-                                </dude-property>
-                            </template>
-                            <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
-                                <dude-property property-type="{{ _getPointType(renderPoint) }}"
-                                               property-name="{{ renderPoint.point.cgName }}"
-                                               property-value="{{ renderPoint.point.cgValue }}"
-                                               property-resources="{{ resources }}"
-                                               no-reference>
-                                </dude-property>
-                            </template>
-                        </template>
-                    </dude-collapse>
-                </template>
-                <template is="dom-if" if="[[ _renderGroup ]]" restamp>
-                    <dude-collapse heading="Edit Group">
-                        <dude-property property-type="string"
-                                       property-name="group name"
-                                       property-value="{{ _renderGroup.nodeName }}"
-                                       no-menu>
-                        </dude-property>
-                    </dude-collapse>
-                </template>
-            </div>
-        </template>
-        <dude-popup id="completionPopup">
-            <dude-hierarchy id="completionHierarchy"
-                            items="{{ _completionItems }}"
-                            on-dude-hierarchy-item-submit="_createBlockFromModelAndPoint"
-                            on-dude-hierarchy-blur="_closeCompletion">
-            </dude-hierarchy>
-        </dude-popup>
+        <div class="layout vertical flex">
+            <dude-collapse heading="Create">
+                <dude-hierarchy
+                        items="[[ models ]]"
+                        placeholder="Create a block..."
+                        on-dude-hierarchy-item-submit="createBlockFromModel">
+                </dude-hierarchy>
+            </dude-collapse>
+        </div>
     </template>
     <script>
         var DudeGraphInspector = Polymer({
-
-
             is: "dude-graph-inspector",
-
+            behaviors: [Polymer.IronA11yKeysBehavior],
             properties: {
                 /**
-                 * The DudeGraph element to inspect
+                 *
                  */
                 "editor": {
                     "type": DudeGraphEditor,
                     "value": null
                 },
+
                 /**
-                 * The list of blocks that can be added to the dudeGraph
+                 *
                  */
-                "modelData": {
+                "models": {
                     "type": Array,
                     "value": []
                 },
 
                 /**
-                 * The resources list for point cgValue properties
+                 *
                  */
-                "resources": {
+                "keyboardShortcuts": {
                     "type": Array,
-                    "value": []
+                    "value": [
+                        {"keys": ["ctrl+0", "meta+0"], "action": "zoomToFit"},
+                        {"keys": ["ctrl+shift+0", "meta+shift+  0"], "action": "zoomToFit"}
+                    ]
                 }
             },
 
-            behaviors: [Polymer.IronA11yKeysBehavior],
             /**
-             * Whether the inspector is ready to inspect the editor
-             * @type {Boolean}
+             *
+             * @param {DudeGraphEditor} dudeGraphEditor
              */
-            _loaded: false,
-
-            /**
-             * The current selected renderBlock
-             * @type {dudeGraph.RenderBlock}
-             */
-            _renderBlock: null,
-
-            /**
-             * The current selected renderGroup
-             * @type {dudeGraph.RenderGroup}
-             */
-            _renderGroup: null,
-
-            /**
-             * Whether the createGroup should be displayed
-             * @type {Boolean}
-             */
-            _createGroupState: false,
-
-            /**
-             * The group name to be created
-             * @type {String}
-             */
-            _groupName: null,
-
-            /**
-             * Call this when the inspected editor is loaded
-             */
-            load: function () {
-                this.editor.renderer.on("drop-connection", function (renderConnection, svgPosition, screenPosition) {
-                    this._lastConnection = renderConnection;
-                    var models = this.filterModels(
-                            this.get("modelData"),
-                            this._lastConnection.realRenderPoint.point.cgValueType,
-                            this._lastConnection.realRenderPoint.isOutput);
-                    this.set("_completionItems", _.map(models, function (model) {
-                        return {item: {name: model.cgName, data: model}};
-                    }));
-                    this.$["completionPopup"].open(screenPosition[0], screenPosition[1]);
-                    this.$["completionHierarchy"].focus();
-                }.bind(this));
-                this.editor.renderer.on("select", function (renderNode) {
-                    if (renderNode instanceof dudeGraph.RenderBlock) {
-                        this.set("_renderBlock", renderNode);
-                        this.set("_renderGroup", null);
-                    } else if (renderNode instanceof dudeGraph.RenderGroup) {
-                        this.set("_renderGroup", renderNode);
-                        this.set("_renderBlock", null);
+            start: function (dudeGraphEditor) {
+                var inspector = this;
+                this.set("editor", dudeGraphEditor);
+                this.set("keyEventTarget", document.body);
+                this.set("stopKeyboardEventPropagation", true);
+                _.forEach(this.get("keyboardShortcuts"), function (keyboardShortcut) {
+                    if (navigator.platform.toUpperCase().indexOf("MAC") === -1) { // Windows/Linux
+                        inspector.addOwnKeyBinding(keyboardShortcut.keys[0], keyboardShortcut.action);
+                    } else { // Mac OSX
+                        inspector.addOwnKeyBinding(keyboardShortcut.keys[1] || keyboardShortcut.keys[0], keyboardShortcut.action);
                     }
-                }.bind(this));
-                this.editor.renderer.on("unselect", function (renderNode) {
-                    if (this.get("_renderBlock") === renderNode) {
-                        this.set("_renderBlock", null);
-                    } else if (this.get("_renderGroup") === renderNode) {
-                        this.set("_renderGroup", null);
-                    }
-                }.bind(this));
-                this.editor.renderer.on("unselect-all", function () {
-                    this.set("_renderBlock", null);
-                    this.set("_renderGroup", null);
-                }.bind(this));
-                var resetRenderBlockPoints = function () {
-                    var renderBlock = this.get("_renderBlock");
-                    var renderGroup = this.get("_renderGroup");
-                    this.set("_renderBlock", null);
-                    this.set("_renderGroup", null);
-                    this.set("_renderBlock", renderBlock);
-                    this.set("_renderGroup", renderGroup);
-                }.bind(this);
-                this.editor.graph.on("dude-graph-connection-create", resetRenderBlockPoints);
-                this.editor.graph.on("dude-graph-connection-remove", resetRenderBlockPoints);
-                this.keyEventTarget = document.body;
-                if (navigator.platform.toUpperCase().indexOf("MAC") !== -1) {
-//                    this.addOwnKeyBinding("meta+s", "_saveGraph");
-//                    this.addOwnKeyBinding("meta+b", "_playGraph");
-//                    this.addOwnKeyBinding("meta+g", "_showCreateGroup");
-                    this.addOwnKeyBinding("meta+a", "_selectAll");
-                    this.addOwnKeyBinding("meta+alt+a", "_selectAll");
-                    this.addOwnKeyBinding("meta+shift+a", "_selectAll");
-                    this.addOwnKeyBinding("meta+y", "_cloneBlock");
-//                    this.addOwnKeyBinding("meta+0", "_zoomToFit");
-                    this.addOwnKeyBinding("meta+shift+0", "_zoomToSelection");
-                } else {
-//                    this.addOwnKeyBinding("ctrl+s", "_saveGraph");
-//                    this.addOwnKeyBinding("ctrl+b", "_playGraph");
-//                    this.addOwnKeyBinding("ctrl+g", "_showCreateGroup");
-                    this.addOwnKeyBinding("ctrl+a", "_selectAll");
-                    this.addOwnKeyBinding("ctrl+alt+a", "_selectAll");
-                    this.addOwnKeyBinding("ctrl+shift+a", "_selectAll");
-                    this.addOwnKeyBinding("ctrl+y", "_cloneBlock");
-//                    this.addOwnKeyBinding("ctrl+0", "_zoomToFit");
-                    if (navigator.platform.toUpperCase().indexOf("WIN") !== -1) {
-                        this.addOwnKeyBinding("ctrl+alt+0", "_zoomToSelection");
-                    } else {
-                        this.addOwnKeyBinding("ctrl+shift+0", "_zoomToSelection");
-                    }
-                }
-//                this.addOwnKeyBinding("del", "_removeSelection");
-                this.addOwnKeyBinding("esc", "_closePopup");
-                this.set("_loaded", true);
-            },
-
-            /**
-             * Filters the models from the given type. It will only return models with an input of this value type.
-             * @param {Array} node - a list of models
-             * @param {String} type - a value type
-             * @param {Boolean} isOutput - whether this is an input or an output
-             */
-            filterModels: function (node, type, isOutput) {
-                var result = [];
-                _.forEach(node, function (model) {
-                    if (model.item && _.find(isOutput ? model.item.data.cgInputs : model.item.data.cgOutputs, function (point) {
-                                return point.cgValueType === type || point.cgType === type;
-                            })) {
-                        result.push(model.item.data);
-                    } else if (model.group) {
-                        result = result.concat(this.filterModels(model.group.items, type, isOutput));
-                    }
-                }.bind(this));
-                return result
-            },
-
-            /**
-             * Closes the completion popup if open.
-             */
-            _closePopup: function () {
-                this.$["completionPopup"].close();
-            },
-
-            /**
-             * Called when pressing (cmd+a/ctrl+a)
-             * Select all blocks and groups
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _selectAll: function (e) {
-                var shift = false;
-                var alt = false;
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    shift = e.detail.keyboardEvent.shiftKey;
-                    alt = e.detail.keyboardEvent.altKey;
-                    e.detail.keyboardEvent.preventDefault();
-                }
-                this.editor.selectAll(alt, shift);
-            },
-
-            /**
-             * Called when pressing (cmd+y/ctrl+y)
-             * Clone the selected block
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _cloneBlock: function (e) {
-                if (this.get("_renderBlock") !== null) {
-                    this.editor.cloneBlock(this.get("_renderBlock").block);
-                }
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the show create group button
-             * Shows the group creation popup
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _showCreateGroup: function (e) {
-                this.set("_createGroupState", true);
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the zoom to fit button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _zoomToSelection: function (e) {
-                this.editor.zoomToFitSelection();
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the cancel create group button
-             * Hides the group creation popup
-             * @delegate
-             * @private
-             */
-            _hideCreateGroup: function () {
-                this.set("_createGroupState", false);
-            },
-
-            /**
-             * Called when clicking on the create group button
-             * Creates a renderGroup
-             * @delegate
-             * @private
-             */
-            _createGroup: function () {
-                this.editor.createGroup(this._groupName);
-                this.set("_groupName", null);
-                this.set("_createGroupState", false);
-            },
-
-            /**
-             * Called when an item is submitted in dude-hierarchy
-             * Creates a block in dudeGraph
-             * @param {CustomEvent} e
-             * @private
-             */
-            _createBlockFromModel: function (e) {
-                if (e.detail.item.data) {
-                    this.editor.createBlock(e.detail.item.data);
-                }
-            },
-
-            /**
-             * TODO: Documentation
-             * @param {CustomEvent} e
-             * @private
-             */
-            _createBlockFromModelAndPoint: function (e) {
-                if (e.detail.item.data) {
-                    var draggingRenderPoint = this._lastConnection.draggingRenderPoint;
-                    var fromRenderPoint = this._lastConnection.realRenderPoint;
-                    var fromRenderBlock = fromRenderPoint.renderBlock;
-                    var toRenderBlock = this.editor.createBlock(e.detail.item.data);
-                    var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
-                                // Tries to find the best suitable point
-                                return renderPoint.point.isOutput !== fromRenderPoint.point.isOutput &&
-                                        renderPoint.point.cgValueType === fromRenderPoint.point.cgValueType;
-                            }) || null;
-                    if (toRenderPoint === null) {
-                        throw new Error("Cannot find suitable point for `" + fromRenderPoint.pointFancyName +
-                                "` in `" + toRenderBlock.nodeFancyName + "`");
-                    }
-                    // TODO: Move the block at the mouse position
-                    toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
-                    toRenderBlock.update();
-                    var connection = fromRenderPoint.point.connect(toRenderPoint.point);
-                    this.editor.renderer.createRenderConnection({
-                        connection: connection,
-                        outputRenderBlock: fromRenderPoint.point.isOutput ? fromRenderBlock : toRenderBlock,
-                        inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
-                    }, true);
-                    this.$["completionPopup"].close();
-                    this.editor.renderer.clearSelection();
-                    this.editor.renderer.addToSelection([toRenderBlock]);
-                    this.editor.renderer.panToFitRenderNodes([toRenderBlock]);
-                }
-            },
-
-            /**
-             * Returns the list of renderPoints og the given renderBlock that accept properties
-             * @param {dudeGraph.RenderBlock} renderBlock
-             * @returns {Array<dudeGraph.RenderPoint>}
-             * @private
-             */
-            _getPointInputs: function (renderBlock) {
-                if (renderBlock === null) {
-                    return null;
-                }
-                return _.filter(renderBlock.renderPoints, function (renderPoint) {
-                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
                 });
             },
 
             /**
-             * Returns lowercase type of renderPoint
-             * @param {dudeGraph.RenderPoint} renderPoint
-             * @returns {String}
-             * @private
+             * @param {CustomEvent} e
              */
-            _getPointType: function (renderPoint) {
-                return renderPoint.point.cgValueType.toLowerCase();
+            zoomToFit:function(e) {
+                if (e.detail.shiftKey) {
+                    this.get("editor").get("renderer").zoomToFitSelection();
+                } else {
+                    this.get("editor").get("renderer").zoomToFit();
+                }
             },
 
             /**
-             * Returns whether the renderPoint is of the given type
-             * @param {dudeGraph.RenderPoint} renderPoint
-             * @param {String} cgValueType
-             * @returns {Boolean}
-             * @private
+             *
+             * @param {CustomEvent} e
              */
-            _isPointType: function (renderPoint, cgValueType) {
-                return renderPoint.point.cgValueType === cgValueType;
-            },
-
-            _closeCompletion: function () {
-                this.$["completionPopup"].close();
+            createBlockFromModel: function (e) {
+                if (e.detail.item.data) {
+                    this.editor.createBlock(e.detail.item.data);
+                }
             }
         })
     </script>

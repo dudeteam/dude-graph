@@ -2,15 +2,16 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
-<script src="../d3/d3.min.js"></script>
+<link rel="import" href="bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <script src="../lodash/lodash.min.js"></script>
+<script src="../d3/d3.min.js"></script>
 <script src="../eventEmitter/EventEmitter.min.js"></script>
 <script src="dude-graph.js"></script>
 <!--
-`dude-graph-editor` is a Polymer element which creates a dudeGraph svg renderer which can be manipulated using several methods and properties.
+`dude-graph-editor` is a Polymer element which creates a dudeGraph SVG renderer.
 
-@group dude-graph-editor
-@element dude-graph
+@group dude-graph
+@element dude-graph-editor
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-editor">
@@ -103,12 +104,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 </dom-module>
 <script>
     var DudeGraphEditor = Polymer({
-
         is: "dude-graph-editor",
-
         properties: {
             /**
-             * Holds a reference on the graph.
+             *
              */
             "graph": {
                 "type": dudeGraph.Graph,
@@ -116,7 +115,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Holds a reference on the renderer.
+             *
              */
             "renderer": {
                 "type": dudeGraph.Renderer,
@@ -124,7 +123,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Holds a reference on the loader.
+             *
+             */
+            "resources": {
+                "type": Object,
+                "value": null
+            },
+
+            /**
+             *
              */
             "loader": {
                 "type": dudeGraph.GraphLoader,
@@ -132,188 +139,117 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Holds a reference on the saver.
+             *
              */
             "saver": {
                 "type": dudeGraph.GraphSaver,
                 "value": null
-            },
-
-            /**
-             * This JSON represents the graph data for a given dudeGraph.
-             */
-            "graphData": {
-                "type": Object,
-                "value": null
-            },
-
-            /**
-             * This JSON represents the graphical blocks to render.
-             */
-            "rendererData": {
-                "type": Object,
-                "value": null
-            },
-
-            /**
-             * This JSON contains some config for the renderer style.
-             */
-            "rendererConfig": {
-                "type": Object,
-                "value": {}
-            },
-
-            /**
-             * The block types
-             */
-            "blockTypes": {
-                "type": Array,
-                "value": [
-                    {"block": "Assignation", "type": dudeGraph.Assignation},
-                    {"block": "Condition", "type": dudeGraph.Condition},
-                    {"block": "Delegate", "type": dudeGraph.Delegate},
-                    {"block": "Each", "type": dudeGraph.Each},
-                    {"block": "Function", "type": dudeGraph.Function},
-                    {"block": "Getter", "type": dudeGraph.Getter},
-                    {"block": "Instruction", "type": dudeGraph.Instruction},
-                    {"block": "Operator", "type": dudeGraph.Operator},
-                    {"block": "Range", "type": dudeGraph.Range},
-                    {"block": "Variable", "type": dudeGraph.Variable}
-                ]
-            },
-
-            /**
-             * The renderer block types
-             */
-            "renderBlockTypes": {
-                "type": Array,
-                "value": [
-                    {"rendererBlock": "Assignation", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Condition", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Delegate", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Each", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Function", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Getter", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Instruction", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Operator", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Range", "type": dudeGraph.RenderBlock},
-                    {"rendererBlock": "Variable", "type": dudeGraph.RenderVariable}
-                ]
-            },
-
-            /**
-             * The point types
-             */
-            "pointTypes": {
-                "type": Array,
-                "value": [
-                    {"point": "Choice", "type": dudeGraph.Choice},
-                    {"point": "Stream", "type": dudeGraph.Stream}
-                ]
             }
         },
 
         /**
-         * Loads the graph and the renderer
+         *
+         * @param {Array<>} [blockTypes=defaultBlockTypes]
+         * @param {Array<>} [pointTypes=defaultPointTypes]
+         * @param {Array<>} [renderBlockTypes=defaultRenderBlockTypes]
          */
-        load: function () {
-            this.graph = new dudeGraph.Graph();
-            this.renderer = new dudeGraph.Renderer();
-            this.loader = new dudeGraph.GraphLoader();
-            this.saver = new dudeGraph.GraphSaver();
-            _.forEach(this.blockTypes, function (blockType) {
-                this.loader.registerBlockType(blockType.block, blockType.type);
+        start: function (blockTypes, pointTypes, renderBlockTypes) {
+            this.set("graph", new dudeGraph.Graph());
+            this.set("renderer", new dudeGraph.Renderer());
+            this.set("loader", new dudeGraph.GraphLoader());
+            this.set("saver", new dudeGraph.GraphSaver());
+            this.get("renderer").initialize(this.get("graph"), this.$.svg);
+            _.forEach(blockTypes || defaultBlockTypes, function (blockType) {
+                this.get("loader").registerBlockType(blockType.block, blockType.type);
             }.bind(this));
-            _.forEach(this.pointTypes, function (pointType) {
-                this.loader.registerPointType(pointType.point, pointType.type);
+            _.forEach(pointTypes || defaultPointTypes, function (pointType) {
+                console.log(pointType);
+                this.get("loader").registerPointType(pointType.point, pointType.type);
             }.bind(this));
-            this.loader.load(this.graph, this.graphData);
-            this.renderer.initialize(this.graph, this.$.svg, this.rendererConfig);
-            _.forEach(this.renderBlockTypes, function (renderBlockType) {
-                this.renderer.registerRenderBlock(renderBlockType.rendererBlock, renderBlockType.type);
-            }.bind(this));
-            this.renderer.load(this.rendererData);
-            this.renderer.on("error", function (error) {
-                this.fire("dude-graph-editor-error", {"error": error, "message": error.message});
+            _.forEach(renderBlockTypes || defaultRenderBlockTypes, function (renderBlockType) {
+                this.get("renderer").registerRenderBlock(renderBlockType.renderBlock, renderBlockType.type);
             }.bind(this));
         },
 
         /**
-         * Saves the current renderer and the graph
-         * @return {Object}
+         *
+         * @param {Object} graphData
+         * @param {Object} rendererData
+         */
+        load: function (graphData, rendererData) {
+            this.get("loader").load(this.get("graph"), graphData);
+            this.get("renderer").load(rendererData);
+        },
+
+        /**
+         *
+         * @returns {Object}
+         */
+        saveGraphData: function () {
+            return this.get("saver").save(this.get("graph"));
+        },
+
+        /**
+         *
+         * @returns {Object}
+         */
+        saveRendererData: function () {
+            return this.get("renderer").save();
+        },
+
+        /**
+         *
+         * @returns {Object}
          */
         save: function () {
             return {
-                "rendererData": this.renderer.save(),
-                "graphData": this.saver.save(this.graph)
-            };
+                "graphData": this.saveGraphData(),
+                "rendererData": this.saveRendererData()
+            }
         },
 
         /**
-         * Creates a block from data
-         * @param {Object} cgBlockData
+         *
+         * @param {Object} blockData
          * @returns {dudeGraph.RenderBlock}
          */
-        createBlock: function (cgBlockData) {
-            var cgBlock = this.loader.loadBlock(this.graph, _.merge(cgBlockData, {
+        createBlock: function (blockData) {
+            var cgBlock = this.get("loader").loadBlock(this.get("graph"), _.merge(blockData, {
                 "cgId": _.uuid()
             }));
             return this.renderer.createRenderBlock({
                 "id": cgBlock.cgId,
                 "cgBlock": cgBlock.cgId
             }, true);
-        },
-
-        /**
-         * Clones the given cgBlock
-         * @param {dudeGraph.Block} cgBlock
-         * @returns {dudeGraph.RenderBlock}
-         */
-        cloneBlock: function (cgBlock) {
-            var newCgBlock = cgBlock.clone();
-            this.graph.addBlock(newCgBlock);
-            return this.renderer.createRenderBlock({
-                "id": newCgBlock.cgId,
-                "cgBlock": newCgBlock.cgId
-            }, true);
-        },
-
-        /***
-         * Creates a group for the selected blocks
-         * @param {String} name - the rendererGroup name
-         */
-        createGroup: function (name) {
-            this.renderer.createRenderGroupForSelection(name);
-        },
-
-        /**
-         * Removes the selected blocks and groups
-         */
-        removeSelection: function () {
-            this.renderer.removeSelection();
-        },
-
-        /**
-         * Removes the selected blocks and groups
-         * @param {Boolean?} ignoreBlocks - Whether to not select all blocks
-         * @param {Boolean?} ignoreGroups - Whether to not select all groups
-         */
-        selectAll: function (ignoreBlocks, ignoreGroups) {
-            this.renderer.selectAll(ignoreBlocks, ignoreGroups);
-        },
-
-        /**
-         * Zoom to best fit all blocks and groups
-         */
-        zoomToFit: function () {
-            this.renderer.zoomToFit();
-        },
-
-        /**
-         * Zoom to best fit all blocks and groups
-         */
-        zoomToFitSelection: function () {
-            this.renderer.zoomToFitSelection();
         }
     });
+
+    var defaultBlockTypes = [
+        {"block": "Assignation", "type": dudeGraph.Assignation},
+        {"block": "Condition", "type": dudeGraph.Condition},
+        {"block": "Delegate", "type": dudeGraph.Delegate},
+        {"block": "Each", "type": dudeGraph.Each},
+        {"block": "Function", "type": dudeGraph.Function},
+        {"block": "Getter", "type": dudeGraph.Getter},
+        {"block": "Instruction", "type": dudeGraph.Instruction},
+        {"block": "Operator", "type": dudeGraph.Operator},
+        {"block": "Range", "type": dudeGraph.Range},
+        {"block": "Variable", "type": dudeGraph.Variable}
+    ];
+    var defaultPointTypes = [
+        {"point": "Choice", "type": dudeGraph.Choice},
+        {"point": "Stream", "type": dudeGraph.Stream}
+    ];
+    var defaultRenderBlockTypes = [
+        {"renderBlock": "Assignation", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Condition", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Delegate", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Each", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Function", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Getter", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Instruction", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Operator", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Range", "type": dudeGraph.RenderBlock},
+        {"renderBlock": "Variable", "type": dudeGraph.RenderVariable}
+    ];
 </script>

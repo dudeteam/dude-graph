@@ -11,103 +11,94 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="layout horizontal fit">
             <dude-graph-editor id="editor"
-                               class="panel layout horizontal flex-2"
-                               graph-data="[[ graphData ]]"
-                               renderer-data="[[ rendererData ]]">
+                               class="panel layout horizontal flex-2">
             </dude-graph-editor>
             <dude-graph-inspector id="inspector"
                                   class="panel layout horizontal flex"
-                                  model-data="[[ modelData ]]">
+                                  models="[[ models ]]">
             </dude-graph-inspector>
         </div>
     </template>
     <script>
-        Polymer({
-            is: "demo-basic",
-            properties: {
-                "graphData": {
-                    "type": Object,
-                    "value": {
-                        "blocks": [
-                            {
-                                "cgType": "Block",
-                                "cgId": "0",
-                                "cgName": "Start",
-                                "cgOutputs": [
-                                    {
-                                        "cgType": "Stream",
-                                        "cgName": "out"
-                                    }
-                                ]
-                            },
-                            {
-                                "cgType": "Block",
-                                "cgId": "1",
-                                "cgName": "End",
-                                "cgInputs": [
-                                    {
-                                        "cgType": "Stream",
-                                        "cgName": "in"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                "rendererData": {
-                    "type": Object,
-                    "value": {
-                        "zoom": {
-                            "translate": [100, 0],
-                            "scale": 1
-                        },
-                        "blocks": [
-                            {
-                                "id": "0",
-                                "cgBlock": "0",
-                                "position": [100, 100]
-                            },
-                            {
-                                "id": "1",
-                                "cgBlock": "1",
-                                "position": [350, 150]
-                            }
-                        ]
-                    }
-                },
-                "modelData": {
-                    "type": Array,
-                    "value": [
+        var graphData = {
+            "blocks": [
+                {
+                    "cgType": "Block",
+                    "cgId": "0",
+                    "cgName": "Start",
+                    "cgOutputs": [
                         {
-                            "item": {
-                                "name": "Middle",
-                                "icon": "fa fa-plus-square",
-                                "data": {
-                                    "cgType": "Block",
-                                    "cgName": "Middle",
-                                    "cgInputs": [
-                                        {
-                                            "cgType": "Stream",
-                                            "cgName": "in"
-                                        }
-                                    ],
-                                    "cgOutputs": [
-                                        {
-                                            "cgType": "Stream",
-                                            "cgName": "out"
-                                        }
-                                    ]
-                                }
-                            }
+                            "cgType": "Stream",
+                            "cgName": "out"
+                        }
+                    ]
+                },
+                {
+                    "cgType": "Block",
+                    "cgId": "1",
+                    "cgName": "End",
+                    "cgInputs": [
+                        {
+                            "cgType": "Stream",
+                            "cgName": "in"
                         }
                     ]
                 }
+            ]
+        };
+        var rendererData = {
+            "zoom": {
+                "translate": [100, 0],
+                "scale": 1
             },
-
+            "blocks": [
+                {
+                    "id": "0",
+                    "cgBlock": "0",
+                    "position": [100, 100]
+                },
+                {
+                    "id": "1",
+                    "cgBlock": "1",
+                    "position": [350, 150]
+                }
+            ]
+        };
+        var models = [
+            {
+                "item": {
+                    "name": "Middle",
+                    "icon": "fa fa-plus-square",
+                    "data": {
+                        "cgType": "Block",
+                        "cgName": "Middle",
+                        "cgInputs": [
+                            {
+                                "cgType": "Stream",
+                                "cgName": "in"
+                            }
+                        ],
+                        "cgOutputs": [
+                            {
+                                "cgType": "Stream",
+                                "cgName": "out"
+                            }
+                        ]
+                    }
+                }
+            }
+        ];
+        Polymer({
+            is: "demo-basic",
+            properties: {
+                "models": {
+                    "value": models
+                }
+            },
             ready: function () {
-                this.$.inspector.editor = this.$.editor;
-                this.$.editor.load();
-                this.$.inspector.load();
+                this.$.editor.start();
+                this.$.inspector.start(this.$.editor);
+                this.$.editor.load(graphData, rendererData);
             }
         });
     </script>
