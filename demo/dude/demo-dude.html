@@ -32,12 +32,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <iron-localstorage
                 name="dude-wrapper-graph-data"
                 value="{{ graphData }}"
-                on-iron-localstorage-load-empty="_graphRendererDataEmpty">
+                on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
         <iron-localstorage
                 name="dude-wrapper-renderer-data"
                 value="{{ rendererData }}"
-                on-iron-localstorage-load-empty="_graphRendererDataEmpty">
+                on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
         <div id="wrapper" class="layout horizontal fit">
             <paper-toast id="error"></paper-toast>
@@ -48,7 +48,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                        models="[[ models ]]">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
-                                          class="layout horizontal flex">
+                                          class="layout horizontal flex"
+                                          on-dude-graph-inspector-save="_save">
                     </dude-graph-inspector>
                 </div>
                 <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
@@ -95,7 +96,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Called when the demo-dude element is attached
              * LocalStorage data needs to be loaded before this gets called
-             * @delegate
              */
             attached: function () {
                 this.$.editor.start();
@@ -105,11 +105,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when the graphData and rendererData are empty in localStorage
-             * @delegate
+             *
+             * @param {CustomEvent} e
              * @private
              */
-            _graphRendererDataEmpty: function () {
+            _save: function (e) {
+                console.log(e);
+                this.set("graphData", e.detail.graphData);
+                this.set("rendererData", e.detail.rendererData);
+            },
+
+            /**
+             * Called when the graphData and rendererData are empty in localStorage
+             * @private
+             */
+            _loadDefaults: function () {
                 this.set("graphData", DEMO_DUDE_GRAPH_DATA);
                 this.set("rendererData", DEMO_DUDE_RENDERER_DATA);
             },
@@ -119,7 +129,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @param {CustomEvent} e
              * @private
              */
-            _editorError: function (e) {
+            _error: function (e) {
                 this.$.error.text = e.detail.error;
                 this.$.error.show();
             }
