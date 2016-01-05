@@ -44,7 +44,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <dude-collapse heading="Create">
                 <!-- Create a new block from hierarchy -->
                 <dude-hierarchy
-                        items="[[ models ]]"
+                        items="[[ editor.models ]]"
                         placeholder="Create a block..."
                         on-dude-hierarchy-item-submit="_createBlockFromModel">
                 </dude-hierarchy>
@@ -123,14 +123,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 /**
                  *
                  */
-                "models": {
-                    "type": Array,
-                    "value": []
-                },
-
-                /**
-                 *
-                 */
                 "keyboardShortcuts": {
                     "type": Array,
                     "value": [
@@ -198,14 +190,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @param {CustomEvent} e
              */
             shortcutSave: function (e) {
-                e.detail.keyboardEvent.preventDefault();
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
              * @param {CustomEvent} e
              */
             shortcutBuild: function (e) {
-                e.detail.keyboardEvent.preventDefault();
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
 
@@ -214,7 +206,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutRemoveSelection: function (e) {
                 this.get("editor").get("renderer").removeSelection();
-                e.detail.keyboardEvent.preventDefault();
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -222,7 +214,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutCreateGroup: function (e) {
                 this.set("_showCreateRenderGroup", true);
-                e.detail.keyboardEvent.preventDefault();
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -234,7 +226,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 } else {
                     this.get("editor").get("renderer").zoomToFit();
                 }
-                e.detail.keyboardEvent.preventDefault();
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**

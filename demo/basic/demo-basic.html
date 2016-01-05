@@ -4,20 +4,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../dude-graph-editor.html">
 <link rel="import" href="../../dude-graph-inspector.html">
+<link rel="import" href="../../dude-graph-toolbar.html">
 <!--
 `demo-basic` is a Polymer element to wrap a dude-graph demo
 -->
 <dom-module id="demo-basic">
     <template>
         <div class="layout horizontal fit">
-            <dude-graph-editor id="editor"
-                               class="panel layout horizontal flex-3">
-            </dude-graph-editor>
-            <dude-graph-inspector id="inspector"
-                                  class="panel layout horizontal flex"
-                                  models="[[ models ]]">
-            </dude-graph-inspector>
-            <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
+            <div class="layout vertical flex">
+                <div class="layout horizontal flex">
+                    <dude-graph-editor id="editor"
+                                       class="layout horizontal flex-3"
+                                       models="[[ models ]]">
+                    </dude-graph-editor>
+                    <dude-graph-inspector id="inspector"
+                                          class="layout horizontal flex">
+                    </dude-graph-inspector>
+                </div>
+                <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
+            </div>
         </div>
     </template>
     <script>
