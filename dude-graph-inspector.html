@@ -6,6 +6,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../dude-property/dude-property.html">
 <!--
 `dude-graph-inspector` is a Polymer element which creates the inspector for a dudeGraphEditor.
 
@@ -40,12 +41,56 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="layout vertical flex">
             <dude-collapse heading="Create">
+                <!-- Create a new block from hierarchy -->
                 <dude-hierarchy
                         items="[[ models ]]"
                         placeholder="Create a block..."
-                        on-dude-hierarchy-item-submit="createBlockFromModel">
+                        on-dude-hierarchy-item-submit="_createBlockFromModel">
                 </dude-hierarchy>
+                <!-- End Create a new block from hierarchy -->
             </dude-collapse>
+            <template is="dom-if" if="[[ _selectedRenderBlock ]]">
+                <dude-collapse heading="Edit block">
+                    <!-- Edit block name -->
+                    <dude-property property-name="Block name"
+                                   property-type="String"
+                                   property-value="{{ _selectedRenderBlock.nodeName }}"
+                                   no-menu>
+                    </dude-property>
+                    <!-- End Edit block name -->
+                    <!-- Edit block points -->
+                    <template is="dom-repeat" items="[[ _getEditablePoints(_selectedRenderBlock) ]]" as="renderPoint">
+                        <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
+                            <dude-property property-type="{{ renderPoint.point.cgValueType }}"
+                                           property-name="{{ renderPoint.point.cgName }}"
+                                           property-value="{{ renderPoint.point.cgValue }}"
+                                           property-resources="{{ resources }}"
+                                           no-reference>
+                            </dude-property>
+                        </template>
+                        <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
+                            <dude-property property-type="Choice"
+                                           property-name="{{ renderPoint.point.cgName }}"
+                                           property-value="{{ renderPoint.point.choice }}"
+                                           property-choices="{{ renderPoint.point.choices }}"
+                                           no-reference>
+                            </dude-property>
+                        </template>
+                    </template>
+                    <!-- End Edit block points -->
+                </dude-collapse>
+            </template>
+            <template is="dom-if" if="[[ _selectedRenderGroup ]]">
+                <dude-collapse heading="Edit group">
+                    <!-- Edit group name -->
+                    <dude-property property-name="Group name"
+                                   property-type="String"
+                                   property-value="{{ _selectedRenderGroup.nodeName }}"
+                                   no-menu>
+                    </dude-property>
+                    <!-- End Edit group name -->
+                </dude-collapse>
+            </template>
         </div>
     </template>
     <script>
@@ -75,19 +120,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "keyboardShortcuts": {
                     "type": Array,
                     "value": [
-                        {"keys": ["ctrl+0", "meta+0"], "action": "zoomToFit"},
-                        {"keys": ["ctrl+shift+0", "meta+shift+  0"], "action": "zoomToFit"}
+                        {"keys": ["ctrl+0", "meta+0"], "action": "shortcutZoomToFit"},
+                        {"keys": ["ctrl+shift+0", "meta+shift+0"], "action": "shortcutZoomToFit"}
                     ]
                 }
             },
 
             /**
              *
-             * @param {DudeGraphEditor} dudeGraphEditor
              */
-            start: function (dudeGraphEditor) {
+            _selectedRenderBlock: null,
+
+            /**
+             *
+             */
+            _selectedRenderGroup: null,
+
+            /**
+             *
+             * @param {DudeGraphEditor} editor
+             */
+            start: function (editor) {
                 var inspector = this;
-                this.set("editor", dudeGraphEditor);
+                this.set("editor", editor);
                 this.set("keyEventTarget", document.body);
                 this.set("stopKeyboardEventPropagation", true);
                 _.forEach(this.get("keyboardShortcuts"), function (keyboardShortcut) {
@@ -97,12 +152,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         inspector.addOwnKeyBinding(keyboardShortcut.keys[1] || keyboardShortcut.keys[0], keyboardShortcut.action);
                     }
                 });
+                this.get("editor").get("renderer").on("select", function (renderNode) {
+                    inspector.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
+                    inspector.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
+                });
+                this.get("editor").get("renderer").on("unselect", function (renderNode) {
+                    inspector.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? null : inspector.get("_selectedRenderBlock"));
+                    inspector.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? null : inspector.get("_selectedRenderGroup"));
+                });
+                this.get("editor").get("renderer").on("unselect-all", function () {
+                    inspector.set("_selectedRenderBlock", null);
+                    inspector.set("_selectedRenderGroup", null);
+                });
             },
 
             /**
              * @param {CustomEvent} e
              */
-            zoomToFit:function(e) {
+            shortcutZoomToFit: function (e) {
                 if (e.detail.shiftKey) {
                     this.get("editor").get("renderer").zoomToFitSelection();
                 } else {
@@ -114,10 +181,35 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              *
              * @param {CustomEvent} e
              */
-            createBlockFromModel: function (e) {
+            _createBlockFromModel: function (e) {
                 if (e.detail.item.data) {
                     this.editor.createBlock(e.detail.item.data);
                 }
+            },
+
+            /**
+             * Returns whether the renderPoint is of the given type
+             * @param {dudeGraph.RenderPoint} renderPoint
+             * @param {String} cgValueType
+             * @returns {Boolean}
+             * @private
+             */
+            _isPointType: function (renderPoint, cgValueType) {
+                return renderPoint.point.cgValueType === cgValueType;
+            },
+
+            /**
+             *
+             * @param {dudeGraph.RenderBlock} renderBlock
+             * @returns {Array<dudeGraph.RenderPoint>|null}
+             */
+            _getEditablePoints: function (renderBlock) {
+                if (renderBlock === null) {
+                    return null;
+                }
+                return _.filter(renderBlock.renderPoints, function (renderPoint) {
+                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
+                });
             }
         })
     </script>

@@ -17,6 +17,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                   class="panel layout horizontal flex"
                                   models="[[ models ]]">
             </dude-graph-inspector>
+            <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
         </div>
     </template>
     <script>
@@ -98,6 +99,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             ready: function () {
                 this.$.editor.start();
                 this.$.inspector.start(this.$.editor);
+                this.$.toolbar.start(this.$.editor, this.$.inspector);
                 this.$.editor.load(graphData, rendererData);
             }
         });

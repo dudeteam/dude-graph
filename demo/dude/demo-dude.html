@@ -15,13 +15,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <style>
         #wrapper {
             background: var(--dude-primary-background-color);
-            /*border: 2px solid var(--dude-secondary-background-color);*/
         }
+
         dude-graph-inspector {
             border-radius: 5px;
             background: var(--dude-secondary-background-color);
             margin: 10px;
         }
+
         #error {
             color: var(--text-primary-color);
             background: var(--paper-red-500);
@@ -43,21 +44,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <div class="layout vertical flex">
                 <div class="layout horizontal flex">
                     <dude-graph-editor id="editor"
-                                       class="layout horizontal flex-2"
-                                       graph-data="[[ graphData ]]"
-                                       renderer-data="[[ rendererData ]]"
-                                       renderer-config="[[ rendererConfig ]]"
-                                       on-dude-graph-editor-error="_editorError">
+                                       class="layout horizontal flex-2">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
                                           class="layout horizontal flex"
-                                          model-data="[[ modelData ]]">
+                                          models="[[ models ]]">
                     </dude-graph-inspector>
                 </div>
-                <dude-graph-toolbar id="toolbar"
-                                    on-dude-graph-toolbar-save="_runSave"
-                                    on-dude-graph-toolbar-play="_runPlay"></dude-graph-toolbar>
-            </div>x
+                <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
+            </div>
         </div>
     </template>
     <script>
@@ -91,7 +86,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 /**
                  * The model data
                  */
-                "modelData": {
+                "models": {
                     "type": Array,
                     "value": DEMO_DUDE_MODEL_DATA
                 }
@@ -103,11 +98,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @delegate
              */
             attached: function () {
-                this.$.inspector.editor = this.$.editor;
-                this.$.toolbar.inspector = this.$.inspector;
-                this.$.toolbar.editor = this.$.editor;
-                this.$.editor.load();
-                this.$.inspector.load();
+                this.$.editor.start();
+                this.$.inspector.start(this.$.editor);
+                this.$.toolbar.start(this.$.editor, this.$.inspector);
+                this.$.editor.load(this.get("graphData"), this.get("rendererData"));
             },
 
             /**
@@ -128,26 +122,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _editorError: function (e) {
                 this.$.error.text = e.detail.error;
                 this.$.error.show();
-            },
-
-            /**
-             * Called when the renderer and the graph are saved
-             * Updates the localStorage
-             * @param {CustomEvent} e
-             * @private
-             */
-            _runSave: function (e) {
-                this.set("graphData", e.detail.graphData);
-                this.set("rendererData", e.detail.rendererData);
-            },
-
-            /**
-             * Called when the play button is pressed.
-             * @param e
-             * @private
-             */
-            _runPlay: function (e) {
-                console.log("PLAY!");
             }
         });
     </script>

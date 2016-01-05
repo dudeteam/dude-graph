@@ -1,5 +1,16 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="dude-graph-tool.html">
+<link rel="stylesheet" href="../font-awesome/css/font-awesome.css">
+<!--
+`dude-graph-toolbar` is a Polymer element which creates the inspector toolbar for a dudeGraphEditor.
+
+@group dude-graph
+@element dude-graph-toolbar
+@demo demo/index.html
+-->
 <dom-module id="dude-graph-toolbar">
     <style>
         :host {
@@ -11,47 +22,39 @@
             <dude-graph-tool class="flex"
                              icon="fa fa-save"
                              description="Save"
-                             on-click="_saveGraph">
+                             data-action="shortcutSave"
+                             on-click="action">
             </dude-graph-tool>
             <dude-graph-tool class="flex"
                              icon="fa fa-play"
-                             description="Play"
-                             on-click="_playGraph">
+                             description="Build"
+                             data-action="shortcutBuild"
+                             on-click="action">
             </dude-graph-tool>
             <dude-graph-tool class="flex"
                              icon="fa fa-trash"
                              description="Remove selection"
-                             on-click="_removeSelection">
+                             data-action="shortcutRemoveSelection"
+                             on-click="action">
             </dude-graph-tool>
             <dude-graph-tool class="flex"
                              icon="fa fa-square-o"
                              description="Create group for selection"
-                             on-click="_showCreateGroup">
+                             data-action="shortcutCreateGroup"
+                             on-click="action">
             </dude-graph-tool>
             <dude-graph-tool class="flex"
                              icon="fa fa-compress"
                              description="Zoom to fit"
-                             on-click="_zoomToFit">
+                             data-action="shortcutZoomToFit"
+                             on-click="action">
             </dude-graph-tool>
         </div>
     </template>
     <script>
         var DudeGraphToolbar = Polymer({
-
             is: "dude-graph-toolbar",
-
             properties: {
-
-                /**
-                 * The list of tools accessible from the toolbar.
-                 */
-                "tools": {
-                    "type": "Array",
-                    "value": [
-                        {}
-                    ]
-                },
-
                 /**
                  * The DudeGraph element to inspect
                  */
@@ -67,73 +70,31 @@
                     "type": DudeGraphInspector,
                     "value": null
                 }
-
-            },
-
-            _toolClicked: function () {
-                console.log(e.target.getAttribute("index"));
             },
 
             /**
-             * Called when clicking on the save button
+             *
+             * @param {DudeGraphEditor} editor
+             * @param {DudeGraphInspector} inspector
+             */
+            start: function (editor, inspector) {
+                this.set("editor", editor);
+                this.set("inspector", inspector);
+            },
+
+            /**
+             *
              * @param {CustomEvent} e
-             * @delegate
-             * @private
              */
-            _saveGraph: function (e) {
-                this.fire("dude-graph-toolbar-save", this.editor.save());
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
+            action: function (e) {
+                var inspectorMethodName = e.target.parentNode.getAttribute("data-action");
+                var inspectorMethod = this.get("inspector")[inspectorMethodName];
+                if (!_.isUndefined(inspectorMethod)) {
+                    inspectorMethod.call(this.get("inspector"), e);
+                } else {
+                    console.warn("Method `" + inspectorMethodName + "` not found in dude-graph-inspector");
                 }
-            },
-
-            /**
-             * Called when clicking on the play button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _playGraph: function (e) {
-                this.fire("dude-graph-inspector-play");
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the remove selection button
-             * Removes the selected renderNodes
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _removeSelection: function (e) {
-                this.editor.removeSelection();
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * Called when clicking on the zoom to fit button
-             * @param {CustomEvent} e
-             * @delegate
-             * @private
-             */
-            _zoomToFit: function (e) {
-                this.editor.zoomToFit();
-                if (e && e.detail && e.detail.keyboardEvent) {
-                    e.detail.keyboardEvent.preventDefault();
-                }
-            },
-
-            /**
-             * @private
-             */
-            _showCreateGroup: function () {
-                this.inspector._showCreateGroup();
             }
-
         });
     </script>
 </dom-module>

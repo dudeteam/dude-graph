@@ -1,0 +1,26 @@
+{
+  "name": "electron",
+  "version": "1.0.0",
+  "description": "A minimal dude-graph electron application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dudeteam/dude-graph.git"
+  },
+  "keywords": [
+    "dude-graph",
+    "electron"
+  ],
+  "author": "Jonathan Picques <jonathan.picques@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dudeteam/dude-graph/issues"
+  },
+  "homepage": "https://github.com/dudeteam/dude-graph#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.0"
+  }
+}
