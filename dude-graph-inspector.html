@@ -4,6 +4,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../dude-collapse/dude-collapse.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <link rel="import" href="../dude-property/dude-property.html">
@@ -91,6 +92,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <!-- End Edit group name -->
                 </dude-collapse>
             </template>
+            <template is="dom-if" if="[[ _showCreateRenderGroup ]]">
+                <dude-collapse heading="Create group">
+                    <!-- Create group name -->
+                    <dude-property property-name="Group name"
+                                   property-type="String"
+                                   property-value="{{ _createRenderGroupName }}"
+                                   no-menu>
+                    </dude-property>
+                    <br />
+                    <paper-button on-click="_createRenderGroup">Create</paper-button>
+                    <!-- End Create group name -->
+                </dude-collapse>
+            </template>
         </div>
     </template>
     <script>
@@ -120,6 +134,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "keyboardShortcuts": {
                     "type": Array,
                     "value": [
+                        {"keys": ["ctrl+s", "meta+s"], "action": "shortcutSave"},
+                        {"keys": ["ctrl+b", "meta+b"], "action": "shortcutBuild"},
+                        {"keys": ["del", "meta+backspace"], "action": "shortcutRemoveSelection"},
+                        {"keys": ["ctrl+alt+g", "meta+alt+g"], "action": "shortcutCreateGroup"},
                         {"keys": ["ctrl+0", "meta+0"], "action": "shortcutZoomToFit"},
                         {"keys": ["ctrl+shift+0", "meta+shift+0"], "action": "shortcutZoomToFit"}
                     ]
@@ -135,6 +153,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              *
              */
             _selectedRenderGroup: null,
+
+            /**
+             *
+             */
+            _showCreateRenderGroup: false,
+
+            /**
+             *
+             */
+            _createRenderGroupName: null,
 
             /**
              *
@@ -169,12 +197,53 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * @param {CustomEvent} e
              */
+            shortcutSave: function (e) {
+                e.detail.keyboardEvent.preventDefault();
+            },
+
+            /**
+             * @param {CustomEvent} e
+             */
+            shortcutBuild: function (e) {
+                e.detail.keyboardEvent.preventDefault();
+            },
+
+
+            /**
+             * @param {CustomEvent} e
+             */
+            shortcutRemoveSelection: function (e) {
+                this.get("editor").get("renderer").removeSelection();
+                e.detail.keyboardEvent.preventDefault();
+            },
+
+            /**
+             * @param {CustomEvent} e
+             */
+            shortcutCreateGroup: function (e) {
+                this.set("_showCreateRenderGroup", true);
+                e.detail.keyboardEvent.preventDefault();
+            },
+
+            /**
+             * @param {CustomEvent} e
+             */
             shortcutZoomToFit: function (e) {
                 if (e.detail.shiftKey) {
                     this.get("editor").get("renderer").zoomToFitSelection();
                 } else {
                     this.get("editor").get("renderer").zoomToFit();
                 }
+                e.detail.keyboardEvent.preventDefault();
+            },
+
+            /**
+             *
+             */
+            _createRenderGroup: function () {
+                this.get("editor").get("renderer").createRenderGroupForSelection(this.get("_createRenderGroupName"));
+                this.set("_showCreateRenderGroup", false);
+                this.set("_createRenderGroupName", null);
             },
 
             /**
@@ -183,7 +252,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createBlockFromModel: function (e) {
                 if (e.detail.item.data) {
-                    this.editor.createBlock(e.detail.item.data);
+                    this.get("editor").createBlock(e.detail.item.data);
                 }
             },
 
