@@ -131,7 +131,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         {"keys": ["del", "meta+backspace"], "action": "shortcutRemoveSelection"},
                         {"keys": ["ctrl+g", "meta+g"], "action": "shortcutCreateRenderGroup"},
                         {"keys": ["ctrl+0", "meta+0"], "action": "shortcutZoomToFit"},
-                        {"keys": ["ctrl+shift+0", "meta+shift+0"], "action": "shortcutZoomToFit"}
+                        {"keys": ["ctrl+shift+0", "meta+shift+0"], "action": "shortcutZoomToFit"},
+                        {"keys": ["ctrl+shift+a", "meta+shift+a"], "action": "shortcutSelectAll"},
+                        {"keys": ["ctrl+alt+a", "meta+alt+a"], "action": "shortcutSelectAll"},
+                        {"keys": ["ctrl+shift+alt+a", "meta+shift+alt+a"], "action": "shortcutSelectAll"}
                     ]
                 }
             },
@@ -213,6 +216,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 } else {
                     this.get("editor").get("renderer").zoomToFit();
                 }
+                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
+            },
+
+            /**
+             *
+             * @param {CustomEvent} e
+             */
+            shortcutSelectAll: function (e) {
+                this.get("editor").get("renderer").selectAll(!e.detail.shiftKey, !e.detail.altKey);
                 e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
