@@ -2,7 +2,9 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../dude-popup/dude-popup.html">
+<link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <script src="../lodash/lodash.min.js"></script>
 <script src="../d3/d3.min.js"></script>
 <script src="../eventEmitter/EventEmitter.min.js"></script>
@@ -99,6 +101,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="layout flex horizontal">
             <svg id="svg" class="flex"></svg>
+            <dude-popup id="autoCompletePopup">
+                <dude-hierarchy
+                        id="autoComplete"
+                        placeholder="Search block..."
+                        items="[[ _autoCompleteModels ]]"
+                        on-dude-hierarchy-item-submit="_autoComplete">
+                </dude-hierarchy>
+            </dude-popup>
         </div>
     </template>
 </dom-module>
@@ -156,17 +166,28 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
+         * @type {dudeGraph.RenderConnection}
+         */
+        _autoCompleteRenderConnection: null,
+
+        /**
+         * @type {Array<Object>}
+         */
+        _autoCompleteModels: [],
+
+        /**
          *
          * @param {Array<>} [blockTypes=defaultBlockTypes]
          * @param {Array<>} [pointTypes=defaultPointTypes]
          * @param {Array<>} [renderBlockTypes=defaultRenderBlockTypes]
          */
         start: function (blockTypes, pointTypes, renderBlockTypes) {
+            var editor = this;
             this.set("graph", new dudeGraph.Graph());
             this.set("renderer", new dudeGraph.Renderer());
             this.set("loader", new dudeGraph.GraphLoader());
             this.set("saver", new dudeGraph.GraphSaver());
-            this.get("renderer").initialize(this.get("graph"), this.$.svg);
+            this.get("renderer").initialize(this.get("graph"), this.$["svg"]);
             _.forEach(blockTypes || defaultBlockTypes, function (blockType) {
                 this.get("loader").registerBlockType(blockType.block, blockType.type);
             }.bind(this));
@@ -176,6 +197,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _.forEach(renderBlockTypes || defaultRenderBlockTypes, function (renderBlockType) {
                 this.get("renderer").registerRenderBlock(renderBlockType.renderBlock, renderBlockType.type);
             }.bind(this));
+            this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
+                var realRenderPoint = renderConnection.realRenderPoint;
+                var autoCompleteModels = editor.queryModels(realRenderPoint.point.cgValueType, realRenderPoint.point.isOutput);
+                editor.set("_autoCompleteRenderConnection", renderConnection);
+                editor.set("_autoCompleteModels", autoCompleteModels);
+                editor.$["autoCompletePopup"].open(position[0], position[1]);
+                editor.$["autoComplete"].focus();
+            });
         },
 
         /**
@@ -228,6 +257,68 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "id": cgBlock.cgId,
                 "cgBlock": cgBlock.cgId
             }, true);
+        },
+
+        /**
+         *
+         * @param type
+         * @param isOutput
+         */
+        queryModels: function (type, isOutput) {
+            var modelsFound = [];
+            (function recursiveQueryModels(models) {
+                _.forEach(models, function (model) {
+                    if (!_.isUndefined(model.item)) {
+                        var cgLookupPoints = isOutput ? model.item.data.cgInputs : model.item.data.cgOutputs;
+                        var found = _.find(cgLookupPoints, function (point) {
+                            return point.cgType === type || point.cgValueType === type;
+                        });
+                        if (found) {
+                            modelsFound.push(model);
+                        }
+                    } else if (!_.isUndefined(model.group)) {
+                        recursiveQueryModels(model.group.items);
+                    }
+
+                });
+            })(this.get("models"));
+            return modelsFound;
+        },
+
+        /**
+         *
+         * @param {CustomEvent} e
+         * @private
+         */
+        _autoComplete: function (e) {
+            if (e.detail.item.data) {
+                var draggingRenderPoint = this._autoCompleteRenderConnection.draggingRenderPoint;
+                var fromRenderPoint = this._autoCompleteRenderConnection.realRenderPoint;
+                var fromRenderBlock = fromRenderPoint.renderBlock;
+                var toRenderBlock = this.createBlock(e.detail.item.data);
+                var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
+                            // Tries to find the best suitable point
+                            return renderPoint.point.isOutput !== fromRenderPoint.point.isOutput &&
+                                    renderPoint.point.cgValueType === fromRenderPoint.point.cgValueType;
+                        }) || null;
+                if (toRenderPoint === null) {
+                    throw new Error("Cannot find suitable point for `" + fromRenderPoint.pointFancyName +
+                            "` in `" + toRenderBlock.nodeFancyName + "`");
+                }
+                // TODO: Move the block at the mouse position
+                toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
+                toRenderBlock.update();
+                var connection = fromRenderPoint.point.connect(toRenderPoint.point);
+                this.get("renderer").createRenderConnection({
+                    connection: connection,
+                    outputRenderBlock: fromRenderPoint.point.isOutput ? fromRenderBlock : toRenderBlock,
+                    inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
+                }, true);
+                this.get("renderer").clearSelection();
+                this.get("renderer").addToSelection([toRenderBlock]);
+                this.get("renderer").panToFitRenderNodes([toRenderBlock]);
+            }
+            this.$["autoCompletePopup"].close();
         }
     });
     var defaultBlockTypes = [
