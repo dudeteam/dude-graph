@@ -3,6 +3,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../dude-popup/dude-popup.html">
 <link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <script src="../lodash/lodash.min.js"></script>
@@ -101,12 +102,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="layout flex horizontal">
             <svg id="svg" class="flex"></svg>
-            <dude-popup id="autoCompletePopup">
+            <dude-popup id="autocompletePopup">
                 <dude-hierarchy
-                        id="autoComplete"
+                        id="autocomplete"
                         placeholder="Search block..."
-                        items="[[ _autoCompleteModels ]]"
-                        on-dude-hierarchy-item-submit="_autoComplete">
+                        items="[[ _autocompleteModels ]]"
+                        on-dude-hierarchy-item-submit="_autocomplete"
+                        on-dude-hierarchy-blur="_closeAutocomplete">
                 </dude-hierarchy>
             </dude-popup>
         </div>
@@ -115,6 +117,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <script>
     var DudeGraphEditor = Polymer({
         is: "dude-graph-editor",
+        behaviors: [Polymer.IronA11yKeysBehavior],
         properties: {
             /**
              *
@@ -168,12 +171,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * @type {dudeGraph.RenderConnection}
          */
-        _autoCompleteRenderConnection: null,
+        _autocompleteRenderConnection: null,
 
         /**
          * @type {Array<Object>}
          */
-        _autoCompleteModels: [],
+        _autocompleteModels: [],
 
         /**
          *
@@ -199,12 +202,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             }.bind(this));
             this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                 var realRenderPoint = renderConnection.realRenderPoint;
-                var autoCompleteModels = editor.queryModels(realRenderPoint.point.cgValueType, realRenderPoint.point.isOutput);
-                editor.set("_autoCompleteRenderConnection", renderConnection);
-                editor.set("_autoCompleteModels", autoCompleteModels);
-                editor.$["autoCompletePopup"].open(position[0], position[1]);
-                editor.$["autoComplete"].focus();
+                var autocompleteModels = editor.queryModels(realRenderPoint.point.cgValueType, realRenderPoint.point.isOutput);
+                editor.set("_autocompleteRenderConnection", renderConnection);
+                editor.set("_autocompleteModels", autocompleteModels);
+                editor.$["autocompletePopup"].open(position[0], position[1]);
+                editor.$["autocomplete"].focus();
             });
+            // TODO: dude-popup should handle this
+            this.addOwnKeyBinding("esc", "_closeAutocomplete");
         },
 
         /**
@@ -290,10 +295,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * @param {CustomEvent} e
          * @private
          */
-        _autoComplete: function (e) {
+        _autocomplete: function (e) {
             if (e.detail.item.data) {
-                var draggingRenderPoint = this._autoCompleteRenderConnection.draggingRenderPoint;
-                var fromRenderPoint = this._autoCompleteRenderConnection.realRenderPoint;
+                var draggingRenderPoint = this._autocompleteRenderConnection.draggingRenderPoint;
+                var fromRenderPoint = this._autocompleteRenderConnection.realRenderPoint;
                 var fromRenderBlock = fromRenderPoint.renderBlock;
                 var toRenderBlock = this.createBlock(e.detail.item.data);
                 var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
@@ -318,9 +323,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.get("renderer").addToSelection([toRenderBlock]);
                 this.get("renderer").panToFitRenderNodes([toRenderBlock]);
             }
-            this.$["autoCompletePopup"].close();
+            this.$["autocompletePopup"].close();
+        },
+
+        /**
+         *
+         * @private
+         */
+        _closeAutocomplete: function () {
+            this.$["autocompletePopup"].close();
         }
     });
+
     var defaultBlockTypes = [
         {"block": "Assignation", "type": dudeGraph.Assignation},
         {"block": "Condition", "type": dudeGraph.Condition},
