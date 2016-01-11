@@ -5,6 +5,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <script>EventEmitter = module.exports;</script>
 <script src="bower_components/d3/d3.min.js"></script>
 <script>d3 = module.exports;</script>
+<script src="data.js"></script>
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-editor.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-inspector.html">
@@ -22,7 +23,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                        models="[[ models ]]">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
-                                          class="layout horizontal flex">
+                                          class="layout horizontal flex"
+                                          on-dude-graph-inspector-save="_save"
+                                          on-dude-graph-inspector-build="_build">
                     </dude-graph-inspector>
                 </div>
                 <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
@@ -30,86 +33,35 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         </div>
     </template>
     <script>
-        var graphData = {
-            "blocks": [
-                {
-                    "cgType": "Block",
-                    "cgId": "0",
-                    "cgName": "Start",
-                    "cgOutputs": [
-                        {
-                            "cgType": "Stream",
-                            "cgName": "out"
-                        }
-                    ]
-                },
-                {
-                    "cgType": "Block",
-                    "cgId": "1",
-                    "cgName": "End",
-                    "cgInputs": [
-                        {
-                            "cgType": "Stream",
-                            "cgName": "in"
-                        }
-                    ]
-                }
-            ]
-        };
-        var rendererData = {
-            "zoom": {
-                "translate": [100, 0],
-                "scale": 1
-            },
-            "blocks": [
-                {
-                    "id": "0",
-                    "cgBlock": "0",
-                    "position": [100, 100]
-                },
-                {
-                    "id": "1",
-                    "cgBlock": "1",
-                    "position": [350, 150]
-                }
-            ]
-        };
-        var models = [
-            {
-                "item": {
-                    "name": "Middle",
-                    "icon": "fa fa-plus-square",
-                    "data": {
-                        "cgType": "Block",
-                        "cgName": "Middle",
-                        "cgInputs": [
-                            {
-                                "cgType": "Stream",
-                                "cgName": "in"
-                            }
-                        ],
-                        "cgOutputs": [
-                            {
-                                "cgType": "Stream",
-                                "cgName": "out"
-                            }
-                        ]
-                    }
-                }
-            }
-        ];
+        const ipcRenderer = require("electron").ipcRenderer;
         Polymer({
             is: "dude-graph-electron",
             properties: {
                 "models": {
-                    "value": models
+                    "value": DUDE_GRAPH_MODELS
                 }
             },
             ready: function () {
+                var dudeGraphElectron = this;
                 this.$.editor.start();
                 this.$.inspector.start(this.$.editor);
                 this.$.toolbar.start(this.$.editor, this.$.inspector);
-                this.$.editor.load(graphData, rendererData);
+                ipcRenderer.on("dude-graph-load", function (e, dudeGraphData) {
+                    if (!_.isUndefined(dudeGraphData.models)) {
+                        dudeGraphElectron.set("models", dudeGraphData.models);
+                    }
+                    dudeGraphElectron.$.editor.load(
+                            dudeGraphData.graphData || DUDE_GRAPH_DEFAULT_GRAPH_DATA,
+                            dudeGraphData.rendererData || DUDE_GRAPH_DEFAULT_RENDERER_DATA);
+                    ipcRenderer.send("dude-graph-loaded");
+                });
+                ipcRenderer.send("dude-graph-ready");
+            },
+            _save: function (e) {
+                ipcRenderer.send("dude-graph-save", e.detail);
+            },
+            _build: function (e) {
+                ipcRenderer.send("dude-graph-build", e.detail);
             }
         });
     </script>
