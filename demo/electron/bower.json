@@ -1,0 +1,29 @@
+{
+  "name": "electron",
+  "version": "0.0.1",
+  "description": "Generic tool to visually represent a graph of connected blocks. It can be used for unreal-like blueprints, state machines, etc..",
+  "main": "main.js",
+  "homepage": "https://github.com/dudeteam/dude-graph",
+  "authors": [
+    "Jonathan Picques <jonathan.picques@gmail.com>",
+    "Jeremie Taboada <taboada.jeremie@gmail.com>"
+  ],
+  "keywords": [
+    "dude",
+    "graph",
+    "blueprint",
+    "node",
+    "graphnode",
+    "electron"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "bower_components",
+    "node_modules",
+    ".gitignore"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~1.2.3",
+    "dude-graph": "~0.4.1"
+  }
+}
