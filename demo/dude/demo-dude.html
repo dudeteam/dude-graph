@@ -40,12 +40,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
         <div id="wrapper" class="layout horizontal fit">
-            <paper-toast id="error"></paper-toast>
             <div class="layout vertical flex">
                 <div class="layout horizontal flex">
+                    <paper-toast id="error"></paper-toast>
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
-                                       models="[[ models ]]">
+                                       models="[[ models ]]"
+                                       on-dude-graph-editor-error="_error">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
                                           class="layout horizontal flex"

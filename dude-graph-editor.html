@@ -213,6 +213,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 editor.$["autocompletePopup"].open(position[0], position[1]);
                 editor.$["autocomplete"].focus();
             });
+            this.get("renderer").on("error", function (error) {
+                editor.fire("dude-graph-editor-error", {"error": error, "message": error.message});
+            });
             // TODO: dude-popup should handle this
             this.addOwnKeyBinding("esc", "_closeAutocomplete");
         },

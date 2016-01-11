@@ -24,6 +24,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#~1.2.3",
-    "dude-graph": "~0.4.1"
+    "dude-graph": "~0.4.1",
+    "paper-toast": "PolymerElements/paper-toast#~1.1.1"
   }
 }

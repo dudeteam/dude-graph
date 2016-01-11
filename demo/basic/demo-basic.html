@@ -2,6 +2,7 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../paper-toast/paper-toast.html">
 <link rel="import" href="../../dude-graph-editor.html">
 <link rel="import" href="../../dude-graph-inspector.html">
 <link rel="import" href="../../dude-graph-toolbar.html">
@@ -11,11 +12,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <dom-module id="demo-basic">
     <template>
         <div class="layout horizontal fit">
+            <paper-toast id="error"></paper-toast>
             <div class="layout vertical flex">
                 <div class="layout horizontal flex">
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
-                                       models="[[ models ]]">
+                                       models="[[ models ]]"
+                                       on-dude-graph-editor-error="_error">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
                                           class="layout horizontal flex">
@@ -106,6 +109,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.inspector.start(this.$.editor);
                 this.$.toolbar.start(this.$.editor, this.$.inspector);
                 this.$.editor.load(graphData, rendererData);
+            },
+            _error: function (e) {
+                this.$.error.text = e.detail.error;
+                this.$.error.show();
             }
         });
     </script>
