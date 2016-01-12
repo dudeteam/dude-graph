@@ -22,7 +22,8 @@ var SOURCES = [
     "lib/renderer/*.js",
     "lib/renderer/nodes/node.js",
     "lib/renderer/nodes/*.js",
-    "lib/renderer/**/*.js"
+    "lib/renderer/**/*.js",
+    "lib/default.js"
 ];
 
 gulp.task("jsdoc", function () {

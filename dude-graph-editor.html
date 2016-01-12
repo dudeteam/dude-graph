@@ -124,34 +124,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     </template>
 </dom-module>
 <script>
-    var defaultBlockTypes = [
-        {"block": "Assignation", "type": dudeGraph.Assignation},
-        {"block": "Condition", "type": dudeGraph.Condition},
-        {"block": "Delegate", "type": dudeGraph.Delegate},
-        {"block": "Each", "type": dudeGraph.Each},
-        {"block": "Function", "type": dudeGraph.Function},
-        {"block": "Getter", "type": dudeGraph.Getter},
-        {"block": "Instruction", "type": dudeGraph.Instruction},
-        {"block": "Operator", "type": dudeGraph.Operator},
-        {"block": "Range", "type": dudeGraph.Range},
-        {"block": "Variable", "type": dudeGraph.Variable}
-    ];
-    var defaultPointTypes = [
-        {"point": "Choice", "type": dudeGraph.Choice},
-        {"point": "Stream", "type": dudeGraph.Stream}
-    ];
-    var defaultRenderBlockTypes = [
-        {"renderBlock": "Assignation", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Condition", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Delegate", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Each", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Function", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Getter", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Instruction", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Operator", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Range", "type": dudeGraph.RenderBlock},
-        {"renderBlock": "Variable", "type": dudeGraph.RenderVariable}
-    ];
     var DudeGraphEditor = Polymer({
         is: "dude-graph-editor",
         behaviors: [Polymer.IronA11yKeysBehavior],
@@ -193,7 +165,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "blockTypes": {
                 "type": Array,
-                "value": defaultBlockTypes
+                "value": dudeGraph.defaultBlocks
             },
 
             /**
@@ -201,7 +173,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "pointTypes": {
                 "type": Array,
-                "value": defaultPointTypes
+                "value": dudeGraph.defaultPoints
             },
 
             /**
@@ -209,7 +181,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "renderBlockTypes": {
                 "type": Array,
-                "value": defaultRenderBlockTypes
+                "value": dudeGraph.defaultRenderBlocks
             },
 
             /**
