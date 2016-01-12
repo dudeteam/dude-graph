@@ -5,12 +5,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <script>EventEmitter = module.exports;</script>
 <script src="bower_components/d3/d3.min.js"></script>
 <script>d3 = module.exports;</script>
-<script src="data.js"></script>
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-editor.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-inspector.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-toolbar.html">
+<script src="data.js"></script>
 <!--
 `dude-graph-electron` is a Polymer element to wrap a dude-graph in an electron shell.
 -->
@@ -29,6 +29,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
                                        models="[[ models ]]"
+                                       block-types="[[ blockTypes ]]"
+                                       point-types="[[ pointTypes ]]"
+                                       render-block-types="[[ renderBlockTypes ]]"
                                        on-dude-graph-editor-error="_error">
                     </dude-graph-editor>
                     <dude-graph-inspector id="inspector"
@@ -48,6 +51,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             properties: {
                 "models": {
                     "value": DUDE_GRAPH_MODELS
+                },
+                "blockTypes": {
+                    "value": DUDE_GRAPH_BLOCK_TYPES
+                },
+                "pointTypes": {
+                    "value": DUDE_GRAPH_POINT_TYPES
+                },
+                "renderBlockTypes": {
+                    "value": DUDE_GRAPH_RENDER_BLOCK_TYPES
                 }
             },
             ready: function () {

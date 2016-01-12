@@ -15,6 +15,7 @@ const Dialog = electron.dialog;
     });
 
     app.on("ready", function () {
+
         Dialog.showOpenDialog({"properties": ["openDirectory"]}, function (paths) {
             if (_.isUndefined(paths)) {
                 throw new Error("No project path specified");

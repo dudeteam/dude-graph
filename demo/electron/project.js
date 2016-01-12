@@ -169,6 +169,7 @@ const _ = require("lodash");
             "width": 1280,
             "height": 720
         });
+        this._window.toggleDevTools();
         this._window.on("closed", function () {
             project._window = null;
         });
