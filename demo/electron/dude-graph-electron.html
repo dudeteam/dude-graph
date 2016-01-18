@@ -75,6 +75,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     if (!_.isUndefined(dudeGraphData.models)) {
                         dudeGraphElectron.set("models", dudeGraphData.models);
                     }
+                    dudeGraphElectron.set("resources", dudeGraphData.resources);
                     dudeGraphElectron.$.editor.load(
                             dudeGraphData.graphData || DUDE_GRAPH_DEFAULT_GRAPH_DATA,
                             dudeGraphData.rendererData || DUDE_GRAPH_DEFAULT_RENDERER_DATA);
