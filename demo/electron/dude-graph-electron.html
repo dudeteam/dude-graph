@@ -94,8 +94,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 ipcRenderer.send("dude-graph-save", e.detail);
             },
             _build: function (e) {
-                var graphBuilt = new DUDE_GRAPH_BUILDER().build(this.$.editor.get("graph"));
-                ipcRenderer.send("dude-graph-build", graphBuilt);
+                try {
+                    var graphBuilt = new DUDE_GRAPH_BUILDER().build(this.$.editor.get("graph"));
+                    ipcRenderer.send("dude-graph-build", graphBuilt);
+                } catch (exception) {
+                    this._error({
+                        "detail": {
+                            "error": exception
+                        }
+                    });
+                }
             },
             _error: function (e) {
                 this.$.error.text = e.detail.error;
