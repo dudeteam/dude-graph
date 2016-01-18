@@ -29,6 +29,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
                                        models="[[ models ]]"
+                                       resources="[[ resources ]]"
                                        block-types="[[ blockTypes ]]"
                                        point-types="[[ pointTypes ]]"
                                        render-block-types="[[ renderBlockTypes ]]"
@@ -51,6 +52,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             properties: {
                 "models": {
                     "value": DUDE_GRAPH_MODELS
+                },
+                "resources": {
+                    "value": []
                 },
                 "blockTypes": {
                     "value": DUDE_GRAPH_BLOCK_TYPES
@@ -75,6 +79,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                             dudeGraphData.graphData || DUDE_GRAPH_DEFAULT_GRAPH_DATA,
                             dudeGraphData.rendererData || DUDE_GRAPH_DEFAULT_RENDERER_DATA);
                     ipcRenderer.send("dude-graph-loaded");
+                });
+                ipcRenderer.on("dude-graph-resource-added", function (e, resource) {
+                    console.log("Resource Added", resource);
+                    dudeGraphElectron.push("resources", resource);
+                });
+                ipcRenderer.on("dude-graph-resource-removed", function (e, resource) {
+                    console.log("Resource Removed", resource);
                 });
                 ipcRenderer.send("dude-graph-ready");
             },
