@@ -21,14 +21,13 @@
   "devDependencies": {
     "bower": "^1.6.2",
     "gulp": "^3.9.0",
-    "jsdoc": "^3.4.0",
     "jshint": "^2.8.0",
     "gulp-shell": "^0.5.1",
-    "gulp-jsdoc": "^0.1.5",
     "gulp-jshint": "^2.0.0",
     "gulp-notify": "^2.2.0",
     "gulp-uglify": "^1.5.1",
     "gulp-concat": "^2.6.0",
+    "gulp-jsdoc3": "^0.1.1",
     "gulp-plumber": "^1.0.1",
     "gulp-sourcemaps": "^1.6.0"
   }

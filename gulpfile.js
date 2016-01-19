@@ -5,8 +5,8 @@ var jshint = require("gulp-jshint");
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
 var shell = require("gulp-shell");
-var jsdoc = require("gulp-jsdoc");
-var sourcemaps = require('gulp-sourcemaps');
+var jsdoc = require("gulp-jsdoc3");
+var sourcemaps = require("gulp-sourcemaps");
 
 var SOURCES = [
     "lib/index.js",
@@ -28,8 +28,14 @@ var SOURCES = [
 
 gulp.task("jsdoc", function () {
     return gulp.src(SOURCES)
-        .pipe(jsdoc.parser())
-        .pipe(jsdoc.generator("documentation"));
+        .pipe(jsdoc({
+            "opts": {
+                "destination": "documentation"
+            },
+            "plugins": [
+                "plugins/markdown"
+            ]
+        }));
 });
 
 gulp.task("jshint", function () {
