@@ -507,6 +507,42 @@ var DEMO_DUDE_MODEL_DATA = [
         }
     },
     {
+        "item": {
+            "name": "Merged Points Bug",
+            "icon": "fa fa-bug",
+            "data": {
+                "cgType": "Instruction",
+                "cgName": "Merged Points Bug",
+                "cgInputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "in"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "this",
+                        "cgValueType": "Entity"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "name",
+                        "cgValueType": "String"
+                    }
+                ],
+                "cgOutputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "in"
+                    },
+                    {
+                        "cgType": "Stream",
+                        "cgName": "out"
+                    }
+                ]
+            }
+        }
+    },
+    {
         "group": {
             "name": "Control",
             "items": [
