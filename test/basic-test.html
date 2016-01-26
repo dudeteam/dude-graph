@@ -10,9 +10,41 @@
 </head>
 <body>
 <script>
-    var graph = new dudeGraph.Graph();
-    var block = new dudeGraph.Block(graph, {});
-    graph.addBlock(block);
+    suite("basic", function () {
+        test("create basic graph and an empty block", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block(graph, {});
+            graph.addBlock(block);
+            expect(graph.cgBlocks[0]).to.be.equal(block);
+            expect(graph.blockById(block.cgId)).to.be.equal(block);
+        });
+        test("create basic graph and a block with one input and one output", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block(graph, {});
+            var outputPoint = new dudeGraph.Point(block, {
+                "cgName": "out",
+                "cgValueType": "Number"
+            }, true, null);
+            var inputPoint = new dudeGraph.Point(block, {
+                "cgName": "in",
+                "cgValueType": "String"
+            }, false, null);
+            graph.addBlock(block);
+            var i = 0;
+            graph.on("cg-point-create", function (_block, point) {
+                expect(_block).to.be.equal(block);
+                expect(point === outputPoint || point === inputPoint).to.be.equal(true);
+                i++;
+            });
+            block.addPoint(outputPoint);
+            block.addPoint(inputPoint);
+            expect(i).to.be.equal(2);
+            expect(block.outputByName("out")).to.be.equal(outputPoint);
+            expect(block.cgOutputs[0]).to.be.equal(outputPoint);
+            expect(block.inputByName("in")).to.be.equal(inputPoint);
+            expect(block.cgInputs[0]).to.be.equal(inputPoint);
+        });
+    });
 </script>
 </body>
 </html>
