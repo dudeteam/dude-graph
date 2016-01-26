@@ -419,6 +419,11 @@ var DEMO_DUDE_RENDERER_DATA = {
                 700,
                 220
             ],
+            "inputs": {
+                "second": {
+                    "hidden": true
+                }
+            },
             "parent": "0"
         },
         {
