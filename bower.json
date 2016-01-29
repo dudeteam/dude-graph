@@ -28,7 +28,7 @@
     "README.md"
   ],
   "dependencies": {
-    "d3": "~3.5.12",
+    "d3": "^3.5.14",
     "lodash": "~3.10.1",
     "eventEmitter": "~4.3.0",
     "font-awesome": "~4.5.0",
