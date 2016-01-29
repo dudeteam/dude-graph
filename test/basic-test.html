@@ -43,6 +43,11 @@
             expect(block.cgOutputs[0]).to.be.equal(outputPoint);
             expect(block.inputByName("in")).to.be.equal(inputPoint);
             expect(block.cgInputs[0]).to.be.equal(inputPoint);
+            expect(block.outputByName("out").cgValueType).to.be.equal("Number");
+            expect(block.inputByName("in").cgValueType).to.be.equal("String");
+        });
+        test("create basic graph with two blocks connected", function () {
+            // TODO
         });
     });
 </script>
