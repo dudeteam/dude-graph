@@ -46,7 +46,3 @@ Then open your favorite browser:
 ``` http://localhost:8080/components/dude-graph/demo/ ``` for the demo.
 
 Note: ``` gulp ``` will minify and concat all the sources in lib/ into the root script file ``` dude-graph.js ``` and will start ``` polyserve ``` on the default port (8080)
-
-## Is it any good?
-
-[Yes](http://news.ycombinator.com/item?id=3067434)
