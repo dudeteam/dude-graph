@@ -513,6 +513,30 @@ var DEMO_DUDE_MODEL_DATA = [
     },
     {
         "item": {
+            "name": "Printf",
+            "icon": "fa fa-plus-square",
+            "data": {
+                "cgType": "Expression",
+                "cgName": "Printf",
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "format",
+                        "cgValueType": "String"
+                    }
+                ],
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "value",
+                        "cgValueType": "String"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "item": {
             "name": "Merged Points Bug",
             "icon": "fa fa-bug",
             "data": {
