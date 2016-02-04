@@ -31,7 +31,7 @@
             }, false, null);
             graph.addBlock(block);
             var i = 0;
-            graph.on("cg-point-create", function (_block, point) {
+            graph.on("cg-point-add", function (_block, point) {
                 expect(_block).to.be.equal(block);
                 expect(point === outputPoint || point === inputPoint).to.be.equal(true);
                 i++;
