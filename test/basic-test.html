@@ -87,6 +87,33 @@
             expect(outputPoint1.cgConnections).to.have.length(0);
             expect(inputPoint2.cgConnections).to.have.length(0);
         });
+        test("test add/remove of points", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block(graph, {});
+            var outputPoint = new dudeGraph.Point(block, {
+                "cgName": "out",
+                "cgValueType": "Number"
+            }, true, null);
+            var inputPoint = new dudeGraph.Point(block, {
+                "cgName": "in",
+                "cgValueType": "Number"
+            }, false, null);
+            block.addPoint(outputPoint);
+            block.addPoint(inputPoint);
+            graph.addBlock(block);
+            expect(block.cgOutputs).to.have.length(1);
+            expect(block.cgInputs).to.have.length(1);
+            expect(block.cgOutputs[0]).to.be.equal(outputPoint);
+            expect(block.cgInputs[0]).to.be.equal(inputPoint);
+            expect(block.outputByName("out")).to.be.equal(outputPoint);
+            expect(block.inputByName("in")).to.be.equal(inputPoint);
+            block.removePoint(inputPoint);
+            expect(block.cgInputs).to.have.length(0);
+            expect(block.inputByName("in")).to.be.null;
+            block.addPoint(inputPoint);
+            expect(block.cgInputs).to.have.length(1);
+            expect(block.cgInputs[0]).to.be.equal(inputPoint);
+        });
     });
 </script>
 </body>
