@@ -9,7 +9,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-editor.html">
 <link rel="import" href="bower_components/dude-graph/dude-graph-inspector.html">
-<link rel="import" href="bower_components/dude-graph/dude-graph-toolbar.html">
+<link rel="import" href="bower_components/dude-toolbar/dude-toolbar.html">
 <script src="data.js"></script>
 <!--
 `dude-graph-electron` is a Polymer element to wrap a dude-graph in an electron shell.
@@ -41,7 +41,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                           on-dude-graph-inspector-build="_build">
                     </dude-graph-inspector>
                 </div>
-                <dude-graph-toolbar id="toolbar"></dude-graph-toolbar>
+                <dude-toolbar id="toolbar"></dude-toolbar>
             </div>
         </div>
     </template>
@@ -70,7 +70,64 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 var dudeGraphElectron = this;
                 this.$.editor.start();
                 this.$.inspector.start(this.$.editor);
-                this.$.toolbar.start(this.$.editor, this.$.inspector);
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-save",
+                    description: "Save graph",
+                    shortcut: ["ctrl+s", "meta+s"],
+                    action: function (e) { this.$.inspector.shortcutSave(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-play",
+                    description: "Build graph",
+                    shortcut: ["ctrl+b", "meta+b"],
+                    action: function (e) { this.$.inspector.shortcutBuild(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-trash",
+                    description: "Remove selection",
+                    shortcut: ["del", "meta+backspace"],
+                    action: function (e) { this.$.inspector.shortcutRemoveSelection(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-square-o",
+                    description: "Create group",
+                    shortcut: ["ctrl+g", "meta+g"],
+                    action: function (e) { this.$.inspector.shortcutCreateRenderGroup(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-compress",
+                    description: "Zoom to fit",
+                    shortcut: ["ctrl+0", "meta+0"],
+                    action: function (e) { this.$.inspector.shortcutZoomToFit(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    hidden: true,
+                    icon: "fa fa-compress",
+                    description: "Zoom to selection",
+                    shortcut: ["ctrl+shift+0", "meta+shift+0"],
+                    action: function (e) { this.$.inspector.shortcutZoomToFit(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "Select blocks",
+                    shortcut: ["ctrl+shift+a", "meta+shift+a"],
+                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "Select groups",
+                    shortcut: ["ctrl+alt+a", "meta+alt+a"],
+                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "Select all",
+                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
+                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                });
                 ipcRenderer.on("dude-graph-load", function (e, dudeGraphData) {
                     if (!_.isUndefined(dudeGraphData.models)) {
                         dudeGraphElectron.set("models", dudeGraphData.models);

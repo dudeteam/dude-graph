@@ -113,25 +113,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "editor": {
                     "type": DudeGraphEditor,
                     "value": null
-                },
-
-                /**
-                 *
-                 */
-                "keyboardShortcuts": {
-                    "type": Array,
-                    "value": [
-                        {"keys": ["ctrl+s", "meta+s"], "action": "shortcutSave"},
-                        {"keys": ["ctrl+b", "meta+b"], "action": "shortcutBuild"},
-                        {"keys": ["del", "meta+backspace"], "action": "shortcutRemoveSelection"},
-                        {"keys": ["ctrl+g", "meta+g"], "action": "shortcutCreateRenderGroup"},
-                        {"keys": ["ctrl+0", "meta+0"], "action": "shortcutZoomToFit"},
-                        {"keys": ["ctrl+shift+0", "meta+shift+0"], "action": "shortcutZoomToFit"},
-                        {"keys": ["ctrl+shift+a", "meta+shift+a"], "action": "shortcutSelectAll"},
-                        {"keys": ["ctrl+alt+a", "meta+alt+a"], "action": "shortcutSelectAll"},
-                        {"keys": ["ctrl+shift+alt+a", "meta+shift+alt+a"], "action": "shortcutSelectAll"}
-                    ]
                 }
+
             },
 
             _selectedRenderBlock: null,
@@ -146,15 +129,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             start: function (editor) {
                 var inspector = this;
                 this.set("editor", editor);
-                this.set("keyEventTarget", document.body);
-                this.set("stopKeyboardEventPropagation", true);
-                _.forEach(this.get("keyboardShortcuts"), function (keyboardShortcut) {
-                    if (navigator.platform.toUpperCase().indexOf("MAC") === -1) {
-                        inspector.addOwnKeyBinding(keyboardShortcut.keys[0], keyboardShortcut.action);
-                    } else {
-                        inspector.addOwnKeyBinding(keyboardShortcut.keys[1] || keyboardShortcut.keys[0], keyboardShortcut.action);
-                    }
-                });
                 this.get("editor").get("renderer").on("select", function (renderNode) {
                     inspector.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
                     inspector.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
@@ -174,7 +148,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutSave: function (e) {
                 this.fire("dude-graph-inspector-save", this.get("editor").save());
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -182,7 +155,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutBuild: function (e) {
                 this.fire("dude-graph-inspector-build");
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
 
@@ -191,7 +163,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutRemoveSelection: function (e) {
                 this.get("editor").get("renderer").removeSelection();
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -199,7 +170,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutCreateRenderGroup: function (e) {
                 this.set("_showCreateRenderGroup", true);
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -211,7 +181,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 } else {
                     this.get("editor").get("renderer").zoomToFit();
                 }
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
@@ -220,7 +189,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             shortcutSelectAll: function (e) {
                 this.get("editor").get("renderer").selectAll(!e.detail.shiftKey, !e.detail.altKey);
-                e && e.detail && e.detail.keyboardEvent && e.detail.keyboardEvent.preventDefault();
             },
 
             /**
