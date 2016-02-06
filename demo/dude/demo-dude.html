@@ -48,12 +48,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                        models="[[ models ]]"
                                        on-dude-graph-editor-error="_error">
                     </dude-graph-editor>
-                    <dude-graph-inspector id="inspector"
-                                          class="layout horizontal flex"
-                                          on-dude-graph-inspector-save="_save">
-                    </dude-graph-inspector>
                 </div>
-                <!--<dude-graph-toolbar id="toolbar"></dude-graph-toolbar>-->
                 <dude-toolbar id="toolbar"></dude-toolbar>
             </div>
         </div>
@@ -101,36 +96,35 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             attached: function () {
                 this.$.editor.start();
-                this.$.inspector.start(this.$.editor);
                 this.$.toolbar.addCommand({
                     icon: "fa fa-save",
                     description: "Save graph",
                     shortcut: ["ctrl+s", "meta+s"],
-                    action: function (e) { this.$.inspector.shortcutSave(e); }.bind(this)
+                    action: this._save.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     icon: "fa fa-play",
                     description: "Build graph",
                     shortcut: ["ctrl+b", "meta+b"],
-                    action: function (e) { this.$.inspector.shortcutBuild(e); }.bind(this)
+                    action: this._build.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     icon: "fa fa-trash",
                     description: "Remove selection",
                     shortcut: ["del", "meta+backspace"],
-                    action: function (e) { this.$.inspector.shortcutRemoveSelection(e); }.bind(this)
+                    action: this._removeSelection.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     icon: "fa fa-square-o",
                     description: "Create group",
                     shortcut: ["ctrl+g", "meta+g"],
-                    action: function (e) { this.$.inspector.shortcutCreateRenderGroup(e); }.bind(this)
+                    action: this._createGroup.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     icon: "fa fa-compress",
                     description: "Zoom to fit",
                     shortcut: ["ctrl+0", "meta+0"],
-                    action: function (e) { this.$.inspector.shortcutZoomToFit(e); }.bind(this)
+                    action: this._zoomToFit.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     hidden: true,
@@ -164,13 +158,40 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             *
-             * @param {CustomEvent} e
-             * @private
+             * Save command.
              */
-            _save: function (e) {
-                this.set("graphData", e.detail.graphData);
-                this.set("rendererData", e.detail.rendererData);
+            _save: function () {
+                var data = this.$.editor.get("renderer").save();
+                this.set("graphData", data.graphData);
+                this.set("rendererData", data.rendererData);
+            },
+
+            /**
+             * Build command.
+             */
+            _build: function () {
+                console.log("build...");
+            },
+
+            /**
+             * RemoveSelection command.
+             */
+            _removeSelection: function () {
+                this.$.editor.get("renderer").removeSelection();
+            },
+
+            /**
+             * Create group command.
+             */
+            _createGroup: function () {
+
+            },
+
+            /**
+             * Zoom to fit command.
+             */
+            _zoomToFit: function () {
+
             },
 
             /**
