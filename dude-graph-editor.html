@@ -290,7 +290,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         createBlock: function (blockData) {
             var cgBlock = this.get("loader").loadBlock(this.get("graph"), _.merge(blockData, {
-                "cgId": _.uuid()
+                "cgId": dudeGraph.uuid()
             }));
             return this.renderer.createRenderBlock({
                 "id": cgBlock.cgId,
