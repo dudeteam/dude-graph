@@ -15,9 +15,9 @@
   "scripts": {
     "start": "gulp",
     "test": "wct",
-    "release-patch": "npm version --no-git-tag-version patch && bower version patch",
-    "release-minor": "npm version --no-git-tag-version minor && bower version minor",
-    "release-major": "npm version --no-git-tag-version major && bower version major"
+    "release-patch": "bower version patch && npm version --no-git-tag-version patch",
+    "release-minor": "bower version minor && npm version --no-git-tag-version minor",
+    "release-major": "bower version major && npm version --no-git-tag-version major"
   },
   "directories": {
     "test": "tests"
