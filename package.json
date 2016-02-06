@@ -1,6 +1,6 @@
 {
   "name": "dude-graph",
-  "version": "0.4.7",
+  "version": "0.4.9",
   "description": "Generic tool to visually represent a graph of connected blocks. It can be used for unreal-like blueprints, state machines, etc..",
   "main": "gulpfile.js",
   "author": "Jeremie Taboada <taboada.jeremie@gmail.com> - Jonathan Picques <jonathan.picques@gmail.com>",
@@ -14,7 +14,10 @@
   },
   "scripts": {
     "start": "gulp",
-    "test": "wct"
+    "test": "wct",
+    "release-patch": "npm version --no-git-tag-version patch && bower version patch",
+    "release-minor": "npm version --no-git-tag-version minor && bower version minor",
+    "release-major": "npm version --no-git-tag-version major && bower version major"
   },
   "directories": {
     "test": "tests"
