@@ -105,7 +105,7 @@ var DEMO_DUDE_GRAPH_DATA = {
         {
             "cgType": "Instruction",
             "cgId": "3",
-            "cgName": "Entity.add_entity",
+            "cgName": "add_entity",
             "cgInputs": [
                 {
                     "cgType": "Stream",
@@ -188,8 +188,9 @@ var DEMO_DUDE_GRAPH_DATA = {
         },
         {
             "cgType": "Assignation",
+            "cgName": "assign",
             "cgId": "9",
-            "cgName": "Assignation",
+            "cgTemplates": {},
             "cgInputs": [
                 {
                     "cgType": "Stream",
@@ -254,7 +255,8 @@ var DEMO_DUDE_GRAPH_DATA = {
         {
             "cgType": "Assignation",
             "cgId": "14",
-            "cgName": "Assignation",
+            "cgName": "assign",
+            "cgTemplates": {},
             "cgInputs": [
                 {
                     "cgType": "Stream",
@@ -603,11 +605,11 @@ var DEMO_DUDE_RENDERER_DATA = {
 var DEMO_DUDE_MODEL_DATA = [
     {
         "item": {
-            "name": "Entity.add_entity",
+            "name": "add_entity",
             "icon": "fa fa-plus-square",
             "data": {
                 "cgType": "Instruction",
-                "cgName": "Entity.add_entity",
+                "cgName": "add_entity",
                 "cgInputs": [
                     {
                         "cgType": "Stream",
@@ -635,11 +637,35 @@ var DEMO_DUDE_MODEL_DATA = [
     },
     {
         "item": {
-            "name": "Printf",
+            "name": "entity",
+            "icon": "fa fa-plus-square",
+            "data": {
+                "cgType": "Function",
+                "cgName": "entity",
+                "cgInputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "name",
+                        "cgValueType": "String"
+                    }
+                ],
+                "cgOutputs": [
+                    {
+                        "cgType": "Point",
+                        "cgName": "value",
+                        "cgValueType": "Entity"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "item": {
+            "name": "format_string",
             "icon": "fa fa-plus-square",
             "data": {
                 "cgType": "Expression",
-                "cgName": "Printf",
+                "cgName": "format_string",
                 "cgInputs": [
                     {
                         "cgType": "Point",
