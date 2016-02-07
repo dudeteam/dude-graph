@@ -5,8 +5,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../../paper-toast/paper-toast.html">
 <link rel="import" href="../../dude-graph-editor.html">
-<link rel="import" href="../../dude-graph-inspector.html">
+<link rel="import" href="../../panels/dude-graph-create-group.html">
+<link rel="import" href="../../panels/dude-graph-edit-group.html">
+<link rel="import" href="../../panels/dude-graph-edit-block.html">
 <link rel="import" href="../../../dude-toolbar/dude-toolbar.html">
+<link rel="import" href="../../../dude-sidebar/dude-sidebar.html">
 <script src="demo-dude.js"></script>
 <!--
 `demo-dude` is a Polymer element to wrap a dude-graph demo
@@ -17,15 +20,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             background: var(--dude-primary-background-color);
         }
 
-        dude-graph-inspector {
-            border-radius: 5px;
-            background: var(--dude-secondary-background-color);
-            margin: 10px;
-        }
+        /*dude-graph-inspector {*/
+            /*border-radius: 5px;*/
+            /*background: var(--dude-secondary-background-color);*/
+            /*margin: 10px;*/
+        /*}*/
 
         #error {
             color: var(--text-primary-color);
             background: var(--paper-red-500);
+        }
+        #content {
+            position: relative;
+        }
+        dude-sidebar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
         }
     </style>
     <template>
@@ -41,7 +53,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         </iron-localstorage>
         <div id="wrapper" class="layout horizontal fit">
             <div class="layout vertical flex">
-                <div class="layout horizontal flex">
+                <div id="content" class="layout horizontal flex">
+                    <dude-sidebar id="createGroupPanel"
+                                        panel-title="Create group"
+                                        panel-element="dude-graph-create-group"
+                                        data="{{ _context }}"
+                                        on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
+                    <dude-sidebar id="editBlockPanel"
+                                  panel-title="Edit block"
+                                  panel-element="dude-graph-edit-block"
+                                  data="{{ _selectedRenderBlock }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
+                    <dude-sidebar id="editGroupPanel"
+                                  panel-title="Edit group"
+                                  panel-element="dude-graph-edit-group"
+                                  data="{{ _selectedRenderGroup }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
                     <paper-toast id="error"></paper-toast>
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
@@ -155,6 +185,26 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
                 });
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
+                this.set("_context", {
+                    editor: this.$.editor
+                });
+                this.$.editor.get("renderer").on("select", function (renderNode) {
+                    this._openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");
+                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
+                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
+                }.bind(this));
+                this.$.editor.get("renderer").on("unselect", function (renderNode) {
+                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? null : this.get("_selectedRenderBlock"));
+                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? null : this.get("_selectedRenderGroup"));
+//                    if (this.get("_selectedRenderGroup") === null && this.get("_selectedRenderBlock") === null) {
+//                        this._closePanel();
+//                    }
+                }.bind(this));
+                this.$.editor.get("renderer").on("unselect-all", function () {
+                    this.set("_selectedRenderBlock", null);
+                    this.set("_selectedRenderGroup", null);
+                }.bind(this));
+                this._lastPanelOpen = null;
             },
 
             /**
@@ -184,14 +234,43 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Create group command.
              */
             _createGroup: function () {
-
+                this._openPanel("createGroupPanel");
             },
 
             /**
              * Zoom to fit command.
              */
             _zoomToFit: function () {
+                this.$.editor.get("renderer").zoomToFit();
+            },
 
+            /**
+             * Open a panel from its id.
+             */
+            _openPanel: function (id) {
+                if (this._lastPanelOpen !== null && this._lastPanelOpen !== this.$[id]) {
+                    this._lastPanelOpen.close(function () {
+                        this.$[id].open();
+                        this._lastPanelOpen = this.$[id];
+                    }.bind(this));
+                } else {
+                    this.$[id].open();
+                    this._lastPanelOpen = this.$[id];
+                }
+            },
+
+            /**
+             * Reset the last panel open variable.
+             */
+            _closePanel: function () {
+                if (this._lastPanelOpen !== null) {
+                    this._lastPanelOpen.close();
+                    this._lastPanelOpen = null;
+                }
+            },
+
+            _resetPanel: function () {
+                this._lastPanelOpen = null;
             },
 
             /**

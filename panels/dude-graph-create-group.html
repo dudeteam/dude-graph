@@ -2,6 +2,7 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../dude-property/dude-property.html">
 <!--
 `dude-graph-create-group` is a panel used to add a new group to the graph.
@@ -11,6 +12,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-create-group">
+    <style>
+        :host {
+            @apply(--layout-vertical);
+            @apply(--layout-flex);
+            overflow: auto;
+            padding: 10px;
+        }
+    </style>
     <template>
         <dude-property property-name="Group name"
                        property-type="String"
@@ -33,7 +42,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _createButtonClicked: function () {
                 this.get("data.editor.renderer").createRenderGroupForSelection(this.get("_groupName"));
                 this.set("_groupName", null);
-                console.log(this.parentElement());
+                this.parentNode.parentNode.close();
             }
         });
     </script>

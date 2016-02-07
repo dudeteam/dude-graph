@@ -2,6 +2,7 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../dude-property/dude-property.html">
 <!--
 `dude-graph-edit-block` is a panel used to edit an existing block.
 
@@ -10,12 +11,76 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-edit-block">
+    <style>
+        :host {
+            @apply(--layout-vertical);
+            @apply(--layout-flex);
+            overflow: auto;
+            padding: 10px;
+        }
+    </style>
     <template>
-        <div>TODO</div>
+        <dude-property property-name="Block name"
+                       property-type="String"
+                       property-value="{{ data.nodeName }}"
+                       no-menu>
+        </dude-property>
+        <!-- End Edit block name -->
+        <!-- Edit block points -->
+        <template is="dom-repeat" items="[[ _getEditablePoints(data) ]]" as="renderPoint">
+            <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
+                <dude-property property-type="{{ renderPoint.point.cgValueType }}"
+                               property-name="{{ renderPoint.point.cgName }}"
+                               property-value="{{ renderPoint.point.cgValue }}"
+                               property-resources="{{ editor.resources }}"
+                               no-reference>
+                </dude-property>
+            </template>
+            <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
+                <dude-property property-type="Choice"
+                               property-name="{{ renderPoint.point.cgName }}"
+                               property-value="{{ renderPoint.point.choice }}"
+                               property-choices="{{ renderPoint.point.choices }}"
+                               no-reference>
+                </dude-property>
+            </template>
+        </template>
     </template>
     <script>
         Polymer({
-            is: "dude-graph-edit-block"
+            is: "dude-graph-edit-block",
+
+            properties: {
+                data: {
+                    type: Object
+                }
+            },
+
+            /**
+             * Returns whether the renderPoint is of the given type
+             * @param {dudeGraph.RenderPoint} renderPoint
+             * @param {String} cgValueType
+             * @returns {Boolean}
+             * @private
+             */
+            _isPointType: function (renderPoint, cgValueType) {
+                return renderPoint.point.cgValueType === cgValueType;
+            },
+
+            /**
+             *
+             * @param {dudeGraph.RenderBlock} renderBlock
+             * @returns {Array<dudeGraph.RenderPoint>|null}
+             * @private
+             */
+            _getEditablePoints: function (renderBlock) {
+                if (renderBlock === null) {
+                    return null;
+                }
+                return _.filter(renderBlock.renderPoints, function (renderPoint) {
+                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
+                });
+            }
         });
     </script>
 </dom-module>
