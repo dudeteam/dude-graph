@@ -25,8 +25,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                        property-value="{{ data.nodeName }}"
                        no-menu>
         </dude-property>
-        <!-- End Edit block name -->
-        <!-- Edit block points -->
         <template is="dom-repeat" items="[[ _getEditablePoints(data) ]]" as="renderPoint">
             <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
                 <dude-property property-type="{{ renderPoint.point.cgValueType }}"
