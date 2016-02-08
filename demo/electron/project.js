@@ -121,6 +121,7 @@ const _ = require("lodash");
                     return false;
             }
         }.bind(this);
+        Watch.unwatchTree(this._projectPath);
         Watch.watchTree(this._projectPath, {"filter": filterFunction}, function (f, curr, prev) {
             if (typeof f == "object" && prev === null && curr === null) {
                 // Finished walking the tree
@@ -143,20 +144,38 @@ const _ = require("lodash");
         JsonFile.writeFile(this._projectFilePath, dudeGraphData, function (err) {
             if (err !== null) {
                 throw new Error(err);
+            } else {
+                this._window.send("dude-graph-saved");
             }
-        });
+        }.bind(this));
     };
 
+    /**
+     * Builds the project
+     */
     Project.prototype.build = function (path, build) {
+        var resourcesUsed = [];
         var project = this;
         var output = FS.createWriteStream(path);
         var archive = Archiver.create("zip", {});
         archive.pipe(output);
-        _.forEach(this.resources, function (resource) {
-            archive.append(FS.createReadStream(Path.join(project._projectPath, resource.item.name)), {"name": resource.item.name});
+        _.forEach(build.blocks, function (block) {
+            if (block.sound && !_.includes(resourcesUsed, block.sound)) {
+                resourcesUsed.push(block.sound);
+            }
+            if (block.cover && !_.includes(resourcesUsed, block.cover)) {
+                resourcesUsed.push(block.cover);
+            }
+            if (block.ambience && !_.includes(resourcesUsed, block.ambience)) {
+                resourcesUsed.push(block.ambience);
+            }
+        });
+        _.forEach(resourcesUsed, function (resource) {
+            archive.append(FS.createReadStream(Path.join(project._projectPath, resource)), {"name": resource});
         });
         archive.append(JSON.stringify(build), {"name": "dude-graph.json"});
         archive.finalize();
+        this._window.send("dude-graph-built");
     };
 
     /**
@@ -169,7 +188,7 @@ const _ = require("lodash");
             "width": 1280,
             "height": 720
         });
-        this._window.toggleDevTools();
+        //this._window.toggleDevTools();
         this._window.on("closed", function () {
             project._window = null;
         });

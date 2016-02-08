@@ -139,11 +139,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     ipcRenderer.send("dude-graph-loaded");
                 });
                 ipcRenderer.on("dude-graph-resource-added", function (e, resource) {
-                    console.log("Resource Added", resource);
+                    var resources = dudeGraphElectron.get("resources");
+                    for (var i = 0; i < resources.length; ++i) {
+                        if (resource.item.file_name == resources[i].item.file_name) {
+                            return;
+                        }
+                    }
                     dudeGraphElectron.push("resources", resource);
                 });
                 ipcRenderer.on("dude-graph-resource-removed", function (e, resource) {
-                    console.log("Resource Removed", resource);
+                    var resources = dudeGraphElectron.get("resources");
+                    for (var i = 0; i < resources.length; ++i) {
+                        if (resource.item.file_name === resources[i].item.file_name) {
+                            dudeGraphElectron.splice("resources", i, 1);
+                            break;
+                        }
+                    }
                 });
                 ipcRenderer.send("dude-graph-ready");
             },
