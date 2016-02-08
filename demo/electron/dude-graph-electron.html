@@ -17,6 +17,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <dom-module id="dude-graph-electron">
     <template>
         <style>
+            #success {
+                color: var(--text-primary-color);
+                background: var(--paper-green-500);
+            }
             #error {
                 color: var(--text-primary-color);
                 background: var(--paper-red-500);
@@ -25,6 +29,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="layout horizontal fit">
             <div class="layout vertical flex">
                 <div class="layout horizontal flex">
+                    <paper-toast id="success"></paper-toast>
                     <paper-toast id="error"></paper-toast>
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
@@ -156,6 +161,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         }
                     }
                 });
+                ipcRenderer.on("dude-graph-saved", function () {
+                    dudeGraphElectron._success("Saved!");
+                });
+                ipcRenderer.on("dude-graph-built", function () {
+                    dudeGraphElectron._success("Built!");
+                });
                 ipcRenderer.send("dude-graph-ready");
             },
             _save: function (e) {
@@ -172,6 +183,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         }
                     });
                 }
+            },
+            _success: function (message) {
+                this.$.success.text = message;
+                this.$.success.show();
             },
             _error: function (e) {
                 this.$.error.text = e.detail.error;
