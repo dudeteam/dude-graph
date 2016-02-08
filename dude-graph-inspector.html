@@ -141,6 +141,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     inspector.set("_selectedRenderBlock", null);
                     inspector.set("_selectedRenderGroup", null);
                 });
+                var updateRenderPoints = function () {
+                  var saveRenderBlock = inspector.get("_selectedRenderBlock");
+                    inspector.set("_selectedRenderBlock", null);
+                    inspector.set("_selectedRenderBlock", saveRenderBlock);
+                };
+                this.get("editor").get("renderer").on("render-point-add", updateRenderPoints);
+                this.get("editor").get("renderer").on("render-point-remove", updateRenderPoints);
+                this.get("editor").get("renderer").on("render-connection-add", updateRenderPoints);
+                this.get("editor").get("renderer").on("render-connection-remove", updateRenderPoints);
             },
 
             /**
