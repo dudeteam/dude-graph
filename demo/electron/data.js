@@ -1,6 +1,22 @@
 const DUDE_GRAPH_MODELS = [
     {
         "item": {
+            "name": "Start",
+            "icon": "fa fa-plus-square",
+            "data": {
+                "cgType": "Block",
+                "cgName": "Start",
+                "cgOutputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "out"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "item": {
             "name": "Middle",
             "icon": "fa fa-plus-square",
             "data": {
@@ -10,12 +26,34 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "cgType": "Stream",
                         "cgName": "in"
+                    },
+                    {
+                        "cgType": "Point",
+                        "cgName": "input",
+                        "cgValueType": "String",
+                        "cgValue": "Test string"
                     }
                 ],
                 "cgOutputs": [
                     {
                         "cgType": "Stream",
                         "cgName": "out"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "item": {
+            "name": "End",
+            "icon": "fa fa-plus-square",
+            "data": {
+                "cgType": "Block",
+                "cgName": "End",
+                "cgInputs": [
+                    {
+                        "cgType": "Stream",
+                        "cgName": "in"
                     }
                 ]
             }
