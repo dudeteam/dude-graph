@@ -1,3 +1,8 @@
 language: node_js
 node_js:
   - "5.6.0"
+addons:
+  sauce_connect:
+    username: "JonathanPicques"
+    access_key:
+      secure: "B1qzChmSByWo5MqKfvArvjdxXDvp8yX1U3bIFWHey6CbNx+WW91xLMHXKR6PPN/tMYXGw3lZtgoNjnd8czfy1KKz/76GO1uboilIuufqV7poRGlMvs9AwHXWVyfecuHLXma+T/XJx3klGAzbrtsOhaKM8ddKgCGknQOeUmPjTe8="

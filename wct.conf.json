@@ -3,6 +3,16 @@
     "sauce": {
       "browsers": [
         {
+          "browserName": "chrome",
+          "platform": "Windows 10",
+          "version": ""
+        },
+        {
+          "browserName": "firefox",
+          "platform": "Windows 10",
+          "version": ""
+        },
+        {
           "browserName": "microsoftedge",
           "platform": "Windows 10",
           "version": ""
@@ -13,9 +23,29 @@
           "version": "11"
         },
         {
+          "browserName": "chrome",
+          "platform": "OS X 10.11",
+          "version": ""
+        },
+        {
+          "browserName": "firefox",
+          "platform": "OS X 10.11",
+          "version": ""
+        },
+        {
           "browserName": "safari",
           "platform": "OS X 10.11",
           "version": "9"
+        },
+        {
+          "browserName": "chrome",
+          "platform": "Linux",
+          "version": ""
+        },
+        {
+          "browserName": "firefox",
+          "platform": "Linux",
+          "version": ""
         }
       ]
     }
