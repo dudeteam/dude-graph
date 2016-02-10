@@ -3,7 +3,6 @@
   "plugins": {
     "local": {
       "browsers": [
-        "chromium",
         "chrome"
       ]
     }
