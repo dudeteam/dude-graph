@@ -128,31 +128,31 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.editor.start();
                 this.$.toolbar.addCommand({
                     icon: "fa fa-save",
-                    description: "Save graph",
+                    description: "Save",
                     shortcut: ["ctrl+s", "meta+s"],
                     action: this._save.bind(this)
                 });
                 this.$.toolbar.addCommand({
+                    icon: "fa fa-plus",
+                    description: "Create",
+                    shortcut: ["ctrl+g", "meta+g"],
+                    action: this._createGroup.bind(this)
+                });
+                this.$.toolbar.addCommand({
                     icon: "fa fa-play",
-                    description: "Build graph",
+                    description: "Build",
                     shortcut: ["ctrl+b", "meta+b"],
                     action: this._build.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     icon: "fa fa-trash",
-                    description: "Remove selection",
+                    description: "Remove",
                     shortcut: ["del", "meta+backspace"],
                     action: this._removeSelection.bind(this)
                 });
                 this.$.toolbar.addCommand({
-                    icon: "fa fa-square-o",
-                    description: "Create group",
-                    shortcut: ["ctrl+g", "meta+g"],
-                    action: this._createGroup.bind(this)
-                });
-                this.$.toolbar.addCommand({
                     icon: "fa fa-compress",
-                    description: "Zoom to fit",
+                    description: "Zoom",
                     shortcut: ["ctrl+0", "meta+0"],
                     action: this._zoomToFit.bind(this)
                 });
@@ -161,28 +161,28 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     icon: "fa fa-compress",
                     description: "Zoom to selection",
                     shortcut: ["ctrl+shift+0", "meta+shift+0"],
-                    action: function (e) { this.$.inspector.shortcutZoomToFit(e); }.bind(this)
+                    action: this._zoomToSelection.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     hidden: true,
                     icon: "fa fa-circle",
                     description: "Select blocks",
                     shortcut: ["ctrl+shift+a", "meta+shift+a"],
-                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                    action: this._selectAllBlocks.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     hidden: true,
                     icon: "fa fa-circle",
                     description: "Select groups",
                     shortcut: ["ctrl+alt+a", "meta+alt+a"],
-                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                    action: this._selectAllGroups.bind(this)
                 });
                 this.$.toolbar.addCommand({
                     hidden: true,
                     icon: "fa fa-circle",
                     description: "Select all",
                     shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
-                    action: function (e) { this.$.inspector.shortcutSelectAll(e); }.bind(this)
+                    action: this._selectAll.bind(this)
                 });
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
                 this.set("_context", {
@@ -242,6 +242,35 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _zoomToFit: function () {
                 this.$.editor.get("renderer").zoomToFit();
+            },
+
+            /**
+             * Zoom to selection command.
+             */
+            _zoomToSelection: function () {
+                console.log("coucou");
+                this.$.editor.get("renderer").zoomToFitSelection();
+            },
+
+            /**
+             * Select all groups command.
+             */
+            _selectAllGroups: function () {
+                this.$.editor.get("renderer").selectAll(true, false);
+            },
+
+            /**
+             * Select all blocks command.
+             */
+            _selectAllBlocks: function () {
+                this.$.editor.get("renderer").selectAll(false, true);
+            },
+
+            /**
+             * Select all command.
+             */
+            _selectAll: function () {
+                this.$.editor.get("renderer").selectAll(false, false);
             },
 
             /**
