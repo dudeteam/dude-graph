@@ -1,6 +1,9 @@
 language: node_js
 node_js:
   - "5.6.0"
+before_script:
+  - npm install -g bower
+  - bower install
 addons:
   sauce_connect:
     username: "JonathanPicques"
