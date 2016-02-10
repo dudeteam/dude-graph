@@ -39,7 +39,7 @@
     "dude-style": "~0.1.2",
     "dude-property": "^0.1.8",
     "dude-collapse": "~0.0.3",
-    "dude-hierarchy": "~0.1.6",
+    "dude-hierarchy": "^0.1.6",
     "dude-popup": "~0.0.3",
     "dude-toolbar": "~0.0.1"
   },
