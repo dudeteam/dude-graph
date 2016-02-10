@@ -1,7 +1,7 @@
 DudeGraph
 =========
 
-[![Build Status](https://travis-ci.org/dudeteam/dude-graph.svg?branch=travis)](https://travis-ci.org/dudeteam/dude-graph)
+[![Build Status](https://travis-ci.org/dudeteam/dude-graph.svg?branch=develop)](https://travis-ci.org/dudeteam/dude-graph)
 
 DudeGraph is a graphic tool to allow users to create content from a simple node-based interface.
 You can use dude-graph to create your own graphical language! And offer the ability to create new content without programming.
