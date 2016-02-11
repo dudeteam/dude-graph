@@ -1,0 +1,52 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../dude-property/dude-property.html">
+<!--
+`dude-graph-create-group` is a panel used to add a new group to the graph.
+
+@group dude-graph
+@element dude-graph-create-group
+@demo demo/index.html
+-->
+<dom-module id="dude-graph-create">
+    <style>
+        :host {
+            @apply(--layout-vertical);
+            @apply(--layout-flex);
+            overflow: auto;
+            padding: 10px;
+        }
+    </style>
+    <template>
+        <dude-hierarchy
+                id="autocomplete"
+                placeholder="Search block..."
+                items="[[ _models ]]"
+                on-dude-hierarchy-item-submit="_autocomplete"
+                on-dude-hierarchy-blur="_closeAutocomplete">
+        </dude-hierarchy>
+        <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
+    </template>
+    <script>
+        Polymer({
+            is: "dude-graph-create",
+
+            properties: {
+                data: {
+                    type: Object
+                }
+            },
+
+            ready: function () {
+                this.set("_models", DEMO_DUDE_MODEL_DATA);
+            },
+
+            _createGroupButtonClicked: function () {
+                console.log("TODO: open group popup");
+            }
+        });
+    </script>
+</dom-module>

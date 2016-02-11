@@ -5,6 +5,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../../paper-toast/paper-toast.html">
 <link rel="import" href="../../dude-graph-editor.html">
+<link rel="import" href="../../panels/dude-graph-create.html">
 <link rel="import" href="../../panels/dude-graph-create-group.html">
 <link rel="import" href="../../panels/dude-graph-edit-group.html">
 <link rel="import" href="../../panels/dude-graph-edit-block.html">
@@ -54,11 +55,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div id="wrapper" class="layout horizontal fit">
             <div class="layout vertical flex">
                 <div id="content" class="layout horizontal flex">
+                    <dude-sidebar id="createPanel"
+                                  panel-title="Create"
+                                  panel-element="dude-graph-create"
+                                  data="{{ _context }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
                     <dude-sidebar id="createGroupPanel"
-                                        panel-title="Create group"
-                                        panel-element="dude-graph-create-group"
-                                        data="{{ _context }}"
-                                        on-dude-panel-close="_resetPanel">
+                                  panel-title="Create group"
+                                  panel-element="dude-graph-create-group"
+                                  data="{{ _context }}"
+                                  on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
                     <dude-sidebar id="editBlockPanel"
                                   panel-title="Edit block"
@@ -234,7 +241,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Create group command.
              */
             _createGroup: function () {
-                this._openPanel("createGroupPanel");
+                this._openPanel("createPanel");
             },
 
             /**
