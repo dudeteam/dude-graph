@@ -10,7 +10,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../panels/dude-graph-edit-group.html">
 <link rel="import" href="../../panels/dude-graph-edit-block.html">
 <link rel="import" href="../../../dude-toolbar/dude-toolbar.html">
-<link rel="import" href="../../../dude-sidebar/dude-sidebar.html">
+<link rel="import" href="../../../dude-seed/dude-sidebar.html">
 <script src="demo-dude.js"></script>
 <!--
 `demo-dude` is a Polymer element to wrap a dude-graph demo
@@ -193,7 +193,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
                 this.set("_context", {
-                    editor: this.$.editor
+                    editor: this.$.editor,
+                    wrapper: this
                 });
                 this.$.editor.get("renderer").on("select", function (renderNode) {
                     this._openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");

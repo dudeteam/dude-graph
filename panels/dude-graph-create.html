@@ -25,8 +25,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 id="autocomplete"
                 placeholder="Search block..."
                 items="[[ _models ]]"
-                on-dude-hierarchy-item-submit="_autocomplete"
-                on-dude-hierarchy-blur="_closeAutocomplete">
+                on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
         <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
     </template>
@@ -44,8 +43,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("_models", DEMO_DUDE_MODEL_DATA);
             },
 
+            _createBlock: function (e) {
+                if (e.detail.item.data) {
+                    var cgBlock = this.get("data.editor.loader").loadBlock(this.get("data.editor.graph"),
+                            _.merge(e.detail.item.data, {
+                        "cgId": dudeGraph.uuid()
+                    }));
+                    var toRenderBlock = this.get("data.editor.renderer").createRenderBlock({
+                        "id": cgBlock.cgId,
+                        "cgBlock": cgBlock.cgId
+                    }, true);
+                    toRenderBlock.update();
+                    this.get("data.editor.renderer").clearSelection();
+                    this.get("data.editor.renderer").addToSelection([toRenderBlock]);
+                    this.get("data.editor.renderer").panToFitRenderNodes([toRenderBlock]);
+                }
+            },
+
             _createGroupButtonClicked: function () {
-                console.log("TODO: open group popup");
+                this.get("data.wrapper")._openPanel("createGroupPanel");
             }
         });
     </script>

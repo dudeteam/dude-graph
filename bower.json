@@ -42,7 +42,8 @@
     "dude-hierarchy": "^0.1.6",
     "dude-popup": "~0.0.3",
     "dude-toolbar": "~0.0.1",
-    "dude-seed": "dude-sidebar#*"
+    "dude-seed": "dude-sidebar#*",
+    "dude-sidebar": "~0.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~1.1.4",
