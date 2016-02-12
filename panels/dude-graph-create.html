@@ -19,6 +19,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             overflow: auto;
             padding: 10px;
         }
+        .btn-row {
+            @apply(--layout-horizontal);
+        }
+        .btn-row paper-button {
+            @apply(--layout-flex);
+        }
+        .btn-row paper-button:first-child {
+            margin-right: 5px;
+        }
+        .btn-row paper-button:last-child {
+            margin-left: 5px;
+        }
         paper-button {
             margin-top: 10px;
         }
@@ -29,9 +41,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 placeholder="Search block..."
                 on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
+        <div class="btn-row">
+            <paper-button on-click="_createVariableButtonClicked">Create variable</paper-button>
+            <paper-button on-click="_createFunctionButtonClicked">Create function</paper-button>
+        </div>
         <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
-        <paper-button on-click="_createVariableButtonClicked">Create variable</paper-button>
-        <paper-button on-click="_createFunctionButtonClicked">Create function</paper-button>
     </template>
     <script>
         Polymer({

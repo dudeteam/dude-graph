@@ -2,7 +2,28 @@ var DEMO_DUDE_MODEL_DATA = [
     {
         "group": {
             "name": "Variables",
-            "items": []
+            "items": [
+                {
+                    "item": {
+                        "name": "player",
+                        "icon": "fa fa-circle",
+                        "data": {
+                            "cgType": "Variable",
+                            "cgValueType": "Entity",
+                            "cgValue": "player",
+                            "cgName": "player",
+                            "cgInputs": [],
+                            "cgOutputs": [
+                                {
+                                    "cgType": "Point",
+                                    "cgValueType": "Entity",
+                                    "cgName": "value"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
         }
     },
     {

@@ -21,9 +21,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         #wrapper {
             background: var(--dude-primary-background-color);
         }
+        #success {
+            font-family: var(--dude-primary-text-font);
+            font-weight: bold;
+            color: var(--dude-primary-text-color);
+            background: #46965e;
+        }
         #error {
-            color: var(--text-primary-color);
-            background: var(--paper-red-500);
+            font-family: var(--dude-primary-text-font);
+            font-weight: bold;
+            color: var(--dude-primary-text-color);
+            background: #b35255;
         }
         #content {
             position: relative;
@@ -76,6 +84,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                   on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
                     <paper-toast id="error"></paper-toast>
+                    <paper-toast id="success"></paper-toast>
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
                                        models="{{ models }}"
@@ -166,6 +175,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             removeSelection: function () {
                 this.$.editor.get("renderer").removeSelection();
+                this.$.success.text = "Selection removed!";
+                this.$.success.show();
             },
 
             /**
