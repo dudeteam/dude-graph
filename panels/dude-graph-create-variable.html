@@ -32,9 +32,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                        property-value="{{ _variableName }}"
                        no-menu>
         </dude-property>
-        <dude-property property-name="Variable value"
-                       property-type="{{ _variableType }}">
-        </dude-property>
+        <template is="dom-if" if="[[ _variableType ]]">
+            <dude-property property-name="Variable value"
+                           property-type="{{ _variableType }}"
+                           property-value="{{ _variableValue }}">
+            </dude-property>
+        </template>
         <br />
         <paper-button on-click="_createButtonClicked">Create</paper-button>
     </template>
@@ -49,13 +52,23 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             ready: function () {
-                this.set("_types", ["String", "Number", "Boolean", "Entity"]);
+                this.set("_types", ["String", "Number", "Boolean"]);
+            },
+
+            _validate: function () {
+                return this.get("_variableName") && this.get("_variableType") && this.get("_variableValue");
             },
 
             _createButtonClicked: function () {
-//                this.get("data").$["editor"].get("renderer").createRenderGroupForSelection(this.get("_groupName"));
-                this.set("_variableName", null);
-                this.parentNode.parentNode.close();
+                if (this._validate()) {
+                    this.get("data").createVariable(
+                            this.get("_variableName"),
+                            this.get("_variableType"),
+                            this.get("_variableValue")
+                    );
+                    this.set("_variableName", null);
+                    this.get("data").openPanel("createPanel");
+                }
             }
         });
     </script>

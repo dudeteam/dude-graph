@@ -158,7 +158,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "models": {
                 "type": Array,
-                "value": []
+                "value": [],
+                "observer": "_modelsChanged"
             },
 
             /**
@@ -284,18 +285,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
-         * Creates a new variable or function model.
-         */
-        createVariableOrFunction: function (e) {
-            if (e.detail.item.name === "New function...") {
-                console.warn("Not yet implemented.");
-            }
-            if (e.detail.item.name === "New variable...") {
-                this.openPanel("createVariable");
-            }
-        },
-
-        /**
          *
          * @param {Object} blockData
          * @returns {dudeGraph.RenderBlock}
@@ -345,6 +334,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             this.get("renderer").addToSelection([block]);
             this.get("renderer").panToFitRenderNodes([block]);
 
+        },
+
+        _modelsChanged: function () {
+            console.log("changed: ", this.get("models"));
         },
 
         /**

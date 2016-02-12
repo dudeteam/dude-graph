@@ -25,9 +25,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     </style>
     <template>
         <dude-hierarchy
-                id="autocomplete"
+                id="modelsHierarchy"
                 placeholder="Search block..."
-                items="[[ _models ]]"
                 on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
         <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
@@ -41,16 +40,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             properties: {
                 data: {
                     type: Object
+                },
+
+                _models: {
+                    type: Object
                 }
             },
 
-            ready: function () {
-                this.set("_models", DEMO_DUDE_MODEL_DATA);
-            },
-
             willOpen: function () {
+                this.$["modelsHierarchy"].set("items", this.get("data.models"));
+                this.$["modelsHierarchy"]._itemsChanged();
                 setTimeout(function () {
-                    this.$["autocomplete"].focus(); // Fixes graphically bug with sidebar animation
+                    this.$["modelsHierarchy"].focus(); // Fixes graphically bug with sidebar animation
                 }.bind(this), 100);
             },
 
