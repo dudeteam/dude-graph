@@ -79,6 +79,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         var data = this.$.context.save();
                         this.set("graphData", data.graphData);
                         this.set("rendererData", data.rendererData);
+                        this.$.context.showSuccess("Graph saved!");
                     }.bind(this)
                 });
                 this.$.context.addCommand({
@@ -93,6 +94,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     shortcut: ["ctrl+b", "meta+b"],
                     action: function () {
                         console.log("Building graph...");
+                        this.$.context.showSuccess("Graph built!");
                     }.bind(this)
                 });
                 this.$.context.addCommand({

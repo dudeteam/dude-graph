@@ -258,6 +258,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Shows a success message.
+             * @param {String} message
+             */
+            showSuccess: function (message) {
+                this.$.success.text = message;
+                this.$.success.show();
+            },
+
+
+            /**
+             * Shows an error message.
+             * @param {String} message
+             */
+            showError: function (message) {
+                this.$.error.text = message;
+                this.$.error.show();
+            },
+
+            /**
              * Reset the last panel open variable.
              */
             _resetPanel: function () {
@@ -270,8 +289,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _error: function (e) {
-                this.$.error.text = e.detail.error;
-                this.$.error.show();
+                this.showError(e.detail.error);
             }
         });
     </script>
