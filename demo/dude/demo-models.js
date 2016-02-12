@@ -7,7 +7,7 @@ var DEMO_DUDE_MODEL_DATA = [
     },
     {
         "item": {
-            "name": "New macro...",
+            "name": "New function...",
             "icon": "fa fa-plus-square"
         }
     },

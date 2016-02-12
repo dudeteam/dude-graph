@@ -53,6 +53,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _createBlock: function (e) {
+                if (e.detail.item.name === "New variable..." && e.detail.item.name === "New function...") {
+                    this.get("data.editor").createVariableOrFunction(e);
+                }
                 if (e.detail.item.data) {
                     var cgBlock = this.get("data.editor.loader").loadBlock(this.get("data.editor.graph"),
                             _.merge(e.detail.item.data, {
