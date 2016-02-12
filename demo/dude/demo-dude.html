@@ -69,7 +69,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                   on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
                     <dude-sidebar id="editBlockPanel"
-                                  panel-title="Edit block"
+                                  panel-title="{{ _selectedRenderBlock.block.cgName }}"
                                   panel-element="dude-graph-edit-block"
                                   data="{{ _selectedRenderBlock }}"
                                   on-dude-panel-close="_resetPanel">
