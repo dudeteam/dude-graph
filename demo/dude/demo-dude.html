@@ -3,14 +3,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
-<link rel="import" href="../../../paper-toast/paper-toast.html">
-<link rel="import" href="../../dude-graph-editor.html">
-<link rel="import" href="../../panels/dude-graph-create.html">
-<link rel="import" href="../../panels/dude-graph-create-group.html">
-<link rel="import" href="../../panels/dude-graph-edit-group.html">
-<link rel="import" href="../../panels/dude-graph-edit-block.html">
-<link rel="import" href="../../../dude-toolbar/dude-toolbar.html">
-<link rel="import" href="../../../dude-seed/dude-sidebar.html">
+<link rel="import" href="../../dude-graph.html">
+
 <script src="demo-data.js"></script>
 <script src="demo-models.js"></script>
 <!--
@@ -18,78 +12,26 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="demo-dude">
     <style>
-        #wrapper {
-            background: var(--dude-primary-background-color);
-        }
-
-        /*dude-graph-inspector {*/
-            /*border-radius: 5px;*/
-            /*background: var(--dude-secondary-background-color);*/
-            /*margin: 10px;*/
-        /*}*/
-
-        #error {
-            color: var(--text-primary-color);
-            background: var(--paper-red-500);
-        }
-        #content {
-            position: relative;
-        }
-        dude-sidebar {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
+        #context {
+            @apply(--layout-horizontal);
+            @apply(--layout-flex);
         }
     </style>
     <template>
         <iron-localstorage
-                name="dude-wrapper-graph-data"
+                name="dude-graph-data"
                 value="{{ graphData }}"
                 on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
         <iron-localstorage
-                name="dude-wrapper-renderer-data"
+                name="dude-graph-renderer-data"
                 value="{{ rendererData }}"
                 on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
-        <div id="wrapper" class="layout horizontal fit">
-            <div class="layout vertical flex">
-                <div id="content" class="layout horizontal flex">
-                    <dude-sidebar id="createPanel"
-                                  panel-title="Create"
-                                  panel-element="dude-graph-create"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="createGroupPanel"
-                                  panel-title="Create group"
-                                  panel-element="dude-graph-create-group"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="editBlockPanel"
-                                  panel-title="{{ _selectedRenderBlock.block.cgName }}"
-                                  panel-element="dude-graph-edit-block"
-                                  data="{{ _selectedRenderBlock }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="editGroupPanel"
-                                  panel-title="Edit group"
-                                  panel-element="dude-graph-edit-group"
-                                  data="{{ _selectedRenderGroup }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <paper-toast id="error"></paper-toast>
-                    <dude-graph-editor id="editor"
-                                       class="layout horizontal flex-3"
-                                       models="[[ models ]]"
-                                       on-dude-graph-editor-error="_error">
-                    </dude-graph-editor>
-                </div>
-                <dude-toolbar id="toolbar"></dude-toolbar>
-            </div>
-        </div>
+        <dude-graph id="context"
+                    graph-data="{{ graphData }}"
+                    renderer-data="{{ rendererData }}"
+                    models="{{ models }}"></dude-graph>
     </template>
     <script>
         Polymer({
@@ -129,189 +71,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when the demo-dude element is attached
-             * LocalStorage data needs to be loaded before this gets called
-             */
-            attached: function () {
-                this.$.editor.start();
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-save",
-                    description: "Save",
-                    shortcut: ["ctrl+s", "meta+s"],
-                    action: this._save.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-plus",
-                    description: "Create",
-                    shortcut: ["ctrl+g", "meta+g"],
-                    action: this._createGroup.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-play",
-                    description: "Build",
-                    shortcut: ["ctrl+b", "meta+b"],
-                    action: this._build.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-trash",
-                    description: "Remove",
-                    shortcut: ["del", "meta+backspace"],
-                    action: this._removeSelection.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Fit",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: this._zoomToFit.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-compress",
-                    description: "Focus",
-                    shortcut: ["ctrl+shift+0", "meta+shift+0"],
-                    action: this._zoomToSelection.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Blocks",
-                    shortcut: ["ctrl+shift+a", "meta+shift+a"],
-                    action: this._selectAllBlocks.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Groups",
-                    shortcut: ["ctrl+alt+a", "meta+alt+a"],
-                    action: this._selectAllGroups.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "All",
-                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
-                    action: this._selectAll.bind(this)
-                });
-                this.$.editor.load(this.get("graphData"), this.get("rendererData"));
-                this.set("_context", {
-                    editor: this.$.editor,
-                    wrapper: this
-                });
-                this.$.editor.get("renderer").on("select", function (renderNode) {
-                    this._openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");
-                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
-                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
-                }.bind(this));
-                this.$.editor.get("renderer").on("unselect", function (renderNode) {
-                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? null : this.get("_selectedRenderBlock"));
-                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? null : this.get("_selectedRenderGroup"));
-//                    if (this.get("_selectedRenderGroup") === null && this.get("_selectedRenderBlock") === null) {
-//                        this._closePanel();
-//                    }
-                }.bind(this));
-                this.$.editor.get("renderer").on("unselect-all", function () {
-                    this.set("_selectedRenderBlock", null);
-                    this.set("_selectedRenderGroup", null);
-                }.bind(this));
-                this._lastPanelOpen = null;
-            },
-
-            /**
-             * Save command.
-             */
-            _save: function () {
-                var data = this.$.editor.get("renderer").save();
-                this.set("graphData", data.graphData);
-                this.set("rendererData", data.rendererData);
-            },
-
-            /**
-             * Build command.
-             */
-            _build: function () {
-                console.log("build...");
-            },
-
-            /**
-             * RemoveSelection command.
-             */
-            _removeSelection: function () {
-                this.$.editor.get("renderer").removeSelection();
-            },
-
-            /**
-             * Create group command.
-             */
-            _createGroup: function () {
-                this._openPanel("createPanel");
-            },
-
-            /**
-             * Zoom to fit command.
-             */
-            _zoomToFit: function () {
-                this.$.editor.get("renderer").zoomToFit();
-            },
-
-            /**
-             * Zoom to selection command.
-             */
-            _zoomToSelection: function () {
-                console.log("coucou");
-                this.$.editor.get("renderer").zoomToFitSelection();
-            },
-
-            /**
-             * Select all groups command.
-             */
-            _selectAllGroups: function () {
-                this.$.editor.get("renderer").selectAll(true, false);
-            },
-
-            /**
-             * Select all blocks command.
-             */
-            _selectAllBlocks: function () {
-                this.$.editor.get("renderer").selectAll(false, true);
-            },
-
-            /**
-             * Select all command.
-             */
-            _selectAll: function () {
-                this.$.editor.get("renderer").selectAll(false, false);
-            },
-
-            /**
-             * Open a panel from its id.
-             */
-            _openPanel: function (id) {
-                if (this._lastPanelOpen !== null && this._lastPanelOpen !== this.$[id]) {
-                    this._lastPanelOpen.close(function () {
-                        this.$[id].open();
-                        this._lastPanelOpen = this.$[id];
-                    }.bind(this));
-                } else {
-                    this.$[id].open();
-                    this._lastPanelOpen = this.$[id];
-                }
-            },
-
-            /**
-             * Reset the last panel open variable.
-             */
-            _closePanel: function () {
-                if (this._lastPanelOpen !== null) {
-                    this._lastPanelOpen.close();
-                    this._lastPanelOpen = null;
-                }
-            },
-
-            _resetPanel: function () {
-                this._lastPanelOpen = null;
-            },
-
-            /**
              * Called when the graphData and rendererData are empty in localStorage
              * @private
              */
@@ -319,17 +78,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 console.log("load defaults!!!");
                 this.set("graphData", DEMO_DUDE_GRAPH_DATA);
                 this.set("rendererData", DEMO_DUDE_RENDERER_DATA);
-            },
-
-            /**
-             * Called when a error occurs in the editor
-             * @param {CustomEvent} e
-             * @private
-             */
-            _error: function (e) {
-                this.$.error.text = e.detail.error;
-                this.$.error.show();
             }
+
         });
     </script>
 </dom-module>

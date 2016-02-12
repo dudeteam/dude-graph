@@ -40,7 +40,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _createButtonClicked: function () {
-                this.get("data.editor.renderer").createRenderGroupForSelection(this.get("_groupName"));
+                this.get("data").$["editor"].get("renderer").createRenderGroupForSelection(this.get("_groupName"));
                 this.set("_groupName", null);
                 this.parentNode.parentNode.close();
             }

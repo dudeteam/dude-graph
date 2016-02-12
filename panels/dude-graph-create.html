@@ -53,27 +53,28 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _createBlock: function (e) {
+                var editor = this.get("data").$["editor"];
                 if (e.detail.item.name === "New variable..." && e.detail.item.name === "New function...") {
-                    this.get("data.editor").createVariableOrFunction(e);
+                    editor.createVariableOrFunction(e);
                 }
                 if (e.detail.item.data) {
-                    var cgBlock = this.get("data.editor.loader").loadBlock(this.get("data.editor.graph"),
+                    var cgBlock = editor.get("loader").loadBlock(editor.get("graph"),
                             _.merge(e.detail.item.data, {
                         "cgId": dudeGraph.uuid()
                     }));
-                    var toRenderBlock = this.get("data.editor.renderer").createRenderBlock({
+                    var toRenderBlock = editor.get("renderer").createRenderBlock({
                         "id": cgBlock.cgId,
                         "cgBlock": cgBlock.cgId
                     }, true);
                     toRenderBlock.update();
-                    this.get("data.editor.renderer").clearSelection();
-                    this.get("data.editor.renderer").addToSelection([toRenderBlock]);
-                    this.get("data.editor.renderer").panToFitRenderNodes([toRenderBlock]);
+                    editor.get("renderer").clearSelection();
+                    editor.get("renderer").addToSelection([toRenderBlock]);
+                    editor.get("renderer").panToFitRenderNodes([toRenderBlock]);
                 }
             },
 
             _createGroupButtonClicked: function () {
-                this.get("data.wrapper")._openPanel("createGroupPanel");
+                this.get("data").openPanel("createGroupPanel");
             }
         });
     </script>
