@@ -7,6 +7,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="dude-graph-editor.html">
 <link rel="import" href="panels/dude-graph-create.html">
 <link rel="import" href="panels/dude-graph-create-group.html">
+<link rel="import" href="panels/dude-graph-create-function.html">
+<link rel="import" href="panels/dude-graph-create-variable.html">
 <link rel="import" href="panels/dude-graph-edit-group.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
 <link rel="import" href="../dude-toolbar/dude-toolbar.html">
@@ -46,6 +48,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-sidebar id="createGroupPanel"
                                   panel-title="Create group"
                                   panel-element="dude-graph-create-group"
+                                  data="{{ _context }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
+                    <dude-sidebar id="createVariablePanel"
+                                  panel-title="Create variable"
+                                  panel-element="dude-graph-create-variable"
+                                  data="{{ _context }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
+                    <dude-sidebar id="createFunctionPanel"
+                                  panel-title="Create function"
+                                  panel-element="dude-graph-create-function"
                                   data="{{ _context }}"
                                   on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
@@ -187,6 +201,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             selectAll: function () {
                 this.$.editor.get("renderer").selectAll(false, false);
+            },
+
+            createBlock: function (blockData) {
+                var toRenderBlock = this.$.editor.createBlock(blockData);
+                this.$.editor.focusBlock(toRenderBlock);
             },
 
             /**

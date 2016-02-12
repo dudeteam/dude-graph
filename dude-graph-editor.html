@@ -337,16 +337,27 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         },
 
         /**
+         * Focus the camera on the given block.
+         */
+        focusBlock: function (block) {
+            block.update();
+            this.get("renderer").clearSelection();
+            this.get("renderer").addToSelection([block]);
+            this.get("renderer").panToFitRenderNodes([block]);
+
+        },
+
+        /**
          *
          * @param {CustomEvent} e
          * @private
          */
         _autocomplete: function (e) {
             if (e.detail.item.data) {
+                var toRenderBlock = this.createBlock(e.detail.item.data);
                 var draggingRenderPoint = this._autocompleteRenderConnection.draggingRenderPoint;
                 var fromRenderPoint = this._autocompleteRenderConnection.realRenderPoint;
                 var fromRenderBlock = fromRenderPoint.renderBlock;
-                var toRenderBlock = this.createBlock(e.detail.item.data);
                 var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
                             // Tries to find the best suitable point
                             return renderPoint.point.isOutput !== fromRenderPoint.point.isOutput &&
@@ -358,16 +369,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
                 // TODO: Move the block at the mouse position
                 toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
-                toRenderBlock.update();
+                this.focusBlock(toRenderBlock);
                 var connection = fromRenderPoint.point.connect(toRenderPoint.point);
                 this.get("renderer").createRenderConnection({
                     connection: connection,
                     outputRenderBlock: fromRenderPoint.point.isOutput ? fromRenderBlock : toRenderBlock,
                     inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
                 }, true);
-                this.get("renderer").clearSelection();
-                this.get("renderer").addToSelection([toRenderBlock]);
-                this.get("renderer").panToFitRenderNodes([toRenderBlock]);
             }
             this.$["autocompletePopup"].close();
         },

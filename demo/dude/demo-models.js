@@ -1,17 +1,5 @@
 var DEMO_DUDE_MODEL_DATA = [
     {
-        "item": {
-            "name": "New variable...",
-            "icon": "fa fa-plus-circle"
-        }
-    },
-    {
-        "item": {
-            "name": "New function...",
-            "icon": "fa fa-plus-square"
-        }
-    },
-    {
         "group": {
             "name": "Variables",
             "items": []

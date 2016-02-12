@@ -31,6 +31,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
         <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
+        <paper-button on-click="_createVariableButtonClicked">Create variable</paper-button>
+        <paper-button on-click="_createFunctionButtonClicked">Create function</paper-button>
     </template>
     <script>
         Polymer({
@@ -53,28 +55,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _createBlock: function (e) {
-                var editor = this.get("data").$["editor"];
-                if (e.detail.item.name === "New variable..." && e.detail.item.name === "New function...") {
-                    editor.createVariableOrFunction(e);
-                }
-                if (e.detail.item.data) {
-                    var cgBlock = editor.get("loader").loadBlock(editor.get("graph"),
-                            _.merge(e.detail.item.data, {
-                        "cgId": dudeGraph.uuid()
-                    }));
-                    var toRenderBlock = editor.get("renderer").createRenderBlock({
-                        "id": cgBlock.cgId,
-                        "cgBlock": cgBlock.cgId
-                    }, true);
-                    toRenderBlock.update();
-                    editor.get("renderer").clearSelection();
-                    editor.get("renderer").addToSelection([toRenderBlock]);
-                    editor.get("renderer").panToFitRenderNodes([toRenderBlock]);
-                }
+                this.get("data").createBlock(e.detail.item.data);
             },
 
             _createGroupButtonClicked: function () {
                 this.get("data").openPanel("createGroupPanel");
+            },
+
+            _createVariableButtonClicked: function () {
+                this.get("data").openPanel("createVariablePanel");
+            },
+
+            _createFunctionButtonClicked: function () {
+                this.get("data").openPanel("createFunctionPanel");
             }
         });
     </script>
