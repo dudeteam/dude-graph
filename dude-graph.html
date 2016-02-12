@@ -116,64 +116,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             attached: function () {
                 this.set("_context", this);
                 this.$.editor.start();
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-save",
-                    description: "Save",
-                    shortcut: ["ctrl+s", "meta+s"],
-                    action: this._save.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-plus",
-                    description: "Create",
-                    shortcut: ["ctrl+g", "meta+g"],
-                    action: this._createGroup.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-play",
-                    description: "Build",
-                    shortcut: ["ctrl+b", "meta+b"],
-                    action: this._build.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-trash",
-                    description: "Remove",
-                    shortcut: ["del", "meta+backspace"],
-                    action: this._removeSelection.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Fit",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: this._zoomToFit.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-compress",
-                    description: "Focus",
-                    shortcut: ["ctrl+shift+0", "meta+shift+0"],
-                    action: this._zoomToSelection.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Blocks",
-                    shortcut: ["ctrl+shift+a", "meta+shift+a"],
-                    action: this._selectAllBlocks.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Groups",
-                    shortcut: ["ctrl+alt+a", "meta+alt+a"],
-                    action: this._selectAllGroups.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "All",
-                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
-                    action: this._selectAll.bind(this)
-                });
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
                 this.$.editor.get("renderer").on("select", function (renderNode) {
                     this.openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");
@@ -192,68 +134,58 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Save command.
+             * Add a new command within the toolbar.
              */
-            _save: function () {
-                var data = this.$.editor.get("renderer").save();
-                this.set("graphData", data.graphData);
-                this.set("rendererData", data.rendererData);
+            addCommand: function (options) {
+                this.$.toolbar.addCommand(options);
             },
 
             /**
-             * Build command.
+             * Save command.
              */
-            _build: function () {
-                console.log("build...");
+            save: function () {
+                return this.$.editor.save();
             },
 
             /**
              * RemoveSelection command.
              */
-            _removeSelection: function () {
+            removeSelection: function () {
                 this.$.editor.get("renderer").removeSelection();
-            },
-
-            /**
-             * Create group command.
-             */
-            _createGroup: function () {
-                this.openPanel("createPanel");
             },
 
             /**
              * Zoom to fit command.
              */
-            _zoomToFit: function () {
+            zoomToFit: function () {
                 this.$.editor.get("renderer").zoomToFit();
             },
 
             /**
              * Zoom to selection command.
              */
-            _zoomToSelection: function () {
-                console.log("coucou");
+            zoomFitToSelection: function () {
                 this.$.editor.get("renderer").zoomToFitSelection();
             },
 
             /**
              * Select all groups command.
              */
-            _selectAllGroups: function () {
+            selectAllGroups: function () {
                 this.$.editor.get("renderer").selectAll(true, false);
             },
 
             /**
              * Select all blocks command.
              */
-            _selectAllBlocks: function () {
+            selectAllBlocks: function () {
                 this.$.editor.get("renderer").selectAll(false, true);
             },
 
             /**
              * Select all command.
              */
-            _selectAll: function () {
+            selectAll: function () {
                 this.$.editor.get("renderer").selectAll(false, false);
             },
 

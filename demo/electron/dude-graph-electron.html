@@ -169,7 +169,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
                 ipcRenderer.send("dude-graph-ready");
             },
-            _save: function (e) {
+            save: function (e) {
                 ipcRenderer.send("dude-graph-save", e.detail);
             },
             _build: function (e) {

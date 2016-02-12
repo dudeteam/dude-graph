@@ -70,6 +70,73 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
             },
 
+            attached: function () {
+                this.$.context.addCommand({
+                    icon: "fa fa-save",
+                    description: "Save",
+                    shortcut: ["ctrl+s", "meta+s"],
+                    action: function () {
+                        var data = this.$.context.save();
+                        this.set("graphData", data.graphData);
+                        this.set("rendererData", data.rendererData);
+                    }.bind(this)
+                });
+                this.$.context.addCommand({
+                    icon: "fa fa-plus",
+                    description: "Create",
+                    shortcut: ["ctrl+g", "meta+g"],
+                    action: function () { this.$.context.openPanel("createPanel"); }.bind(this)
+                });
+                this.$.context.addCommand({
+                    icon: "fa fa-play",
+                    description: "Build",
+                    shortcut: ["ctrl+b", "meta+b"],
+                    action: function () {
+                        console.log("Building graph...");
+                    }.bind(this)
+                });
+                this.$.context.addCommand({
+                    icon: "fa fa-trash",
+                    description: "Remove",
+                    shortcut: ["del", "meta+backspace"],
+                    action: this.$.context.removeSelection.bind(this.$.context)
+                });
+                this.$.context.addCommand({
+                    icon: "fa fa-compress",
+                    description: "Fit",
+                    shortcut: ["ctrl+0", "meta+0"],
+                    action: this.$.context.zoomToFit.bind(this.$.context)
+                });
+                this.$.context.addCommand({
+                    hidden: true,
+                    icon: "fa fa-compress",
+                    description: "Focus",
+                    shortcut: ["ctrl+shift+0", "meta+shift+0"],
+                    action: this.$.context.zoomFitToSelection.bind(this.$.context)
+                });
+                this.$.toolbar.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "Blocks",
+                    shortcut: ["ctrl+shift+a", "meta+shift+a"],
+                    action: this.$.context.selectAllBlocks.bind(this.$.context)
+                });
+                this.$.context.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "Groups",
+                    shortcut: ["ctrl+alt+a", "meta+alt+a"],
+                    action: this.$.context.selectAllGroups.bind(this.$.context)
+                });
+                this.$.context.addCommand({
+                    hidden: true,
+                    icon: "fa fa-circle",
+                    description: "All",
+                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
+                    action: this.$.context.selectAll.bind(this.$.context)
+                });
+            },
+
             /**
              * Called when the graphData and rendererData are empty in localStorage
              * @private
