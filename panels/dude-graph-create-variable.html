@@ -21,10 +21,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
     </style>
     <template>
+        <dude-property property-name="Variable type"
+                       property-type="Choice"
+                       property-value="{{ _variableType }}"
+                       property-choices="{{ _types }}"
+                       no-menu>
+        </dude-property>
         <dude-property property-name="Variable name"
                        property-type="String"
                        property-value="{{ _variableName }}"
                        no-menu>
+        </dude-property>
+        <dude-property property-name="Variable value"
+                       property-type="{{ _variableType }}">
         </dude-property>
         <br />
         <paper-button on-click="_createButtonClicked">Create</paper-button>
@@ -37,6 +46,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 data: {
                     type: Object
                 }
+            },
+
+            ready: function () {
+                this.set("_types", ["String", "Number", "Boolean", "Entity"]);
             },
 
             _createButtonClicked: function () {
