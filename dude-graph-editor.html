@@ -307,7 +307,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             var modelsFound = [];
             (function recursiveQueryModels(models) {
                 _.forEach(models, function (model) {
-                    if (!_.isUndefined(model.item)) {
+                    if (!_.isUndefined(model.item) && !_.isUndefined(model.item.data)) {
                         var cgLookupPoints = isOutput ? model.item.data.cgInputs : model.item.data.cgOutputs;
                         var found = _.find(cgLookupPoints, function (point) {
                             return point.cgType === type || point.cgValueType === type;
