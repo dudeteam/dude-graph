@@ -15,24 +15,24 @@
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block(graph, {});
             graph.addBlock(block);
-            expect(graph.cgBlocks[0]).to.be.equal(block);
-            expect(graph.blockById(block.cgId)).to.be.equal(block);
+            expect(graph.graphBlocks[0]).to.be.equal(block);
+            expect(graph.blockById(block.blockId)).to.be.equal(block);
         });
         test("create basic graph and a block with one input and one output", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block(graph, {});
-            var outputPoint = new dudeGraph.Point(block, {
-                "cgName": "out",
-                "cgValueType": "Number"
-            }, true, null);
-            var inputPoint = new dudeGraph.Point(block, {
-                "cgName": "in",
-                "cgValueType": "String"
-            }, false, null);
+            var outputPoint = new dudeGraph.Point(block, true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            var inputPoint = new dudeGraph.Point(block, false, {
+                "pointName": "in",
+                "pointValueType": "String"
+            });
             graph.addBlock(block);
             var i = 0;
-            graph.on("cg-point-add", function (_block, point) {
-                expect(_block).to.be.equal(block);
+            graph.on("point-add", function (contextBlock, point) {
+                expect(contextBlock).to.be.equal(block);
                 expect(point === outputPoint || point === inputPoint).to.be.equal(true);
                 i++;
             });
@@ -40,128 +40,128 @@
             block.addPoint(inputPoint);
             expect(i).to.be.equal(2);
             expect(block.outputByName("out")).to.be.equal(outputPoint);
-            expect(block.cgOutputs[0]).to.be.equal(outputPoint);
+            expect(block.blockInputPoints[0]).to.be.equal(outputPoint);
             expect(block.inputByName("in")).to.be.equal(inputPoint);
-            expect(block.cgInputs[0]).to.be.equal(inputPoint);
-            expect(block.outputByName("out").cgValueType).to.be.equal("Number");
-            expect(block.inputByName("in").cgValueType).to.be.equal("String");
+            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
+            expect(block.outputByName("out").pointValueType).to.be.equal("Number");
+            expect(block.inputByName("in").pointValueType).to.be.equal("String");
         });
-        test("create basic graph with two blocks connected and disconnect them", function () {
+        test("create basic graph with two graphBlocks connected and disconnect them", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block(graph, {});
-            var outputPoint1 = new dudeGraph.Point(block1, {
-                "cgName": "out",
-                "cgValueType": "Number"
-            }, true, null);
+            var outputPoint1 = new dudeGraph.Point(block1, true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
             block1.addPoint(outputPoint1);
             graph.addBlock(block1);
             var block2 = new dudeGraph.Block(graph, {});
-            var inputPoint2 = new dudeGraph.Point(block2, {
-                "cgName": "in",
-                "cgValueType": "Number"
-            }, false, null);
+            var inputPoint2 = new dudeGraph.Point(block2, false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
             block2.addPoint(inputPoint2);
             graph.addBlock(block2);
             outputPoint1.connect(inputPoint2);
-            expect(graph.cgConnections).to.have.length(1);
-            expect(outputPoint1.cgConnections).to.have.length(1);
-            expect(inputPoint2.cgConnections).to.have.length(1);
-            expect(outputPoint1.cgConnections[0]).to.be.equal(graph.cgConnections[0]);
-            expect(inputPoint2.cgConnections[0]).to.be.equal(graph.cgConnections[0]);
-            expect(outputPoint1.cgConnections[0]).to.be.equal(inputPoint2.cgConnections[0]);
+            expect(graph.graphConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections).to.have.length(1);
+            expect(inputPoint2.pointConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
             outputPoint1.disconnect(inputPoint2);
-            expect(graph.cgConnections).to.have.length(0);
-            expect(outputPoint1.cgConnections).to.have.length(0);
-            expect(inputPoint2.cgConnections).to.have.length(0);
+            expect(graph.graphConnections).to.have.length(0);
+            expect(outputPoint1.pointConnections).to.have.length(0);
+            expect(inputPoint2.pointConnections).to.have.length(0);
             // Test associativity point1.connect(point2) === point2.connect(point1)
             inputPoint2.connect(outputPoint1);
-            expect(graph.cgConnections).to.have.length(1);
-            expect(outputPoint1.cgConnections).to.have.length(1);
-            expect(inputPoint2.cgConnections).to.have.length(1);
-            expect(outputPoint1.cgConnections[0]).to.be.equal(graph.cgConnections[0]);
-            expect(inputPoint2.cgConnections[0]).to.be.equal(graph.cgConnections[0]);
-            expect(outputPoint1.cgConnections[0]).to.be.equal(inputPoint2.cgConnections[0]);
+            expect(graph.graphConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections).to.have.length(1);
+            expect(inputPoint2.pointConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
             // Test associativity point1.disconnect(point2) === point2.disconnect(point1)
             inputPoint2.disconnect(outputPoint1);
-            expect(graph.cgConnections).to.have.length(0);
-            expect(outputPoint1.cgConnections).to.have.length(0);
-            expect(inputPoint2.cgConnections).to.have.length(0);
+            expect(graph.graphConnections).to.have.length(0);
+            expect(outputPoint1.pointConnections).to.have.length(0);
+            expect(inputPoint2.pointConnections).to.have.length(0);
         });
         test("add/remove of points", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block(graph, {});
-            var outputPoint = new dudeGraph.Point(block, {
-                "cgName": "out",
-                "cgValueType": "Number"
-            }, true, null);
-            var inputPoint = new dudeGraph.Point(block, {
-                "cgName": "in",
-                "cgValueType": "Number"
-            }, false, null);
+            var outputPoint = new dudeGraph.Point(block, true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            var inputPoint = new dudeGraph.Point(block, false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
             block.addPoint(outputPoint);
             block.addPoint(inputPoint);
             graph.addBlock(block);
-            expect(block.cgOutputs).to.have.length(1);
-            expect(block.cgInputs).to.have.length(1);
-            expect(block.cgOutputs[0]).to.be.equal(outputPoint);
-            expect(block.cgInputs[0]).to.be.equal(inputPoint);
+            expect(block.blockInputPoints).to.have.length(1);
+            expect(block.blockInputPoints).to.have.length(1);
+            expect(block.blockInputPoints[0]).to.be.equal(outputPoint);
+            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
             expect(block.outputByName("out")).to.be.equal(outputPoint);
             expect(block.inputByName("in")).to.be.equal(inputPoint);
             block.removePoint(inputPoint);
-            expect(block.cgInputs).to.have.length(0);
+            expect(block.blockInputPoints).to.have.length(0);
             expect(block.inputByName("in")).to.be.null;
             block.addPoint(inputPoint);
-            expect(block.cgInputs).to.have.length(1);
-            expect(block.cgInputs[0]).to.be.equal(inputPoint);
+            expect(block.blockInputPoints).to.have.length(1);
+            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
         });
         test("ill-formed templated point", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block(graph, {
-                "cgTemplates": {
+                "blockTemplates": {
                     "ValueType": ["String", "Boolean"]
                 }
             });
             expect(function () {
                 new dudeGraph.Point(block1, {
-                    "cgName": "in",
-                    "cgValueType": "Number",
-                    "cgTemplate": "ValueType"
+                    "pointName": "in",
+                    "pointValueType": "Number",
+                    "pointTemplate": "ValueType"
                 }, false, null);
             }).to.throw();
         });
         test("templated types", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block(graph, {});
-            var outputPoint1_1 = new dudeGraph.Point(block1, {
-                "cgName": "out",
-                "cgValueType": "String"
-            }, true, null);
+            var outputPoint1_1 = new dudeGraph.Point(block1, true, {
+                "pointName": "out",
+                "pointValueType": "String"
+            });
             block1.addPoint(outputPoint1_1);
-            var outputPoint1_2 = new dudeGraph.Point(block1, {
-                "cgName": "out2",
-                "cgValueType": "String"
-            }, true, null);
+            var outputPoint1_2 = new dudeGraph.Point(block1, true, {
+                "pointName": "out2",
+                "pointValueType": "String"
+            });
             block1.addPoint(outputPoint1_2);
             graph.addBlock(block1);
             var block2 = new dudeGraph.Block(graph, {
-                "cgTemplates": {
+                "blockTemplates": {
                     "ValueType": [
                         "Number",
                         "String"
                     ]
                 }
             });
-            var inputPoint2_1 = new dudeGraph.Point(block2, {
-                "cgName": "in",
-                "cgValueType": "Number",
-                "cgTemplate": "ValueType"
-            }, false, null);
+            var inputPoint2_1 = new dudeGraph.Point(block2, false, {
+                "pointName": "in",
+                "pointValueType": "Number",
+                "pointTemplate": "ValueType"
+            });
             block2.addPoint(inputPoint2_1);
-            var inputPoint2_2 = new dudeGraph.Point(block2, {
-                "cgName": "in2",
-                "cgValueType": "Number",
-                "cgTemplate": "ValueType"
-            }, false, null);
+            var inputPoint2_2 = new dudeGraph.Point(block2, false, {
+                "pointName": "in2",
+                "pointValueType": "Number",
+                "pointTemplate": "ValueType"
+            });
             block2.addPoint(inputPoint2_2);
             graph.addBlock(block2);
             outputPoint1_1.connect(inputPoint2_1);
@@ -170,36 +170,36 @@
         test("template mismatch", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block(graph, {});
-            var outputPoint1_1 = new dudeGraph.Point(block1, {
-                "cgName": "out",
-                "cgValueType": "String"
-            }, true, null);
+            var outputPoint1_1 = new dudeGraph.Point(block1, true, {
+                "pointName": "out",
+                "pointValueType": "String"
+            });
             block1.addPoint(outputPoint1_1);
-            var outputPoint1_2 = new dudeGraph.Point(block1, {
-                "cgName": "out2",
-                "cgValueType": "Number"
-            }, true, null);
+            var outputPoint1_2 = new dudeGraph.Point(block1, true, {
+                "pointName": "out2",
+                "pointValueType": "Number"
+            });
             block1.addPoint(outputPoint1_2);
             graph.addBlock(block1);
             var block2 = new dudeGraph.Block(graph, {
-                "cgTemplates": {
+                "blockTemplates": {
                     "ValueType": [
                         "Number",
                         "String"
                     ]
                 }
             });
-            var inputPoint2_1 = new dudeGraph.Point(block2, {
-                "cgName": "in",
-                "cgValueType": "Number",
-                "cgTemplate": "ValueType"
-            }, false, null);
+            var inputPoint2_1 = new dudeGraph.Point(block2, false, {
+                "pointName": "in",
+                "pointValueType": "Number",
+                "pointTemplate": "ValueType"
+            });
             block2.addPoint(inputPoint2_1);
-            var inputPoint2_2 = new dudeGraph.Point(block2, {
-                "cgName": "in2",
-                "cgValueType": "Number",
-                "cgTemplate": "ValueType"
-            }, false, null);
+            var inputPoint2_2 = new dudeGraph.Point(block2, false, {
+                "pointName": "in2",
+                "pointValueType": "Number",
+                "pointTemplate": "ValueType"
+            });
             block2.addPoint(inputPoint2_2);
             graph.addBlock(block2);
             outputPoint1_1.connect(inputPoint2_1);
