@@ -87,7 +87,7 @@
             expect(outputPoint1.cgConnections).to.have.length(0);
             expect(inputPoint2.cgConnections).to.have.length(0);
         });
-        test("test add/remove of points", function () {
+        test("add/remove of points", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block(graph, {});
             var outputPoint = new dudeGraph.Point(block, {
@@ -113,6 +113,99 @@
             block.addPoint(inputPoint);
             expect(block.cgInputs).to.have.length(1);
             expect(block.cgInputs[0]).to.be.equal(inputPoint);
+        });
+        test("ill-formed templated point", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block(graph, {
+                "cgTemplates": {
+                    "ValueType": ["String", "Boolean"]
+                }
+            });
+            expect(function () {
+                new dudeGraph.Point(block1, {
+                    "cgName": "in",
+                    "cgValueType": "Number",
+                    "cgTemplate": "ValueType"
+                }, false, null);
+            }).to.throw();
+        });
+        test("templated types", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block(graph, {});
+            var outputPoint1_1 = new dudeGraph.Point(block1, {
+                "cgName": "out",
+                "cgValueType": "String"
+            }, true, null);
+            block1.addPoint(outputPoint1_1);
+            var outputPoint1_2 = new dudeGraph.Point(block1, {
+                "cgName": "out2",
+                "cgValueType": "String"
+            }, true, null);
+            block1.addPoint(outputPoint1_2);
+            graph.addBlock(block1);
+            var block2 = new dudeGraph.Block(graph, {
+                "cgTemplates": {
+                    "ValueType": [
+                        "Number",
+                        "String"
+                    ]
+                }
+            });
+            var inputPoint2_1 = new dudeGraph.Point(block2, {
+                "cgName": "in",
+                "cgValueType": "Number",
+                "cgTemplate": "ValueType"
+            }, false, null);
+            block2.addPoint(inputPoint2_1);
+            var inputPoint2_2 = new dudeGraph.Point(block2, {
+                "cgName": "in2",
+                "cgValueType": "Number",
+                "cgTemplate": "ValueType"
+            }, false, null);
+            block2.addPoint(inputPoint2_2);
+            graph.addBlock(block2);
+            outputPoint1_1.connect(inputPoint2_1);
+            outputPoint1_2.connect(inputPoint2_2);
+        });
+        test("template mismatch", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block(graph, {});
+            var outputPoint1_1 = new dudeGraph.Point(block1, {
+                "cgName": "out",
+                "cgValueType": "String"
+            }, true, null);
+            block1.addPoint(outputPoint1_1);
+            var outputPoint1_2 = new dudeGraph.Point(block1, {
+                "cgName": "out2",
+                "cgValueType": "Number"
+            }, true, null);
+            block1.addPoint(outputPoint1_2);
+            graph.addBlock(block1);
+            var block2 = new dudeGraph.Block(graph, {
+                "cgTemplates": {
+                    "ValueType": [
+                        "Number",
+                        "String"
+                    ]
+                }
+            });
+            var inputPoint2_1 = new dudeGraph.Point(block2, {
+                "cgName": "in",
+                "cgValueType": "Number",
+                "cgTemplate": "ValueType"
+            }, false, null);
+            block2.addPoint(inputPoint2_1);
+            var inputPoint2_2 = new dudeGraph.Point(block2, {
+                "cgName": "in2",
+                "cgValueType": "Number",
+                "cgTemplate": "ValueType"
+            }, false, null);
+            block2.addPoint(inputPoint2_2);
+            graph.addBlock(block2);
+            outputPoint1_1.connect(inputPoint2_1);
+            expect(function () {
+                outputPoint1_2.connect(inputPoint2_2);
+            }).to.throw();
         });
     });
 </script>
