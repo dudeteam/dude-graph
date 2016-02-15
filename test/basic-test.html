@@ -204,7 +204,7 @@
             expect(connection.connectionOutputPoint).to.be.equal(outputPoint1);
             expect(connection.connectionInputPoint).to.be.equal(inputPoint2);
         });
-        test("disconnect points", function () {
+        test("disconnect points of same type", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block();
             var block2 = new dudeGraph.Block();
@@ -288,128 +288,58 @@
             expect(outputPoint1.pointConnections).to.have.length(0);
             expect(inputPoint2.pointConnections).to.have.length(0);
         });
-        /*
-        test("create graph and an empty block", function () {
+        test("point value", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block();
-            graph.addBlock(block);
-            expect(graph.graphBlocks[0]).to.be.equal(block);
-            expect(graph.blockById(block.blockId)).to.be.equal(block);
-        });
-        test("block with one input and one output", function () {
-            var graph = new dudeGraph.Graph();
-            var block = new dudeGraph.Block();
-            graph.addBlock(block);
-            var outputPoint = new dudeGraph.Point(true, {
-                "pointName": "out",
+            var inputPoint = new dudeGraph.Point(true, {
+                "pointName": "in",
                 "pointValueType": "Number"
             });
-            var inputPoint = new dudeGraph.Point(false, {
-                "pointName": "in",
-                "pointValueType": "String"
-            });
-            var i = 0;
-            graph.on("block-point-add", function (contextBlock, point) {
-                expect(contextBlock).to.be.equal(block);
-                expect(point === outputPoint || point === inputPoint).to.be.equal(true);
-                i++;
-            });
-            block.addPoint(outputPoint);
+            graph.addBlock(block);
             block.addPoint(inputPoint);
-            block.validate();
-            expect(i).to.be.equal(2);
-            expect(block.outputByName("out")).to.be.equal(outputPoint);
-            expect(block.blockOutputPoints[0]).to.be.equal(outputPoint);
-            expect(block.inputByName("in")).to.be.equal(inputPoint);
-            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
-            expect(block.outputByName("out").pointValueType).to.be.equal("Number");
-            expect(block.inputByName("in").pointValueType).to.be.equal("String");
-        });
-        test("add points at positions", function () {
-            var graph = new dudeGraph.Graph();
-            var block = new dudeGraph.Block();
-            graph.addBlock(block);
-            var outputPoint1 = new dudeGraph.Point(true, {
-                "pointName": "out1",
-                "pointValueType": "Number"
-            });
-            var outputPoint2 = new dudeGraph.Point(true, {
-                "pointName": "out2",
-                "pointValueType": "Number"
-            });
-            var outputPoint3 = new dudeGraph.Point(true, {
-                "pointName": "out3",
-                "pointValueType": "Number"
-            });
-            var outputPoint4 = new dudeGraph.Point(true, {
-                "pointName": "out4",
-                "pointValueType": "Number"
-            });
-            var outputPoint5 = new dudeGraph.Point(true, {
-                "pointName": "out5",
-                "pointValueType": "Number"
-            });
-            block.addPoint(outputPoint4);
-            block.addPoint(outputPoint3, 0);
-            block.addPoint(outputPoint1, 0);
-            block.addPoint(outputPoint5);
-            block.addPoint(outputPoint2, 1);
-            block.validate();
-            expect(block.blockOutputPoints[0]).to.be.equal(outputPoint1);
-            expect(block.blockOutputPoints[1]).to.be.equal(outputPoint2);
-            expect(block.blockOutputPoints[2]).to.be.equal(outputPoint3);
-            expect(block.blockOutputPoints[3]).to.be.equal(outputPoint4);
-            expect(block.blockOutputPoints[4]).to.be.equal(outputPoint5);
-        });
-        test("block points connect and disconnect", function () {
-            var graph = new dudeGraph.Graph();
-            var block1 = new dudeGraph.Block();
-            var outputPoint1 = new dudeGraph.Point(true, {
-                "pointName": "out",
-                "pointValueType": "Number"
-            });
-            graph.addBlock(block1);
-            block1.addPoint(outputPoint1);
-            block1.validate();
-            var block2 = new dudeGraph.Block();
-            var inputPoint2 = new dudeGraph.Point(false, {
-                "pointName": "in",
-                "pointValueType": "Number"
-            });
-            graph.addBlock(block2);
-            block2.addPoint(inputPoint2);
-            block2.validate();
-            // Test connect/disconnect
-            outputPoint1.connect(inputPoint2);
-            expect(graph.graphConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections).to.have.length(1);
-            expect(inputPoint2.pointConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
+            // Test value of type `Number`
+            inputPoint.pointValue = 42;
+            expect(inputPoint.pointValue).to.be.equal(42);
+            inputPoint.pointValue = NaN;
+            expect(inputPoint.pointValue).to.be.NaN;
+            inputPoint.pointValue = Infinity;
+            expect(inputPoint.pointValue).to.be.equal(Infinity);
+            inputPoint.pointValue = -Infinity;
+            expect(inputPoint.pointValue).to.be.equal(-Infinity);
+            // Test compatible pointValue
+            inputPoint.pointValue = "32.444";
+            expect(inputPoint.pointValue).to.be.equal(32.444);
+            inputPoint.pointValue = true;
+            expect(inputPoint.pointValue).to.be.equal(1);
+            // Test non compatible pointValue
             expect(function () {
-                outputPoint1.connect(inputPoint2);
+                inputPoint.pointValue = "1234.435.12";
             }).to.throw();
-            outputPoint1.disconnect(inputPoint2);
-            expect(graph.graphConnections).to.have.length(0);
-            expect(outputPoint1.pointConnections).to.have.length(0);
-            expect(inputPoint2.pointConnections).to.have.length(0);
-            // Test associativity point1.(dis)connect(point2) === point2.(dis)connect(point1)
-            inputPoint2.connect(outputPoint1);
-            expect(graph.graphConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections).to.have.length(1);
-            expect(inputPoint2.pointConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
             expect(function () {
-                inputPoint2.connect(outputPoint1);
+                inputPoint.pointValue = [3, true, {}];
             }).to.throw();
-            inputPoint2.disconnect(outputPoint1);
-            expect(graph.graphConnections).to.have.length(0);
-            expect(outputPoint1.pointConnections).to.have.length(0);
-            expect(inputPoint2.pointConnections).to.have.length(0);
+            // Test to create a point with a number pointValue convertible to String
+            var inputPoint2 = new dudeGraph.Point(true, {
+                "pointName": "in2",
+                "pointValueType": "String",
+                "pointValue": 42
+            });
+            block.addPoint(inputPoint2);
+            expect(inputPoint2.pointValue).to.be.equal("42");
+            inputPoint2.pointValue = 32;
+            expect(inputPoint2.pointValue).to.be.equal("32");
+            inputPoint2.pointValue = true;
+            expect(inputPoint2.pointValue).to.be.equal("true");
+            // Test non compatible inline pointValue
+            expect(function () {
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "in2",
+                    "pointValueType": "Number",
+                    "pointValue": "NaN"
+                }));
+            }).to.throw();
         });
+        /*
         test("points connect with types", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block();
