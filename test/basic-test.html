@@ -302,6 +302,8 @@
             expect(inputPoint.pointValue).to.be.equal(42);
             inputPoint.pointValue = NaN;
             expect(inputPoint.pointValue).to.be.NaN;
+            inputPoint.pointValue = null;
+            expect(inputPoint.pointValue).to.be.null;
             inputPoint.pointValue = Infinity;
             expect(inputPoint.pointValue).to.be.equal(Infinity);
             inputPoint.pointValue = -Infinity;
@@ -336,6 +338,34 @@
                     "pointName": "in2",
                     "pointValueType": "Number",
                     "pointValue": "NaN"
+                }));
+            }).to.throw();
+        });
+        test("point value type", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            var inputPoint = new dudeGraph.Point(true, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
+            graph.addBlock(block);
+            block.addPoint(inputPoint);
+            inputPoint.pointValue = 32;
+            inputPoint.pointValueType = "String";
+            expect(inputPoint.pointValueType).to.be.equal("String");
+            expect(inputPoint.pointValue).to.be.equal("32");
+            expect(function () {
+                inputPoint.pointValueType = "Array";
+            }).to.throw();
+            inputPoint.pointValue = null;
+            inputPoint.pointValueType = "Array";
+            expect(inputPoint.pointValueType).to.be.equal("Array");
+            inputPoint.pointValue = [32, [], {}];
+            expect(inputPoint.pointValue).to.be.eql([32, [], {}]);
+            expect(function () {
+                block.addPoint(new dudeGraph.Point(true, {
+                    "pointName": "in2",
+                    "pointValueType": "UnknownValueType" // Unknown type
                 }));
             }).to.throw();
         });
