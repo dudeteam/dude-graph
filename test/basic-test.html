@@ -94,6 +94,55 @@
             block1.addPoint(outputPoint1);
             block1.validate();
             var block2 = new dudeGraph.Block();
+            var inputPoint2 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
+            graph.addBlock(block2);
+            block2.addPoint(inputPoint2);
+            block2.validate();
+            // Test connect/disconnect
+            outputPoint1.connect(inputPoint2);
+            expect(graph.graphConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections).to.have.length(1);
+            expect(inputPoint2.pointConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
+            expect(function () {
+                outputPoint1.connect(inputPoint2);
+            }).to.throw();
+            outputPoint1.disconnect(inputPoint2);
+            expect(graph.graphConnections).to.have.length(0);
+            expect(outputPoint1.pointConnections).to.have.length(0);
+            expect(inputPoint2.pointConnections).to.have.length(0);
+            // Test associativity point1.(dis)connect(point2) === point2.(dis)connect(point1)
+            inputPoint2.connect(outputPoint1);
+            expect(graph.graphConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections).to.have.length(1);
+            expect(inputPoint2.pointConnections).to.have.length(1);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(inputPoint2.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
+            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2.pointConnections[0]);
+            expect(function () {
+                inputPoint2.connect(outputPoint1);
+            }).to.throw();
+            inputPoint2.disconnect(outputPoint1);
+            expect(graph.graphConnections).to.have.length(0);
+            expect(outputPoint1.pointConnections).to.have.length(0);
+            expect(inputPoint2.pointConnections).to.have.length(0);
+        });
+        test("points connect with types", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block();
+            var outputPoint1 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            graph.addBlock(block1);
+            block1.addPoint(outputPoint1);
+            block1.validate();
+            var block2 = new dudeGraph.Block();
             var inputPoint2_1 = new dudeGraph.Point(false, {
                 "pointName": "in",
                 "pointValueType": "Number"
@@ -106,36 +155,11 @@
             block2.addPoint(inputPoint2_1);
             block2.addPoint(inputPoint2_2);
             block2.validate();
-            // Test connect/disconnect
             outputPoint1.connect(inputPoint2_1);
-            expect(graph.graphConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections).to.have.length(1);
-            expect(inputPoint2_1.pointConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(inputPoint2_1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2_1.pointConnections[0]);
-            expect(function () {
-                outputPoint1.connect(inputPoint2_1);
-            }).to.throw();
             outputPoint1.disconnect(inputPoint2_1);
-            expect(graph.graphConnections).to.have.length(0);
-            expect(outputPoint1.pointConnections).to.have.length(0);
-            expect(inputPoint2_1.pointConnections).to.have.length(0);
-            // Test associativity point1.(dis)connect(point2) === point2.(dis)connect(point1)
-            inputPoint2_1.connect(outputPoint1);
-            expect(graph.graphConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections).to.have.length(1);
-            expect(inputPoint2_1.pointConnections).to.have.length(1);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(inputPoint2_1.pointConnections[0]).to.be.equal(graph.graphConnections[0]);
-            expect(outputPoint1.pointConnections[0]).to.be.equal(inputPoint2_1.pointConnections[0]);
             expect(function () {
-                inputPoint2_1.connect(outputPoint1);
+                outputPoint1.connect(inputPoint2_2);
             }).to.throw();
-            inputPoint2_1.disconnect(outputPoint1);
-            expect(graph.graphConnections).to.have.length(0);
-            expect(outputPoint1.pointConnections).to.have.length(0);
-            expect(inputPoint2_1.pointConnections).to.have.length(0);
         });
         test("block points connect and singleConnection and disconnectAll", function () {
             var graph = new dudeGraph.Graph();
