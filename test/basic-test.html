@@ -224,30 +224,21 @@
             block.addPoint(inputPoint);
             expect(inputPoint.pointValueType).to.be.equal("Number");
             expect(inputPoint.pointValue).to.be.equal(32);
+            // _.isNumber(NaN) => true
+            inputPoint.pointValue = NaN;
+            expect(inputPoint.pointValue).to.be.NaN;
+            // _.isNumber(Infinity) => true
+            inputPoint.pointValue = Infinity;
+            expect(inputPoint.pointValue).to.be.equal(Infinity);
+            // _.isNumber(-Infinity) => true
+            inputPoint.pointValue = -Infinity;
+            expect(inputPoint.pointValue).to.be.equal(-Infinity);
             expect(function () {
-                inputPoint.pointValue = "NaN";
-            }).to.throw();
-            expect(function () {
-                inputPoint.pointValue = NaN;
-                inputPoint.pointValue = Infinity;
-                inputPoint.pointValue = -Infinity;
-                inputPoint.pointValue = 32;
-            }).to.not.throw();
-            expect(function () {
-                var badPoint = new dudeGraph.Point(false, {
-                    "pointName": "test1",
-                    "pointValueType": "String",
-                    "pointValue": 32
+                var outputPoint = new dudeGraph.Point(true, {
+                    "pointName": "test",
+                    "pointValueType": "Number",
+                    "pointValue": 32 // Outputs cannot have value
                 });
-                block.addPoint(badPoint);
-            }).to.throw();
-            expect(function () {
-                var badPoint = new dudeGraph.Point(false, {
-                    "pointName": "test2",
-                    "pointValueType": "UnknownType",
-                    "pointValue": NaN
-                });
-                block.addPoint(badPoint);
             }).to.throw();
         });
         test("mix point values and point connections", function () {
@@ -282,11 +273,17 @@
             block2.addPoint(inputPoint2_3);
             outputPoint1.connect(inputPoint2_1);
             expect(function () {
-                outputPoint1.connect(inputPoint2_2); // cannot pointValue and pointConnections
+                outputPoint1.connect(inputPoint2_2); // cannot have a pointValue and pointConnections at same time
             }).to.throw();
             expect(function () {
-                outputPoint1.connect(inputPoint2_3); // cannot pointValue and pointConnections, even if !pointSingleConnection
+                outputPoint1.connect(inputPoint2_3); // even if !pointSingleConnection
             }).to.throw();
+        });
+        test("change point value type and conversion", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            graph.addBlock(block);
+            // var inputPoint =
         });
         /*
         test("custom block and custom point", function () {
