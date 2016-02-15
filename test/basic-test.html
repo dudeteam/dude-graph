@@ -11,6 +11,104 @@
 <body>
 <script>
     suite("basic", function () {
+        test("create graph", function () {
+            var graph = new dudeGraph.Graph();
+        });
+        test("create block", function () {
+            var block = new dudeGraph.Block({
+                "blockId": "testId",
+                "blockName": "Test",
+                "blockTemplates": {
+                    "ValueType": ["Number", "String"]
+                }
+            });
+            expect(block.blockId).to.be.equal("testId");
+            expect(block.blockType).to.be.equal("Block");
+            expect(block.blockName).to.be.equal("Test");
+            expect(block.blockTemplates).to.be.eql({
+                "ValueType": ["Number", "String"]
+            });
+            // Different ways of creating a block
+            new dudeGraph.Block();
+            new dudeGraph.Block({
+                "blockId": "testId"
+            });
+            new dudeGraph.Block({
+                "blockName": "testId"
+            });
+            new dudeGraph.Block({
+                "blockTemplates": {
+                    "ValueType": ["Number", "String"]
+                }
+            });
+        });
+        test("create graph block", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            expect(block.blockId).to.be.null;
+            graph.addBlock(block);
+            expect(block.blockId).to.be.not.null;
+            expect(graph.graphBlocks[0]).to.be.equal(block);
+            // Cannot add the same block again
+            expect(function () {
+                graph.addBlock(block);
+            }).to.throw();
+        });
+        test("create point", function () {
+            var outputPoint = new dudeGraph.Point(true, {
+                "pointName": "output",
+                "pointValueType": "Whatever" // pointValueType is enforced only when adding to a block
+            });
+            expect(outputPoint.pointBlock).to.be.null;
+            expect(outputPoint.pointOutput).to.be.true;
+            expect(outputPoint.pointType).to.be.equal("Point");
+            expect(outputPoint.pointName).to.be.equal("output");
+            expect(outputPoint.pointValueType).to.be.equal("Whatever");
+            var inputPoint = new dudeGraph.Point(false, {
+                "pointName": "input",
+                "pointValueType": "WhateverAgain", // pointValueType is enforced only when adding to a block
+                "pointValue": {"whatever": true} // pointValue is enforced to valueType only when adding to a block
+            });
+            expect(inputPoint.pointBlock).to.be.null;
+            expect(inputPoint.pointOutput).to.be.false;
+            expect(inputPoint.pointType).to.be.equal("Point");
+            expect(inputPoint.pointName).to.be.equal("input");
+            expect(inputPoint.pointValueType).to.be.equal("WhateverAgain");
+            expect(inputPoint.pointValue).to.be.eql({"whatever": true});
+            // Ill-formed points
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                new dudeGraph.Point(true, {
+                    "pointName": "output"
+                    // pointValueType is mandatory
+                });
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                new dudeGraph.Point(true, {
+                    // pointName is mandatory
+                    "pointValueType": "Whatever"
+                });
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                new dudeGraph.Point(true, {
+                    "pointName": false, // pointName must be a String
+                    "pointValueType": "Whatever"
+                });
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                new dudeGraph.Point(true, {
+                    "pointName": "output",
+                    "pointValueType": new dudeGraph.Graph() // pointValueType must be a String
+                });
+            }).to.throw();
+        });
+        test("create block point", function () {
+
+        });
+        /*
         test("create graph and an empty block", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block();
@@ -285,7 +383,6 @@
             graph.addBlock(block);
             // var inputPoint =
         });
-        /*
         test("custom block and custom point", function () {
 
         });
