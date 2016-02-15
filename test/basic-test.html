@@ -368,11 +368,13 @@
                     "pointValueType": "UnknownValueType" // Unknown type
                 }));
             }).to.throw();
-            graph.addType("NewType", function (value) {
-                if (value === "NewValue") {
-                    return "ThisIsACorrectNewValue";
+            graph.addType("NewType", {
+                "convert": function (value) {
+                    if (value === "NewValue") {
+                        return "ThisIsACorrectNewValue";
+                    }
+                    return undefined;
                 }
-                return undefined;
             });
             expect(function () {
                 graph.addType("NewType", _.noop); // Cannot add twice the same type name
@@ -394,6 +396,9 @@
             inputPoint.pointValueType = "NewType";
             expect(inputPoint.pointValueType).to.be.equal("NewType");
             expect(inputPoint.pointValue).to.be.equal("ThisIsACorrectNewValue");
+        });
+        test("connect compatible types", function () {
+
         });
         /*
         test("points connect with types", function () {
