@@ -106,7 +106,98 @@
             }).to.throw();
         });
         test("create block point", function () {
-
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            var outputPoint = new dudeGraph.Point(true, {
+                "pointName": "output",
+                "pointValueType": "String"
+            });
+            expect(function () {
+                block.addPoint(outputPoint); // The block must be added to the graph to accept points
+            }).to.throw();
+            graph.addBlock(block);
+            block.addPoint(outputPoint);
+            expect(block.blockOutputPoints).to.have.length(1);
+            expect(block.blockInputPoints).to.have.length(0);
+            expect(function () {
+                block.addPoint(new dudeGraph.Point(true, {
+                    "pointName": "output", // Cannot add 2 outputs with the same name
+                    "pointValueType": "String"
+                }));
+            }).to.throw();
+            block.addPoint(new dudeGraph.Point(false, {
+                "pointName": "output", // But can add an input with the same name as an output
+                "pointValueType": "String"
+            }));
+            expect(block.blockOutputPoints).to.have.length(1);
+            expect(block.blockInputPoints).to.have.length(1);
+            expect(function () {
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "output", // But still cannot add 2 inputs with the same name
+                    "pointValueType": "String"
+                }));
+            }).to.throw();
+        });
+        test("create block point at positions", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            graph.addBlock(block);
+            var outputPoint1 = new dudeGraph.Point(true, {
+                "pointName": "out1",
+                "pointValueType": "Number"
+            });
+            var outputPoint2 = new dudeGraph.Point(true, {
+                "pointName": "out2",
+                "pointValueType": "Number"
+            });
+            var outputPoint3 = new dudeGraph.Point(true, {
+                "pointName": "out3",
+                "pointValueType": "Number"
+            });
+            var outputPoint4 = new dudeGraph.Point(true, {
+                "pointName": "out4",
+                "pointValueType": "Number"
+            });
+            var outputPoint5 = new dudeGraph.Point(true, {
+                "pointName": "out5",
+                "pointValueType": "Number"
+            });
+            block.addPoint(outputPoint4); // Add to end [4]
+            block.addPoint(outputPoint2, 0); // Add to start [2, 4]
+            block.addPoint(outputPoint1, 0); // Add to start [1, 2, 4]
+            block.addPoint(outputPoint5); // Add to end [1, 2, 4, 5]
+            block.addPoint(outputPoint3, 2); // Add to 2nd position [1, 2, 3, 4, 5]
+            block.validate(); // Block should be validated when the basic points are created
+            expect(block.blockOutputPoints[0]).to.be.equal(outputPoint1);
+            expect(block.blockOutputPoints[1]).to.be.equal(outputPoint2);
+            expect(block.blockOutputPoints[2]).to.be.equal(outputPoint3);
+            expect(block.blockOutputPoints[3]).to.be.equal(outputPoint4);
+            expect(block.blockOutputPoints[4]).to.be.equal(outputPoint5);
+        });
+        test("connect points of same type", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block();
+            var block2 = new dudeGraph.Block();
+            graph.addBlock(block1);
+            graph.addBlock(block2);
+            var outputPoint1 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            var inputPoint2 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
+            /*
+            expect(function () {
+                outputPoint1.connect(inputPoint2); // The points are not bound to blocks
+            }).to.throw();
+            block1.addPoint(outputPoint1);
+            expect(function () {
+                outputPoint1.connect(inputPoint2); // inputPoint2 is not bound to a block
+            }).to.throw();
+            block2.addPoint(inputPoint2);
+            */
         });
         /*
         test("create graph and an empty block", function () {
