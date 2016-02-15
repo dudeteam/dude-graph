@@ -368,6 +368,32 @@
                     "pointValueType": "UnknownValueType" // Unknown type
                 }));
             }).to.throw();
+            graph.addType("NewType", function (value) {
+                if (value === "NewValue") {
+                    return "ThisIsACorrectNewValue";
+                }
+                return undefined;
+            });
+            expect(function () {
+                graph.addType("NewType", _.noop); // Cannot add twice the same type name
+            }).to.throw();
+            inputPoint.pointValue = null;
+            inputPoint.pointValueType = "NewType";
+            inputPoint.pointValue = "NewValue";
+            expect(inputPoint.pointValueType).to.be.equal("NewType");
+            expect(inputPoint.pointValue).to.be.equal("ThisIsACorrectNewValue");
+            expect(function () {
+                inputPoint.pointValue = "NewNewValue"; // Only "NewValue" is accepted for `NewType`
+            }).to.throw();
+            // Reconvert to `String` as "ThisIsACorrectNewValue" is convertible to `String`
+            inputPoint.pointValueType = "String";
+            expect(inputPoint.pointValue).to.be.equal("ThisIsACorrectNewValue");
+            inputPoint.pointValue = "NewValue";
+            expect(inputPoint.pointValue).to.be.equal("NewValue");
+            // Reconvert to `NewType` as "NewValue" is acceptable as `NewType`
+            inputPoint.pointValueType = "NewType";
+            expect(inputPoint.pointValueType).to.be.equal("NewType");
+            expect(inputPoint.pointValue).to.be.equal("ThisIsACorrectNewValue");
         });
         /*
         test("points connect with types", function () {
