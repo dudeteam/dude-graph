@@ -398,7 +398,39 @@
             expect(inputPoint.pointValue).to.be.equal("ThisIsACorrectNewValue");
         });
         test("connect compatible types", function () {
-
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block();
+            var block2 = new dudeGraph.Block();
+            graph.addBlock(block1);
+            graph.addBlock(block2);
+            var outputPoint1_1 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            var outputPoint1_2 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Boolean"
+            });
+            var inputPoint2_1 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Boolean"
+            });
+            var inputPoint2_2 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
+            block1.addPoint(outputPoint1_1);
+            block2.addPoint(inputPoint2_1);
+            outputPoint1_1.connect(inputPoint2_1); // `Number` => `Boolean`
+            outputPoint1_1.disconnect(inputPoint2_1);
+            inputPoint2_1.connect(outputPoint1_1); // `Number` => `Boolean`
+            inputPoint2_1.disconnect(outputPoint1_1);
+            expect(function () {
+                outputPoint1_2.connect(inputPoint2_2); // `Boolean` =/=> `Number`
+            }).to.throw();
+            expect(function () {
+                inputPoint2_2.connect(outputPoint1_2); // `Boolean` =/=> `Number`
+            }).to.throw();
         });
         /*
         test("points connect with types", function () {
