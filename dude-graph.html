@@ -141,6 +141,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.editor.start();
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
                 this.$.editor.get("renderer").on("select", function (renderNode) {
+                    console.log(renderNode.nodePosition[0] - this.$.editor.get("renderer")._zoom.translate[0]);
                     this.openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");
                     this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
                     this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);

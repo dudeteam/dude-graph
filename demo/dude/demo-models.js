@@ -303,6 +303,30 @@ var DEMO_DUDE_MODEL_DATA = [
                             ]
                         }
                     }
+                },
+                {
+                    "item": {
+                        "name": "calc",
+                        "icon": "fa fa-square",
+                        "data": {
+                            "cgType": "CalcExpression",
+                            "cgName": "calc",
+                            "cgInputs": [
+                                {
+                                    "cgType": "Point",
+                                    "cgName": "format",
+                                    "cgValueType": "String"
+                                }
+                            ],
+                            "cgOutputs": [
+                                {
+                                    "cgType": "Point",
+                                    "cgName": "value",
+                                    "cgValueType": "Number"
+                                }
+                            ]
+                        }
+                    }
                 }
             ]
         }

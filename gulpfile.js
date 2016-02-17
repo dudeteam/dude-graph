@@ -17,6 +17,7 @@ var SOURCES = [
     "lib/graph/connection.js",
     "lib/graph/points/*.js",
     "lib/graph/blocks/*.js",
+    "lib/graph/blocks/expression/*.js",
     "lib/graph/**/*.js",
     "lib/renderer/renderer.js",
     "lib/renderer/*.js",
