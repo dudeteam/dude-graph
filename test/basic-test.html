@@ -652,41 +652,41 @@
             }).to.throw();
             graph.addBlock(block);
             block.updateTemplate("TemplateTest", "String");
+            expect(block.template("TemplateTest").valueType).to.equals("String");
+            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
             block.updateTemplate("TemplateTest", "Number");
+            expect(block.template("TemplateTest").valueType).to.equals("Number");
+            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
+            block.updateTemplate("TemplateTest", "String");
+            expect(block.template("TemplateTest").valueType).to.equals("String");
+            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
             expect(function () {
                 block.updateTemplate("TemplateTest", "Boolean"); // `TemplateTest` has no template `Boolean`
             }).to.throw();
         });
+        test("point templates", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block({
+                "blockTemplates": {
+                    "TemplateTest": {
+                        "valueType": "Number",
+                        "templates": ["Number", "String"]
+                    }
+                }
+            });
+            graph.addBlock(block);
+            /*
+            var inputPoint1 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointTemplate": "TemplateTest",
+                "pointValueType": null
+            });
+            block.addPoint(inputPoint1);
+            */
+        });
         /*
         test("custom block and custom point", function () {
 
-        });
-        test("add/remove of points", function () {
-            var graph = new dudeGraph.Graph();
-            var block = new dudeGraph.Block();
-            var outputPoint = new dudeGraph.Point(true, {
-                "pointName": "out",
-                "pointValueType": "Number"
-            });
-            var inputPoint = new dudeGraph.Point(false, {
-                "pointName": "in",
-                "pointValueType": "Number"
-            });
-            graph.addBlock(block);
-            block.addPoint(outputPoint);
-            block.addPoint(inputPoint);
-            expect(block.blockInputPoints).to.have.length(1);
-            expect(block.blockInputPoints).to.have.length(1);
-            expect(block.blockInputPoints[0]).to.be.equal(outputPoint);
-            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
-            expect(block.outputByName("out")).to.be.equal(outputPoint);
-            expect(block.inputByName("in")).to.be.equal(inputPoint);
-            block.removePoint(inputPoint);
-            expect(block.blockInputPoints).to.have.length(0);
-            expect(block.inputByName("in")).to.be.null;
-            block.addPoint(inputPoint);
-            expect(block.blockInputPoints).to.have.length(1);
-            expect(block.blockInputPoints[0]).to.be.equal(inputPoint);
         });
         test("ill-formed templated point", function () {
             var graph = new dudeGraph.Graph();
