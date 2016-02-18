@@ -666,7 +666,7 @@
         });
         test("point templates", function () {
             var graph = new dudeGraph.Graph();
-            var block = new dudeGraph.Block({
+            var block1 = new dudeGraph.Block({
                 "blockTemplates": {
                     "TemplateTest": {
                         "valueType": "Number",
@@ -674,15 +674,33 @@
                     }
                 }
             });
-            graph.addBlock(block);
-            /*
-            var inputPoint1 = new dudeGraph.Point(false, {
+            graph.addBlock(block1);
+            var inputPoint1_1 = new dudeGraph.Point(false, {
                 "pointName": "in",
                 "pointTemplate": "TemplateTest",
                 "pointValueType": null
             });
-            block.addPoint(inputPoint1);
-            */
+            var inputPoint1_2 = new dudeGraph.Point(false, {
+                "pointName": "in2",
+                "pointTemplate": "TemplateTest",
+                "pointValueType": null
+            });
+            block1.addPoint(inputPoint1_1);
+            block1.addPoint(inputPoint1_2);
+            expect(inputPoint1_1.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_2.pointValueType).to.be.equals("Number");
+            block1.updateTemplate("TemplateTest", "String");
+            expect(inputPoint1_1.pointValueType).to.be.equals("String");
+            expect(inputPoint1_2.pointValueType).to.be.equals("String");
+            inputPoint1_1.pointValue = "I'm a String, and NotANumber";
+            inputPoint1_2.pointValue = "Me neither";
+            expect(function () {
+                block1.updateTemplate("TemplateTest", "Number"); // All points cannot safely be transformed to `Number`
+            }).to.throw();
+            inputPoint1_1.pointValue = "64";
+            inputPoint1_2.pointValue = "32";
+            block1.updateTemplate("TemplateTest", "Number"); // Now they can be transformed to `Number`
+            expect(inputPoint1_1.pointValue);
         });
         /*
         test("custom block and custom point", function () {
