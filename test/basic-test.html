@@ -582,6 +582,81 @@
             expect(graph.graphConnections).to.have.length(0);
             expect(inputPoint2.pointConnections).to.have.length(0);
         });
+        test("block templates", function () {
+            var graph = new dudeGraph.Graph();
+            expect(function () {
+                var badBlock = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "TemplateName": {} // `valueType` is required, `templates` is required
+                    }
+                });
+                graph.addBlock(badBlock);
+            }).to.throw();
+            expect(function () {
+                var badBlock = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "TemplateName": {
+                            "valueType": "Number"
+                            // `templates` is required
+                        }
+                    }
+                });
+                graph.addBlock(badBlock);
+            }).to.throw();
+            expect(function () {
+                var badBlock = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "TemplateName": {
+                            // `valueType` is required
+                            "templates": ["Number"]
+                        }
+                    }
+                });
+                graph.addBlock(badBlock);
+            }).to.throw();
+            expect(function () {
+                var badBlock = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "TemplateName": {
+                            "valueType": "String",
+                            "templates": ["Number", "Boolean"] // `valueType` must be included in `templates`
+                        }
+                    }
+                });
+                graph.addBlock(badBlock);
+            }).to.throw();
+            expect(function () {
+                var badBlock = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "TemplateName": {
+                            "valueType": "UnknownType", // `valueType` must be a graph known type
+                            "templates": ["UnknownType"]
+                        }
+                    }
+                });
+                graph.addBlock(badBlock);
+            }).to.throw();
+            var block = new dudeGraph.Block({
+                "blockTemplates": {
+                    "TemplateTest": {
+                        "valueType": "Number",
+                        "templates": ["Number", "String"]
+                    }
+                }
+            });
+            expect(function () {
+                block.template("TemplateTest"); // Cannot manipulate templates while not bound to a graph
+            }).to.throw();
+            expect(function () {
+                block.updateTemplate("TemplateTest", "String"); // Cannot manipulate templates while not bound to a graph
+            }).to.throw();
+            graph.addBlock(block);
+            block.updateTemplate("TemplateTest", "String");
+            block.updateTemplate("TemplateTest", "Number");
+            expect(function () {
+                block.updateTemplate("TemplateTest", "Boolean"); // `TemplateTest` has no template `Boolean`
+            }).to.throw();
+        });
         /*
         test("custom block and custom point", function () {
 
