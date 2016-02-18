@@ -128,8 +128,8 @@
             }).to.throw();
             graph.addBlock(block);
             block.addPoint(outputPoint);
-            expect(block.blockOutputPoints).to.have.length(1);
-            expect(block.blockInputPoints).to.have.length(0);
+            expect(block.blockOutputs).to.have.length(1);
+            expect(block.blockInputs).to.have.length(0);
             expect(function () {
                 block.addPoint(new dudeGraph.Point(true, {
                     "pointName": "output", // Cannot add 2 outputs with the same name
@@ -140,8 +140,8 @@
                 "pointName": "output", // But can add an input with the same name as an output
                 "pointValueType": "String"
             }));
-            expect(block.blockOutputPoints).to.have.length(1);
-            expect(block.blockInputPoints).to.have.length(1);
+            expect(block.blockOutputs).to.have.length(1);
+            expect(block.blockInputs).to.have.length(1);
             expect(function () {
                 block.addPoint(new dudeGraph.Point(false, {
                     "pointName": "output", // But still cannot add 2 inputs with the same name
@@ -178,11 +178,11 @@
             block.addPoint(outputPoint1, 0); // Add to start [1, 2, 4]
             block.addPoint(outputPoint5); // Add to end [1, 2, 4, 5]
             block.addPoint(outputPoint3, 2); // Add to 2nd position [1, 2, 3, 4, 5]
-            expect(block.blockOutputPoints[0]).to.be.equal(outputPoint1);
-            expect(block.blockOutputPoints[1]).to.be.equal(outputPoint2);
-            expect(block.blockOutputPoints[2]).to.be.equal(outputPoint3);
-            expect(block.blockOutputPoints[3]).to.be.equal(outputPoint4);
-            expect(block.blockOutputPoints[4]).to.be.equal(outputPoint5);
+            expect(block.blockOutputs[0]).to.be.equal(outputPoint1);
+            expect(block.blockOutputs[1]).to.be.equal(outputPoint2);
+            expect(block.blockOutputs[2]).to.be.equal(outputPoint3);
+            expect(block.blockOutputs[3]).to.be.equal(outputPoint4);
+            expect(block.blockOutputs[4]).to.be.equal(outputPoint5);
         });
         test("point value", function () {
             var graph = new dudeGraph.Graph();
