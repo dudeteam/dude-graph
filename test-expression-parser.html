@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+    <title>Test expressions</title>
+</head>
+<body>
+    <pre><code id="code"></code></pre>
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/eventEmitter/EventEmitter.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="dude-graph.js"></script>
+    <script>
+        var parser = new dudeGraph.ExpressionParser();
+        document.querySelector("#code").innerHTML = JSON.stringify(parser.parse("x + y * 2 - 5 && (x - 2) * 4 > 0"), null, 4);
+//        document.querySelector("#code").innerHTML = JSON.stringify(parser.parse("(2 + 2 * 2)"), null, 4);
+    </script>
+</body>
+</html>

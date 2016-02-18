@@ -285,7 +285,7 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "format_string",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Expression",
+                            "cgType": "Format",
                             "cgName": "format_string",
                             "cgInputs": [
                                 {
@@ -306,15 +306,15 @@ var DEMO_DUDE_MODEL_DATA = [
                 },
                 {
                     "item": {
-                        "name": "calc",
+                        "name": "expression",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "CalcExpression",
-                            "cgName": "calc",
+                            "cgType": "Expression",
+                            "cgName": "expression",
                             "cgInputs": [
                                 {
                                     "cgType": "Point",
-                                    "cgName": "format",
+                                    "cgName": "expression",
                                     "cgValueType": "String"
                                 }
                             ],
