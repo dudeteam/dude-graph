@@ -731,7 +731,6 @@
             expect(inputPoint1_1.pointValue);
         });
         test("point templates and connections", function () {
-            /*
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block({
                 "blockTemplates": {
@@ -750,10 +749,16 @@
                 "pointName": "in2",
                 "pointTemplate": "TemplateTest"
             });
+            var inputPoint1_3 = new dudeGraph.Point(false, {
+                "pointName": "in3",
+                "pointTemplate": "TemplateTest"
+            });
             block1.addPoint(inputPoint1_1);
             expect(inputPoint1_1.pointValueType).to.be.equals("Number");
             block1.addPoint(inputPoint1_2);
             expect(inputPoint1_2.pointValueType).to.be.equals("Number");
+            block1.addPoint(inputPoint1_3);
+            expect(inputPoint1_3.pointValueType).to.be.equals("Number");
             var block2 = new dudeGraph.Block();
             graph.addBlock(block2);
             var outputPoint2_1 = new dudeGraph.Point(true, {
@@ -762,21 +767,28 @@
             });
             var outputPoint2_2 = new dudeGraph.Point(true, {
                 "pointName": "out2",
+                "pointValueType": "String"
+            });
+            var outputPoint2_3 = new dudeGraph.Point(true, {
+                "pointName": "out3",
                 "pointValueType": "Boolean"
             });
             block2.addPoint(outputPoint2_1);
-            expect(outputPoint2_1.pointValueType).to.be.equals("Number");
             block2.addPoint(outputPoint2_2);
-            expect(outputPoint2_2.pointValueType).to.be.equals("String");
-            outputPoint2_1.connect(inputPoint1_1);
+            block2.addPoint(outputPoint2_3);
+            outputPoint2_1.connect(inputPoint1_1); // `Number` ===> `Number`
+            expect(function () {
+                outputPoint2_2.connect(inputPoint1_2); // `String` =/=> `Number`
+            }).to.throw();
             expect(block1.template("TemplateTest").valueType).to.be.equals("Number");
             expect(inputPoint1_1.pointValueType).to.be.equals("Number");
             expect(inputPoint1_2.pointValueType).to.be.equals("Number");
-            outputPoint2_2.connect(inputPoint1_2);
+            expect(inputPoint1_3.pointValueType).to.be.equals("Number");
+            block1.updateTemplate("TemplateTest", "String");
             expect(block1.template("TemplateTest").valueType).to.be.equals("String");
-            expect(inputPoint1_1.pointValueType).to.be.equals("Boolean");
-            expect(inputPoint1_2.pointValueType).to.be.equals("Boolean");
-            */
+            expect(inputPoint1_1.pointValueType).to.be.equals("String");
+            expect(inputPoint1_2.pointValueType).to.be.equals("String");
+            expect(inputPoint1_3.pointValueType).to.be.equals("String");
         });
         /*
         test("custom block and custom point", function () {
