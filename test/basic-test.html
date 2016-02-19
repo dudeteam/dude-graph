@@ -417,28 +417,56 @@
                 "pointValueType": "Number"
             });
             var outputPoint1_2 = new dudeGraph.Point(true, {
-                "pointName": "out",
+                "pointName": "out2",
                 "pointValueType": "Boolean"
+            });
+            var outputPoint1_3 = new dudeGraph.Point(true, {
+                "pointName": "out3",
+                "pointValueType": "Number"
+            });
+            var outputPoint1_4 = new dudeGraph.Point(true, {
+                "pointName": "out4",
+                "pointValueType": "String"
             });
             var inputPoint2_1 = new dudeGraph.Point(false, {
                 "pointName": "in",
                 "pointValueType": "Boolean"
             });
             var inputPoint2_2 = new dudeGraph.Point(false, {
-                "pointName": "in",
+                "pointName": "in2",
+                "pointValueType": "Number"
+            });
+            var inputPoint2_3 = new dudeGraph.Point(false, {
+                "pointName": "in3",
+                "pointValueType": "String"
+            });
+            var inputPoint2_4 = new dudeGraph.Point(false, {
+                "pointName": "in3",
                 "pointValueType": "Number"
             });
             block1.addPoint(outputPoint1_1);
+            block1.addPoint(outputPoint1_2);
+            block1.addPoint(outputPoint1_3);
             block2.addPoint(inputPoint2_1);
+            block2.addPoint(inputPoint2_2);
+            block2.addPoint(inputPoint2_3);
             outputPoint1_1.connect(inputPoint2_1); // `Number` => `Boolean`
             outputPoint1_1.disconnect(inputPoint2_1);
             inputPoint2_1.connect(outputPoint1_1); // `Number` => `Boolean`
             inputPoint2_1.disconnect(outputPoint1_1);
+            outputPoint1_2.connect(inputPoint2_2); // `Boolean` => `Number`
+            outputPoint1_2.disconnect(inputPoint2_2);
+            inputPoint2_2.connect(outputPoint1_2); // `Boolean` => `Number`
+            inputPoint2_2.disconnect(outputPoint1_2);
+            outputPoint1_3.connect(inputPoint2_3); // `String` => `Number`
+            outputPoint1_3.disconnect(inputPoint2_3);
+            inputPoint2_3.connect(outputPoint1_3); // `String` => `Number`
+            inputPoint2_3.disconnect(outputPoint1_3);
             expect(function () {
-                outputPoint1_2.connect(inputPoint2_2); // `Boolean` =/=> `Number`
+                outputPoint1_4.connect(inputPoint2_4); // `Number` =/=> `String`
             }).to.throw();
             expect(function () {
-                inputPoint2_2.connect(outputPoint1_2); // `Boolean` =/=> `Number`
+                inputPoint2_4.connect(outputPoint1_4); // `Number` =/=> `String`
             }).to.throw();
         });
         test("cannot mix connect and point value", function () {
@@ -701,6 +729,54 @@
             inputPoint1_2.pointValue = "32";
             block1.updateTemplate("TemplateTest", "Number"); // Now they can be transformed to `Number`
             expect(inputPoint1_1.pointValue);
+        });
+        test("point templates and connections", function () {
+            /*
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block({
+                "blockTemplates": {
+                    "TemplateTest": {
+                        "valueType": "Number",
+                        "templates": ["Number", "String", "Boolean"]
+                    }
+                }
+            });
+            graph.addBlock(block1);
+            var inputPoint1_1 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointTemplate": "TemplateTest"
+            });
+            var inputPoint1_2 = new dudeGraph.Point(false, {
+                "pointName": "in2",
+                "pointTemplate": "TemplateTest"
+            });
+            block1.addPoint(inputPoint1_1);
+            expect(inputPoint1_1.pointValueType).to.be.equals("Number");
+            block1.addPoint(inputPoint1_2);
+            expect(inputPoint1_2.pointValueType).to.be.equals("Number");
+            var block2 = new dudeGraph.Block();
+            graph.addBlock(block2);
+            var outputPoint2_1 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            var outputPoint2_2 = new dudeGraph.Point(true, {
+                "pointName": "out2",
+                "pointValueType": "Boolean"
+            });
+            block2.addPoint(outputPoint2_1);
+            expect(outputPoint2_1.pointValueType).to.be.equals("Number");
+            block2.addPoint(outputPoint2_2);
+            expect(outputPoint2_2.pointValueType).to.be.equals("String");
+            outputPoint2_1.connect(inputPoint1_1);
+            expect(block1.template("TemplateTest").valueType).to.be.equals("Number");
+            expect(inputPoint1_1.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_2.pointValueType).to.be.equals("Number");
+            outputPoint2_2.connect(inputPoint1_2);
+            expect(block1.template("TemplateTest").valueType).to.be.equals("String");
+            expect(inputPoint1_1.pointValueType).to.be.equals("Boolean");
+            expect(inputPoint1_2.pointValueType).to.be.equals("Boolean");
+            */
         });
         /*
         test("custom block and custom point", function () {
