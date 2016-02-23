@@ -815,106 +815,86 @@
             expect(inputPoint1_2.pointValueType).to.be.equal("Boolean");
             expect(inputPoint1_3.pointValueType).to.be.equal("Boolean");
         });
-        /*
         test("custom block and custom point", function () {
-
-        });
-        test("ill-formed template point", function () {
             var graph = new dudeGraph.Graph();
-            var block = new dudeGraph.Block({
-                "blockTemplates": {
-                    "ValueType": ["String", "Boolean"]
-                }
-            });
-            graph.addBlock(block);
+            var assignationBlock = new dudeGraph.Assignation();
+            graph.addBlock(assignationBlock);
+            assignationBlock.addPoint(new dudeGraph.Stream(false, {"pointName": "in"}));
+            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Object"}));
+            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "other", "pointValueType": "Object"}));
             expect(function () {
-                var point = new dudeGraph.Point(false, {
-                    "pointName": "in",
-                    "pointValueType": "Number",
-                    "pointTemplate": "ValueType"
-                });
+                assignationBlock.validatePoints(); // Missing output "out `Stream`"
+            }).to.throw();
+            assignationBlock.addPoint(new dudeGraph.Stream(true, {"pointName": "out"}));
+            assignationBlock.validatePoints();
+            expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.Assignation).to.be.true;
+            expect(assignationBlock.inputByName("in") instanceof dudeGraph.Stream).to.be.true;
+        });
+        suite("dude-graph events", function () {
+           test("block-add", function () {
+               var spy = sinon.spy();
+               var graph = new dudeGraph.Graph();
+               var block = new dudeGraph.Block();
+               graph.on("block-add", spy);
+               graph.addBlock(block);
+               sinon.assert.calledWith(spy, block);
+           });
+            test("point-add", function () {
+                var graphSpy = sinon.spy();
+                var blockSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                var point = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                graph.on("block-point-add", graphSpy);
+                block.on("point-add", blockSpy);
+                graph.addBlock(block);
                 block.addPoint(point);
-            }).to.throw();
+                sinon.assert.calledWith(graphSpy, block, point);
+                sinon.assert.calledWith(blockSpy, point);
+            });
+            test("point-remove", function () {
+                var graphSpy = sinon.spy();
+                var blockSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                var point = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                graph.on("block-point-remove", graphSpy);
+                block.on("point-remove", blockSpy);
+                graph.addBlock(block);
+                block.addPoint(point);
+                block.removePoint(point);
+                sinon.assert.calledWith(graphSpy, block, point);
+                sinon.assert.calledWith(blockSpy, point);
+            });
+            test("point-value-type-change", function () {
+                var graphSpy = sinon.spy();
+                var pointSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                var point = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                graph.addBlock(block);
+                block.addPoint(point);
+                graph.on("point-value-type-change", graphSpy);
+                point.on("value-type-change", pointSpy);
+                point.pointValueType = "String";
+                sinon.assert.calledWith(graphSpy, point, "String", "Number");
+                sinon.assert.calledWith(pointSpy, "String", "Number");
+            });
+            test("point-value-change", function () {
+                var graphSpy = sinon.spy();
+                var pointSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                var point = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                graph.addBlock(block);
+                block.addPoint(point);
+                graph.on("point-value-change", graphSpy);
+                point.on("value-change", pointSpy);
+                point.pointValue = 42;
+                sinon.assert.calledWith(graphSpy, point, 42, null);
+                sinon.assert.calledWith(pointSpy, 42, null);
+            });
         });
-        test("templated types", function () {
-            var graph = new dudeGraph.Graph();
-            var block1 = new dudeGraph.Block();
-            graph.addBlock(block1);
-            var outputPoint1_1 = new dudeGraph.Point(true, {
-                "pointName": "out",
-                "pointValueType": "String"
-            });
-            block1.addPoint(outputPoint1_1);
-            var outputPoint1_2 = new dudeGraph.Point(true, {
-                "pointName": "out2",
-                "pointValueType": "String"
-            });
-            block1.addPoint(outputPoint1_2);
-            var block2 = new dudeGraph.Block({
-                "blockTemplates": {
-                    "ValueType": [
-                        "Number",
-                        "String"
-                    ]
-                }
-            });
-            graph.addBlock(block2);
-            var inputPoint2_1 = new dudeGraph.Point(false, {
-                "pointName": "in",
-                "pointValueType": "Number",
-                "pointTemplate": "ValueType"
-            });
-            block2.addPoint(inputPoint2_1);
-            var inputPoint2_2 = new dudeGraph.Point(false, {
-                "pointName": "in2",
-                "pointValueType": "Number",
-                "pointTemplate": "ValueType"
-            });
-            block2.addPoint(inputPoint2_2);
-            outputPoint1_1.connect(inputPoint2_1);
-            outputPoint1_2.connect(inputPoint2_2);
-        });
-        test("template mismatch", function () {
-            var graph = new dudeGraph.Graph();
-            var block1 = new dudeGraph.Block();
-            graph.addBlock(block1);
-            var outputPoint1_1 = new dudeGraph.Point(true, {
-                "pointName": "out",
-                "pointValueType": "String"
-            });
-            block1.addPoint(outputPoint1_1);
-            var outputPoint1_2 = new dudeGraph.Point(true, {
-                "pointName": "out2",
-                "pointValueType": "Number"
-            });
-            block1.addPoint(outputPoint1_2);
-            var block2 = new dudeGraph.Block({
-                "blockTemplates": {
-                    "ValueType": [
-                        "Number",
-                        "String"
-                    ]
-                }
-            });
-            graph.addBlock(block2);
-            var inputPoint2_1 = new dudeGraph.Point(false, {
-                "pointName": "in",
-                "pointValueType": "Number",
-                "pointTemplate": "ValueType"
-            });
-            block2.addPoint(inputPoint2_1);
-            var inputPoint2_2 = new dudeGraph.Point(false, {
-                "pointName": "in2",
-                "pointValueType": "Number",
-                "pointTemplate": "ValueType"
-            });
-            block2.addPoint(inputPoint2_2);
-            outputPoint1_1.connect(inputPoint2_1);
-            expect(function () {
-                outputPoint1_2.connect(inputPoint2_2);
-            }).to.throw();
-         });
-         */
     });
 </script>
 </body>
