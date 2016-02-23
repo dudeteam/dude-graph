@@ -586,7 +586,7 @@
             expect(graph.graphConnections).to.have.length(1);
             expect(outputPoint1.pointConnections).to.have.length(1);
         });
-        test("remove points", function () {
+        test("remove block points", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block();
             var block2 = new dudeGraph.Block();
@@ -624,6 +624,48 @@
             block1.removePoint(outputPoint1);
             expect(graph.graphConnections).to.have.length(0);
             expect(inputPoint2.pointConnections).to.have.length(0);
+        });
+        test("remove all block points", function () {
+            var graph = new dudeGraph.Graph();
+            var block = new dudeGraph.Block();
+            graph.addBlock(block);
+            block.addPoint(new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(true, {
+                "pointName": "out2",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(true, {
+                "pointName": "out3",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(true, {
+                "pointName": "out4",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(true, {
+                "pointName": "out5",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(false, {
+                "pointName": "in2",
+                "pointValueType": "Number"
+            }));
+            block.addPoint(new dudeGraph.Point(false, {
+                "pointName": "in3",
+                "pointValueType": "Number"
+            }));
+            expect(block.blockOutputs).to.have.length(5);
+            expect(block.blockInputs).to.have.length(3);
+            block.removeAllPoints();
+            expect(block.blockOutputs).to.have.length(0);
+            expect(block.blockInputs).to.have.length(0);
         });
         test("block templates", function () {
             var graph = new dudeGraph.Graph();
@@ -831,14 +873,14 @@
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.Stream).to.be.true;
         });
         suite("dude-graph events", function () {
-           test("block-add", function () {
-               var spy = sinon.spy();
-               var graph = new dudeGraph.Graph();
-               var block = new dudeGraph.Block();
-               graph.on("block-add", spy);
-               graph.addBlock(block);
-               sinon.assert.calledWith(spy, block);
-           });
+            test("block-add", function () {
+                var spy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                graph.on("block-add", spy);
+                graph.addBlock(block);
+                sinon.assert.calledWith(spy, block);
+            });
             test("point-add", function () {
                 var graphSpy = sinon.spy();
                 var blockSpy = sinon.spy();
