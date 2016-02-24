@@ -27,16 +27,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         </dude-property>
         <template is="dom-repeat" items="[[ _getEditablePoints(data) ]]" as="renderPoint">
             <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
-                <dude-property property-type="{{ renderPoint.point.cgValueType }}"
-                               property-name="{{ renderPoint.point.cgName }}"
-                               property-value="{{ renderPoint.point.cgValue }}"
+                <dude-property property-type="{{ renderPoint.point.pointValueType }}"
+                               property-name="{{ renderPoint.point.pointName }}"
+                               property-value="{{ renderPoint.point.pointValue }}"
                                property-resources="{{ editor.resources }}"
                                no-reference>
                 </dude-property>
             </template>
             <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
                 <dude-property property-type="Choice"
-                               property-name="{{ renderPoint.point.cgName }}"
+                               property-name="{{ renderPoint.point.pointName }}"
                                property-value="{{ renderPoint.point.choice }}"
                                property-choices="{{ renderPoint.point.choices }}"
                                no-reference>
@@ -57,12 +57,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Returns whether the renderPoint is of the given type
              * @param {dudeGraph.RenderPoint} renderPoint
-             * @param {String} cgValueType
+             * @param {String} pointValueType
              * @returns {Boolean}
              * @private
              */
-            _isPointType: function (renderPoint, cgValueType) {
-                return renderPoint.point.cgValueType === cgValueType;
+            _isPointType: function (renderPoint, pointValueType) {
+                return renderPoint.point.pointValueType === pointValueType;
             },
 
             /**
@@ -76,7 +76,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     return null;
                 }
                 return _.filter(renderBlock.renderPoints, function (renderPoint) {
-                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.isOutput;
+                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.Stream) && !renderPoint.point.pointOutput;
                 });
             }
         });

@@ -234,7 +234,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             }.bind(this));
             this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                 var realRenderPoint = renderConnection.realRenderPoint;
-                var autocompleteModels = editor.queryModels(realRenderPoint.point.cgValueType, realRenderPoint.point.isOutput);
+                var autocompleteModels = editor.queryModels(realRenderPoint.point.pointValueType, realRenderPoint.point.isOutput);
                 editor.set("_autocompleteRenderConnection", renderConnection);
                 editor.set("_autocompleteModels", autocompleteModels);
                 editor.$["autocompletePopup"].open(position[0], position[1]);
@@ -295,7 +295,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             }));
             return this.renderer.createRenderBlock({
                 "id": block.blockId,
-                "blockId": block.blockId
+                "block": block.blockId
             }, true);
         },
 
@@ -309,9 +309,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             (function recursiveQueryModels(models) {
                 _.forEach(models, function (model) {
                     if (!_.isUndefined(model.item) && !_.isUndefined(model.item.data)) {
-                        var cgLookupPoints = isOutput ? model.item.data.cgInputs : model.item.data.cgOutputs;
-                        var found = _.find(cgLookupPoints, function (point) {
-                            return point.cgType === type || point.cgValueType === type;
+                        var lookupPoints = isOutput ? model.item.data.blockInputs : model.item.data.blockOutputs;
+                        var found = _.find(lookupPoints, function (point) {
+                            return point.pointType === type || point.pointValueType === type;
                         });
                         if (found) {
                             modelsFound.push(model);
@@ -353,8 +353,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 var fromRenderBlock = fromRenderPoint.renderBlock;
                 var toRenderPoint = _.find(toRenderBlock.renderPoints, function (renderPoint) {
                             // Tries to find the best suitable point
-                            return renderPoint.point.isOutput !== fromRenderPoint.point.isOutput &&
-                                    renderPoint.point.cgValueType === fromRenderPoint.point.cgValueType;
+                            return renderPoint.point.pointOutput !== fromRenderPoint.point.pointOutput &&
+                                    renderPoint.point.pointValueType === fromRenderPoint.point.pointValueType;
                         }) || null;
                 if (toRenderPoint === null) {
                     throw new Error("Cannot find suitable point for `" + fromRenderPoint.pointFancyName +
@@ -366,8 +366,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 var connection = fromRenderPoint.point.connect(toRenderPoint.point);
                 this.get("renderer").createRenderConnection({
                     connection: connection,
-                    outputRenderBlock: fromRenderPoint.point.isOutput ? fromRenderBlock : toRenderBlock,
-                    inputRenderBlock: fromRenderPoint.point.isOutput ? toRenderBlock : fromRenderBlock
+                    outputRenderBlock: fromRenderPoint.point.pointOutput ? fromRenderBlock : toRenderBlock,
+                    inputRenderBlock: fromRenderPoint.point.pointOutput ? toRenderBlock : fromRenderBlock
                 }, true);
             }
             this.$["autocompletePopup"].close();
