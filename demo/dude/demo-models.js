@@ -8,16 +8,16 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "player",
                         "icon": "fa fa-circle",
                         "data": {
-                            "cgType": "Variable",
-                            "cgValueType": "Entity",
-                            "cgValue": "player",
-                            "cgName": "player",
-                            "cgInputs": [],
-                            "cgOutputs": [
+                            "blockType": "Variable",
+                            "blockValueType": "Entity",
+                            "blockValue": "player",
+                            "blockName": "player",
+                            "blockInputs": [],
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgValueType": "Entity",
-                                    "cgName": "value"
+                                    "pointType": "Point",
+                                    "pointValueType": "Entity",
+                                    "pointName": "value"
                                 }
                             ]
                         }
@@ -35,14 +35,14 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_start",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_start",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_start",
+                            "blockInputs": [
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -53,14 +53,14 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_update",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_update",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_update",
+                            "blockInputs": [
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -71,14 +71,14 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_stop",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_update",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_update",
+                            "blockInputs": [
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -89,19 +89,19 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_key_down",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_key_down",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_key_down",
+                            "blockInputs": [
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgValueType": "Choice",
-                                    "cgName": "key"
+                                    "pointType": "Point",
+                                    "pointValueType": "Choice",
+                                    "pointName": "key"
                                 }
                             ]
                         }
@@ -112,19 +112,19 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_key_up",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_key_down",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_key_down",
+                            "blockInputs": [
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgValueType": "Choice",
-                                    "cgName": "key"
+                                    "pointType": "Point",
+                                    "pointValueType": "Choice",
+                                    "pointName": "key"
                                 }
                             ]
                         }
@@ -135,19 +135,19 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "on_key",
                         "icon": "fa fa-play",
                         "data": {
-                            "cgType": "Delegate",
-                            "cgName": "on_key_down",
-                            "cgInputs": [
+                            "blockType": "Delegate",
+                            "blockName": "on_key_down",
+                            "blockInputs": [
                             ],
                             "cgOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgValueType": "Choice",
-                                    "cgName": "key"
+                                    "pointType": "Point",
+                                    "pointValueType": "Choice",
+                                    "pointName": "key"
                                 }
                             ]
                         }
@@ -165,33 +165,33 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "assign",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Instruction",
-                            "cgName": "assign",
-                            "cgTemplates": {
+                            "blockType": "Instruction",
+                            "blockName": "assign",
+                            "blockTemplates": {
                                 "ValueType": ["Boolean", "Number", "String"]
                             },
-                            "cgInputs": [
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "this",
-                                    "cgTemplate": "ValueType",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "this",
+                                    "pointTemplate": "ValueType",
+                                    "pointValueType": "Number"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "other",
-                                    "cgTemplate": "ValueType",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "other",
+                                    "pointTemplate": "ValueType",
+                                    "pointValueType": "Number"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -202,23 +202,23 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "add_entity",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Instruction",
-                            "cgName": "add_entity",
-                            "cgInputs": [
+                            "blockType": "Instruction",
+                            "blockName": "add_entity",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "entity",
-                                    "cgValueType": "Entity"
+                                    "pointType": "Point",
+                                    "pointName": "entity",
+                                    "pointValueType": "Entity"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -229,23 +229,23 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "remove_entity",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Instruction",
-                            "cgName": "remove_entity",
-                            "cgInputs": [
+                            "blockType": "Instruction",
+                            "blockName": "remove_entity",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "entity",
-                                    "cgValueType": "Entity"
+                                    "pointType": "Point",
+                                    "pointName": "entity",
+                                    "pointValueType": "Entity"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "out"
+                                    "pointType": "Stream",
+                                    "pointName": "out"
                                 }
                             ]
                         }
@@ -256,25 +256,25 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "random",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Function",
-                            "cgName": "random_range",
-                            "cgInputs": [
+                            "blockType": "Function",
+                            "blockName": "random_range",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "from",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "from",
+                                    "pointValueType": "Number"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "to",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "to",
+                                    "pointValueType": "Number"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "value",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "value",
+                                    "pointValueType": "Number"
                                 }
                             ]
                         }
@@ -282,23 +282,23 @@ var DEMO_DUDE_MODEL_DATA = [
                 },
                 {
                     "item": {
-                        "name": "format_string",
+                        "name": "format",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Format",
-                            "cgName": "format_string",
-                            "cgInputs": [
+                            "blockType": "Format",
+                            "blockName": "format",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "format",
-                                    "cgValueType": "String"
+                                    "pointType": "Point",
+                                    "pointName": "format",
+                                    "pointValueType": "String"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "value",
-                                    "cgValueType": "String"
+                                    "pointType": "Point",
+                                    "pointName": "value",
+                                    "pointValueType": "String"
                                 }
                             ]
                         }
@@ -309,20 +309,20 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "expression",
                         "icon": "fa fa-square",
                         "data": {
-                            "cgType": "Expression",
-                            "cgName": "expression",
-                            "cgInputs": [
+                            "blockType": "Expression",
+                            "blockName": "expression",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "expression",
-                                    "cgValueType": "String"
+                                    "pointType": "Point",
+                                    "pointName": "expression",
+                                    "pointValueType": "String"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "value",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "value",
+                                    "pointValueType": "Number"
                                 }
                             ]
                         }
@@ -340,27 +340,27 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "Condition",
                         "icon": "fa fa-share-alt",
                         "data": {
-                            "cgType": "Condition",
-                            "cgName": "Condition",
-                            "cgInputs": [
+                            "blockType": "Condition",
+                            "blockName": "Condition",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "test",
-                                    "cgValueType": "Boolean"
+                                    "pointType": "Point",
+                                    "pointName": "test",
+                                    "pointValueType": "Boolean"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "true"
+                                    "pointType": "Stream",
+                                    "pointName": "true"
                                 },
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "false"
+                                    "pointType": "Stream",
+                                    "pointName": "false"
                                 }
                             ]
                         }
@@ -371,27 +371,27 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "Each",
                         "icon": "fa fa-refresh",
                         "data": {
-                            "cgType": "Each",
-                            "cgName": "Each",
-                            "cgInputs": [
+                            "blockType": "Each",
+                            "blockName": "Each",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "list",
-                                    "cgValueType": "List"
+                                    "pointType": "Point",
+                                    "pointName": "list",
+                                    "pointValueType": "List"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "iteration"
+                                    "pointType": "Stream",
+                                    "pointName": "iteration"
                                 },
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "end"
+                                    "pointType": "Stream",
+                                    "pointName": "end"
                                 }
                             ]
                         }
@@ -402,37 +402,37 @@ var DEMO_DUDE_MODEL_DATA = [
                         "name": "Range",
                         "icon": "fa fa-retweet",
                         "data": {
-                            "cgType": "Range",
-                            "cgName": "Range",
-                            "cgInputs": [
+                            "blockType": "Range",
+                            "blockName": "Range",
+                            "blockInputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "in"
+                                    "pointType": "Stream",
+                                    "pointName": "in"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "from",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "from",
+                                    "pointValueType": "Number"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "to",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "to",
+                                    "pointValueType": "Number"
                                 },
                                 {
-                                    "cgType": "Point",
-                                    "cgName": "step",
-                                    "cgValueType": "Number"
+                                    "pointType": "Point",
+                                    "pointName": "step",
+                                    "pointValueType": "Number"
                                 }
                             ],
-                            "cgOutputs": [
+                            "blockOutputs": [
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "iteration"
+                                    "pointType": "Stream",
+                                    "pointName": "iteration"
                                 },
                                 {
-                                    "cgType": "Stream",
-                                    "cgName": "end"
+                                    "pointType": "Stream",
+                                    "pointName": "end"
                                 }
                             ]
                         }
