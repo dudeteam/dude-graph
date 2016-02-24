@@ -871,6 +871,21 @@
             assignationBlock.validatePoints();
             expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.Assignation).to.be.true;
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.Stream).to.be.true;
+            var pointValueChangedSpy = sinon.spy();
+            var CustomBlock = function () {
+              dudeGraph.Block.apply(this, arguments);
+            };
+            CustomBlock.prototype = _.create(dudeGraph.Block.prototype, {
+                "constructor": CustomBlock,
+                "className": "CustomBlock"
+            });
+            CustomBlock.prototype.pointValueChanged = pointValueChangedSpy;
+            var customBlock = new CustomBlock();
+            graph.addBlock(customBlock);
+            var point = new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Number"});
+            customBlock.addPoint(point);
+            point.pointValue = 32;
+            sinon.assert.calledWith(pointValueChangedSpy, point, 32, null);
         });
         suite("dude-graph events", function () {
             test("block-add", function () {
