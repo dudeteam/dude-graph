@@ -1001,6 +1001,25 @@
                 sinon.assert.calledWith(graphSpy, point, 42, null);
                 sinon.assert.calledWith(pointSpy, 42, null);
             });
+            test("block-template-update", function () {
+                var graphSpy = sinon.spy();
+                var blockSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block({
+                    "blockTemplates": {
+                        "Test": {
+                            "valueType": "Number",
+                            "templates": ["Number", "String"]
+                        }
+                    }
+                });
+                graph.addBlock(block);
+                graph.on("block-template-update", graphSpy);
+                block.on("template-update", blockSpy);
+                block.updateTemplate("Test", "String");
+                sinon.assert.calledWith(graphSpy, block, "Test", "String", "Number");
+                sinon.assert.calledWith(blockSpy, "Test", "String", "Number");
+            });
         });
     });
 </script>
