@@ -751,7 +751,7 @@
         });
         test("point templates", function () {
             var graph = new dudeGraph.Graph();
-            var block1 = new dudeGraph.Block({
+            var block = new dudeGraph.Block({
                 "blockTemplates": {
                     "TemplateTest": {
                         "valueType": "Number",
@@ -759,7 +759,7 @@
                     }
                 }
             });
-            graph.addBlock(block1);
+            graph.addBlock(block);
             var inputPoint1_1 = new dudeGraph.Point(false, {
                 "pointName": "in",
                 "pointTemplate": "TemplateTest",
@@ -770,21 +770,21 @@
                 "pointTemplate": "TemplateTest",
                 "pointValueType": null
             });
-            block1.addPoint(inputPoint1_1);
-            block1.addPoint(inputPoint1_2);
+            block.addPoint(inputPoint1_1);
+            block.addPoint(inputPoint1_2);
             expect(inputPoint1_1.pointValueType).to.be.equals("Number");
             expect(inputPoint1_2.pointValueType).to.be.equals("Number");
-            block1.updateTemplate("TemplateTest", "String");
+            block.updateTemplate("TemplateTest", "String");
             expect(inputPoint1_1.pointValueType).to.be.equals("String");
             expect(inputPoint1_2.pointValueType).to.be.equals("String");
             inputPoint1_1.pointValue = "I'm a String, and NotANumber";
             inputPoint1_2.pointValue = "Me neither";
             expect(function () {
-                block1.updateTemplate("TemplateTest", "Number"); // All points cannot safely be transformed to `Number`
+                block.updateTemplate("TemplateTest", "Number"); // All points cannot safely be transformed to `Number`
             }).to.throw();
             inputPoint1_1.pointValue = "64";
             inputPoint1_2.pointValue = "32";
-            block1.updateTemplate("TemplateTest", "Number"); // Now they can be transformed to `Number`
+            block.updateTemplate("TemplateTest", "Number"); // Now they can be transformed to `Number`
             expect(inputPoint1_1.pointValue);
         });
         test("point templates and connections", function () {
@@ -857,6 +857,47 @@
             expect(inputPoint1_2.pointValueType).to.be.equal("Boolean");
             expect(inputPoint1_3.pointValueType).to.be.equal("Boolean");
         });
+        test("remove block", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block({
+                "blockTemplates": {
+                    "TemplateTest": {
+                        "valueType": "Number",
+                        "templates": ["Number", "String"]
+                    }
+                }
+            });
+            var block2 = new dudeGraph.Block();
+            graph.addBlock(block1);
+            graph.addBlock(block2);
+            var inputPoint1 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointTemplate": "TemplateTest",
+                "pointValueType": null
+            });
+            block1.addPoint(inputPoint1);
+            var outputPoint2 = new dudeGraph.Point(true, {
+                "pointName": "out",
+                "pointValueType": "Number"
+            });
+            block2.addPoint(outputPoint2);
+            outputPoint2.connect(inputPoint1);
+            expect(graph.graphBlocks).to.have.length(2);
+            expect(graph.graphBlocksIds[block1.blockId]).to.be.equals(block1);
+            expect(graph.graphBlocksIds[block2.blockId]).to.be.equals(block2);
+            expect(graph.graphConnections).to.have.length(1);
+            expect(block1.blockInputs).to.have.length(1);
+            expect(block2.blockOutputs).to.have.length(1);
+            expect(outputPoint2.pointConnections).to.have.length(1);
+            graph.removeBlock(block1);
+            expect(graph.graphBlocks).to.have.length(1);
+            expect(graph.graphBlocksIds[block1.blockId]).to.be.undefined;
+            expect(graph.graphBlocksIds[block2.blockId]).to.be.equals(block2);
+            expect(graph.graphConnections).to.have.length(0);
+            expect(block1.blockInputs).to.have.length(0);
+            expect(block2.blockOutputs).to.have.length(1);
+            expect(outputPoint2.pointConnections).to.have.length(0);
+        });
         test("custom block and custom point", function () {
             var graph = new dudeGraph.Graph();
             var assignationBlock = new dudeGraph.Assignation();
@@ -894,6 +935,15 @@
                 var block = new dudeGraph.Block();
                 graph.on("block-add", spy);
                 graph.addBlock(block);
+                sinon.assert.calledWith(spy, block);
+            });
+            test("block-remove", function () {
+                var spy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                graph.on("block-remove", spy);
+                graph.addBlock(block);
+                graph.removeBlock(block);
                 sinon.assert.calledWith(spy, block);
             });
             test("point-add", function () {
