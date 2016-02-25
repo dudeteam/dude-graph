@@ -72,7 +72,7 @@ var DEMO_DUDE_MODEL_DATA = [
                         "icon": "fa fa-play",
                         "data": {
                             "blockType": "Delegate",
-                            "blockName": "on_update",
+                            "blockName": "on_stop",
                             "blockInputs": [
                             ],
                             "blockOutputs": [
@@ -168,7 +168,10 @@ var DEMO_DUDE_MODEL_DATA = [
                             "blockType": "Instruction",
                             "blockName": "assign",
                             "blockTemplates": {
-                                "ValueType": ["Boolean", "Number", "String"]
+                                "AssignTemplate": {
+                                    "valueType": "Number",
+                                    "templates": ["Number", "String", "Boolean"]
+                                }
                             },
                             "blockInputs": [
                                 {
@@ -178,13 +181,13 @@ var DEMO_DUDE_MODEL_DATA = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "this",
-                                    "pointTemplate": "ValueType",
+                                    "pointTemplate": "AssignTemplate",
                                     "pointValueType": "Number"
                                 },
                                 {
                                     "pointType": "Point",
                                     "pointName": "other",
-                                    "pointTemplate": "ValueType",
+                                    "pointTemplate": "AssignTemplate",
                                     "pointValueType": "Number"
                                 }
                             ],
