@@ -1,0 +1,102 @@
+<link rel="import" href="../../paper-tabs/paper-tabs.html">
+<link rel="import" href="../../paper-tabs/paper-tab.html">
+<dom-module id="dude-graph-console">
+    <style>
+        :host {
+            padding-bottom: 10px;
+            @apply(--layout-vertical);
+            @apply(--layout-flex);
+        }
+        paper-tabs {
+            padding-bottom: 10px;
+        }
+        #rows {
+            overflow: auto;
+        }
+        .row {
+            font-family: var(--dude-primary-text-font);
+            padding: 5px 15px;
+        }
+        .row i {
+            width: 20px;
+        }
+        .row.debug {
+            color: var(--dude-success-color);
+        }
+        .row.info {
+            color: var(--dude-content-text-color);
+        }
+        .row.warning {
+            color: var(--dude-warning-color);
+        }
+        .row.error {
+            color: var(--dude-error-color);
+        }
+    </style>
+    <template>
+        <paper-tabs selected="{{ logFilter }}">
+            <paper-tab>all</paper-tab>
+            <paper-tab>debug</paper-tab>
+            <paper-tab>info</paper-tab>
+            <paper-tab>warning</paper-tab>
+            <paper-tab>error</paper-tab>
+        </paper-tabs>
+        <div id="rows">
+            <template is="dom-repeat" items="[[ _rows ]]">
+                <div class$="[[ _getStatusClass(item.status) ]]" hidden$="[[ !_isFiltered(item.status, logFilter) ]]">
+                    <i class$="[[ _getStatusIcon(item.status) ]]"></i>
+                    <span>[[ item.message ]]</span>
+                </div>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: "dude-graph-console",
+
+            properties: {
+                logFilter: {
+                    type: Number,
+                    value: 0
+                }
+            },
+
+            ready: function () {
+                this.set("_rows", [
+                    {message: "Graph created", "status": "info"},
+                    {message: "Test 1", "status": "debug"},
+                    {message: "Test 2", "status": "debug"},
+                    {message: "Graph saved", "status": "info"},
+                    {message: "Graph created", "status": "warning"},
+                    {message: "Cannot connect points together", "status": "error"}
+                ]);
+            },
+
+            _getStatusClass: function (status) {
+                return "row " + status;
+            },
+
+            _getStatusIcon: function (status) {
+                return {
+                    "info": "fa fa-info-circle",
+                    "warning": "fa fa-warning",
+                    "error": "fa fa-times-circle",
+                    "debug": "fa fa-bug"
+                }[status];
+            },
+
+            _isFiltered: function (status, filter) {
+                if (filter === 0) {
+                    return true;
+                }
+                return {
+                    "info": 2,
+                    "warning": 3,
+                    "error": 4,
+                    "debug": 1
+                }[status] === filter;
+            }
+
+        })
+    </script>
+</dom-module>

@@ -11,6 +11,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="panels/dude-graph-create-variable.html">
 <link rel="import" href="panels/dude-graph-edit-group.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
+<link rel="import" href="panels/dude-graph-console.html">
 <link rel="import" href="../dude-toolbar/dude-toolbar.html">
 <link rel="import" href="../dude-seed/dude-sidebar.html">
 <!--
@@ -81,6 +82,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                   panel-title="Edit group"
                                   panel-element="dude-graph-edit-group"
                                   data="{{ _selectedRenderGroup }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
+                    <dude-sidebar id="consolePanel"
+                                  panel-title="Console"
+                                  panel-element="dude-graph-console"
+                                  data="{{ _context }}"
                                   on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
                     <paper-toast id="error"></paper-toast>

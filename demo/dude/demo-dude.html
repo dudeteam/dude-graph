@@ -110,6 +110,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     action: this.$.context.zoomToFit.bind(this.$.context)
                 });
                 this.$.context.addCommand({
+                    icon: "fa fa-terminal",
+                    description: "Console",
+                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
+                    action: function () { this.$.context.openPanel("consolePanel"); }.bind(this)
+                });
+                this.$.context.addCommand({
                     hidden: true,
                     icon: "fa fa-compress",
                     description: "Focus",
