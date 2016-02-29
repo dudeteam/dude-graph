@@ -427,61 +427,56 @@
             var block2 = new dudeGraph.Block();
             graph.addBlock(block1);
             graph.addBlock(block2);
-            var outputPoint1_1 = new dudeGraph.Point(true, {
+            var outputPoint1_Number = new dudeGraph.Point(true, {
                 "pointName": "out",
                 "pointValueType": "Number"
             });
-            var outputPoint1_2 = new dudeGraph.Point(true, {
-                "pointName": "out2",
-                "pointValueType": "Boolean"
-            });
-            var outputPoint1_3 = new dudeGraph.Point(true, {
+            var outputPoint1_Boolean = new dudeGraph.Point(true, {
                 "pointName": "out3",
-                "pointValueType": "String"
-            });
-            var outputPoint1_4 = new dudeGraph.Point(true, {
-                "pointName": "out4",
-                "pointValueType": "Number"
-            });
-            var inputPoint2_1 = new dudeGraph.Point(false, {
-                "pointName": "in",
                 "pointValueType": "Boolean"
             });
-            var inputPoint2_2 = new dudeGraph.Point(false, {
+            var outputPoint1_String = new dudeGraph.Point(true, {
+                "pointName": "out4",
+                "pointValueType": "String"
+            });
+            var inputPoint2_Number = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointValueType": "Number"
+            });
+            var inputPoint2_Boolean = new dudeGraph.Point(false, {
                 "pointName": "in2",
-                "pointValueType": "Number"
+                "pointValueType": "Boolean"
             });
-            var inputPoint2_3 = new dudeGraph.Point(false, {
-                "pointName": "in3",
-                "pointValueType": "Number"
-            });
-            var inputPoint2_4 = new dudeGraph.Point(false, {
+            var inputPoint2_String = new dudeGraph.Point(false, {
                 "pointName": "in3",
                 "pointValueType": "String"
             });
-            block1.addPoint(outputPoint1_1);
-            block1.addPoint(outputPoint1_2);
-            block1.addPoint(outputPoint1_3);
-            block2.addPoint(inputPoint2_1);
-            block2.addPoint(inputPoint2_2);
-            block2.addPoint(inputPoint2_3);
-            outputPoint1_1.connect(inputPoint2_1); // `Number` =~=> `Boolean`
-            outputPoint1_1.disconnect(inputPoint2_1);
-            inputPoint2_1.connect(outputPoint1_1); // `Number` =~=> `Boolean`
-            inputPoint2_1.disconnect(outputPoint1_1);
-            outputPoint1_2.connect(inputPoint2_2); // `Boolean` =~=> `Number`
-            outputPoint1_2.disconnect(inputPoint2_2);
-            inputPoint2_2.connect(outputPoint1_2); // `Boolean` =~=> `Number`
-            inputPoint2_2.disconnect(outputPoint1_2);
-            outputPoint1_3.connect(inputPoint2_3); // `Number` =~=> `String`
-            outputPoint1_3.disconnect(inputPoint2_3);
-            inputPoint2_3.connect(outputPoint1_3); // `Number` =~=> `String`
-            inputPoint2_3.disconnect(outputPoint1_3);
+            block1.addPoint(outputPoint1_Number);
+            block1.addPoint(outputPoint1_Boolean);
+            block1.addPoint(outputPoint1_String);
+            block2.addPoint(inputPoint2_Number);
+            block2.addPoint(inputPoint2_Boolean);
+            block2.addPoint(inputPoint2_String);
+            // Direct connection
+            outputPoint1_Number.connect(inputPoint2_Number); // `Number` ===> `Number`
+            outputPoint1_Number.disconnect(inputPoint2_Number);
+            outputPoint1_Boolean.connect(inputPoint2_Boolean); // `Boolean` ===> `Boolean`
+            outputPoint1_Boolean.disconnect(inputPoint2_Boolean);
+            outputPoint1_String.connect(inputPoint2_String); // `String` ===> `String`
+            outputPoint1_String.disconnect(inputPoint2_String);
+            // Convert connection
+            outputPoint1_Number.connect(inputPoint2_String); // `Number` =~=> `String`
+            outputPoint1_Number.disconnect(inputPoint2_String);
+            outputPoint1_Boolean.connect(inputPoint2_Number); // `Boolean` =~=> `Number`
+            outputPoint1_Boolean.disconnect(inputPoint2_Number);
+            outputPoint1_Number.connect(inputPoint2_Boolean); // `Number` =~=> `Boolean`
+            outputPoint1_Number.disconnect(inputPoint2_Boolean);
+            // Impossible connection
             expect(function () {
-                outputPoint1_4.connect(inputPoint2_4); // `String` =/=> `Number`
+                outputPoint1_String.connect(inputPoint2_Number); // `String` =/=> `Number`
             }).to.throw();
             expect(function () {
-                inputPoint2_4.connect(outputPoint1_4); // `String` =/=> `Number`
+                outputPoint1_String.connect(inputPoint2_Boolean); // `String` =/=> `Boolean`
             }).to.throw();
         });
         test("cannot mix connect and point value", function () {
@@ -850,12 +845,14 @@
             expect(inputPoint1_3.pointValueType).to.be.equal("String");
             expect(inputPoint1_2.pointValue).to.be.equal("32");
             inputPoint1_2.pointValue = null;
-            outputPointBoolean.connect(inputPoint1_1); // inputPoint1_1 `Boolean` =#=> `TemplateTest:String`
+            outputPointBoolean.connect(inputPoint1_1); // inputPoint1_1 `Boolean` =~=> `TemplateTest:String`
             inputPoint1_2.pointValue = false;
             inputPoint1_3.pointValue = true;
-            expect(inputPoint1_1.pointValueType).to.be.equal("Boolean");
-            expect(inputPoint1_2.pointValueType).to.be.equal("Boolean");
-            expect(inputPoint1_3.pointValueType).to.be.equal("Boolean");
+            expect(inputPoint1_1.pointValueType).to.be.equal("String");
+            expect(inputPoint1_2.pointValueType).to.be.equal("String");
+            expect(inputPoint1_3.pointValueType).to.be.equal("String");
+            expect(inputPoint1_2.pointValue).to.be.equal("false");
+            expect(inputPoint1_3.pointValue).to.be.equal("true");
         });
         test("remove block", function () {
             var graph = new dudeGraph.Graph();
