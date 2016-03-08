@@ -9,14 +9,14 @@ var DEMO_DUDE_MODEL_DATA = [
                         "icon": "fa fa-circle",
                         "data": {
                             "blockType": "Variable",
-                            "blockValueType": "Entity",
+                            "blockValueType": "Object",
                             "blockValue": "player",
                             "blockName": "player",
                             "blockInputs": [],
                             "blockOutputs": [
                                 {
                                     "pointType": "Point",
-                                    "pointValueType": "Entity",
+                                    "pointValueType": "Object",
                                     "pointName": "value"
                                 }
                             ]
@@ -215,7 +215,7 @@ var DEMO_DUDE_MODEL_DATA = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "entity",
-                                    "pointValueType": "Entity"
+                                    "pointValueType": "Object"
                                 }
                             ],
                             "blockOutputs": [
@@ -242,7 +242,7 @@ var DEMO_DUDE_MODEL_DATA = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "entity",
-                                    "pointValueType": "Entity"
+                                    "pointValueType": "Object"
                                 }
                             ],
                             "blockOutputs": [

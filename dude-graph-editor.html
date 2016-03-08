@@ -234,7 +234,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             }.bind(this));
             this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                 var realRenderPoint = renderConnection.realRenderPoint;
-                var autocompleteModels = editor.queryModels(realRenderPoint.point.pointValueType, realRenderPoint.point.isOutput);
+                var autocompleteModels = editor.queryModels(realRenderPoint.point.pointValueType, realRenderPoint.point.pointOutput);
                 editor.set("_autocompleteRenderConnection", renderConnection);
                 editor.set("_autocompleteModels", autocompleteModels);
                 editor.$["autocompletePopup"].open(position[0], position[1]);
