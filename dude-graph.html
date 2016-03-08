@@ -11,6 +11,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="panels/dude-graph-create-variable.html">
 <link rel="import" href="panels/dude-graph-edit-group.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
+<link rel="import" href="panels/dude-graph-edit-variable.html">
 <link rel="import" href="panels/dude-graph-console.html">
 <link rel="import" href="../dude-toolbar/dude-toolbar.html">
 <link rel="import" href="../dude-seed/dude-sidebar.html">
@@ -84,6 +85,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                                   data="{{ _selectedRenderGroup }}"
                                   on-dude-panel-close="_resetPanel">
                     </dude-sidebar>
+                    <dude-sidebar id="editVariablePanel"
+                                  panel-title="Edit variable"
+                                  panel-element="dude-graph-edit-variable"
+                                  data="{{ _selectedRenderBlock }}"
+                                  on-dude-panel-close="_resetPanel">
+                    </dude-sidebar>
                     <dude-sidebar id="consolePanel"
                                   panel-title="Console"
                                   panel-element="dude-graph-console"
@@ -148,9 +155,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.editor.start();
                 this.$.editor.load(this.get("graphData"), this.get("rendererData"));
                 this.$.editor.get("renderer").on("select", function (renderNode) {
-                    this.openPanel(renderNode instanceof dudeGraph.RenderBlock ? "editBlockPanel" : "editGroupPanel");
-                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
-                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
+                    if (renderNode instanceof dudeGraph.RenderGroup) {
+                        this.openPanel("editGroupPanel");
+                        this.set("_selectedRenderGroup", renderNode);
+                        this.set("_selectedRenderBlock", null);
+                    } else {
+                        console.log(renderNode);
+                        this.openPanel(renderNode.customPanel || "editBlockPanel");
+                        this.set("_selectedRenderGroup", null);
+                        this.set("_selectedRenderBlock", renderNode);
+                    }
                 }.bind(this));
                 this.$.editor.get("renderer").on("unselect", function (renderNode) {
                     this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? null : this.get("_selectedRenderBlock"));
