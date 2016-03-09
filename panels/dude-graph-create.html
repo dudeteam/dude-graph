@@ -70,7 +70,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _createBlock: function (e) {
-                this.get("data").createBlock(e.detail.item.data);
+                if (e.detail.item.data) {
+                    this.get("data").createBlock(e.detail.item.data);
+                }
             },
 
             _createGroupButtonClicked: function () {
