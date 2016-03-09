@@ -2,7 +2,6 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="dude-graph-editor.html">
 <link rel="import" href="panels/dude-graph-create.html">
@@ -146,10 +145,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
             },
 
-            /**
-             * Called when the demo-dude element is attached
-             * LocalStorage data needs to be loaded before this gets called
-             */
             attached: function () {
                 this.set("_context", this);
                 this.$.editor.start();
@@ -172,6 +167,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.editor.get("renderer").on("unselect-all", function () {
                     this.set("_selectedRenderBlock", null);
                     this.set("_selectedRenderGroup", null);
+                    this.closePanel();
                 }.bind(this));
                 this._lastPanelOpen = null;
             },
@@ -234,11 +230,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.editor.get("renderer").selectAll(false, false);
             },
 
+            /**
+             * Creates a block and focuses it
+             */
             createBlock: function (blockData) {
                 var toRenderBlock = this.$.editor.createBlock(blockData);
                 this.$.editor.focusBlock(toRenderBlock);
             },
 
+            /**
+             * Creates a variable
+             */
             createVariable: function (name, type, value) {
                 this.push("models.0.group.items", {
                     "item": {
@@ -274,6 +276,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 } else {
                     this.$[id].open();
                     this._lastPanelOpen = this.$[id];
+                }
+            },
+
+            /**
+             * Closes the last opened panel
+             */
+            closePanel: function () {
+                if (this._lastPanelOpen !== null) {
+                    this._lastPanelOpen.close();
                 }
             },
 
