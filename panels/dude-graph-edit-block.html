@@ -25,7 +25,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                        property-value="{{ data.nodeName }}"
                        no-menu>
         </dude-property>
-        <template is="dom-repeat" items="[[ _getEditablePoints(data) ]]" as="renderPoint">
+        <template is="dom-repeat" items="[[ _getEditablePoints(data, refresh) ]]" as="renderPoint">
             <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
                 <dude-property property-type="{{ renderPoint.point.pointValueType }}"
                                property-name="{{ renderPoint.point.pointName }}"
@@ -49,8 +49,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             is: "dude-graph-edit-block",
 
             properties: {
-                data: {
-                    type: Object
+                "data": {
+                    "type": dudeGraph.RenderBlock,
+                    "observer": "_dataChanged"
+                },
+                "refresh": {
+                    "type": Boolean,
+                    "value": false
+                }
+            },
+
+            /**
+             * @param {dudeGraph.RenderBlock|null} newData
+             * @param {dudeGraph.RenderBlock|null} oldData
+             * @private
+             */
+            _dataChanged(newData, oldData) {
+                if (newData !== null && oldData === null) {
+                    var refreshRenderBlock = function () {
+                        this.set("refresh", true);
+                        this.set("refresh", false);
+                    }.bind(this);
+                    newData.renderer.on("render-point-add", refreshRenderBlock);
+                    newData.renderer.on("render-point-remove", refreshRenderBlock);
                 }
             },
 
