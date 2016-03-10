@@ -15,7 +15,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../dude-toolbar/dude-toolbar.html">
 <link rel="import" href="../dude-seed/dude-sidebar.html">
 <!--
-`demo-dude` is a Polymer element to wrap a dude-graph demo
+`dude-graph` is a Polymer element to manipulate `dude-graph-editor`
 -->
 <dom-module id="dude-graph">
     <style>
@@ -101,6 +101,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     <dude-graph-editor id="editor"
                                        class="layout horizontal flex-3"
                                        models="{{ models }}"
+                                       block-types="[[ blockTypes ]]"
+                                       point-types="[[ pointTypes ]]"
+                                       render-block-types="[[ renderBlockTypes ]]"
                                        on-dude-graph-editor-error="_error">
                     </dude-graph-editor>
                 </div>
@@ -121,14 +124,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
 
                 /**
-                 * The renderer config
-                 */
-                "rendererConfig": {
-                    "type": Object,
-                    "value": {}
-                },
-
-                /**
                  * The renderer data
                  */
                 "rendererData": {
@@ -141,6 +136,38 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                  */
                 "models": {
                     "type": Array,
+                    "value": {}
+                },
+
+                /**
+                 *
+                 */
+                "blockTypes": {
+                    "type": Array,
+                    "value": dudeGraph.defaultBlocks
+                },
+
+                /**
+                 *
+                 */
+                "pointTypes": {
+                    "type": Array,
+                    "value": dudeGraph.defaultPoints
+                },
+
+                /**
+                 *
+                 */
+                "renderBlockTypes": {
+                    "type": Array,
+                    "value": dudeGraph.defaultRenderBlocks
+                },
+
+                /**
+                 * The renderer config
+                 */
+                "rendererConfig": {
+                    "type": Object,
                     "value": {}
                 }
             },

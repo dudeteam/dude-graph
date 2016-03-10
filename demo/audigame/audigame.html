@@ -5,12 +5,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../dude-graph.html">
 
-<script src="demo-data.js"></script>
-<script src="demo-models.js"></script>
+<script src="data.js"></script>
 <!--
-`demo-dude` is a Polymer element to wrap a dude-graph demo
+`audigame` is a Polymer element to wrap a dude-graph demo
 -->
-<dom-module id="demo-dude">
+<dom-module id="demo-audigame">
     <style>
         #context {
             @apply(--layout-horizontal);
@@ -29,20 +28,64 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 on-iron-localstorage-load-empty="_loadDefaults">
         </iron-localstorage>
         <dude-graph id="context"
-                    graph-data="{{ graphData }}"
-                    renderer-data="{{ rendererData }}"
-                    models="{{ models }}"></dude-graph>
+                    graph-data="[[ graphData ]]"
+                    renderer-data="[[ rendererData ]]"
+                    models="[[ models ]]"
+                    block-types="[[ blockTypes ]]"
+                    point-types="[[ pointTypes ]]"
+                    render-block-types="[[ renderBlockTypes ]]">
+        </dude-graph>
     </template>
     <script>
         Polymer({
-            is: "demo-dude",
+            is: "demo-audigame",
             properties: {
                 /**
                  * The graph data
                  */
                 "graphData": {
                     "type": Object,
-                    "value": DEMO_DUDE_GRAPH_DATA
+                    "value": DUDE_GRAPH_DEFAULT_GRAPH_DATA
+                },
+
+                /**
+                 * The renderer data
+                 */
+                "rendererData": {
+                    "type": Object,
+                    "value": DUDE_GRAPH_DEFAULT_RENDERER_DATA
+                },
+
+                /**
+                 * The model data
+                 */
+                "models": {
+                    "type": Array,
+                    "value": DUDE_GRAPH_MODELS
+                },
+
+                /**
+                 * The custom block types
+                 */
+                "blockTypes": {
+                    "type": Array,
+                    "value": DUDE_GRAPH_BLOCK_TYPES
+                },
+
+                /**
+                 * The custom point types
+                 */
+                "pointTypes": {
+                    "type": Array,
+                    "value": DUDE_GRAPH_POINT_TYPES
+                },
+
+                /**
+                 * The custom renderer for blocks
+                 */
+                "renderBlockTypes": {
+                    "type": Array,
+                    "value": DUDE_GRAPH_RENDER_BLOCK_TYPES
                 },
 
                 /**
@@ -51,22 +94,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "rendererConfig": {
                     "type": Object,
                     "value": {}
-                },
-
-                /**
-                 * The renderer data
-                 */
-                "rendererData": {
-                    "type": Object,
-                    "value": DEMO_DUDE_RENDERER_DATA
-                },
-
-                /**
-                 * The model data
-                 */
-                "models": {
-                    "type": Array,
-                    "value": DEMO_DUDE_MODEL_DATA
                 }
             },
 
@@ -150,8 +177,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _loadDefaults: function () {
-                this.set("graphData", DEMO_DUDE_GRAPH_DATA);
-                this.set("rendererData", DEMO_DUDE_RENDERER_DATA);
+                this.set("graphData", DUDE_GRAPH_DEFAULT_GRAPH_DATA);
+                this.set("rendererData", DUDE_GRAPH_DEFAULT_RENDERER_DATA);
             }
 
         });
