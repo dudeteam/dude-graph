@@ -225,7 +225,7 @@ const DUDE_GRAPH_MODELS = [
                 },
                 {
                     "item": {
-                        "name": "random",
+                        "name": "random_range",
                         "icon": "fa fa-square",
                         "data": {
                             "blockType": "Function",
