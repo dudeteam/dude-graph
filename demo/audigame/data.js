@@ -5,18 +5,38 @@ const DUDE_GRAPH_MODELS = [
             "items": [
                 {
                     "item": {
-                        "name": "player",
+                        "name": "has_key",
                         "icon": "fa fa-circle",
                         "data": {
                             "blockType": "Variable",
-                            "blockValueType": "Object",
-                            "blockValue": "player",
-                            "blockName": "player",
+                            "blockValueType": "Boolean",
+                            "blockValue": "has_key",
+                            "blockName": "has_key",
                             "blockInputs": [],
                             "blockOutputs": [
                                 {
                                     "pointType": "Point",
-                                    "pointValueType": "Object",
+                                    "pointValueType": "Boolean",
+                                    "pointName": "value"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "item": {
+                        "name": "nb_coins",
+                        "icon": "fa fa-circle",
+                        "data": {
+                            "blockType": "Variable",
+                            "blockValueType": "Number",
+                            "blockValue": "nb_coins",
+                            "blockName": "nb_coins",
+                            "blockInputs": [],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "Point",
+                                    "pointValueType": "Number",
                                     "pointName": "value"
                                 }
                             ]
