@@ -167,7 +167,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "blockTypes": {
                 "type": Array,
-                "value": dudeGraph.defaultBlocks
+                "value": []
             },
 
             /**
@@ -175,7 +175,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "pointTypes": {
                 "type": Array,
-                "value": dudeGraph.defaultPoints
+                "value": []
             },
 
             /**
@@ -183,7 +183,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             "renderBlockTypes": {
                 "type": Array,
-                "value": dudeGraph.defaultRenderBlocks
+                "value": []
+            },
+
+            /**
+             *
+             */
+            "renderPointTypes": {
+                "type": Array,
+                "value": []
             },
 
             /**
@@ -231,6 +239,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             }.bind(this));
             _.forEach(this.get("renderBlockTypes"), function (renderBlockType) {
                 this.get("renderer").registerRenderBlock(renderBlockType.renderBlock, renderBlockType.type);
+            }.bind(this));
+            _.forEach(this.get("renderPointTypes"), function (renderPointType) {
+                this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
             }.bind(this));
             this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                 var realRenderPoint = renderConnection.realRenderPoint;
