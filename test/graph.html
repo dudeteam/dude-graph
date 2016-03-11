@@ -485,28 +485,34 @@
             var block2 = new dudeGraph.Block();
             graph.addBlock(block1);
             graph.addBlock(block2);
-            var outputPoint1 = new dudeGraph.Point(true, {
+            var outputPoint = new dudeGraph.Point(true, {
                 "pointName": "out",
                 "pointValueType": "Number"
             });
-            var inputPoint2 = new dudeGraph.Point(false, {
+            var inputPoint = new dudeGraph.Point(false, {
                 "pointName": "in",
-                "pointValueType": "Boolean"
+                "pointValueType": "Number"
             });
-            block1.addPoint(outputPoint1);
-            block2.addPoint(inputPoint2);
-            inputPoint2.pointValue = false;
+            block1.addPoint(outputPoint);
+            block2.addPoint(inputPoint);
+            inputPoint.pointValue = 32;
             expect(function () {
-                outputPoint1.connect(inputPoint2); // Cannot connect a point with a non-null pointValue
+                outputPoint.connect(inputPoint); // Cannot connect a point with a non-null pointValue
             }).to.throw();
             expect(function () {
-                inputPoint2.connect(outputPoint1); // Cannot connect a point with a non-null pointValue (commutativity)
+                inputPoint.connect(outputPoint); // Cannot connect a point with a non-null pointValue (commutativity)
             }).to.throw();
-            inputPoint2.pointValue = null;
-            outputPoint1.connect(inputPoint2);
-            outputPoint1.disconnect(inputPoint2);
-            inputPoint2.connect(outputPoint1);
-            inputPoint2.disconnect(outputPoint1);
+            inputPoint.pointValue = null;
+            outputPoint.connect(inputPoint);
+            expect(function () {
+                inputPoint.pointValue = 32; // Cannot assign pointValue when a point is connected
+            }).to.throw();
+            outputPoint.disconnect(inputPoint);
+            inputPoint.connect(outputPoint);
+            expect(function () {
+                outputPoint.pointValue = 32; // Cannot assign pointValue when a point is connected (commutativity)
+            }).to.throw();
+            inputPoint.disconnect(outputPoint);
         });
         test("connect and value type", function () {
             var graph = new dudeGraph.Graph();
