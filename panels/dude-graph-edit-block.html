@@ -26,22 +26,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                        no-menu>
         </dude-property>
         <template is="dom-repeat" items="[[ _getEditablePoints(data, refresh) ]]" as="renderPoint">
-            <template is="dom-if" if="[[ !_isPointType(renderPoint, 'Choice') ]]">
-                <dude-property property-type="{{ renderPoint.point.pointValueType }}"
-                               property-name="{{ renderPoint.point.pointName }}"
-                               property-value="{{ renderPoint.point.pointValue }}"
-                               property-resources="{{ editor.resources }}"
-                               no-reference>
-                </dude-property>
-            </template>
-            <template is="dom-if" if="[[ _isPointType(renderPoint, 'Choice') ]]">
-                <dude-property property-type="Choice"
-                               property-name="{{ renderPoint.point.pointName }}"
-                               property-value="{{ renderPoint.point.choice }}"
-                               property-choices="{{ renderPoint.point.choices }}"
-                               no-reference>
-                </dude-property>
-            </template>
+            <dude-property property-type="{{ renderPoint.point.pointValueType }}"
+                           property-name="{{ renderPoint.point.pointName }}"
+                           property-value="{{ renderPoint.point.pointValue }}"
+                           property-resources="{{ renderPoint.point.pointResources }}"
+                           no-reference>
+            </dude-property>
         </template>
     </template>
     <script>
@@ -73,17 +63,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     newData.renderer.on("render-point-add", refreshRenderBlock);
                     newData.renderer.on("render-point-remove", refreshRenderBlock);
                 }
-            },
-
-            /**
-             * Returns whether the renderPoint is of the given type
-             * @param {dudeGraph.RenderPoint} renderPoint
-             * @param {String} pointValueType
-             * @returns {Boolean}
-             * @private
-             */
-            _isPointType: function (renderPoint, pointValueType) {
-                return renderPoint.point.pointValueType === pointValueType;
             },
 
             /**
