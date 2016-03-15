@@ -903,18 +903,18 @@
         });
         test("custom block and custom point", function () {
             var graph = new dudeGraph.Graph();
-            var assignationBlock = new dudeGraph.Assignation();
+            var assignationBlock = new dudeGraph.AssignationBlock();
             graph.addBlock(assignationBlock);
-            assignationBlock.addPoint(new dudeGraph.Stream(false, {"pointName": "in"}));
+            assignationBlock.addPoint(new dudeGraph.StreamPoint(false, {"pointName": "in"}));
             assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Object"}));
             assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "other", "pointValueType": "Object"}));
             expect(function () {
-                assignationBlock.validatePoints(); // Missing output "out `Stream`"
+                assignationBlock.validatePoints(); // Missing output "out `StreamPoint`"
             }).to.throw();
-            assignationBlock.addPoint(new dudeGraph.Stream(true, {"pointName": "out"}));
+            assignationBlock.addPoint(new dudeGraph.StreamPoint(true, {"pointName": "out"}));
             assignationBlock.validatePoints();
-            expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.Assignation).to.be.true;
-            expect(assignationBlock.inputByName("in") instanceof dudeGraph.Stream).to.be.true;
+            expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.AssignationBlock).to.be.true;
+            expect(assignationBlock.inputByName("in") instanceof dudeGraph.StreamPoint).to.be.true;
             var pointValueChangedSpy = sinon.spy();
             var CustomBlock = function () {
               dudeGraph.Block.apply(this, arguments);

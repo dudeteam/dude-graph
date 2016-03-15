@@ -19,7 +19,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointValueType": "Number"
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -27,7 +27,7 @@ const DUDE_GRAPH_MODELS = [
                         }
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -37,11 +37,11 @@ const DUDE_GRAPH_MODELS = [
                 ],
                 "blockOutputs": [
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "first"
                     },
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "second"
                     }
                 ]
@@ -57,7 +57,7 @@ const DUDE_GRAPH_MODELS = [
                 "blockName": "Step",
                 "blockInputs": [
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "in",
                         "singleConnection": false
                     },
@@ -78,7 +78,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointValueType": "Number"
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -86,7 +86,7 @@ const DUDE_GRAPH_MODELS = [
                         }
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -96,11 +96,11 @@ const DUDE_GRAPH_MODELS = [
                 ],
                 "blockOutputs": [
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "first"
                     },
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "second"
                     }
                 ]
@@ -116,7 +116,7 @@ const DUDE_GRAPH_MODELS = [
                 "blockName": "End",
                 "blockInputs": [
                     {
-                        "pointType": "Stream",
+                        "pointType": "StreamPoint",
                         "pointName": "in",
                         "singleConnection": false
                     },
@@ -131,7 +131,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointValueType": "String"
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -139,7 +139,7 @@ const DUDE_GRAPH_MODELS = [
                         }
                     },
                     {
-                        "pointType": "Resource",
+                        "pointType": "ResourcePoint",
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
@@ -159,7 +159,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "has_key",
                         "icon": "fa fa-circle",
                         "data": {
-                            "blockType": "Variable",
+                            "blockType": "VariableBlock",
                             "blockValueType": "Boolean",
                             "blockValue": "has_key",
                             "blockName": "has_key",
@@ -179,7 +179,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "nb_coins",
                         "icon": "fa fa-circle",
                         "data": {
-                            "blockType": "Variable",
+                            "blockType": "VariableBlock",
                             "blockValueType": "Number",
                             "blockValue": "nb_coins",
                             "blockName": "nb_coins",
@@ -206,7 +206,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "assign",
                         "icon": "fa fa-square",
                         "data": {
-                            "blockType": "Instruction",
+                            "blockType": "InstructionBlock",
                             "blockName": "assign",
                             "blockTemplates": {
                                 "AssignTemplate": {
@@ -216,7 +216,7 @@ const DUDE_GRAPH_MODELS = [
                             },
                             "blockInputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "in"
                                 },
                                 {
@@ -234,7 +234,7 @@ const DUDE_GRAPH_MODELS = [
                             ],
                             "blockOutputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "out"
                                 }
                             ]
@@ -246,7 +246,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "format",
                         "icon": "fa fa-square",
                         "data": {
-                            "blockType": "Format",
+                            "blockType": "FormatBlock",
                             "blockName": "format",
                             "blockInputs": [
                                 {
@@ -270,7 +270,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "expression",
                         "icon": "fa fa-square",
                         "data": {
-                            "blockType": "Expression",
+                            "blockType": "ExpressionBlock",
                             "blockName": "expression",
                             "blockInputs": [
                                 {
@@ -294,7 +294,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "random_range",
                         "icon": "fa fa-square",
                         "data": {
-                            "blockType": "Function",
+                            "blockType": "FunctionBlock",
                             "blockName": "random_range",
                             "blockInputs": [
                                 {
@@ -323,11 +323,11 @@ const DUDE_GRAPH_MODELS = [
                         "name": "print",
                         "icon": "fa fa-square",
                         "data": {
-                            "blockType": "Instruction",
+                            "blockType": "InstructionBlock",
                             "blockName": "print",
                             "blockInputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "in"
                                 },
                                 {
@@ -338,7 +338,7 @@ const DUDE_GRAPH_MODELS = [
                             ],
                             "blockOutputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "out"
                                 }
                             ]
@@ -357,11 +357,11 @@ const DUDE_GRAPH_MODELS = [
                         "name": "Condition",
                         "icon": "fa fa-share-alt",
                         "data": {
-                            "blockType": "Condition",
+                            "blockType": "ConditionBlock",
                             "blockName": "Condition",
                             "blockInputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "in"
                                 },
                                 {
@@ -372,11 +372,11 @@ const DUDE_GRAPH_MODELS = [
                             ],
                             "blockOutputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "true"
                                 },
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "false"
                                 }
                             ]
@@ -388,26 +388,26 @@ const DUDE_GRAPH_MODELS = [
                         "name": "Each",
                         "icon": "fa fa-refresh",
                         "data": {
-                            "blockType": "Each",
+                            "blockType": "EachBlock",
                             "blockName": "Each",
                             "blockInputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "in"
                                 },
                                 {
                                     "pointType": "Point",
                                     "pointName": "list",
-                                    "pointValueType": "List"
+                                    "pointValueType": "Array"
                                 }
                             ],
                             "blockOutputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "iteration"
                                 },
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "end"
                                 }
                             ]
@@ -419,11 +419,11 @@ const DUDE_GRAPH_MODELS = [
                         "name": "Range",
                         "icon": "fa fa-retweet",
                         "data": {
-                            "blockType": "Range",
+                            "blockType": "RangeBlock",
                             "blockName": "Range",
                             "blockInputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "in"
                                 },
                                 {
@@ -444,11 +444,11 @@ const DUDE_GRAPH_MODELS = [
                             ],
                             "blockOutputs": [
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "iteration"
                                 },
                                 {
-                                    "pointType": "Stream",
+                                    "pointType": "StreamPoint",
                                     "pointName": "end"
                                 }
                             ]
@@ -488,22 +488,22 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          */
         Start.prototype.validatePoints = function () {
             if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("Start `" + this.cgId + "` must have an input `text` of type `Point` of pointValueType `String`");
+                throw new Error("Start `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
             }
             if (!(this.inputByName("timer") instanceof dudeGraph.Point) || this.inputByName("timer").pointValueType !== "Number") {
-                throw new Error("Start `" + this.cgId + "` must have an input `timer` of type `Point` of pointValueType `Number`");
+                throw new Error("Start `" + this.blockFancyName + "` must have an input `timer` of type `Point` of pointValueType `Number`");
             }
-            if (!(this.inputByName("sound") instanceof dudeGraph.Point) || this.inputByName("sound").pointValueType !== "Resource") {
-                throw new Error("Start `" + this.cgId + "` must have an input `sound` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("sound") instanceof dudeGraph.ResourcePoint) || this.inputByName("sound").pointValueType !== "Resource") {
+                throw new Error("Start `" + this.blockFancyName + "` must have an input `sound` of type `Resource`");
             }
-            if (!(this.inputByName("cover") instanceof dudeGraph.Point) || this.inputByName("cover").pointValueType !== "Resource") {
-                throw new Error("Start `" + this.cgId + "` must have an input `cover` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
+                throw new Error("Start `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
             }
-            if (!(this.outputByName("first") instanceof dudeGraph.Stream)) {
-                throw new Error("Start `" + this.cgId + "` must have an output `first` of type `Stream`");
+            if (!(this.outputByName("first") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("Start `" + this.blockFancyName + "` must have an output `first` of type `Stream`");
             }
-            if (!(this.outputByName("second") instanceof dudeGraph.Stream)) {
-                throw new Error("Start `" + this.cgId + "` must have an output `second` of type `Stream`");
+            if (!(this.outputByName("second") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("Start `" + this.blockFancyName + "` must have an output `second` of type `Stream`");
             }
         };
 
@@ -530,29 +530,29 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         Step.prototype.validatePoints = function () {
-            if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
-                throw new Error("Step `" + this.cgId + "` must have an input `in` of type `Stream`");
+            if (!(this.inputByName("in") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `in` of type `Stream`");
             }
             if (!(this.inputByName("choice") instanceof dudeGraph.Point) || this.inputByName("choice").pointValueType !== "String") {
-                throw new Error("Step `" + this.cgId + "` must have an input `choice` of type `Point` of pointValueType `String`");
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `choice` of type `Point` of pointValueType `String`");
             }
             if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("Step `" + this.cgId + "` must have an input `text` of type `Point` of pointValueType `String`");
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
             }
             if (!(this.inputByName("timer") instanceof dudeGraph.Point) || this.inputByName("timer").pointValueType !== "Number") {
-                throw new Error("Step `" + this.cgId + "` must have an input `timer` of type `Point` of pointValueType `Number`");
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `timer` of type `Point` of pointValueType `Number`");
             }
-            if (!(this.inputByName("sound") instanceof dudeGraph.Point) || this.inputByName("sound").pointValueType !== "Resource") {
-                throw new Error("Step `" + this.cgId + "` must have an input `sound` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("sound") instanceof dudeGraph.ResourcePoint) || this.inputByName("sound").pointValueType !== "Resource") {
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `sound` of type `Resource`");
             }
-            if (!(this.inputByName("cover") instanceof dudeGraph.Point) || this.inputByName("cover").pointValueType !== "Resource") {
-                throw new Error("Step `" + this.cgId + "` must have an input `cover` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
             }
-            if (!(this.outputByName("first") instanceof dudeGraph.Stream)) {
-                throw new Error("Step `" + this.cgId + "` must have an output `first` of type `Stream`");
+            if (!(this.outputByName("first") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("Step `" + this.blockFancyName + "` must have an output `first` of type `Stream`");
             }
-            if (!(this.outputByName("second") instanceof dudeGraph.Stream)) {
-                throw new Error("Step `" + this.cgId + "` must have an output `second` of type `Stream`");
+            if (!(this.outputByName("second") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("Step `" + this.blockFancyName + "` must have an output `second` of type `Stream`");
             }
         };
 
@@ -580,20 +580,20 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         End.prototype.validatePoints = function () {
-            if (!(this.inputByName("in") instanceof dudeGraph.Stream)) {
-                throw new Error("End `" + this.cgId + "` must have an input `in` of type `Stream`");
+            if (!(this.inputByName("in") instanceof dudeGraph.StreamPoint)) {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `in` of type `Stream`");
             }
             if (!(this.inputByName("choice") instanceof dudeGraph.Point) || this.inputByName("choice").pointValueType !== "String") {
-                throw new Error("End `" + this.cgId + "` must have an input `choice` of type `Point` of pointValueType `String`");
+                throw new Error("End `" + this.blockFancyName + "` must have an input `choice` of type `Point` of pointValueType `String`");
             }
             if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("End `" + this.cgId + "` must have an input `text` of type `Point` of pointValueType `String`");
+                throw new Error("End `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
             }
-            if (!(this.inputByName("sound") instanceof dudeGraph.Point) || this.inputByName("sound").pointValueType !== "Resource") {
-                throw new Error("End `" + this.cgId + "` must have an input `sound` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("sound") instanceof dudeGraph.ResourcePoint) || this.inputByName("sound").pointValueType !== "Resource") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `sound` of type `Resource`");
             }
-            if (!(this.inputByName("cover") instanceof dudeGraph.Point) || this.inputByName("cover").pointValueType !== "Resource") {
-                throw new Error("End `" + this.cgId + "` must have an input `cover` of type `Point` of pointValueType `Resource`");
+            if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
             }
         };
 
