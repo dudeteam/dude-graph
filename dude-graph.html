@@ -43,6 +43,69 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             right: 0;
         }
     </style>
+    <style>
+        /**
+         * Typography
+         */
+        ::content text {
+            fill: var(--dude-content-text-color);
+            font-family: var(--dude-primary-text-font);
+        }
+        ::content .dude-graph-title {
+            fill: var(--dude-title-text-color);
+            font-weight: bold;
+        }
+        /**
+         * Select brush
+         */
+        ::content .dude-graph-select {
+            fill: hsla(0, 0%, 80%, 0.1);
+            stroke: hsla(0, 0%, 80%, 0.2);
+        }
+        /**
+         * Blocks
+         */
+        ::content .dude-graph-block > rect {
+            @apply(--dude-graph-block);
+        }
+        ::content .dude-graph-block:hover > rect {
+            @apply(--dude-graph-block-hover);
+        }
+        ::content .dude-graph-block.dude-graph-selected > rect {
+            @apply(--dude-graph-block-selected);
+        }
+        /**
+         * Groups
+         */
+        ::content .dude-graph-group > rect {
+            @apply(--dude-graph-group);
+        }
+        ::content .dude-graph-group:hover > rect {
+            @apply(--dude-graph-group-hover)
+        }
+        ::content .dude-graph-group.dude-graph-selected > rect,
+        ::content .dude-graph-group.dude-graph-active > rect {
+            @apply(--dude-graph-group-selected);
+        }
+        /**
+         * Connections
+         */
+        ::content .dude-graph-connection {
+            stroke-width: 2px;
+            fill: transparent;
+        }
+        /**
+         * Cursors block, groups and points
+         */
+        ::content .dude-graph-block,
+        ::content .dude-graph-group {
+            cursor: move;
+        }
+        ::content .dude-graph-point,
+        ::content .dude-graph-point {
+            cursor: pointer;
+        }
+    </style>
     <template>
         <div class="container">
             <!-- dude-graph SVG renderer -->
