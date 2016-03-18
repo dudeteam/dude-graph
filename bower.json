@@ -39,12 +39,13 @@
     "dude-style": "~0.1.3",
     "dude-property": "^0.1.8",
     "dude-collapse": "~0.0.3",
-    "dude-hierarchy": "^0.1.6",
+    "dude-hierarchy": "^0.1.9",
     "dude-popup": "~0.0.3",
-    "dude-toolbar": "~0.0.1",
+    "dude-toolbar": "~0.0.2",
     "dude-seed": "dude-sidebar#*",
     "dude-sidebar": "~0.0.1",
-    "paper-tabs": "PolymerElements/paper-tabs#~1.3.7"
+    "paper-tabs": "PolymerElements/paper-tabs#~1.3.7",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~1.1.4",
