@@ -3,38 +3,40 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../dude-graph.html">
-
 <script src="data.js"></script>
 <!--
 `audigame` is a Polymer element to wrap a dude-graph demo
 -->
 <dom-module id="demo-audigame">
     <style>
-        #context {
-            @apply(--layout-horizontal);
-            @apply(--layout-flex);
+        .container {
+            height: 100%;
         }
     </style>
     <template>
-        <iron-localstorage
-                name="dude-graph-data"
-                value="{{ graphData }}"
-                on-iron-localstorage-load-empty="_loadDefaults">
-        </iron-localstorage>
-        <iron-localstorage
-                name="dude-graph-renderer-data"
-                value="{{ rendererData }}"
-                on-iron-localstorage-load-empty="_loadDefaults">
-        </iron-localstorage>
-        <dude-graph id="context"
-                    graph-data="[[ graphData ]]"
-                    renderer-data="[[ rendererData ]]"
-                    models="[[ models ]]"
-                    block-types="[[ blockTypes ]]"
-                    point-types="[[ pointTypes ]]"
-                    render-block-types="[[ renderBlockTypes ]]">
-        </dude-graph>
+        <div class="container">
+            <iron-localstorage
+                    name="dude-graph-data"
+                    value="{{ graphData }}"
+                    on-iron-localstorage-load-empty="_loadDefaults">
+            </iron-localstorage>
+            <iron-localstorage
+                    name="dude-graph-renderer-data"
+                    value="{{ rendererData }}"
+                    on-iron-localstorage-load-empty="_loadDefaults">
+            </iron-localstorage>
+            <dude-graph id="context"
+                        class="container"
+                        graph-data="[[ graphData ]]"
+                        renderer-data="[[ rendererData ]]"
+                        models="[[ models ]]"
+                        block-types="[[ blockTypes ]]"
+                        point-types="[[ pointTypes ]]"
+                        render-block-types="[[ renderBlockTypes ]]">
+            </dude-graph>
+        </div>
     </template>
     <script>
         Polymer({
@@ -86,100 +88,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "renderBlockTypes": {
                     "type": Array,
                     "value": DUDE_GRAPH_RENDER_BLOCK_TYPES
-                },
-
-                /**
-                 * The renderer config
-                 */
-                "rendererConfig": {
-                    "type": Object,
-                    "value": {}
                 }
-            },
-
-            attached: function () {
-                this.$.context.addCommand({
-                    icon: "fa fa-save",
-                    description: "Save",
-                    shortcut: ["ctrl+s", "meta+s"],
-                    action: function () {
-                        var data = this.$.context.save();
-                        this.set("graphData", data.graphData);
-                        this.set("rendererData", data.rendererData);
-                        this.$.context.showSuccess("Graph saved!");
-                    }.bind(this)
-                });
-                this.$.context.addCommand({
-                    icon: "fa fa-plus",
-                    description: "Create",
-                    shortcut: ["ctrl+g", "meta+g"],
-                    action: function () { this.$.context.openPanel("createPanel"); }.bind(this)
-                });
-                this.$.context.addCommand({
-                    icon: "fa fa-play",
-                    description: "Build",
-                    shortcut: ["ctrl+b", "meta+b"],
-                    action: function () {
-                        console.log("Building graph...");
-                        this.$.context.showSuccess("Graph built!");
-                    }.bind(this)
-                });
-                this.$.context.addCommand({
-                    icon: "fa fa-trash",
-                    description: "Remove",
-                    shortcut: ["del", "meta+backspace"],
-                    action: this.$.context.removeSelection.bind(this.$.context)
-                });
-                this.$.context.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Fit",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: this.$.context.zoomToFit.bind(this.$.context)
-                });
-                this.$.context.addCommand({
-                    icon: "fa fa-terminal",
-                    description: "Console",
-                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
-                    action: function () { this.$.context.openPanel("consolePanel"); }.bind(this)
-                });
-                this.$.context.addCommand({
-                    hidden: true,
-                    icon: "fa fa-compress",
-                    description: "Focus",
-                    shortcut: ["ctrl+shift+0", "meta+shift+0"],
-                    action: this.$.context.zoomFitToSelection.bind(this.$.context)
-                });
-                this.$.context.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Blocks",
-                    shortcut: ["ctrl+shift+a", "meta+shift+a"],
-                    action: this.$.context.selectAllBlocks.bind(this.$.context)
-                });
-                this.$.context.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "Groups",
-                    shortcut: ["ctrl+alt+a", "meta+alt+a"],
-                    action: this.$.context.selectAllGroups.bind(this.$.context)
-                });
-                this.$.context.addCommand({
-                    hidden: true,
-                    icon: "fa fa-circle",
-                    description: "All",
-                    shortcut: ["ctrl+shift+alt+a", "meta+shift+alt+a"],
-                    action: this.$.context.selectAll.bind(this.$.context)
-                });
-            },
+            }
 
             /**
              * Called when the graphData and rendererData are empty in localStorage
              * @private
-             */
             _loadDefaults: function () {
                 this.set("graphData", DUDE_GRAPH_DEFAULT_GRAPH_DATA);
                 this.set("rendererData", DUDE_GRAPH_DEFAULT_RENDERER_DATA);
             }
+            */
 
         });
     </script>

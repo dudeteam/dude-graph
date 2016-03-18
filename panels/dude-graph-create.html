@@ -2,8 +2,7 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../paper-button/paper-button.html">
-<link rel="import" href="../../dude-property/dude-property.html">
+<link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
 <!--
 `dude-graph-create-group` is a panel used to add a new group to the graph.
 
@@ -12,79 +11,33 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-create">
-    <style>
-        :host {
-            @apply(--layout-vertical);
-            @apply(--layout-flex);
-            overflow: auto;
-            padding: 10px;
-        }
-        .btn-row {
-            @apply(--layout-horizontal);
-        }
-        .btn-row paper-button {
-            @apply(--layout-flex);
-        }
-        .btn-row paper-button:first-child {
-            margin-right: 5px;
-        }
-        .btn-row paper-button:last-child {
-            margin-left: 5px;
-        }
-        paper-button {
-            margin-top: 10px;
-        }
-    </style>
     <template>
         <dude-hierarchy
+                style="height: 100%; overflow: scroll"
                 id="modelsHierarchy"
                 placeholder="Search block..."
+                items="{{ data.models }}"
                 on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
-        <div class="btn-row">
-            <paper-button on-click="_createVariableButtonClicked">Create variable</paper-button>
-            <paper-button on-click="_createFunctionButtonClicked">Create function</paper-button>
-        </div>
-        <paper-button on-click="_createGroupButtonClicked">Create group</paper-button>
     </template>
     <script>
         Polymer({
             is: "dude-graph-create",
-
             properties: {
-                data: {
-                    type: Object
-                },
-
-                _models: {
-                    type: Object
+                "data": {
+                    "type": Object
                 }
             },
 
-            willOpen: function () {
-                this.$["modelsHierarchy"].set("items", this.get("data.models"));
-                this.$["modelsHierarchy"]._itemsChanged();
-                setTimeout(function () {
-                    this.$["modelsHierarchy"].focus(); // Fixes graphically bug with sidebar animation
-                }.bind(this), 100);
-            },
-
+            /**
+             * Creates the block from the selected model
+             * @param {CustomEvent} e
+             * @private
+             */
             _createBlock: function (e) {
                 if (e.detail.item.data) {
                     this.get("data").createBlock(e.detail.item.data);
                 }
-            },
-
-            _createGroupButtonClicked: function () {
-                this.get("data").openPanel("createGroupPanel");
-            },
-
-            _createVariableButtonClicked: function () {
-                this.get("data").openPanel("createVariablePanel");
-            },
-
-            _createFunctionButtonClicked: function () {
-                this.get("data").openPanel("createFunctionPanel");
             }
         });
     </script>

@@ -28,32 +28,21 @@
     "README.md"
   ],
   "dependencies": {
-    "d3": "^3.5.14",
-    "lodash": "^4.2.1",
-    "eventEmitter": "~4.3.0",
-    "polymer": "~1.2.3",
-    "iron-input": "PolymerElements/iron-input#~1.0.8",
-    "paper-input": "PolymerElements/paper-input#~1.1.5",
-    "paper-button": "PolymerElements/paper-button#~1.0.11",
-    "paper-tooltip": "PolymerElements/paper-tooltip#~1.1.1",
-    "dude-style": "~0.1.3",
-    "dude-property": "^0.1.8",
-    "dude-collapse": "~0.0.3",
+    "polymer": "^1.3.1",
+    "iron-flex-layout": "^1.3.1",
+    "d3": "^3.5.16",
+    "lodash": "^4.6.1",
+    "eventEmitter": "^4.3.0",
+    "dude-style": "^0.1.3",
     "dude-hierarchy": "^0.1.9",
-    "dude-popup": "~0.0.3",
-    "dude-toolbar": "~0.0.2",
-    "dude-seed": "dude-sidebar#*",
-    "dude-sidebar": "~0.0.1",
-    "paper-tabs": "PolymerElements/paper-tabs#~1.3.7",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1"
+    "dude-property": "#feature/dynamic-property"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#~1.1.4",
-    "iron-localstorage": "PolymerElements/iron-localstorage#~1.0.5",
-    "paper-toast": "PolymerElements/paper-toast#~1.1.3",
-    "web-component-tester": "^4.2.0"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.1.5",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.5",
+    "web-component-tester": "^4.2.2"
   },
   "resolutions": {
-    "lodash": "^4.2.1"
+    "lodash": "^4.6.1"
   }
 }

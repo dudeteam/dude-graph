@@ -1,121 +1,104 @@
 <!--
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
+<!--suppress HtmlUnknownTarget -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-toast/paper-toast.html">
-<link rel="import" href="dude-graph-editor.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../dude-style/dude-style.html">
+<!-- javascript dependencies -->
+<script src="../lodash/dist/lodash.min.js"></script>
+<script src="../d3/d3.min.js"></script>
+<script src="../eventEmitter/EventEmitter.min.js"></script>
+<!-- dude-graph dependency -->
+<script src="dude-graph.js"></script>
+<!-- dude-graph sidebar panels -->
 <link rel="import" href="panels/dude-graph-create.html">
-<link rel="import" href="panels/dude-graph-create-group.html">
-<link rel="import" href="panels/dude-graph-create-function.html">
-<link rel="import" href="panels/dude-graph-create-variable.html">
-<link rel="import" href="panels/dude-graph-edit-group.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
-<link rel="import" href="panels/dude-graph-edit-variable.html">
-<link rel="import" href="panels/dude-graph-console.html">
-<link rel="import" href="../dude-toolbar/dude-toolbar.html">
-<link rel="import" href="../dude-seed/dude-sidebar.html">
 <!--
-`dude-graph` is a Polymer element to manipulate `dude-graph-editor`
+`dude-graph` is a Polymer element which creates a dude-graph SVG renderer.
 -->
 <dom-module id="dude-graph">
     <style>
-        #wrapper {
+        .container {
+            @apply(--layout-horizontal);
+            @apply(--layout-flex);
             background: var(--dude-primary-background-color);
+            height: 100%;
         }
-        #success {
-            font-family: var(--dude-primary-text-font);
-            font-weight: bold;
-            color: var(--dude-primary-text-color);
-            background: #46965e;
+        #svg {
+            @apply(--layout-flex-3);
         }
-        #error {
-            font-family: var(--dude-primary-text-font);
-            font-weight: bold;
-            color: var(--dude-primary-text-color);
-            background: #b35255;
+        #sidebar[opened] {
+            @apply(--layout-flex);
+            min-width: 300px;
         }
-        #content {
-            position: relative;
+        #sidebar {
+            background: var(--dude-secondary-background-color);
+            width: 0;
+            height: 100%;
         }
-        dude-sidebar {
-            position: absolute;
-            top: 0;
+        #button {
+            position: fixed;
             bottom: 0;
             right: 0;
         }
     </style>
     <template>
-        <div id="wrapper" class="layout horizontal fit">
-            <div class="layout vertical flex">
-                <div id="content" class="layout horizontal flex">
-                    <dude-sidebar id="createPanel"
-                                  panel-title="Create"
-                                  panel-element="dude-graph-create"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="createGroupPanel"
-                                  panel-title="Create group"
-                                  panel-element="dude-graph-create-group"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="createVariablePanel"
-                                  panel-title="Create variable"
-                                  panel-element="dude-graph-create-variable"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="createFunctionPanel"
-                                  panel-title="Create function"
-                                  panel-element="dude-graph-create-function"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="editBlockPanel"
-                                  panel-title="{{ _selectedRenderBlock.block.blockName }}"
-                                  panel-element="dude-graph-edit-block"
-                                  data="{{ _selectedRenderBlock }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="editGroupPanel"
-                                  panel-title="Edit group"
-                                  panel-element="dude-graph-edit-group"
-                                  data="{{ _selectedRenderGroup }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="editVariablePanel"
-                                  panel-title="Edit variable"
-                                  panel-element="dude-graph-edit-variable"
-                                  data="{{ _selectedRenderBlock }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <dude-sidebar id="consolePanel"
-                                  panel-title="Console"
-                                  panel-element="dude-graph-console"
-                                  data="{{ _context }}"
-                                  on-dude-panel-close="_resetPanel">
-                    </dude-sidebar>
-                    <paper-toast id="error"></paper-toast>
-                    <paper-toast id="success"></paper-toast>
-                    <dude-graph-editor id="editor"
-                                       class="layout horizontal flex-3"
-                                       models="{{ models }}"
-                                       block-types="[[ blockTypes ]]"
-                                       point-types="[[ pointTypes ]]"
-                                       render-block-types="[[ renderBlockTypes ]]"
-                                       render-point-types="[[ renderPointTypes ]]"
-                                       on-dude-graph-editor-error="_error">
-                    </dude-graph-editor>
-                </div>
-                <dude-toolbar id="toolbar"></dude-toolbar>
+        <div class="container">
+            <!-- dude-graph SVG renderer -->
+            <svg id="svg"></svg>
+            <!-- dude-graph sidebar -->
+            <div id="sidebar" hidden$="[[ !sidebarOpened ]]">
+                <dude-graph-create data="{{ dudeGraphElement }}"></dude-graph-create>
+                <dude-graph-edit-block data="{{ dudeGraphElement }}"></dude-graph-edit-block>
             </div>
         </div>
+        <!-- Toggle sidebar visibility -->
+        <input id="button"
+               type="button"
+               value="Toggle Sidebar"
+               on-click="toggleSidebar">
     </template>
     <script>
         Polymer({
             is: "dude-graph",
             properties: {
+                /**
+                 * The dudeGraph element
+                 */
+                "dudeGraphElement": {
+                    "type": HTMLElement
+                },
+
+                /**
+                 * The graph
+                 */
+                "graph": {
+                    "type": dudeGraph.Graph
+                },
+
+                /**
+                 * The renderer
+                 */
+                "renderer": {
+                    "type": dudeGraph.Renderer
+                },
+
+                /**
+                 * The graph loader
+                 */
+                "loader": {
+                    "type": dudeGraph.GraphLoader,
+                    "value": null
+                },
+                /**
+                 * The graph saver
+                 */
+                "saver": {
+                    "type": dudeGraph.GraphSaver,
+                    "value": null
+                },
+
                 /**
                  * The graph data
                  */
@@ -123,7 +106,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": Object,
                     "value": {}
                 },
-
                 /**
                  * The renderer data
                  */
@@ -131,41 +113,36 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": Object,
                     "value": {}
                 },
-
                 /**
                  * The model data
                  */
                 "models": {
                     "type": Array,
-                    "value": {}
+                    "value": []
                 },
-
                 /**
-                 *
+                 * The block types handled by the graph loader
                  */
                 "blockTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultBlocks
                 },
-
                 /**
-                 *
+                 * The point types handled by the graph loader
                  */
                 "pointTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultPoints
                 },
-
                 /**
-                 *
+                 * Assign custom renderBlocks to blocks
                  */
                 "renderBlockTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultRenderBlocks
                 },
-
                 /**
-                 *
+                 * Assign custom renderPoints to points
                  */
                 "renderPointTypes": {
                     "type": Array,
@@ -173,190 +150,73 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
 
                 /**
-                 * The renderer config
+                 * Whether the sidebar is opened
                  */
-                "rendererConfig": {
-                    "type": Object,
-                    "value": {}
+                "sidebarOpened": {
+                    "type": Boolean,
+                    "value": true,
+                    "observer": "_sidebarOpenedChanged"
                 }
             },
 
+            /**
+             * Creates the dude-graph and the SVG renderer
+             */
             attached: function () {
-                this.set("_context", this);
-                this.$.editor.start();
-                this.$.editor.load(this.get("graphData"), this.get("rendererData"));
-                this.$.editor.get("renderer").on("select", function (renderNode) {
-                    if (renderNode instanceof dudeGraph.RenderGroup) {
-                        this.openPanel("editGroupPanel");
-                        this.set("_selectedRenderGroup", renderNode);
-                        this.set("_selectedRenderBlock", null);
-                    } else {
-                        this.openPanel(renderNode.customPanel || "editBlockPanel");
-                        this.set("_selectedRenderGroup", null);
-                        this.set("_selectedRenderBlock", renderNode);
-                    }
+                this.set("dudeGraphElement", this);
+                this.set("graph", new dudeGraph.Graph());
+                this.set("renderer", new dudeGraph.Renderer());
+                this.set("loader", new dudeGraph.GraphLoader());
+                this.set("saver", new dudeGraph.GraphSaver());
+                this.get("renderer").initialize(this.get("graph"), this.$.svg);
+                _.forEach(this.get("blockTypes"), function (blockType) {
+                    this.get("loader").registerBlockType(blockType.block, blockType.type);
                 }.bind(this));
-                this.$.editor.get("renderer").on("unselect", function (renderNode) {
-                    this.set("_selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? null : this.get("_selectedRenderBlock"));
-                    this.set("_selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? null : this.get("_selectedRenderGroup"));
+                _.forEach(this.get("pointTypes"), function (pointType) {
+                    this.get("loader").registerPointType(pointType.point, pointType.type);
                 }.bind(this));
-                this.$.editor.get("renderer").on("unselect-all", function () {
-                    this.set("_selectedRenderBlock", null);
-                    this.set("_selectedRenderGroup", null);
-                    this.closePanel();
+                _.forEach(this.get("renderBlockTypes"), function (renderBlockType) {
+                    this.get("renderer").registerRenderBlock(renderBlockType.renderBlock, renderBlockType.type);
                 }.bind(this));
-                this._lastPanelOpen = null;
+                _.forEach(this.get("renderPointTypes"), function (renderPointType) {
+                    this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
+                }.bind(this));
             },
 
             /**
-             * Add a new command within the toolbar.
-             */
-            addCommand: function (options) {
-                this.$.toolbar.addCommand(options);
-            },
-
-            /**
-             * Save command.
-             */
-            save: function () {
-                return this.$.editor.save();
-            },
-
-            /**
-             * RemoveSelection command.
-             */
-            removeSelection: function () {
-                this.$.editor.get("renderer").removeSelection();
-                this.$.success.text = "Selection removed!";
-                this.$.success.show();
-            },
-
-            /**
-             * Zoom to fit command.
-             */
-            zoomToFit: function () {
-                this.$.editor.get("renderer").zoomToFit();
-            },
-
-            /**
-             * Zoom to selection command.
-             */
-            zoomFitToSelection: function () {
-                this.$.editor.get("renderer").zoomToFitSelection();
-            },
-
-            /**
-             * Select all groups command.
-             */
-            selectAllGroups: function () {
-                this.$.editor.get("renderer").selectAll(true, false);
-            },
-
-            /**
-             * Select all blocks command.
-             */
-            selectAllBlocks: function () {
-                this.$.editor.get("renderer").selectAll(false, true);
-            },
-
-            /**
-             * Select all command.
-             */
-            selectAll: function () {
-                this.$.editor.get("renderer").selectAll(false, false);
-            },
-
-            /**
-             * Creates a block and focuses it
+             *
+             * @param {Object} blockData
+             * @returns {dudeGraph.RenderBlock}
              */
             createBlock: function (blockData) {
-                var toRenderBlock = this.$.editor.createBlock(blockData);
-                this.$.editor.focusBlock(toRenderBlock);
+                var block = this.get("loader").loadBlock(this.get("graph"), _.merge(blockData, {
+                    "blockId": dudeGraph.uuid()
+                }));
+                return this.renderer.createRenderBlock({
+                    "id": block.blockId,
+                    "block": block.blockId
+                }, true);
             },
 
+
             /**
-             * Creates a variable
+             * Toggles the sidebar visibility
              */
-            createVariable: function (name, type, value) {
-                this.push("models.0.group.items", {
-                    "item": {
-                        "name": name,
-                        "icon": "fa fa-circle",
-                        "data": {
-                            "blockType": "VariableBlock",
-                            "blockValueType": type,
-                            "blockValue": value,
-                            "blockName": name,
-                            "blockInputs": [],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "Point",
-                                    "pointValueType": type,
-                                    "pointName": "value"
-                                }
-                            ]
-                        }
-                    }
-                });
+            toggleSidebar: function () {
+                this.set("sidebarOpened", !this.get("sidebarOpened"));
             },
 
             /**
-             * Open a panel from its id.
-             */
-            openPanel: function (id) {
-                if (this._lastPanelOpen !== null && this._lastPanelOpen !== this.$[id]) {
-                    this._lastPanelOpen.close(function () {
-                        this.$[id].open();
-                        this._lastPanelOpen = this.$[id];
-                    }.bind(this));
-                } else {
-                    this.$[id].open();
-                    this._lastPanelOpen = this.$[id];
-                }
-            },
-
-            /**
-             * Closes the last opened panel
-             */
-            closePanel: function () {
-                if (this._lastPanelOpen !== null) {
-                    this._lastPanelOpen.close();
-                }
-            },
-
-            /**
-             * Shows a success message.
-             * @param {String} message
-             */
-            showSuccess: function (message) {
-                this.$.success.text = message;
-                this.$.success.show();
-            },
-
-
-            /**
-             * Shows an error message.
-             * @param {String} message
-             */
-            showError: function (message) {
-                this.$.error.text = message;
-                this.$.error.show();
-            },
-
-            /**
-             * Reset the last panel open variable.
-             */
-            _resetPanel: function () {
-                this._lastPanelOpen = null;
-            },
-
-            /**
-             * Called when a error occurs in the editor
-             * @param {CustomEvent} e
+             * Shows or hides the sidebar when sidebarOpened changes
+             * @param sidebarOpened
              * @private
              */
-            _error: function (e) {
-                this.showError(e.detail.error);
+            _sidebarOpenedChanged: function (sidebarOpened) {
+                if (sidebarOpened) {
+                    this.$.sidebar.setAttribute("opened", sidebarOpened);
+                } else {
+                    this.$.sidebar.removeAttribute("opened");
+                }
             }
         });
     </script>

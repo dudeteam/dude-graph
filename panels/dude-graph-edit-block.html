@@ -11,73 +11,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-edit-block">
-    <style>
-        :host {
-            @apply(--layout-vertical);
-            @apply(--layout-flex);
-            overflow: auto;
-            padding: 10px;
-        }
-    </style>
     <template>
         <dude-property property-name="Block name"
                        property-type="String"
-                       property-value="{{ data.nodeName }}"
-                       no-menu>
+                       property-value="{{ data.renderer.renderBlocks.0 }}">
         </dude-property>
-        <template is="dom-repeat" items="[[ _getEditablePoints(data, refresh) ]]" as="renderPoint">
-            <dude-property property-type="{{ renderPoint.point.pointValueType }}"
-                           property-name="{{ renderPoint.point.pointName }}"
-                           property-value="{{ renderPoint.point.pointValue }}"
-                           property-resources="{{ renderPoint.point.pointResources }}"
-                           no-reference>
-            </dude-property>
-        </template>
     </template>
     <script>
         Polymer({
             is: "dude-graph-edit-block",
-
             properties: {
                 "data": {
-                    "type": dudeGraph.RenderBlock,
-                    "observer": "_dataChanged"
-                },
-                "refresh": {
-                    "type": Boolean,
-                    "value": false
+                    "type": dudeGraph.RenderBlock
                 }
-            },
-
-            /**
-             * @param {dudeGraph.RenderBlock|null} newData
-             * @param {dudeGraph.RenderBlock|null} oldData
-             * @private
-             */
-            _dataChanged(newData, oldData) {
-                if (newData !== null && oldData === null) {
-                    var refreshRenderBlock = function () {
-                        this.set("refresh", true);
-                        this.set("refresh", false);
-                    }.bind(this);
-                    newData.renderer.on("render-point-add", refreshRenderBlock);
-                    newData.renderer.on("render-point-remove", refreshRenderBlock);
-                }
-            },
-
-            /**
-             *
-             * @param {dudeGraph.RenderBlock} renderBlock
-             * @returns {Array<dudeGraph.RenderPoint>|null}
-             * @private
-             */
-            _getEditablePoints: function (renderBlock) {
-                if (renderBlock === null) {
-                    return null;
-                }
-                return _.filter(renderBlock.renderPoints, function (renderPoint) {
-                    return _.isEmpty(renderPoint.renderConnections) && !(renderPoint.point instanceof dudeGraph.StreamPoint) && !renderPoint.point.pointOutput;
-                });
             }
         });
     </script>
