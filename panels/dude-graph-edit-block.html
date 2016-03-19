@@ -2,29 +2,62 @@
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../dude-property/dude-property.html">
+<link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
 <!--
-`dude-graph-edit-block` is a panel used to edit an existing block.
+`dude-graph-edit-block` is a panel used to add a new blocks/variables to the graph.
 
 @group dude-graph
-@element dude-graph-edit-block
+@element dude-graph-edit-block-group
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-edit-block">
     <template>
-        <dude-property property-name="Block name"
-                       property-type="String"
-                       property-value="{{ data.renderer.renderBlocks.0 }}">
-        </dude-property>
+        <h1>{{ data.selectedRenderBlock._block.blockName }}</h1>
+        <div>
+            <span>{{ data.selectedRenderBlock._block.blockInputs.length }}</span> inputs
+            <span>{{ data.selectedRenderBlock._block.blockOutputs.length }}</span> outputs
+        </div>
     </template>
     <script>
+        /**
+         * @extends {DudeStackItemElement}
+         */
         Polymer({
             is: "dude-graph-edit-block",
             properties: {
                 "data": {
-                    "type": dudeGraph.RenderBlock
+                    "type": "DudeGraphElement",
+                    "readonly": true
                 }
-            }
+            },
+
+            /**
+             * Called when the panel is attached to the DOM
+             * Notifies the dude-stack
+             */
+            attached: function () {
+                this.fire("dude-stack-attached");
+            },
+
+            /**
+             * Called when the panel is opened
+             */
+            opened: function () {},
+
+            /**
+             * Called when the panel is the top of the stack
+             */
+            resumed: function () {},
+
+            /**
+             * Called when the panel is not anymore the top of the stack
+             */
+            paused: function () {},
+
+            /**
+             * Called when the panel is closed
+             */
+            closed: function () {}
         });
     </script>
 </dom-module>

@@ -245,6 +245,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
                 this.$.stack.pushStack("dude-graph-create");
+                this._listenDudeGraphEvents();
             },
 
             /**
@@ -268,6 +269,30 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             toggleSidebar: function () {
                 this.set("sidebarOpened", !this.get("sidebarOpened"));
+            },
+
+            /**
+             * Listens on the graph and renderer events
+             * @private
+             */
+            _listenDudeGraphEvents: function () {
+                var dudeGraphElement = this;
+                var editBlockStackItem = null;
+                this.get("renderer").on("select", function (renderNode) {
+                    dudeGraphElement.set("selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
+                    dudeGraphElement.set("selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
+                    if (dudeGraphElement.get("selectedRenderBlock") !== null) {
+                        editBlockStackItem = dudeGraphElement.$.stack.pushStack("dude-graph-edit-block");
+                    }
+                });
+                this.get("renderer").on("unselect-all", function () {
+                    if (editBlockStackItem !== null) {
+                        dudeGraphElement.$.stack.removeStack(editBlockStackItem);
+                        editBlockStackItem = null;
+                    }
+                    dudeGraphElement.set("selectedRenderBlock", null);
+                    dudeGraphElement.set("selectedRenderGroup", null);
+                });
             },
 
             /**
