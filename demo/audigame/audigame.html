@@ -19,13 +19,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="container">
             <iron-localstorage
                     name="dude-graph-data"
-                    value="{{ graphData }}"
-                    on-iron-localstorage-load-empty="_loadDefaults">
+                    value="{{ graphData }}">
             </iron-localstorage>
             <iron-localstorage
                     name="dude-graph-renderer-data"
-                    value="{{ rendererData }}"
-                    on-iron-localstorage-load-empty="_loadDefaults">
+                    value="{{ rendererData }}">
             </iron-localstorage>
             <dude-graph id="context"
                         class="container"
@@ -90,16 +88,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "value": DUDE_GRAPH_RENDER_BLOCK_TYPES
                 }
             }
-
-            /**
-             * Called when the graphData and rendererData are empty in localStorage
-             * @private
-            _loadDefaults: function () {
-                this.set("graphData", DUDE_GRAPH_DEFAULT_GRAPH_DATA);
-                this.set("rendererData", DUDE_GRAPH_DEFAULT_RENDERER_DATA);
-            }
-            */
-
         });
     </script>
 </dom-module>

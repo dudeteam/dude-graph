@@ -3,6 +3,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../../dude-property/dude-property.html">
 <!--
 `dude-graph-edit-block` is a panel used to add a new blocks/variables to the graph.
 
@@ -17,6 +18,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <span>{{ data.selectedRenderBlock._block.blockInputs.length }}</span> inputs
             <span>{{ data.selectedRenderBlock._block.blockOutputs.length }}</span> outputs
         </div>
+        <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
+            <dude-property property-name="[[ point.pointName ]]"
+                           property-type="[[ point.pointValueType ]]"
+                           property-value="{{ point.pointValue }}">
+            </dude-property>
+        </template>
+        <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockOutputs ]]" as="point">
+            <dude-property property-name="[[ point.pointName ]]"
+                           property-type="[[ point.pointValueType ]]"
+                           property-value="{{ point.pointValue }}">
+            </dude-property>
+        </template>
     </template>
     <script>
         /**
