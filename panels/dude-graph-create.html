@@ -4,7 +4,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
 <!--
-`dude-graph-create-group` is a panel used to add a new group to the graph.
+`dude-graph-create` is a panel used to add a new blocks/variables to the graph.
 
 @group dude-graph
 @element dude-graph-create-group
@@ -21,13 +21,45 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         </dude-hierarchy>
     </template>
     <script>
+        /**
+         * @extends {DudeStackItemElement}
+         */
         Polymer({
             is: "dude-graph-create",
             properties: {
                 "data": {
-                    "type": Object
+                    "type": "DudeGraphElement",
+                    "readonly": true
                 }
             },
+
+            /**
+             * Called when the panel is attached to the DOM
+             * Notifies the dude-stack
+             */
+            attached: function () {
+                this.fire("dude-stack-attached");
+            },
+
+            /**
+             * Called when the panel is opened
+             */
+            opened: function () {},
+
+            /**
+             * Called when the panel is the top of the stack
+             */
+            resumed: function () {},
+
+            /**
+             * Called when the panel is not anymore the top of the stack
+             */
+            paused: function () {},
+
+            /**
+             * Called when the panel is closed
+             */
+            closed: function () {},
 
             /**
              * Creates the block from the selected model

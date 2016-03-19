@@ -12,6 +12,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <!-- dude-graph dependency -->
 <script src="dude-graph.js"></script>
 <!-- dude-graph sidebar panels -->
+<link rel="import" href="panels/dude-stack.html">
 <link rel="import" href="panels/dude-graph-create.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
 <!--
@@ -112,8 +113,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <svg id="svg"></svg>
             <!-- dude-graph sidebar -->
             <div id="sidebar" hidden$="[[ !sidebarOpened ]]">
-                <dude-graph-create data="{{ dudeGraphElement }}"></dude-graph-create>
-                <dude-graph-edit-block data="{{ dudeGraphElement }}"></dude-graph-edit-block>
+                <dude-stack id="stack" data="{{ dudeGraphElement }}"></dude-stack>
             </div>
         </div>
         <!-- Toggle sidebar visibility -->
@@ -130,7 +130,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                  * The dudeGraph element
                  */
                 "dudeGraphElement": {
-                    "type": HTMLElement
+                    "type": "DudeGraphElement"
                 },
 
                 /**
@@ -244,10 +244,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 _.forEach(this.get("renderPointTypes"), function (renderPointType) {
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
+                this.$.stack.pushStack("dude-graph-create");
             },
 
             /**
-             *
+             * Creates a block and a renderBlock from the given blockData
              * @param {Object} blockData
              * @returns {dudeGraph.RenderBlock}
              */
@@ -281,6 +282,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.$.sidebar.removeAttribute("opened");
                 }
             }
+
+            /**
+             * @typedef {Element} DudeGraphElement
+             * @property {dudeGraph.Graph} graph
+             * @property {dudeGraph.Renderer} renderer
+             * @property {Function} createBlock
+             */
         });
     </script>
 </dom-module>

@@ -1,0 +1,146 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<!--suppress HtmlUnknownTarget -->
+<link rel="import" href="../../polymer/polymer.html">
+<!--
+`dude-stack`
+
+@group dude-graph
+@element dude-stack
+@demo demo/index.html
+-->
+<dom-module id="dude-stack">
+    <template>
+        <div id="stack"></div>
+    </template>
+    <script>
+        Polymer({
+            is: "dude-stack",
+            listeners: {
+                "dude-stack-attached": "_stackReady",
+                "dude-stack-close": "_stackClose"
+            },
+
+            /**
+             * The stack of opened elements
+             * @type {Array<DudeStackItemElement>}
+             * @private
+             */
+            _stack: [],
+
+            /**
+             * The element on the top of the stack
+             * @type {DudeStackItemElement|null}
+             * @private
+             */
+            _currentElement: null,
+
+            /**
+             * Pushes an element on the stack
+             * @param {String} stackElementName
+             * @returns {DudeStackItemElement}
+             */
+            pushStack: function (stackElementName) {
+                if (this._currentElement !== null) {
+                    this._currentElement.setAttribute("hidden", "true");
+                    this._currentElement.paused();
+                }
+                this._currentElement = document.createElement(stackElementName);
+                this._stack.push(this._currentElement);
+                this.$.stack.appendChild(this._currentElement);
+                return this._currentElement;
+            },
+
+            /**
+             * Pops the current element and shows the previous element
+             * @returns {DudeStackItemElement|null}
+             */
+            popStack: function () {
+                if (this._currentElement !== null) {
+                    var currentElement = this._stack.pop();
+                    currentElement.closed();
+                    this.$.stack.removeChild(currentElement);
+                    this._currentElement = this._stack[this._stack.length - 1] || null;
+                    if (this._currentElement !== null) {
+                        this._currentElement.removeAttribute("hidden");
+                        this._currentElement.resumed();
+                    }
+                    return currentElement;
+                }
+                return null;
+            },
+
+            /**
+             * Called when a pushed stack element wants to be closed
+             * @param {DudeStackItemElement} stackElement
+             */
+            removeStack: function (stackElement) {
+                if (this._currentElement === stackElement) {
+                    this.popStack();
+                } else {
+                    var stackIndex = this._safeStackIndex(stackElement);
+                    stackElement.closed();
+                    this.$.stack.removeChild(stackElement);
+                    this._stack.splice(stackIndex, 1);
+                }
+            },
+
+            /**
+             * Returns the stacked element index if it exists, throws otherwise
+             * @param {DudeStackItemElement} stackElement
+             * @returns {Number}
+             * @private
+             */
+            _safeStackIndex: function (stackElement) {
+                var index = this._stack.indexOf(stackElement);
+                if (index === -1) {
+                    throw new Error("`" + stackElement + "` not found in the stack");
+                }
+                return index;
+            },
+
+            /**
+             * Called when a pushed stack element is ready
+             * @param {CustomEvent} e
+             * @param {DudeStackItemElement} e.target
+             * @private
+             */
+            _stackReady: function (e) {
+                var stackElement = e.target;
+                this._safeStackIndex(stackElement);
+                stackElement.set("stack", this);
+                stackElement.set("data", this.get("data"));
+                stackElement.opened();
+                if (this._currentElement === stackElement) {
+                    stackElement.resumed();
+                }
+            },
+
+            /**
+             * Called when a pushed stack element wants to be closed
+             * @param {CustomEvent} e
+             * @param {DudeStackItemElement} e.target
+             * @private
+             */
+            _stackClose: function (e) {
+                this.removeStack(e.target);
+            }
+        });
+
+        /**
+         * @typedef {Element} DudeStackElement
+         * @property {Function} pushStack
+         * @property {Function} popStack
+         * @property {Function} removeStack
+         */
+
+        /**
+         * @typedef {Element} DudeStackItemElement
+         * @property {Function} opened
+         * @property {Function} resumed
+         * @property {Function} paused
+         * @property {Function} closed
+         */
+    </script>
+</dom-module>
