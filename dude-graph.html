@@ -281,7 +281,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.get("renderer").on("select", function (renderNode) {
                     dudeGraphElement.set("selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
                     dudeGraphElement.set("selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
-                    if (dudeGraphElement.get("selectedRenderBlock") !== null) {
+                    if (dudeGraphElement.get("selectedRenderBlock") !== null && editBlockStackItem === null) {
                         editBlockStackItem = dudeGraphElement.$.stack.pushStack("dude-graph-edit-block");
                     }
                 });
