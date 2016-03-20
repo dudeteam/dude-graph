@@ -34,20 +34,23 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         #svg {
             @apply(--layout-flex-3);
         }
-        #sidebar[opened] {
+        #stack {
             @apply(--layout-flex);
-            min-width: 300px;
         }
-        #sidebar {
-            background: var(--dude-secondary-background-color);
-            width: 0;
-            height: 100%;
-        }
-        #button {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-        }
+        /*#sidebar[opened] {*/
+            /*@apply(--layout-flex);*/
+            /*min-width: 300px;*/
+        /*}*/
+        /*#sidebar {*/
+            /*background: var(--dude-secondary-background-color);*/
+            /*width: 0;*/
+            /*height: 100%;*/
+        /*}*/
+        /*#button {*/
+            /*position: fixed;*/
+            /*bottom: 0;*/
+            /*right: 0;*/
+        /*}*/
     </style>
     <style>
         /**
@@ -117,15 +120,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <!-- dude-graph SVG renderer -->
             <svg id="svg"></svg>
             <!-- dude-graph sidebar -->
-            <div id="sidebar" hidden$="[[ !sidebarOpened ]]">
+            <!--<div id="sidebar" hidden$="[[ !sidebarOpened ]]">-->
                 <dude-stack id="stack" data="{{ dudeGraphElement }}"></dude-stack>
-            </div>
+            <!--</div>-->
         </div>
         <!-- Toggle sidebar visibility -->
-        <input id="button"
-               type="button"
-               value="Toggle Sidebar"
-               on-click="toggleSidebar">
+        <!--<input id="button"-->
+               <!--type="button"-->
+               <!--value="Toggle Sidebar"-->
+               <!--on-click="toggleSidebar">-->
     </template>
     <script>
         Polymer({
@@ -217,14 +220,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "value": dudeGraph.defaultRenderPoints
                 },
 
-                /**
-                 * Whether the sidebar is opened
-                 */
-                "sidebarOpened": {
-                    "type": Boolean,
-                    "value": true,
-                    "observer": "_sidebarOpenedChanged"
-                }
+//                /**
+//                 * Whether the sidebar is opened
+//                 */
+//                "sidebarOpened": {
+//                    "type": Boolean,
+//                    "value": true,
+//                    "observer": "_sidebarOpenedChanged"
+//                }
             },
 
             /**
@@ -269,12 +272,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
 
-            /**
-             * Toggles the sidebar visibility
-             */
-            toggleSidebar: function () {
-                this.set("sidebarOpened", !this.get("sidebarOpened"));
-            },
+//            /**
+//             * Toggles the sidebar visibility
+//             */
+//            toggleSidebar: function () {
+//                this.set("sidebarOpened", !this.get("sidebarOpened"));
+//            },
 
             /**
              * Listens on the graph and renderer events
@@ -304,18 +307,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
             },
 
-            /**
-             * Shows or hides the sidebar when sidebarOpened changes
-             * @param sidebarOpened
-             * @private
-             */
-            _sidebarOpenedChanged: function (sidebarOpened) {
-                if (sidebarOpened) {
-                    this.$.sidebar.setAttribute("opened", sidebarOpened);
-                } else {
-                    this.$.sidebar.removeAttribute("opened");
-                }
-            }
+//            /**
+//             * Shows or hides the sidebar when sidebarOpened changes
+//             * @param sidebarOpened
+//             * @private
+//             */
+//            _sidebarOpenedChanged: function (sidebarOpened) {
+//                if (sidebarOpened) {
+//                    this.$.sidebar.setAttribute("opened", sidebarOpened);
+//                } else {
+//                    this.$.sidebar.removeAttribute("opened");
+//                }
+//            }
 
             /**
              * @typedef {Element} DudeGraphElement
