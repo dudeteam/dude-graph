@@ -11,6 +11,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-graph-create">
+    <style>
+        :host {
+            @apply(--layout-vertical);
+            @apply(--layout-flex);
+            padding: 10px;
+        }
+    </style>
     <template>
         <dude-hierarchy
                 style="height: 100%; overflow: scroll"
