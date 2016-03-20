@@ -44,7 +44,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             pushStack: function (stackElementName) {
                 if (this._currentElement !== null) {
                     this._currentElement.setAttribute("hidden", "true");
-                    this._currentElement.paused();
+                    if (typeof this._currentElement.paused === "function") {
+                        this._currentElement.paused();
+                    }
                 }
                 this._currentElement = document.createElement(stackElementName);
                 this._stack.push(this._currentElement);
@@ -59,12 +61,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             popStack: function () {
                 if (this._currentElement !== null) {
                     var currentElement = this._stack.pop();
-                    currentElement.closed();
+                    if (typeof currentElement.closed === "function") {
+                        currentElement.closed();
+                    }
                     this.$.stack.removeChild(currentElement);
                     this._currentElement = this._stack[this._stack.length - 1] || null;
                     if (this._currentElement !== null) {
                         this._currentElement.removeAttribute("hidden");
-                        this._currentElement.resumed();
+                        if (typeof this._currentElement.resumed === "function") {
+                            this._currentElement.resumed();
+                        }
                     }
                     return currentElement;
                 }
@@ -80,7 +86,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.popStack();
                 } else {
                     var stackIndex = this._safeStackIndex(stackElement);
-                    stackElement.closed();
+                    if (typeof stackElement.closed === "function") {
+                        stackElement.closed();
+                    }
                     this.$.stack.removeChild(stackElement);
                     this._stack.splice(stackIndex, 1);
                 }
@@ -111,8 +119,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this._safeStackIndex(stackElement);
                 stackElement.set("stack", this);
                 stackElement.set("data", this.get("data"));
-                stackElement.opened();
-                if (this._currentElement === stackElement) {
+                if (typeof stackElement.opened === "function") {
+                    stackElement.opened();
+                }
+                if (this._currentElement === stackElement && typeof stackElement.resumed === "function") {
                     stackElement.resumed();
                 }
             },
