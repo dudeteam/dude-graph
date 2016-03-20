@@ -11,7 +11,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @demo demo/index.html
 -->
 <dom-module id="dude-stack">
+    <style>
+        :host {
+            position: relative;
+        }
+        .title {
+            font-family: var(--dude-primary-text-font);
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            color: var(--dude-content-text-color);
+            border-bottom: 2px solid var(--dude-primary-background-color);
+            margin-bottom: 10px;
+        }
+        i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--dude-secondary-text-color);
+        }
+    </style>
     <template>
+        <i class="fa fa-close"></i>
+        <div class="title">Panel title</div>
         <div id="stack"></div>
     </template>
     <script>
