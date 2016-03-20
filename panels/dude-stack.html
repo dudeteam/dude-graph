@@ -25,6 +25,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             margin-bottom: 10px;
         }
         i {
+            z-index: 10;
+            cursor: pointer;
             position: absolute;
             top: 10px;
             left: 10px;
@@ -32,7 +34,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
     </style>
     <template>
-        <i class="fa fa-close"></i>
+        <i on-click="popStack" class="fa fa-close"></i>
         <div class="title">Panel title</div>
         <div id="stack"></div>
     </template>
