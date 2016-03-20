@@ -14,7 +14,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <!-- dude-graph sidebar panels -->
 <link rel="import" href="panels/dude-stack.html">
 <link rel="import" href="panels/dude-graph-create.html">
+<link rel="import" href="panels/dude-graph-create-group.html">
+<link rel="import" href="panels/dude-graph-create-function.html">
+<link rel="import" href="panels/dude-graph-create-variable.html">
 <link rel="import" href="panels/dude-graph-edit-block.html">
+<link rel="import" href="panels/dude-graph-edit-group.html">
+<link rel="import" href="panels/dude-graph-edit-variable.html">
 <!--
 `dude-graph` is a Polymer element which creates a dude-graph SVG renderer.
 -->
@@ -277,18 +282,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _listenDudeGraphEvents: function () {
                 var dudeGraphElement = this;
-                var editBlockStackItem = null;
+                var previousStackItem = null;
                 this.get("renderer").on("select", function (renderNode) {
-                    dudeGraphElement.set("selectedRenderBlock", renderNode instanceof dudeGraph.RenderBlock ? renderNode : null);
-                    dudeGraphElement.set("selectedRenderGroup", renderNode instanceof dudeGraph.RenderGroup ? renderNode : null);
-                    if (dudeGraphElement.get("selectedRenderBlock") !== null && editBlockStackItem === null) {
-                        editBlockStackItem = dudeGraphElement.$.stack.pushStack("dude-graph-edit-block");
+                    if (renderNode instanceof dudeGraph.RenderGroup) {
+                        dudeGraphElement.set("selectedRenderBlock", null);
+                        dudeGraphElement.set("selectedRenderGroup", renderNode);
+                        previousStackItem = dudeGraphElement.$.stack.pushStack("dude-graph-edit-group");
+                    } else if (renderNode instanceof dudeGraph.RenderBlock) {
+                        dudeGraphElement.set("selectedRenderBlock", renderNode);
+                        dudeGraphElement.set("selectedRenderGroup", null);
+                        previousStackItem = dudeGraphElement.$.stack.pushStack(renderNode.customPanel || "dude-graph-edit-block");
                     }
                 });
                 this.get("renderer").on("unselect-all", function () {
-                    if (editBlockStackItem !== null) {
-                        dudeGraphElement.$.stack.removeStack(editBlockStackItem);
-                        editBlockStackItem = null;
+                    if (previousStackItem !== null) {
+                        dudeGraphElement.$.stack.removeStack(previousStackItem);
+                        previousStackItem = null;
                     }
                     dudeGraphElement.set("selectedRenderBlock", null);
                     dudeGraphElement.set("selectedRenderGroup", null);
