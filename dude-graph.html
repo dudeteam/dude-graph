@@ -221,6 +221,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
                 this._listenDudeGraphEvents();
+                this.get("loader").load(this.get("graph"), this.get("graphData"));
+                this.get("renderer").load(this.get("rendererData"));
             },
 
             /**
@@ -236,6 +238,31 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "id": block.blockId,
                     "block": block.blockId
                 }, true);
+            },
+
+            /**
+             * Saves the graph data
+             * @returns {Object}
+             */
+            saveGraphData: function () {
+                return this.get("saver").save(this.get("graph"));
+            },
+            /**
+             * Saves the renderer data
+             * @returns {Object}
+             */
+            saveRendererData: function () {
+                return this.get("renderer").save();
+            },
+
+            /**
+             * Saves the graph and renderer data
+             */
+            save: function () {
+                return {
+                    "graphData": this.saveGraphData(),
+                    "rendererData": this.saveRendererData()
+                }
             },
 
             /**
@@ -267,6 +294,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @property {dudeGraph.Graph} graph
              * @property {dudeGraph.Renderer} renderer
              * @property {Function} createBlock
+             * @property {Function} saveGraphData
+             * @property {Function} saveRendererData
+             * @property {Function} save
              */
         });
     </script>

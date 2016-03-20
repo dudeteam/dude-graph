@@ -27,6 +27,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 items="{{ data.models }}"
                 on-dude-hierarchy-item-submit="_createBlock">
         </dude-hierarchy>
+        <button on-click="_save">Save</button>
     </template>
     <script>
         /**
@@ -83,6 +84,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (e.detail.item.data) {
                     this.get("data").createBlock(e.detail.item.data);
                 }
+            },
+
+            /**
+             * Saves the graph and renderer
+             * @private
+             */
+            _save: function () {
+                this.get("data").fire("dude-graph-save", this.get("data").save());
             }
         });
     </script>
