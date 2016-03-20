@@ -17,13 +17,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             @apply(--layout-vertical);
             @apply(--layout-flex);
         }
-        :host(.closed) {
-            width: 50px;
-            height: 50px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
         #panel {
             background: var(--dude-secondary-background-color);
             @apply(--layout-vertical);
@@ -65,12 +58,49 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             top: 10px;
             left: 10px;
         }
+
+        /* closing */
+        :host(.closed) {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        :host(.closed) #panel {
+            display: none;
+        }
+        :host(:not(.closed)) #button {
+            display: none;
+        }
+        @keyframes open-panel {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes close-panel {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        :host(:not(.closed)) #panel {
+            animation: open-panel 1s;
+        }
+        :host(.closed) #panel {
+            animation: close-panel 1s;
+        }
     </style>
     <template>
-        <div id="button" hidden$="[[ _panelOpen ]]" on-click="_openPanel">
+        <div id="button" on-click="_openPanel">
             <i class="fa fa-info"></i>
         </div>
-        <div id="panel" hidden$="[[ !_panelOpen ]]">
+        <div id="panel">
             <i on-click="popStack" class="fa fa-close"></i>
             <div class="title">Panel title</div>
             <div id="stack"></div>
@@ -206,12 +236,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             _openPanel: function () {
-                this.set("_panelOpen", true);
                 this.toggleClass("closed", false);
             },
 
             _closePanel: function () {
-                this.set("_panelOpen", false);
                 this.toggleClass("closed", true);
             }
         });
