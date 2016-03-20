@@ -17,6 +17,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             @apply(--layout-vertical);
             @apply(--layout-flex);
         }
+        :host(.closed) {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
         #panel {
             background: var(--dude-secondary-background-color);
             @apply(--layout-vertical);
@@ -39,15 +46,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             color: var(--dude-secondary-text-color);
         }
         #button {
-            width: 50px;
-            height: 50px;
+            /*width: 50px;*/
+            /*height: 50px;*/
+            position: relative;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             background: var(--dude-secondary-background-color);
             color: var(--dude-secondary-text-color);
             cursor: pointer;
-            position: absolute;
-            top: 10px;
-            right: 10px;
+            /*position: absolute;*/
+            /*top: 10px;*/
+            /*right: 10px;*/
         }
         #button i {
             position: absolute;
@@ -89,7 +99,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _currentElement: null,
 
             ready: function () {
-                this.set("_panelOpen", false);
+                this._openPanel();
             },
 
             /**
@@ -128,7 +138,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                             this._currentElement.resumed();
                         }
                     } else {
-                        this.set("_panelOpen", false);
+                        this._closePanel();
                     }
                     return currentElement;
                 }
@@ -197,6 +207,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             _openPanel: function () {
                 this.set("_panelOpen", true);
+                this.toggleClass("closed", false);
+            },
+
+            _closePanel: function () {
+                this.set("_panelOpen", false);
+                this.toggleClass("closed", true);
             }
         });
 
