@@ -12,7 +12,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <!-- dude-graph dependency -->
 <script src="dude-graph.js"></script>
 <!-- dude-graph sidebar panels -->
-<link rel="import" href="panels/dude-stack.html">
+<link rel="import" href="panels/dude-inspector.html">
 <link rel="import" href="panels/dude-graph-create.html">
 <link rel="import" href="panels/dude-graph-create-group.html">
 <link rel="import" href="panels/dude-graph-create-function.html">
@@ -34,23 +34,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         #svg {
             @apply(--layout-flex-3);
         }
-        #stack {
+        #inspector {
             @apply(--layout-flex);
         }
-        /*#sidebar[opened] {*/
-            /*@apply(--layout-flex);*/
-            /*min-width: 300px;*/
-        /*}*/
-        /*#sidebar {*/
-            /*background: var(--dude-secondary-background-color);*/
-            /*width: 0;*/
-            /*height: 100%;*/
-        /*}*/
-        /*#button {*/
-            /*position: fixed;*/
-            /*bottom: 0;*/
-            /*right: 0;*/
-        /*}*/
     </style>
     <style>
         /**
@@ -117,18 +103,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     </style>
     <template>
         <div class="container">
-            <!-- dude-graph SVG renderer -->
             <svg id="svg"></svg>
-            <!-- dude-graph sidebar -->
-            <!--<div id="sidebar" hidden$="[[ !sidebarOpened ]]">-->
-                <dude-stack id="stack" data="{{ dudeGraphElement }}"></dude-stack>
-            <!--</div>-->
+            <dude-inspector id="inspector" data="{{ dudeGraphElement }}" root-panel="dude-graph-create"></dude-inspector>
         </div>
-        <!-- Toggle sidebar visibility -->
-        <!--<input id="button"-->
-               <!--type="button"-->
-               <!--value="Toggle Sidebar"-->
-               <!--on-click="toggleSidebar">-->
     </template>
     <script>
         Polymer({
@@ -218,16 +195,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "renderPointTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultRenderPoints
-                },
-
-//                /**
-//                 * Whether the sidebar is opened
-//                 */
-//                "sidebarOpened": {
-//                    "type": Boolean,
-//                    "value": true,
-//                    "observer": "_sidebarOpenedChanged"
-//                }
+                }
             },
 
             /**
@@ -252,7 +220,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 _.forEach(this.get("renderPointTypes"), function (renderPointType) {
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
-                this.$.stack.pushStack("dude-graph-create");
                 this._listenDudeGraphEvents();
             },
 
@@ -271,54 +238,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }, true);
             },
 
-
-//            /**
-//             * Toggles the sidebar visibility
-//             */
-//            toggleSidebar: function () {
-//                this.set("sidebarOpened", !this.get("sidebarOpened"));
-//            },
-
             /**
              * Listens on the graph and renderer events
              * @private
              */
             _listenDudeGraphEvents: function () {
                 var dudeGraphElement = this;
-                var previousStackItem = null;
                 this.get("renderer").on("select", function (renderNode) {
                     if (renderNode instanceof dudeGraph.RenderGroup) {
                         dudeGraphElement.set("selectedRenderBlock", null);
                         dudeGraphElement.set("selectedRenderGroup", renderNode);
-                        previousStackItem = dudeGraphElement.$.stack.pushStack("dude-graph-edit-group");
+                        dudeGraphElement.$.inspector.pushStack("dude-graph-edit-group");
                     } else if (renderNode instanceof dudeGraph.RenderBlock) {
                         dudeGraphElement.set("selectedRenderBlock", renderNode);
                         dudeGraphElement.set("selectedRenderGroup", null);
-                        previousStackItem = dudeGraphElement.$.stack.pushStack(renderNode.customPanel || "dude-graph-edit-block");
+                        dudeGraphElement.$.inspector.pushStack(renderNode.customPanel || "dude-graph-edit-block");
                     }
                 });
                 this.get("renderer").on("unselect-all", function () {
-                    if (previousStackItem !== null) {
-                        dudeGraphElement.$.stack.removeStack(previousStackItem);
-                        previousStackItem = null;
-                    }
                     dudeGraphElement.set("selectedRenderBlock", null);
                     dudeGraphElement.set("selectedRenderGroup", null);
+                    dudeGraphElement.$.inspector.clearStack();
                 });
-            },
-
-//            /**
-//             * Shows or hides the sidebar when sidebarOpened changes
-//             * @param sidebarOpened
-//             * @private
-//             */
-//            _sidebarOpenedChanged: function (sidebarOpened) {
-//                if (sidebarOpened) {
-//                    this.$.sidebar.setAttribute("opened", sidebarOpened);
-//                } else {
-//                    this.$.sidebar.removeAttribute("opened");
-//                }
-//            }
+            }
 
             /**
              * @typedef {Element} DudeGraphElement

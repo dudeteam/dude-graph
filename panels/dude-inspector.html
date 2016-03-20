@@ -5,27 +5,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
 <!--
-`dude-stack`
+`dude-inspector` is a Polymer element which creates a closable stack of panels.
 
 @group dude-graph
-@element dude-stack
-@demo demo/index.html
+@element dude-inspector
 -->
-<dom-module id="dude-stack">
+<dom-module id="dude-inspector">
     <style>
         :host {
             position: relative;
             @apply(--layout-vertical);
             @apply(--layout-flex);
         }
+
         #panel {
             background: var(--dude-secondary-background-color);
             @apply(--layout-vertical);
             @apply(--layout-flex);
         }
+
         #stack {
             overflow: auto;
         }
+
         .title {
             font-family: var(--dude-primary-text-font);
             text-align: center;
@@ -34,6 +36,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             color: var(--dude-content-text-color);
             border-bottom: 2px solid var(--dude-primary-background-color);
         }
+
         #panel i {
             z-index: 10;
             cursor: pointer;
@@ -42,9 +45,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             left: 10px;
             color: var(--dude-secondary-text-color);
         }
+
         #button {
-            /*width: 50px;*/
-            /*height: 50px;*/
             position: relative;
             width: 100%;
             height: 100%;
@@ -53,9 +55,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             color: var(--dude-secondary-text-color);
             cursor: pointer;
             /*position: absolute;*/
+            /*width: 50px;*/
+            /*height: 50px;*/
             /*top: 10px;*/
             /*right: 10px;*/
         }
+
         #button i {
             position: absolute;
             margin: 8px 12px;
@@ -71,12 +76,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             top: 10px;
             right: 10px;
         }
+
         :host(.closed) #panel {
             display: none;
         }
+
         :host(:not(.closed)) #button {
             display: none;
         }
+
         @keyframes open-panel {
             from {
                 opacity: 0;
@@ -85,6 +93,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 opacity: 1;
             }
         }
+
         @keyframes close-panel {
             from {
                 opacity: 1;
@@ -93,9 +102,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 opacity: 0;
             }
         }
+
         :host(:not(.closed)) #panel {
             animation: open-panel 1s;
         }
+
         :host(.closed) #panel {
             animation: close-panel 1s;
         }
@@ -106,73 +117,93 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         </div>
         <div id="panel">
             <i on-click="popStack" class="fa fa-close"></i>
-            <div class="title">Panel title</div>
+            <div class="title">[[ _panelTitle(topPanel, topPanel.panelTitle) ]]</div>
             <div id="stack"></div>
         </div>
     </template>
     <script>
         Polymer({
-            is: "dude-stack",
+            is: "dude-inspector",
+            properties: {
+                /**
+                 * The first panel to create
+                 */
+                "rootPanel": {
+                    "type": "String"
+                },
+
+                /**
+                 * The top panel
+                 */
+                "topPanel": {
+                    "type": "DudeStackItemElement",
+                    "readonly": true,
+                    "value": null
+                }
+            },
             listeners: {
-                "dude-stack-attached": "_stackReady",
-                "dude-stack-close": "_stackClose"
+                "dude-inspector-attached": "_panelAttached"
             },
 
             /**
-             * The stack of opened elements
+             * The panels stack
              * @type {Array<DudeStackItemElement>}
              * @private
              */
-            _stack: [],
+            _panels: [],
 
             /**
-             * The element on the top of the stack
-             * @type {DudeStackItemElement|null}
-             * @private
+             *
              */
-            _currentElement: null,
-
             ready: function () {
+                if (!this.get("rootPanel")) {
+                    throw new Error("`dude-inspector` must have a rootPanel");
+                }
+                this.pushStack(this.get("rootPanel"));
                 this._openPanel();
             },
 
             /**
-             * Pushes an element on the stack
-             * @param {String} stackElementName
+             * Pushes a panel on the stack, becoming the top panel
+             * The previous top panel will be hidden and paused
+             * @param {String} panelElementName
              * @returns {DudeStackItemElement}
              */
-            pushStack: function (stackElementName) {
-                if (this._currentElement !== null) {
-                    this._currentElement.setAttribute("hidden", "true");
-                    if (typeof this._currentElement.paused === "function") {
-                        this._currentElement.paused();
+            pushStack: function (panelElementName) {
+                if (this.get("topPanel") !== null) {
+                    this.get("topPanel").setAttribute("hidden", "true");
+                    if (typeof this.get("topPanel").paused === "function") {
+                        this.get("topPanel").paused();
                     }
                 }
-                this._currentElement = document.createElement(stackElementName);
-                this._stack.push(this._currentElement);
-                this.$.stack.appendChild(this._currentElement);
-                return this._currentElement;
+                this.set("topPanel", document.createElement(panelElementName));
+                this._panels.push(this.get("topPanel"));
+                this.$.stack.appendChild(this.get("topPanel"));
+                return this.get("topPanel");
             },
 
             /**
-             * Pops the current element and shows the previous element
+             * Pops the top panel and shows the previous one
+             * If the top panel is the root panel, the inspector will be closed instead
              * @returns {DudeStackItemElement|null}
              */
             popStack: function () {
-                if (this._currentElement !== null) {
-                    var currentElement = this._stack.pop();
+                if (this._panels.length === 1) {
+                    this._closePanel();
+                    return null;
+                }
+                if (this.get("topPanel") !== null) {
+                    var currentElement = this._panels.pop();
                     if (typeof currentElement.closed === "function") {
                         currentElement.closed();
                     }
                     this.$.stack.removeChild(currentElement);
-                    this._currentElement = this._stack[this._stack.length - 1] || null;
-                    if (this._currentElement !== null) {
-                        this._currentElement.removeAttribute("hidden");
-                        if (typeof this._currentElement.resumed === "function") {
-                            this._currentElement.resumed();
+                    this.set("topPanel", this._panels[this._panels.length - 1] || null);
+                    if (this.get("topPanel") !== null) {
+                        this.get("topPanel").removeAttribute("hidden");
+                        if (typeof this.get("topPanel").resumed === "function") {
+                            this.get("topPanel").resumed();
                         }
-                    } else {
-                        this._closePanel();
                     }
                     return currentElement;
                 }
@@ -180,19 +211,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when a pushed stack element wants to be closed
-             * @param {DudeStackItemElement} stackElement
+             * Clears all but the root element
              */
-            removeStack: function (stackElement) {
-                if (this._currentElement === stackElement) {
+            clearStack: function () {
+                while (this._panels.length > 1) {
                     this.popStack();
-                } else {
-                    var stackIndex = this._safeStackIndex(stackElement);
-                    if (typeof stackElement.closed === "function") {
-                        stackElement.closed();
-                    }
-                    this.$.stack.removeChild(stackElement);
-                    this._stack.splice(stackIndex, 1);
                 }
             },
 
@@ -202,8 +225,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @returns {Number}
              * @private
              */
-            _safeStackIndex: function (stackElement) {
-                var index = this._stack.indexOf(stackElement);
+            _safePanelIndex: function (stackElement) {
+                var index = this._panels.indexOf(stackElement);
                 if (index === -1) {
                     throw new Error("`" + stackElement + "` not found in the stack");
                 }
@@ -211,40 +234,46 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Called when a pushed stack element is ready
+             * Called when a panel is attached to the DOM
              * @param {CustomEvent} e
              * @param {DudeStackItemElement} e.target
              * @private
              */
-            _stackReady: function (e) {
+            _panelAttached: function (e) {
                 var stackElement = e.target;
-                this._safeStackIndex(stackElement);
+                this._safePanelIndex(stackElement);
                 stackElement.set("stack", this);
                 stackElement.set("data", this.get("data"));
                 if (typeof stackElement.opened === "function") {
                     stackElement.opened();
                 }
-                if (this._currentElement === stackElement && typeof stackElement.resumed === "function") {
+                if (this.get("topPanel") === stackElement && typeof stackElement.resumed === "function") {
                     stackElement.resumed();
                 }
             },
 
             /**
-             * Called when a pushed stack element wants to be closed
-             * @param {CustomEvent} e
-             * @param {DudeStackItemElement} e.target
+             * Opens the panel
              * @private
              */
-            _stackClose: function (e) {
-                this.removeStack(e.target);
-            },
-
             _openPanel: function () {
                 this.toggleClass("closed", false);
             },
 
+            /**
+             * Closes the panel
+             * @private
+             */
             _closePanel: function () {
                 this.toggleClass("closed", true);
+            },
+
+            /**
+             * Returns the panel title
+             * @returns {String}
+             */
+            _panelTitle: function (topPanel, panelTitle) {
+                return panelTitle || "None";
             }
         });
 
