@@ -64,6 +64,17 @@
                 }
             });
         });
+        test("create block unique ids", function () {
+            var graph = new dudeGraph.Graph();
+            var ids = {};
+            for (var i = 0; i < 5000; i++) {
+                var id = graph.nextBlockId();
+                if (typeof ids[id] !== "undefined") {
+                    throw new Error();
+                }
+                ids[id] = true;
+            }
+        });
         test("create graph block", function () {
             var graph = new dudeGraph.Graph();
             var block = new dudeGraph.Block();
