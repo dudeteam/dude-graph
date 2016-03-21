@@ -271,6 +271,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _listenDudeGraphEvents: function () {
                 var dudeGraphElement = this;
+                this.get("renderer").on("error", function (error) {
+                    dudeGraphElement.fire("dude-graph-error", {"error": error, "message": error.message});
+                });
                 this.get("renderer").on("select", function (renderNode) {
                     if (renderNode instanceof dudeGraph.RenderGroup) {
                         dudeGraphElement.set("selectedRenderBlock", null);

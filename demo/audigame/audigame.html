@@ -89,7 +89,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
             },
             listeners: {
+                "dude-graph-error": "_error",
                 "dude-graph-save": "_save"
+            },
+
+            /**
+             * Shows errors
+             * @param {CustomEvent} e
+             * @param {Object} e.detail
+             * @param {Error} e.detail.error
+             * @param {String} e.detail.error.message
+             * @private
+             */
+            _error: function (e) {
+                console.error(e.detail.error.message);
             },
 
             /**
