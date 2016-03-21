@@ -59,7 +59,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "StreamPoint",
                         "pointName": "in",
-                        "singleConnection": false
+                        "pointSingleConnection": false
                     },
                     {
                         "pointType": "Point",
@@ -118,7 +118,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "StreamPoint",
                         "pointName": "in",
-                        "singleConnection": false
+                        "pointSingleConnection": false
                     },
                     {
                         "pointType": "Point",
@@ -217,7 +217,8 @@ const DUDE_GRAPH_MODELS = [
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
-                                    "pointName": "in"
+                                    "pointName": "in",
+                                    "pointSingleConnection": true
                                 },
                                 {
                                     "pointType": "Point",
@@ -252,7 +253,8 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "format",
-                                    "pointValueType": "String"
+                                    "pointValueType": "String",
+                                    "pointSingleConnection": true
                                 }
                             ],
                             "blockOutputs": [
@@ -276,7 +278,8 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "expression",
-                                    "pointValueType": "String"
+                                    "pointValueType": "String",
+                                    "pointSingleConnection": true
                                 }
                             ],
                             "blockOutputs": [
@@ -328,7 +331,8 @@ const DUDE_GRAPH_MODELS = [
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
-                                    "pointName": "in"
+                                    "pointName": "in",
+                                    "pointSingleConnection": true
                                 },
                                 {
                                     "pointType": "Point",
@@ -362,7 +366,8 @@ const DUDE_GRAPH_MODELS = [
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
-                                    "pointName": "in"
+                                    "pointName": "in",
+                                    "pointSingleConnection": true
                                 },
                                 {
                                     "pointType": "Point",
@@ -393,7 +398,8 @@ const DUDE_GRAPH_MODELS = [
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
-                                    "pointName": "in"
+                                    "pointName": "in",
+                                    "pointSingleConnection": true
                                 },
                                 {
                                     "pointType": "Point",
@@ -424,7 +430,8 @@ const DUDE_GRAPH_MODELS = [
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
-                                    "pointName": "in"
+                                    "pointName": "in",
+                                    "pointSingleConnection": true
                                 },
                                 {
                                     "pointType": "Point",
