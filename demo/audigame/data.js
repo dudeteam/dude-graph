@@ -230,13 +230,13 @@ const DUDE_GRAPH_MODELS = [
                                 },
                                 {
                                     "pointType": "Point",
-                                    "pointName": "this",
+                                    "pointName": "variable",
                                     "pointTemplate": "AssignTemplate",
                                     "pointValueType": "Number"
                                 },
                                 {
                                     "pointType": "Point",
-                                    "pointName": "other",
+                                    "pointName": "value",
                                     "pointTemplate": "AssignTemplate",
                                     "pointValueType": "Number"
                                 }
