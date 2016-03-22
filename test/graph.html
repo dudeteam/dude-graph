@@ -64,6 +64,15 @@
                 }
             });
         });
+        test("graph query", function () {
+            var graph = new dudeGraph.Graph();
+            expect(graph.blocksByName("AssignationBlock")).to.have.length(0);
+            expect(graph.blocksByType(dudeGraph.AssignationBlock)).to.have.length(0);
+            var block = new dudeGraph.AssignationBlock();
+            graph.addBlock(block);
+            expect(graph.blocksByName("AssignationBlock")).to.have.length(1);
+            expect(graph.blocksByType(dudeGraph.AssignationBlock)).to.have.length(1);
+        });
         test("create block unique ids", function () {
             var graph = new dudeGraph.Graph();
             var ids = {};
