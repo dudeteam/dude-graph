@@ -221,8 +221,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
                 this._listenDudeGraphEvents();
-                this.get("loader").load(this.get("graph"), this.get("graphData"));
-                this.get("renderer").load(this.get("rendererData"));
+                this.get("loader").load(this.get("graph"), this.get("graphData") || {});
+                this.get("renderer").load(this.get("rendererData") || {});
             },
 
             /**

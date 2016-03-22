@@ -15,7 +15,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "timer",
-                        "pointValue": 5,
+                        "pointValue": 0,
                         "pointValueType": "Number"
                     },
                     {
@@ -43,6 +43,10 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "StreamPoint",
                         "pointName": "second"
+                    },
+                    {
+                        "pointType": "StreamPoint",
+                        "pointName": "timeout"
                     }
                 ]
             }
@@ -74,7 +78,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "timer",
-                        "pointValue": 5,
+                        "pointValue": 0,
                         "pointValueType": "Number"
                     },
                     {
@@ -102,6 +106,10 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "StreamPoint",
                         "pointName": "second"
+                    },
+                    {
+                        "pointType": "StreamPoint",
+                        "pointName": "timeout"
                     }
                 ]
             }
