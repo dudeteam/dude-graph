@@ -926,8 +926,8 @@
             var assignationBlock = new dudeGraph.AssignationBlock();
             graph.addBlock(assignationBlock);
             assignationBlock.addPoint(new dudeGraph.StreamPoint(false, {"pointName": "in"}));
-            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Object"}));
-            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "other", "pointValueType": "Object"}));
+            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "variable", "pointValueType": "Object"}));
+            assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "value", "pointValueType": "Object"}));
             expect(function () {
                 assignationBlock.validatePoints(); // Missing output "out `StreamPoint`"
             }).to.throw();
