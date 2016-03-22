@@ -290,6 +290,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     dudeGraphElement.set("selectedRenderGroup", null);
                     dudeGraphElement.$.inspector.clearStack();
                 });
+                /**
+                this.get("renderer").on("drop-connection", function (renderConnection) {
+                    var draggingRenderPoint = renderConnection.draggingRenderPoint;
+                    var fromRenderPoint = renderConnection.realRenderPoint;
+                    var eligibleModels = dudeGraph.Models.query(dudeGraphElement.get("models"), fromRenderPoint.point);
+                    _.forEach(eligibleModels, function (eligibleModel) {
+                        console.log(eligibleModel.model.item.data.blockName, eligibleModel.modelPoints.join(", "));
+                    });
+                });
+                 **/
             }
 
             /**

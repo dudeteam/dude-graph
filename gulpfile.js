@@ -11,7 +11,7 @@ var sourcemaps = require("gulp-sourcemaps");
 var SOURCES = [
     "lib/index.js",
     "lib/utils/*.js",
-    "lib/data/*.js",
+    "lib/models/*.js",
     "lib/graph/graph.js",
     "lib/graph/block.js",
     "lib/graph/point.js",

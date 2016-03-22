@@ -925,13 +925,13 @@
             var graph = new dudeGraph.Graph();
             var assignationBlock = new dudeGraph.AssignationBlock();
             graph.addBlock(assignationBlock);
-            assignationBlock.addPoint(new dudeGraph.StreamPoint(false, {"pointName": "in"}));
+            assignationBlock.addPoint(new dudeGraph.StreamPoint(false, {"pointName": "in", "pointValueType": "Stream"}));
             assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "variable", "pointValueType": "Object"}));
             assignationBlock.addPoint(new dudeGraph.Point(false, {"pointName": "value", "pointValueType": "Object"}));
             expect(function () {
                 assignationBlock.validatePoints(); // Missing output "out `StreamPoint`"
             }).to.throw();
-            assignationBlock.addPoint(new dudeGraph.StreamPoint(true, {"pointName": "out"}));
+            assignationBlock.addPoint(new dudeGraph.StreamPoint(true, {"pointName": "out", "pointValueType": "Stream"}));
             assignationBlock.validatePoints();
             expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.AssignationBlock).to.be.true;
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.StreamPoint).to.be.true;
