@@ -31,6 +31,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                            property-value="{{ point.pointValue }}">
             </dude-property>
         </template>
+        <button on-click="_remove">Remove selection</button>
     </template>
     <script>
         /**
@@ -76,7 +77,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Called when the panel is closed
              */
-            closed: function () {}
+            closed: function () {},
+
+            /**
+             * Removes the selection
+             * @private
+             */
+            _remove: function () {
+                this.get("data").get("renderer").removeSelection();
+            }
         });
     </script>
 </dom-module>
