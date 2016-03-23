@@ -14,11 +14,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="dude-graph-edit-block">
     <template>
-        <h1>{{ data.selectedRenderBlock._block.blockName }}</h1>
-        <div>
-            <span>{{ data.selectedRenderBlock._block.blockInputs.length }}</span> inputs
-            <span>{{ data.selectedRenderBlock._block.blockOutputs.length }}</span> outputs
-        </div>
+        <dude-property property-name="[[ data.selectedRenderBlock._block.blockName ]]"
+                       property-type="String"
+                       property-value="{{ data.selectedRenderBlock.nodeName }}">
+        </dude-property>
         <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
             <dude-property property-name="[[ point.pointName ]]"
                            property-type="[[ point.pointValueType ]]"
@@ -31,7 +30,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                            property-value="{{ point.pointValue }}">
             </dude-property>
         </template>
-        <button on-click="_remove">Remove selection</button>
     </template>
     <script>
         /**
@@ -77,15 +75,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Called when the panel is closed
              */
-            closed: function () {},
-
-            /**
-             * Removes the selection
-             * @private
-             */
-            _remove: function () {
-                this.get("data").get("renderer").removeSelection();
-            }
+            closed: function () {}
         });
     </script>
 </dom-module>
