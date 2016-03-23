@@ -235,7 +235,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 },
                                 {
                                     "pointType": "Point",
@@ -272,7 +272,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "Point",
                                     "pointName": "format",
                                     "pointValueType": "String",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 }
                             ],
                             "blockOutputs": [
@@ -296,15 +296,15 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "expression",
-                                    "pointValueType": "String",
-                                    "pointSingleConnection": true
+                                    "pointValueType": "String"
                                 }
                             ],
                             "blockOutputs": [
                                 {
                                     "pointType": "Point",
                                     "pointName": "value",
-                                    "pointValueType": "Number"
+                                    "pointValueType": "Number",
+                                    "pointSingleConnection": false
                                 }
                             ]
                         }
@@ -351,7 +351,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 },
                                 {
                                     "pointType": "Point",
@@ -388,7 +388,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 },
                                 {
                                     "pointType": "Point",
@@ -423,7 +423,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 },
                                 {
                                     "pointType": "Point",
@@ -458,7 +458,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": true
+                                    "pointSingleConnection": false
                                 },
                                 {
                                     "pointType": "Point",
