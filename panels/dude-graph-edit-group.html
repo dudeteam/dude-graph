@@ -22,13 +22,51 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <dude-property property-name="Group name"
                        property-type="String"
-                       property-value="{{ data.nodeName }}"
-                       no-menu>
+                       property-value="{{ data.selectedRenderGroup.nodeName }}">
         </dude-property>
     </template>
     <script>
         Polymer({
-            is: "dude-graph-edit-group"
+            is: "dude-graph-edit-group",
+            properties: {
+                "data": {
+                    "type": "DudeGraphElement",
+                    "readonly": true
+                },
+                "panelTitle": {
+                    "type": String,
+                    "value": "Edit block",
+                    "readonly": true
+                }
+            },
+
+            /**
+             * Called when the panel is attached to the DOM
+             * Notifies the dude-stack
+             */
+            attached: function () {
+                this.fire("dude-inspector-attached");
+            },
+
+            /**
+             * Called when the panel is opened
+             */
+            opened: function () {},
+
+            /**
+             * Called when the panel is the top of the stack
+             */
+            resumed: function () {},
+
+            /**
+             * Called when the panel is not anymore the top of the stack
+             */
+            paused: function () {},
+
+            /**
+             * Called when the panel is closed
+             */
+            closed: function () {}
         });
     </script>
 </dom-module>

@@ -355,6 +355,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     dudeGraphElement.get("renderer").zoomToFit();
                     e.preventDefault();
                 });
+                jwerty.key("ctrl+shift+g/⌘+shift+g", function (e) {
+                    dudeGraphElement.get("renderer").createRenderGroupForSelection();
+                    e.preventDefault();
+                });
                 jwerty.key("delete/backspace", function (e) {
                     if (dudeGraphElement.get("renderer").removeSelection()) {
                         e.preventDefault();
