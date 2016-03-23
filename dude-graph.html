@@ -5,6 +5,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../dude-style/dude-style.html">
+<link rel="import" href="../dude-popup/dude-popup.html">
+<link rel="import" href="../dude-hierarchy/dude-hierarchy.html">
 <!-- javascript dependencies -->
 <script src="../lodash/dist/lodash.min.js"></script>
 <script src="../d3/d3.min.js"></script>
@@ -106,6 +108,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="container">
             <svg id="svg"></svg>
             <dude-inspector id="inspector" data="{{ dudeGraphElement }}" root-panel="dude-graph-create"></dude-inspector>
+            <dude-popup id="autocompletePopup">
+                <dude-hierarchy
+                        id="autocomplete"
+                        placeholder="Search block..."
+                        items="[[ autocompleteModels ]]"
+                        on-dude-hierarchy-item-submit="_autocomplete"
+                        on-dude-hierarchy-blur="_closeAutocomplete">
+                </dude-hierarchy>
+            </dude-popup>
         </div>
     </template>
     <script>
@@ -118,21 +129,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "dudeGraphElement": {
                     "type": "DudeGraphElement"
                 },
-
                 /**
                  * The graph
                  */
                 "graph": {
                     "type": dudeGraph.Graph
                 },
-
                 /**
                  * The renderer
                  */
                 "renderer": {
                     "type": dudeGraph.Renderer
                 },
-
                 /**
                  * The graph loader
                  */
@@ -147,7 +155,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": dudeGraph.GraphSaver,
                     "value": null
                 },
-
                 /**
                  * The graph data
                  */
@@ -196,6 +203,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "renderPointTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultRenderPoints
+                },
+                /**
+                 * The render connection involved in the autocomplete
+                 */
+                "autocompleteRenderConnection": {
+                    "type": dudeGraph.RenderConnection,
+                    "value": null,
+                    "readonly": true
+                },
+                /**
+                 * The models eligible for the autocomplete render connection
+                 */
+                "autocompleteModels": {
+                    "type": "dudeGraph.Models.modelTypedef",
+                    "value": [],
+                    "readonly": true
                 }
             },
 
@@ -273,7 +296,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @emit {Object} dude-graph-save
              */
             emitSave: function () {
-              this.fire("dude-graph-save", this.save());
+                this.fire("dude-graph-save", this.save());
             },
 
             /**
@@ -289,28 +312,37 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     if (renderNode instanceof dudeGraph.RenderGroup) {
                         dudeGraphElement.set("selectedRenderBlock", null);
                         dudeGraphElement.set("selectedRenderGroup", renderNode);
-                        dudeGraphElement.$.inspector.pushStack("dude-graph-edit-group");
+                        dudeGraphElement.$["inspector"].pushStack("dude-graph-edit-group");
                     } else if (renderNode instanceof dudeGraph.RenderBlock) {
                         dudeGraphElement.set("selectedRenderBlock", renderNode);
                         dudeGraphElement.set("selectedRenderGroup", null);
-                        dudeGraphElement.$.inspector.pushStack(renderNode.customPanel || "dude-graph-edit-block");
+                        dudeGraphElement.$["inspector"].pushStack(renderNode.customPanel || "dude-graph-edit-block");
                     }
                 });
                 this.get("renderer").on("unselect-all", function () {
                     dudeGraphElement.set("selectedRenderBlock", null);
                     dudeGraphElement.set("selectedRenderGroup", null);
-                    dudeGraphElement.$.inspector.clearStack();
+                    dudeGraphElement.$["inspector"].clearStack();
                 });
-                /**
-                this.get("renderer").on("drop-connection", function (renderConnection) {
-                    var draggingRenderPoint = renderConnection.draggingRenderPoint;
+                this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                     var fromRenderPoint = renderConnection.realRenderPoint;
                     var eligibleModels = dudeGraph.Models.query(dudeGraphElement.get("models"), fromRenderPoint.point);
+                    var autocompleteModels = [];
                     _.forEach(eligibleModels, function (eligibleModel) {
-                        console.log(eligibleModel.model.item.data.blockName, eligibleModel.modelPoints.join(", "));
+                        _.forEach(eligibleModel.modelPoints, function (modelPoint) {
+                            var model = _.cloneDeep(eligibleModel.model);
+                            model.item.name += "#" + modelPoint;
+                            model.item.data.modelPoint = modelPoint;
+                            autocompleteModels.push(model);
+                        });
                     });
+                    if (!_.isEmpty(autocompleteModels)) {
+                        dudeGraphElement.set("autocompleteRenderConnection", renderConnection);
+                        dudeGraphElement.set("autocompleteModels", autocompleteModels);
+                        dudeGraphElement.$["autocompletePopup"].open(position[0], position[1]);
+                        dudeGraphElement.$["autocomplete"].focus();
+                    }
                 });
-                 **/
             },
 
             /**
@@ -332,6 +364,39 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     dudeGraphElement.emitSave();
                     e.preventDefault();
                 })
+            },
+
+            /**
+             * Performs an autocomplete
+             * @param {CustomEvent} e
+             * @private
+             */
+            _autocomplete: function (e) {
+                var model = e.detail;
+                var draggingRenderPoint = this.get("autocompleteRenderConnection").draggingRenderPoint;
+                var fromRenderPoint = this.get("autocompleteRenderConnection").realRenderPoint;
+                var fromRenderBlock = fromRenderPoint.renderBlock;
+                var toRenderBlock = this.createBlock(model.item.data);
+                toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
+                toRenderBlock.update();
+                var toRenderPoint = fromRenderPoint.point.pointOutput ? toRenderBlock.block.inputByName(model.item.data.modelPoint) : toRenderBlock.block.outputByName(model.item.data.modelPoint);
+                var connection = fromRenderPoint.point.connect(toRenderPoint);
+                this.get("renderer").createRenderConnection({
+                    connection: connection,
+                    outputRenderBlock: fromRenderPoint.point.pointOutput ? fromRenderBlock : toRenderBlock,
+                    inputRenderBlock: fromRenderPoint.point.pointOutput ? toRenderBlock : fromRenderBlock
+                }, true);
+                this.set("autocompleteRenderConnection", null);
+                this.set("autocompleteModels", []);
+                this._closeAutocomplete();
+            },
+
+            /**
+             * Closes the autocomplete popup
+             * @private
+             */
+            _closeAutocomplete: function () {
+                this.$["autocompletePopup"].close();
             }
 
             /**

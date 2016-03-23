@@ -2,7 +2,7 @@ const DUDE_GRAPH_MODELS = [
     {
         "item": {
             "name": "Start",
-            "icon": "fa fa-stop",
+            "icon": "fa fa-play",
             "data": {
                 "blockType": "Start",
                 "blockName": "Start",
@@ -58,7 +58,7 @@ const DUDE_GRAPH_MODELS = [
     {
         "item": {
             "name": "Step",
-            "icon": "fa fa-stop",
+            "icon": "fa fa-share-alt",
             "data": {
                 "blockType": "Step",
                 "blockName": "Step",
@@ -116,7 +116,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "StreamPoint",
                         "pointName": "timeout",
-                        "pointValueType": "Stream",
+                        "pointValueType": "Stream"
                     }
                 ]
             }
