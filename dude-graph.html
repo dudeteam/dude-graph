@@ -9,6 +9,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <script src="../lodash/dist/lodash.min.js"></script>
 <script src="../d3/d3.min.js"></script>
 <script src="../eventEmitter/EventEmitter.min.js"></script>
+<script src="../jwerty/jwerty.js"></script>
 <!-- dude-graph dependency -->
 <script src="dude-graph.js"></script>
 <!-- dude-graph sidebar panels -->
@@ -220,9 +221,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 _.forEach(this.get("renderPointTypes"), function (renderPointType) {
                     this.get("renderer").registerRenderPoint(renderPointType.renderPoint, renderPointType.type);
                 }.bind(this));
-                this._listenDudeGraphEvents();
                 this.get("loader").load(this.get("graph"), this.get("graphData") || {});
                 this.get("renderer").load(this.get("rendererData") || {});
+                this._listenDudeGraphEvents();
+                this._listenDudeGraphShortcuts();
             },
 
             /**
@@ -257,12 +259,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Saves the graph and renderer data
+             * @returns {Object}
              */
             save: function () {
                 return {
                     "graphData": this.saveGraphData(),
                     "rendererData": this.saveRendererData()
                 }
+            },
+
+            /**
+             * Emits the save event
+             * @emit {Object} dude-graph-save
+             */
+            emitSave: function () {
+              this.fire("dude-graph-save", this.save());
             },
 
             /**
@@ -300,6 +311,27 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     });
                 });
                  **/
+            },
+
+            /**
+             * Dude-graph shortcuts
+             * @private
+             */
+            _listenDudeGraphShortcuts: function () {
+                var dudeGraphElement = this;
+                jwerty.key("ctrl+shift+0/⌘+shift+0", function (e) {
+                    dudeGraphElement.get("renderer").zoomToFit();
+                    e.preventDefault();
+                });
+                jwerty.key("delete/backspace", function (e) {
+                    if (dudeGraphElement.get("renderer").removeSelection()) {
+                        e.preventDefault();
+                    }
+                });
+                jwerty.key("ctrl+s/⌘+s", function (e) {
+                    dudeGraphElement.emitSave();
+                    e.preventDefault();
+                })
             }
 
             /**
