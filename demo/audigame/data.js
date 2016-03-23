@@ -271,15 +271,15 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "format",
-                                    "pointValueType": "String",
-                                    "pointSingleConnection": false
+                                    "pointValueType": "String"
                                 }
                             ],
                             "blockOutputs": [
                                 {
                                     "pointType": "Point",
                                     "pointName": "value",
-                                    "pointValueType": "String"
+                                    "pointValueType": "String",
+                                    "pointSingleConnection": false
                                 }
                             ]
                         }
