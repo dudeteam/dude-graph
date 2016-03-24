@@ -256,13 +256,29 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @returns {dudeGraph.RenderBlock}
              */
             createBlock: function (blockData) {
-                var block = this.get("loader").loadBlock(this.get("graph"), _.merge(blockData, {
-                    "blockId": this.get("graph").nextBlockId()
-                }));
-                return this.renderer.createRenderBlock({
-                    "id": block.blockId,
-                    "block": block.blockId
-                }, true);
+                var dudeGraphElement = this;
+                var createGraphBlock = function () {
+                    return dudeGraphElement.get("loader").loadBlock(dudeGraphElement.get("graph"), _.merge(blockData, {
+                        "blockId": dudeGraphElement.get("graph").nextBlockId()
+                    }));
+                };
+                var createRenderBlock = function (block) {
+                    return dudeGraphElement.renderer.createRenderBlock({
+                        "id": dudeGraphElement.get("graph").nextBlockId(),
+                        "block": block.blockId
+                    }, true);
+                };
+                var blockType = blockData.blockType;
+                if (blockType === "VariableBlock") {
+                    var variablesFound = this.get("graph").blocksByName(blockData.blockName);
+                    var variableFound = _.find(variablesFound, function (variable) {
+                        return variable instanceof dudeGraph.VariableBlock;
+                    }) || null;
+                    if (variableFound) {
+                        return createRenderBlock(variableFound);
+                    }
+                }
+                return createRenderBlock(createGraphBlock());
             },
 
             /**
