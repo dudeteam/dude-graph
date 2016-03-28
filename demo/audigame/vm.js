@@ -1,20 +1,17 @@
 /**
- * @param {CelestoryVM.Block} start
+ * CelestoryVM is a virtual machine for Celestory generated stories
+ * @param {CelestoryVM.Blocks} blocks
+ * @param {String} startBlockId
  * @param {CelestoryVM.Variables} variables
  * @class
  */
-var CelestoryVM = function (start, variables) {
+var CelestoryVM = function (blocks, startBlockId, variables) {
     /**
-     * CelestoryVM current state
-     * @type {CelestoryVM.State}
+     * CelestoryVM blocks
+     * @type {Array<CelestoryVM.Block>}
      * @private
      */
-    this._state = {};
-    Object.defineProperty(this, "state", {
-        get: function () {
-            return this._state;
-        }.bind(this)
-    });
+    this._blocks = blocks;
 
     /**
      * CelestoryVM current variables
@@ -32,30 +29,69 @@ var CelestoryVM = function (start, variables) {
     });
 
     /**
-     * CelestoryVM current block
-     * @type {CelestoryVM.Block}
+     * CelestoryVM current block (Start, Step or End)
      * @private
      */
     this._block = null;
     Object.defineProperty(this, "block", {
         get: function () {
             return this._block;
+        }.bind(this)
+    });
+
+    /**
+     * CelestoryVM current block ID (Start, Step or End)
+     * @type {String}
+     * @private
+     */
+    this._blockId = null;
+    Object.defineProperty(this, "blockId", {
+        get: function () {
+            return this._blockId;
         }.bind(this),
-        set: function (block) {
-            this._block = block;
-            if (block.type !== "End") {
-                var variables = JSON.parse(JSON.stringify(this._variables));
-                this._first.block = (block.first).call(this);
-                this._first.variables = JSON.parse(JSON.stringify(this._variables));
-                this._variables = JSON.parse(JSON.stringify(variables));
-                this._second.block = (block.second).call(this);
-                this._second.variables = JSON.parse(JSON.stringify(this._variables));
-                this._variables = JSON.parse(JSON.stringify(variables));
-                this._timeout.block = (block.timeout || block.first).call(this);
-                this._timeout.variables = JSON.parse(JSON.stringify(this._variables));
-                this._variables = JSON.parse(JSON.stringify(variables));
+        set: function (blockId) {
+            var block = this._blocks[blockId];
+            if (typeof block === "undefined") {
+                throw new Error("No block for blockId");
             }
+            this._block = block;
+            this._blockId = blockId;
+
+            if (block.type !== "End") {
+                var vm = this;
+                var blocks = JSON.parse(JSON.stringify(this._blocks));
+                var variables = JSON.parse(JSON.stringify(this._variables));
+                var resetState = function () {
+                    vm._blocks = JSON.parse(JSON.stringify(blocks));
+                    vm._variables = JSON.parse(JSON.stringify(variables));
+                };
+                this._first.blockId = this._evaluateStream(block.first.blockId);
+                this._first.blocks = JSON.parse(JSON.stringify(this._blocks));
+                this._first.variables = JSON.parse(JSON.stringify(this._variables));
+                resetState();
+                this._second.blockId = this._evaluateStream(block.second.blockId);
+                this._second.blocks = JSON.parse(JSON.stringify(this._blocks));
+                this._second.variables = JSON.parse(JSON.stringify(this._variables));
+                resetState();
+                this._timeout.blockId = this._evaluateStream(block.second.blockId);
+                this._timeout.blocks = JSON.parse(JSON.stringify(this._blocks));
+                this._timeout.variables = JSON.parse(JSON.stringify(this._variables));
+                resetState();
+            }
+
             this._computeState();
+        }.bind(this)
+    });
+
+    /**
+     * CelestoryVM current state (computed from current block)
+     * @type {CelestoryVM.State}
+     * @private
+     */
+    this._state = null;
+    Object.defineProperty(this, "state", {
+        get: function () {
+            return this._state;
         }.bind(this)
     });
 
@@ -65,7 +101,8 @@ var CelestoryVM = function (start, variables) {
      */
     this._first = {
         "variables": [],
-        "block": null
+        "blocks": [],
+        "blockId": null
     };
     /**
      * @type {CelestoryVM.Choice}
@@ -73,7 +110,8 @@ var CelestoryVM = function (start, variables) {
      */
     this._second = {
         "variables": [],
-        "block": null
+        "blocks": [],
+        "blockId": null
     };
     /**
      * @type {CelestoryVM.Choice}
@@ -81,86 +119,14 @@ var CelestoryVM = function (start, variables) {
      */
     this._timeout = {
         "variables": [],
-        "block": null
+        "blocks": [],
+        "blockId": null
     };
 
     /**
-     * Initialization of the start block
+     * Initialization of the Start block
      */
-    this.block = start;
-};
-
-/**
- * Clones the variables
- * @param {CelestoryVM.Variables} variables
- * @private
- */
-CelestoryVM.prototype._cloneVariables = function (variables) {
-    var target = {};
-    for (var i in variables) {
-        if (variables.hasOwnProperty(i)) {
-            target[i] = variables[i];
-        }
-    }
-    return target;
-};
-
-/**
- * Computes the current block state state
- * @private
- */
-CelestoryVM.prototype._computeState = function () {
-    var type = this._block.type;
-    var choice = this._block.choice ? this._block.choice.call(this) : null;
-    var timer = this._block.timer ? this._block.timer.call(this) : null;
-    var sound = this._block.sound ? this._block.sound.call(this) : null;
-    var cover = this._block.cover ? this._block.cover.call(this) : null;
-    this._state = {
-        "type": type
-    };
-    if (choice !== null) {
-        this._state.choice = choice;
-    }
-    if (timer !== null) {
-        this._state.timer = timer;
-    }
-    if (sound !== null) {
-        this._state.sound = sound;
-    }
-    if (cover !== null) {
-        this._state.cover = cover;
-    }
-    if (type !== "End") {
-        this._state.first = this._first.block.choice.call(this);
-        this._state.second = this._second.block.choice.call(this);
-    }
-};
-
-/**
- * Evaluates the given block
- * @param {Object} block
- * @returns {Object}
- */
-CelestoryVM.prototype.evaluate = function (block) {
-    var blockType = block.type;
-    switch (blockType) {
-        case "Start":
-        case "Step":
-        case "End":
-            return block;
-        default:
-            return block.evaluate.call(this);
-    }
-};
-
-/**
- * Ensures the story haven't ended yet
- * @private
- */
-CelestoryVM.prototype._sanityChecks = function () {
-    if (this._block.type === "End") {
-        throw new Error("Story finished");
-    }
+    this.blockId = startBlockId;
 };
 
 /**
@@ -168,8 +134,9 @@ CelestoryVM.prototype._sanityChecks = function () {
  */
 CelestoryVM.prototype.firstChoice = function () {
     this._sanityChecks();
-    this.block = this._first.block;
-    this.variables = this._first.variables;
+    this._blocks = this._first.blocks;
+    this._variables = this._first.variables;
+    this.blockId = this._first.blockId;
 };
 
 /**
@@ -177,8 +144,9 @@ CelestoryVM.prototype.firstChoice = function () {
  */
 CelestoryVM.prototype.secondChoice = function () {
     this._sanityChecks();
-    this.block = this._second.block;
-    this.variables = this._second.variables;
+    this._blocks = this._second.blocks;
+    this._variables = this._second.variables;
+    this.blockId = this._second.blockId;
 };
 
 /**
@@ -186,12 +154,90 @@ CelestoryVM.prototype.secondChoice = function () {
  */
 CelestoryVM.prototype.timeoutChoice = function () {
     this._sanityChecks();
-    this.block = this._timeout.block;
-    this.variables = this._timeout.variables;
+    this._blocks = this._timeout.blocks;
+    this._variables = this._timeout.variables;
+    this.blockId = this._timeout.blockId;
+};
+
+/**
+ * Ensures the story hasn't ended yet
+ * @private
+ */
+CelestoryVM.prototype._sanityChecks = function () {
+    if (this._block.type === "End") {
+        throw new Error("Story ended");
+    }
+};
+
+/**
+ * Computes the current state
+ * @private
+ */
+CelestoryVM.prototype._computeState = function () {
+    var choice = this._evaluateValue(this._block.choice);
+    var timer = this._evaluateValue(this._block.timer);
+    var sound = this._evaluateValue(this._block.sound);
+    var cover = this._evaluateValue(this._block.cover);
+    this._state = {
+        "type": this._block.type
+    };
+    if (typeof choice !== "undefined") {
+        this._state.choice = choice;
+    }
+    if (typeof timer !== "undefined") {
+        this._state.timer = timer;
+    }
+    if (typeof sound !== "undefined") {
+        this._state.sound = sound;
+    }
+    if (typeof cover !== "undefined") {
+        this._state.cover = cover;
+    }
+    if (this._block.type !== "End") {
+        this._state.first = this._blocks[this._first.blockId].choice;
+        this._state.second = this._blocks[this._second.blockId].choice;
+    }
+};
+
+/**
+ * Returns whether the direct value or the indirect value
+ * @param {CelestoryVM.Value} value
+ * @returns {CelestoryVM.Value}
+ * @private
+ */
+CelestoryVM.prototype._evaluateValue = function (value) {
+    if (typeof value === "object") {
+        // TODO: handle indirect value
+    }
+    return value;
+};
+
+/**
+ * Evaluates the block and returns the next block encountered on the stream (Step or End)
+ * @param {Object} blockId
+ * @private
+ */
+CelestoryVM.prototype._evaluateStream = function (blockId) {
+    var block = this._blocks[blockId];
+    switch (block.type) {
+        case "Start":
+        case "Step":
+        case "End":
+            return blockId;
+        case "assign":
+            this._variables[this._blocks[block.variable.blockId].name] = this._evaluateValue(block.value);
+            return this._evaluateStream(block.out.blockId);
+        default:
+            throw new Error("Cannot evaluate type `" + block.type + "`");
+    }
 };
 
 /**
  * @typedef {Object<String, *>} CelestoryVM.Variables
+ */
+
+/**
+ * @typedef {*} CelestoryVM.Value
  */
 
 /**
@@ -205,154 +251,133 @@ CelestoryVM.prototype.timeoutChoice = function () {
  * @property {String} [second=undefined] - second is undefined if the state is an Ending
  */
 
-
 /**
  * @typedef {Object} CelestoryVM.Block
  * @property {String} type
- * @property {CelestoryVM.Value} [choice=undefined] - choice is undefined if the state is a Start
- * @property {CelestoryVM.Value} [timer=undefined] - timer is undefined if the state is an Ending
- * @property {CelestoryVM.Value} sound
- * @property {CelestoryVM.Value} cover
- * @property {CelestoryVM.Evaluate} first
- * @property {CelestoryVM.Evaluate} second
- * @property {CelestoryVM.Evaluate} [timeout=first|second] - if no timeout is specified, timeout will be randomly set to
- * either first or second
+ * @property {String} [first=undefined] - will be filled to the blockId if block is a Start, Step or End
+ * @property {String} [second=undefined] - will be filled to the blockId if block is a Start, Step or End
+ * @property {String} [timeout=undefined] - will be filled to the blockId if block is a Start, Step or End
+ * @property {String} [out=undefined] - will be filled to the blockId if block is neither a Start, Step or End
  */
 
 /**
- * @typedef {Function} CelestoryVM.Evaluate
- * @returns {CelestoryVM.Block}
- */
-
-/**
- * @typedef {Function} CelestoryVM.Value
- * @returns {*}
- */
+ * @typedef {Object<String, CelestoryVM.Block>} CelestoryVM.Blocks
+ * /
 
 /**
  * @typedef {Object} CelestoryVM.Choice
  * @property {CelestoryVM.Variables} variables
- * @property {CelestoryVM.Block} block
+ * @property {Array<CelestoryVM.Block>} blocks
+ * @property {String} blockId
  */
 
-//////////////////////////////////////////////////////////////////////
-// Generated Celestory VM                                           //
-//                                                                  //
-// Graph: https://i.gyazo.com/cde73374368a35c77c62b6494d122be4.png  //
-//////////////////////////////////////////////////////////////////////
-
+//noinspection SpellCheckingInspection
+/**
+ * @type {CelestoryVM.Blocks}
+ */
 var blocks = {
     "4f77-73ff-91ea-43e9-1bd7-fd58b71a8433": {
         "type": "Start",
-        "timer": function () {
-            return 0;
+        "sound": {
+            "resourceType": "Sound"
         },
-        "sound": function () {
-            return "start.ogg";
+        "cover": {
+            "resourceType": "Image"
         },
-        "cover": function () {
-            return "start.png";
+        "timer": 0,
+        "first": {
+            "blockId": "4f77-92c9-52a6-8dd8-e08c-5f2e0ed58dca"
         },
-        "first": function () {
-            return this.evaluate(blocks["4f77-92c9-52a6-8dd8-e08c-5f2e0ed58dca"]);
-        },
-        "second": function () {
-            return this.evaluate(blocks["02d5-fe8f-ee3b-26d4-c858-5f7883d416d4"]);
+        "second": {
+            "blockId": "02d5-fe8f-ee3b-26d4-c858-5f7883d416d4"
         }
     },
     "4f77-92c9-52a6-8dd8-e08c-5f2e0ed58dca": {
         "type": "Step",
-        "choice": function () {
-            return "Leave key";
+        "sound": {
+            "resourceType": "Sound"
         },
-        "timer": function () {
-            return 0;
+        "cover": {
+            "resourceType": "Image"
         },
-        "sound": function () {
-            return "leave_key.ogg";
+        "choice": "Leave Key",
+        "timer": 0,
+        "first": {
+            "blockId": "4f77-b362-cbfe-7fe1-756a-9633b789a0c4"
         },
-        "cover": function () {
-            return "leave_key.png";
-        },
-        "first": function () {
-            return this.evaluate(blocks["4f77-b362-cbfe-7fe1-756a-9633b789a0c4"]);
-        },
-        "second": function () {
-            return this.evaluate(blocks["02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"]);
-        }
-    },
-    "02d5-e284-fa65-9da3-f7ea-1358c08b4870": {
-        "type": "Step",
-        "choice": function () {
-            return "Take key";
-        },
-        "timer": function () {
-            return 0;
-        },
-        "sound": function () {
-            return "take_key.ogg";
-        },
-        "cover": function () {
-            return "take_key.png";
-        },
-        "first": function () {
-            return this.evaluate(blocks["4f77-b362-cbfe-7fe1-756a-9633b789a0c4"]);
-        },
-        "second": function () {
-            return this.evaluate(blocks["02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"]);
-        },
-        "timeout": function () {
-            return this.evaluate(blocks["d397-632d-18ec-a26f-3afb-a80e3af78a87"]);
+        "second": {
+            "blockId": "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"
         }
     },
     "4f77-b362-cbfe-7fe1-756a-9633b789a0c4": {
         "type": "End",
-        "choice": function () {
-            return "Kill Sarah";
+        "sound": {
+            "resourceType": "Sound"
         },
-        "sound": function () {
-            return "kill_sarah.ogg";
+        "cover": {
+            "resourceType": "Image"
         },
-        "cover": function () {
-            return "kill_sarah.png";
+        "choice": "Kill Sarah"
+    },
+    "3457-2a45-5dcd-fdae-44fd-b392e334ad5e": {
+        "type": "Variable",
+        "name": "has_key"
+    },
+    "02d5-fe8f-ee3b-26d4-c858-5f7883d416d4": {
+        "type": "assign",
+        "variable": {
+            "blockId": "3457-2a45-5dcd-fdae-44fd-b392e334ad5e"
+        },
+        "value": 1,
+        "out": {
+            "blockId": "02d5-e284-fa65-9da3-f7ea-1358c08b4870"
         }
     },
     "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa": {
         "type": "End",
-        "choice": function () {
-            return "Spare Sarah";
+        "sound": {
+            "resourceType": "Sound"
         },
-        "sound": function () {
-            return "spare_sarah.ogg";
+        "cover": {
+            "resourceType": "Image"
         },
-        "cover": function () {
-            return "spare_sarah.png";
+        "choice": "Spare Sarah"
+    },
+    "02d5-e284-fa65-9da3-f7ea-1358c08b4870": {
+        "type": "Step",
+        "sound": {
+            "resourceType": "Sound"
+        },
+        "cover": {
+            "resourceType": "Image"
+        },
+        "choice": "Take Key",
+        "timer": 0,
+        "first": {
+            "blockId": "4f77-b362-cbfe-7fe1-756a-9633b789a0c4"
+        },
+        "second": {
+            "blockId": "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"
+        },
+        "timeout": {
+            "blockId": "d397-632d-18ec-a26f-3afb-a80e3af78a87"
         }
     },
     "d397-632d-18ec-a26f-3afb-a80e3af78a87": {
         "type": "End",
-        "choice": function () {
-            return "Leave with money";
+        "sound": {
+            "resourceType": "Sound"
         },
-        "sound": function () {
-            return "leave_money.ogg";
+        "cover": {
+            "resourceType": "Image"
         },
-        "cover": function () {
-            return "leave_money.png";
-        }
-    },
-    "02d5-fe8f-ee3b-26d4-c858-5f7883d416d4": {
-        "type": "assign",
-        "evaluate": function () {
-            this._variables["has_key"] = 1;
-            return this.evaluate(blocks["02d5-e284-fa65-9da3-f7ea-1358c08b4870"]);
-        }
+        "choice": null
     }
 };
 
-var CVM = new CelestoryVM(blocks["4f77-73ff-91ea-43e9-1bd7-fd58b71a8433"], {
+const CVM = new CelestoryVM(blocks, "4f77-73ff-91ea-43e9-1bd7-fd58b71a8433", {
     "has_key": false,
-    "nb_coins": 0
+    "nb_coins": 32
 });
 if (typeof module !== "undefined") {
     module.exports = CVM;

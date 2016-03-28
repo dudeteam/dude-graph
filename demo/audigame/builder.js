@@ -4,11 +4,15 @@
  * @class
  */
 var CelestoryBuilder = function (graph) {
+    this._graph = graph;
+};
+
+CelestoryBuilder.prototype.build = function () {
     var builder = this;
-    var blocks = [];
-    _.forEach(graph.graphBlocks, function (block) {
+    var blocks = {};
+    _.forEach(this._graph.graphBlocks, function (block) {
         if (block instanceof dudeGraph.VariableBlock) {
-            builder.buildVariable(block);
+            blocks[block.blockId] = builder.buildVariable(block);
         } else {
             var blockName = block.blockName;
             var blockSaver = builder["build" + blockName];
@@ -18,59 +22,148 @@ var CelestoryBuilder = function (graph) {
             blocks[block.blockId] = blockSaver.call(builder, block);
         }
     });
-};
-
-/**
- *
- * @param {dudeGraph.Point} point
- * @returns {dudeGraph.Block|null}
- */
-CelestoryBuilder.prototype.getConnectedBlock = function (point) {
-    var connectedBlock = point.pointConnections[0];
-    return connectedBlock ? connectedBlock.connectionOutputBlock : null;
+    return blocks;
 };
 
 /**
  * @param {dudeGraph.Block} start
  */
 CelestoryBuilder.prototype.buildStart = function (start) {
-    var first = start.outputByName("first");
-    var second = start.outputByName("second");
-    var timeout = start.outputByName("timeout");
-    var firstTo = this.getConnectedBlock(first);
-    var secondTo = this.getConnectedBlock(second);
-    var timeoutTo = this.getConnectedBlock(timeout);
-    if (firstTo === null || secondTo === null) {
-        throw new Error("`" + start.blockName + "`: first and second must be connected");
-    }
-    return start.blockName;
+    var startValues = this._connectedValues(start);
+    var startStreams = this._connectedStreams(start);
+    return _.merge({
+        "type": "Start"
+    }, startValues, startStreams);
 };
 
 /**
  * @param {dudeGraph.Block} step
  */
 CelestoryBuilder.prototype.buildStep = function (step) {
-    return step.blockName;
+    var stepValues = this._connectedValues(step);
+    var stepStreams = this._connectedStreams(step);
+    return _.merge({
+        "type": "Step"
+    }, stepValues, stepStreams);
 };
 
 /**
  * @param {dudeGraph.Block} end
  */
 CelestoryBuilder.prototype.buildEnd = function (end) {
-    return end.blockName;
+    var endValues = this._connectedValues(end);
+    return _.merge({
+        "type": "End"
+    }, endValues);
 };
 
+/**
+ * @param {dudeGraph.ConditionBlock} condition
+ */
+CelestoryBuilder.prototype.buildCondition = function (condition) {
+    return condition.blockName;
+};
 
 /**
  * @param {dudeGraph.VariableBlock} variable
  */
 CelestoryBuilder.prototype.buildVariable = function (variable) {
-    return variable.blockName;
+    return {
+        "type": "Variable",
+        "name": variable.blockName
+    };
 };
 
 /**
  * @param {dudeGraph.InstructionBlock} assign
  */
 CelestoryBuilder.prototype.buildassign = function (assign) {
-    return assign.blockName;
+    return _.merge({
+        "type": "assign",
+        "variable": this._connectedStream(assign.inputByName("variable")),
+        "value": this._connectedValue(assign.inputByName("value")),
+        "out": this._connectedStream(assign.outputByName("out"))
+    });
+};
+
+/**
+ * @param {dudeGraph.FormatBlock} format
+ */
+CelestoryBuilder.prototype.buildformat = function (format) {
+    return format.blockName;
+};
+
+/**
+ * @param {dudeGraph.FormatBlock} random_range
+ */
+CelestoryBuilder.prototype.buildrandom_range = function (random_range) {
+    return random_range.blockName;
+};
+
+/**
+ * @param {dudeGraph.Block} block
+ * @returns {Object}
+ * @private
+ */
+CelestoryBuilder.prototype._connectedValues = function (block) {
+    var blockData = {
+        "sound": this._connectedValue(block.inputByName("sound")),
+        "cover": this._connectedValue(block.inputByName("cover"))
+    };
+    try {
+        blockData.choice = this._connectedValue(block.inputByName("choice"));
+    } catch (e) {
+    }
+    try {
+        blockData.timer = this._connectedValue(block.inputByName("timer"));
+    } catch (e) {
+    }
+    return blockData;
+};
+
+/**
+ * @param {dudeGraph.Point} point
+ * @returns {Number|String|Boolean|Object}
+ * @private
+ */
+CelestoryBuilder.prototype._connectedValue = function (point) {
+    if (point === null) {
+        throw new Error("`" + point.pointFancyName + "` must be non null");
+    }
+    if (point.pointConnections.length > 0) {
+        return this._connectedStream(point);
+    }
+    return point.pointValue;
+};
+
+/**
+ * @param {dudeGraph.Block} block
+ * @returns {Object}
+ * @private
+ */
+CelestoryBuilder.prototype._connectedStreams = function (block) {
+    var blockData = {
+        "first": this._connectedStream(block.outputByName("first")),
+        "second": this._connectedStream(block.outputByName("second"))
+    };
+    try {
+        blockData.timeout = this._connectedStream(block.outputByName("timeout"));
+    } catch (e) {
+    }
+    return blockData;
+};
+
+/**
+ * @param {dudeGraph.Point} point
+ * @returns {Object<String, String>}
+ * @private
+ */
+CelestoryBuilder.prototype._connectedStream = function (point) {
+    var connection = point.pointConnections[0];
+    if (typeof connection !== "undefined") {
+        return {
+            "blockId": point.pointOutput ? connection.connectionInputPoint.pointBlock.blockId : connection.connectionOutputPoint.pointBlock.blockId
+        };
+    }
+    throw new Error("`" + point.pointFancyName + "` must be connected");
 };
