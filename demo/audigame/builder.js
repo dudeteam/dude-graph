@@ -123,6 +123,10 @@ CelestoryBuilder.prototype._connectedValues = function (block) {
     } catch (e) {
     }
     try {
+        blockData.text = this._connectedValue(block.inputByName("text"));
+    } catch (e) {
+    }
+    try {
         blockData.timer = this._connectedValue(block.inputByName("timer"));
     } catch (e) {
     }

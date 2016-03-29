@@ -56,7 +56,6 @@ var CelestoryVM = function (blocks, startBlockId, variables) {
             }
             this._block = block;
             this._blockId = blockId;
-
             if (block.type !== "End") {
                 var vm = this;
                 var blocks = JSON.parse(JSON.stringify(this._blocks));
@@ -78,7 +77,6 @@ var CelestoryVM = function (blocks, startBlockId, variables) {
                 this._timeout.variables = JSON.parse(JSON.stringify(this._variables));
                 resetState();
             }
-
             this._computeState();
         }.bind(this)
     });
@@ -174,6 +172,7 @@ CelestoryVM.prototype._sanityChecks = function () {
  * @private
  */
 CelestoryVM.prototype._computeState = function () {
+    var text = this._evaluateValue(this._block.text);
     var choice = this._evaluateValue(this._block.choice);
     var timer = this._evaluateValue(this._block.timer);
     var sound = this._evaluateValue(this._block.sound);
@@ -181,6 +180,9 @@ CelestoryVM.prototype._computeState = function () {
     this._state = {
         "type": this._block.type
     };
+    if (typeof text !== "undefined") {
+        this._state.text = text;
+    }
     if (typeof choice !== "undefined") {
         this._state.choice = choice;
     }
@@ -206,7 +208,7 @@ CelestoryVM.prototype._computeState = function () {
  * @private
  */
 CelestoryVM.prototype._evaluateValue = function (value) {
-    if (typeof value === "object") {
+    if (value !== null && typeof value === "object") {
         var block = this._blocks[value.blockId];
         if (typeof block !== "undefined") {
             switch (block.type) {
@@ -261,6 +263,7 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
 /**
  * @typedef {Object} CelestoryVM.State
  * @property {String} type
+ * @property {String} [text=undefined] - text is undefined if the state is a Start
  * @property {String} [choice=undefined] - choice is undefined if the state is a Start
  * @property {String} [timer=undefined] - timer is undefined if the state is an Ending
  * @property {String} sound
@@ -289,146 +292,9 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
  * @property {String} blockId
  */
 
-//noinspection SpellCheckingInspection
 /**
- * @type {CelestoryVM.Blocks}
+ * NodeJS export
  */
-var blocks = {
-    "fef8-9fad-987c-ea0d-aeac-db6043d6739b": {
-        "type": "Variable",
-        "name": "has_key"
-    },
-    "2e49-1e75-0881-3719-7dfa-5f19b8c70641": {
-        "type": "Start",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "timer": 32,
-        "first": {
-            "blockId": "2e49-c40a-9957-1421-155f-13d1c0244864"
-        },
-        "second": {
-            "blockId": "183c-5ff3-46f5-c907-88f0-d0f220aa882b"
-        }
-    },
-    "2e49-c40a-9957-1421-155f-13d1c0244864": {
-        "type": "Step",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "Step me",
-        "timer": 0,
-        "first": {
-            "blockId": "183c-5dbc-43da-a448-b6c6-53de21c625fc"
-        },
-        "second": {
-            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
-        },
-        "timeout": {
-            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
-        }
-    },
-    "183c-5ff3-46f5-c907-88f0-d0f220aa882b": {
-        "type": "Condition",
-        "test": {
-            "blockId": "fef8-9fad-987c-ea0d-aeac-db6043d6739b"
-        },
-        "true": {
-            "blockId": "183c-e17e-b87d-755b-fe62-2bcbb963750e"
-        },
-        "false": {
-            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
-        }
-    },
-    "183c-5dbc-43da-a448-b6c6-53de21c625fc": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": {
-            "blockId": "183c-652d-6a1f-aaf4-7720-699b91d74f26"
-        }
-    },
-    "183c-4075-c017-da86-d7f8-54e80ba317c9": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "End 2"
-    },
-    "183c-80dd-add5-af55-5dde-fe9ec79963ab": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "End 3"
-    },
-    "183c-e17e-b87d-755b-fe62-2bcbb963750e": {
-        "type": "assign",
-        "variable": {
-            "blockId": "183c-3777-36b1-7860-7714-e1262b4826da"
-        },
-        "value": 21,
-        "out": {
-            "blockId": "a479-655e-ceed-d222-1e35-ef8522c741f4"
-        }
-    },
-    "183c-3777-36b1-7860-7714-e1262b4826da": {
-        "type": "Variable",
-        "name": "nb_coins"
-    },
-    "183c-652d-6a1f-aaf4-7720-699b91d74f26": {
-        "type": "format",
-        "value": "format_string"
-    },
-    "a479-556b-a8d8-0b52-c29a-0bd111b654fa": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "End 4"
-    },
-    "a479-655e-ceed-d222-1e35-ef8522c741f4": {
-        "type": "Step",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "Step 2 me",
-        "timer": 0,
-        "first": {
-            "blockId": "183c-80dd-add5-af55-5dde-fe9ec79963ab"
-        },
-        "second": {
-            "blockId": "a479-556b-a8d8-0b52-c29a-0bd111b654fa"
-        }
-    }
-};
-
-const CVM = new CelestoryVM(blocks, "2e49-1e75-0881-3719-7dfa-5f19b8c70641", {
-    "has_key": false,
-    "nb_coins": 32
-});
 if (typeof module !== "undefined") {
-    module.exports = CVM;
+    module.exports = CelestoryVM;
 }
