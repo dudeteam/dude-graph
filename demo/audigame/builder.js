@@ -61,7 +61,12 @@ CelestoryBuilder.prototype.buildEnd = function (end) {
  * @param {dudeGraph.ConditionBlock} condition
  */
 CelestoryBuilder.prototype.buildCondition = function (condition) {
-    return condition.blockName;
+    return {
+        "type": "Condition",
+        "test": this._connectedValue(condition.inputByName("test")),
+        "true": this._connectedStream(condition.outputByName("true")),
+        "false": this._connectedStream(condition.outputByName("false"))
+    };
 };
 
 /**
@@ -90,7 +95,10 @@ CelestoryBuilder.prototype.buildassign = function (assign) {
  * @param {dudeGraph.FormatBlock} format
  */
 CelestoryBuilder.prototype.buildformat = function (format) {
-    return format.blockName;
+    // TODO: format
+    return {
+        "type": "format"
+    }
 };
 
 /**

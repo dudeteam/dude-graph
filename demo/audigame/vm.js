@@ -194,8 +194,8 @@ CelestoryVM.prototype._computeState = function () {
         this._state.cover = cover;
     }
     if (this._block.type !== "End") {
-        this._state.first = this._blocks[this._first.blockId].choice;
-        this._state.second = this._blocks[this._second.blockId].choice;
+        this._state.first = this._evaluateValue(this._blocks[this._first.blockId].choice);
+        this._state.second = this._evaluateValue(this._blocks[this._second.blockId].choice);
     }
 };
 
@@ -207,7 +207,19 @@ CelestoryVM.prototype._computeState = function () {
  */
 CelestoryVM.prototype._evaluateValue = function (value) {
     if (typeof value === "object") {
-        // TODO: handle indirect value
+        var block = this._blocks[value.blockId];
+        if (typeof block !== "undefined") {
+            console.log("im an indirect value", value, block);
+            switch (block.type) {
+                case "Variable":
+                    return this._variables[block.name];
+                case "format":
+                    // TODO: format
+                    return "format";
+                default:
+                    throw new Error("Cannot evaluate value for type `" + block.type + "`");
+            }
+        }
     }
     return value;
 };
@@ -224,11 +236,17 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
         case "Step":
         case "End":
             return blockId;
+        case "Condition":
+            var test = this._evaluateValue(block.test);
+            if (test) {
+                return this._evaluateStream(block.true.blockId);
+            }
+            return this._evaluateStream(block.false.blockId);
         case "assign":
             this._variables[this._blocks[block.variable.blockId].name] = this._evaluateValue(block.value);
             return this._evaluateStream(block.out.blockId);
         default:
-            throw new Error("Cannot evaluate type `" + block.type + "`");
+            throw new Error("Cannot evaluate stream for type `" + block.type + "`");
     }
 };
 
@@ -238,6 +256,7 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
 
 /**
  * @typedef {*} CelestoryVM.Value
+ * @property {String} [blockId=undefined]
  */
 
 /**
@@ -276,7 +295,11 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
  * @type {CelestoryVM.Blocks}
  */
 var blocks = {
-    "4f77-73ff-91ea-43e9-1bd7-fd58b71a8433": {
+    "fef8-9fad-987c-ea0d-aeac-db6043d6739b": {
+        "type": "Variable",
+        "name": "has_key"
+    },
+    "2e49-1e75-0881-3719-7dfa-5f19b8c70641": {
         "type": "Start",
         "sound": {
             "resourceType": "Sound"
@@ -284,15 +307,15 @@ var blocks = {
         "cover": {
             "resourceType": "Image"
         },
-        "timer": 0,
+        "timer": 32,
         "first": {
-            "blockId": "4f77-92c9-52a6-8dd8-e08c-5f2e0ed58dca"
+            "blockId": "2e49-c40a-9957-1421-155f-13d1c0244864"
         },
         "second": {
-            "blockId": "02d5-fe8f-ee3b-26d4-c858-5f7883d416d4"
+            "blockId": "183c-5ff3-46f5-c907-88f0-d0f220aa882b"
         }
     },
-    "4f77-92c9-52a6-8dd8-e08c-5f2e0ed58dca": {
+    "2e49-c40a-9957-1421-155f-13d1c0244864": {
         "type": "Step",
         "sound": {
             "resourceType": "Sound"
@@ -300,70 +323,31 @@ var blocks = {
         "cover": {
             "resourceType": "Image"
         },
-        "choice": "Leave Key",
+        "choice": "Step me",
         "timer": 0,
         "first": {
-            "blockId": "4f77-b362-cbfe-7fe1-756a-9633b789a0c4"
+            "blockId": "183c-5dbc-43da-a448-b6c6-53de21c625fc"
         },
         "second": {
-            "blockId": "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"
-        }
-    },
-    "4f77-b362-cbfe-7fe1-756a-9633b789a0c4": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "Kill Sarah"
-    },
-    "3457-2a45-5dcd-fdae-44fd-b392e334ad5e": {
-        "type": "Variable",
-        "name": "has_key"
-    },
-    "02d5-fe8f-ee3b-26d4-c858-5f7883d416d4": {
-        "type": "assign",
-        "variable": {
-            "blockId": "3457-2a45-5dcd-fdae-44fd-b392e334ad5e"
-        },
-        "value": 1,
-        "out": {
-            "blockId": "02d5-e284-fa65-9da3-f7ea-1358c08b4870"
-        }
-    },
-    "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa": {
-        "type": "End",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "Spare Sarah"
-    },
-    "02d5-e284-fa65-9da3-f7ea-1358c08b4870": {
-        "type": "Step",
-        "sound": {
-            "resourceType": "Sound"
-        },
-        "cover": {
-            "resourceType": "Image"
-        },
-        "choice": "Take Key",
-        "timer": 0,
-        "first": {
-            "blockId": "4f77-b362-cbfe-7fe1-756a-9633b789a0c4"
-        },
-        "second": {
-            "blockId": "02d5-4e68-3903-0a2e-f99f-07935cf7f3aa"
+            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
         },
         "timeout": {
-            "blockId": "d397-632d-18ec-a26f-3afb-a80e3af78a87"
+            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
         }
     },
-    "d397-632d-18ec-a26f-3afb-a80e3af78a87": {
+    "183c-5ff3-46f5-c907-88f0-d0f220aa882b": {
+        "type": "Condition",
+        "test": {
+            "blockId": "fef8-9fad-987c-ea0d-aeac-db6043d6739b"
+        },
+        "true": {
+            "blockId": "183c-e17e-b87d-755b-fe62-2bcbb963750e"
+        },
+        "false": {
+            "blockId": "183c-4075-c017-da86-d7f8-54e80ba317c9"
+        }
+    },
+    "183c-5dbc-43da-a448-b6c6-53de21c625fc": {
         "type": "End",
         "sound": {
             "resourceType": "Sound"
@@ -371,11 +355,78 @@ var blocks = {
         "cover": {
             "resourceType": "Image"
         },
-        "choice": null
+        "choice": {
+            "blockId": "183c-652d-6a1f-aaf4-7720-699b91d74f26"
+        }
+    },
+    "183c-4075-c017-da86-d7f8-54e80ba317c9": {
+        "type": "End",
+        "sound": {
+            "resourceType": "Sound"
+        },
+        "cover": {
+            "resourceType": "Image"
+        },
+        "choice": "End 2"
+    },
+    "183c-80dd-add5-af55-5dde-fe9ec79963ab": {
+        "type": "End",
+        "sound": {
+            "resourceType": "Sound"
+        },
+        "cover": {
+            "resourceType": "Image"
+        },
+        "choice": "End 3"
+    },
+    "183c-e17e-b87d-755b-fe62-2bcbb963750e": {
+        "type": "assign",
+        "variable": {
+            "blockId": "183c-3777-36b1-7860-7714-e1262b4826da"
+        },
+        "value": 21,
+        "out": {
+            "blockId": "a479-655e-ceed-d222-1e35-ef8522c741f4"
+        }
+    },
+    "183c-3777-36b1-7860-7714-e1262b4826da": {
+        "type": "Variable",
+        "name": "nb_coins"
+    },
+    "183c-652d-6a1f-aaf4-7720-699b91d74f26": {
+        "type": "format",
+        "value": "format_string"
+    },
+    "a479-556b-a8d8-0b52-c29a-0bd111b654fa": {
+        "type": "End",
+        "sound": {
+            "resourceType": "Sound"
+        },
+        "cover": {
+            "resourceType": "Image"
+        },
+        "choice": "End 4"
+    },
+    "a479-655e-ceed-d222-1e35-ef8522c741f4": {
+        "type": "Step",
+        "sound": {
+            "resourceType": "Sound"
+        },
+        "cover": {
+            "resourceType": "Image"
+        },
+        "choice": "Step 2 me",
+        "timer": 0,
+        "first": {
+            "blockId": "183c-80dd-add5-af55-5dde-fe9ec79963ab"
+        },
+        "second": {
+            "blockId": "a479-556b-a8d8-0b52-c29a-0bd111b654fa"
+        }
     }
 };
 
-const CVM = new CelestoryVM(blocks, "4f77-73ff-91ea-43e9-1bd7-fd58b71a8433", {
+const CVM = new CelestoryVM(blocks, "2e49-1e75-0881-3719-7dfa-5f19b8c70641", {
     "has_key": false,
     "nb_coins": 32
 });
