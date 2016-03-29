@@ -209,7 +209,6 @@ CelestoryVM.prototype._evaluateValue = function (value) {
     if (typeof value === "object") {
         var block = this._blocks[value.blockId];
         if (typeof block !== "undefined") {
-            console.log("im an indirect value", value, block);
             switch (block.type) {
                 case "Variable":
                     return this._variables[block.name];
