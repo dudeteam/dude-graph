@@ -2,7 +2,7 @@ const DUDE_GRAPH_MODELS = [
     {
         "item": {
             "name": "Start",
-            "icon": "fa fa-play",
+            "icon": "fa fa-rocket",
             "data": {
                 "blockType": "Start",
                 "blockName": "Start",
@@ -58,7 +58,7 @@ const DUDE_GRAPH_MODELS = [
     {
         "item": {
             "name": "Step",
-            "icon": "fa fa-share-alt",
+            "icon": "fa fa-puzzle-piece",
             "data": {
                 "blockType": "Step",
                 "blockName": "Step",
@@ -125,7 +125,7 @@ const DUDE_GRAPH_MODELS = [
     {
         "item": {
             "name": "End",
-            "icon": "fa fa-stop",
+            "icon": "fa fa-ban",
             "data": {
                 "blockType": "End",
                 "blockName": "End",
@@ -220,7 +220,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "assign",
-                        "icon": "fa fa-square",
+                        "icon": "fa fa-pencil-square-o",
                         "data": {
                             "blockType": "InstructionBlock",
                             "blockName": "assign",
@@ -263,7 +263,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "format",
-                        "icon": "fa fa-square",
+                        "icon": "fa fa-font",
                         "data": {
                             "blockType": "FormatBlock",
                             "blockName": "format",
@@ -288,7 +288,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "expression",
-                        "icon": "fa fa-square",
+                        "icon": "fa fa-calculator",
                         "data": {
                             "blockType": "ExpressionBlock",
                             "blockName": "expression",
@@ -313,7 +313,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "random_range",
-                        "icon": "fa fa-square",
+                        "icon": "fa fa-sort-numeric-asc",
                         "data": {
                             "blockType": "FunctionBlock",
                             "blockName": "random_range",
@@ -342,7 +342,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "print",
-                        "icon": "fa fa-square",
+                        "icon": "fa fa-bug",
                         "data": {
                             "blockType": "InstructionBlock",
                             "blockName": "print",
@@ -378,8 +378,33 @@ const DUDE_GRAPH_MODELS = [
             "items": [
                 {
                     "item": {
+                        "name": "go",
+                        "icon": "fa fa-road",
+                        "data": {
+                            "blockType": "Block",
+                            "blockName": "go",
+                            "blockInputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "in",
+                                    "pointValueType": "Stream",
+                                    "pointSingleConnection": false
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "out",
+                                    "pointValueType": "Stream"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "item": {
                         "name": "Condition",
-                        "icon": "fa fa-share-alt",
+                        "icon": "fa fa-question",
                         "data": {
                             "blockType": "ConditionBlock",
                             "blockName": "Condition",
@@ -413,46 +438,11 @@ const DUDE_GRAPH_MODELS = [
                 },
                 {
                     "item": {
-                        "name": "Each",
-                        "icon": "fa fa-refresh",
-                        "data": {
-                            "blockType": "EachBlock",
-                            "blockName": "Each",
-                            "blockInputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "in",
-                                    "pointValueType": "Stream",
-                                    "pointSingleConnection": false
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "list",
-                                    "pointValueType": "Array"
-                                }
-                            ],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "iteration",
-                                    "pointValueType": "Stream"
-                                },
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "end",
-                                    "pointValueType": "Stream"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "item": {
-                        "name": "Range",
-                        "icon": "fa fa-retweet",
+                        "name": "Loop",
+                        "icon": "fa fa-repeat",
                         "data": {
                             "blockType": "RangeBlock",
-                            "blockName": "Range",
+                            "blockName": "Loop",
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
@@ -486,6 +476,11 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "end",
                                     "pointValueType": "Stream"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "index",
+                                    "pointValueType": "Number"
                                 }
                             ]
                         }
