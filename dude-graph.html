@@ -247,7 +247,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.get("loader").load(this.get("graph"), this.get("graphData") || {});
                 this.get("renderer").load(this.get("rendererData") || {});
                 this._listenDudeGraphEvents();
-                this._listenDudeGraphShortcuts();
             },
 
             /**
@@ -316,6 +315,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Emits the save event
+             * @emit {Object} dude-graph-build
+             */
+            emitBuild: function () {
+                this.fire("dude-graph-build");
+            },
+
+            /**
              * Listens on the graph and renderer events
              * @private
              */
@@ -359,31 +366,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                         dudeGraphElement.$["autocomplete"].focus();
                     }
                 });
-            },
-
-            /**
-             * Dude-graph shortcuts
-             * @private
-             */
-            _listenDudeGraphShortcuts: function () {
-                var dudeGraphElement = this;
-                jwerty.key("ctrl+shift+0/⌘+shift+0", function (e) {
-                    dudeGraphElement.get("renderer").zoomToFit();
-                    e.preventDefault();
-                });
-                jwerty.key("ctrl+shift+g/⌘+shift+g", function (e) {
-                    dudeGraphElement.get("renderer").createRenderGroupForSelection();
-                    e.preventDefault();
-                });
-                jwerty.key("ctrl+shift+delete/ctrl+shift+backspace/⌘+shift+delete/⌘+shift+backspace", function (e) {
-                    if (dudeGraphElement.get("renderer").removeSelection()) {
-                        e.preventDefault();
-                    }
-                });
-                jwerty.key("ctrl+s/⌘+s", function (e) {
-                    dudeGraphElement.emitSave();
-                    e.preventDefault();
-                })
             },
 
             /**

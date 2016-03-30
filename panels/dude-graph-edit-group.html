@@ -3,6 +3,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../dude-toolbar/dude-toolbar.html">
+<link rel="import" href="../../dude-collapse/dude-collapse.html">
+<link rel="import" href="../../dude-property/dude-property.html">
 <!--
 `dude-graph-edit-group` is a panel used to edit an existing group.
 
@@ -18,12 +21,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             overflow: auto;
             padding: 10px;
         }
+        .toolbar {
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
     </style>
     <template>
-        <dude-property property-name="Group name"
-                       property-type="String"
-                       property-value="{{ data.selectedRenderGroup.nodeName }}">
-        </dude-property>
+        <div class="toolbar">
+            <dude-toolbar id="toolbar"></dude-toolbar>
+        </div>
+        <dude-collapse heading="[[ data.selectedRenderGroup.nodeName ]]">
+            <dude-property property-name="Group name"
+                           property-type="String"
+                           property-value="{{ data.selectedRenderGroup.nodeName }}">
+            </dude-property>
+        </dude-collapse>
     </template>
     <script>
         Polymer({
@@ -45,6 +57,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Notifies the dude-stack
              */
             attached: function () {
+                var panel = this;
+                this.$.toolbar.set("commands", []); // TODO: debug why commands are "global"
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-compress",
+                    description: "Zoom to selection",
+                    shortcut: ["ctrl+0", "meta+0"],
+                    action: function () {
+                        panel.get("data").get("renderer").zoomToFitSelection();
+                    }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-trash",
+                    description: "Remove selection",
+                    shortcut: ["ctrl+delete", "meta+backspace"],
+                    action: function () {
+                        panel.get("data").get("renderer").removeSelection();
+                    }.bind(this)
+                });
                 this.fire("dude-inspector-attached");
             },
 

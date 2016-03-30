@@ -4,6 +4,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../../dude-toolbar/dude-toolbar.html">
+<link rel="import" href="../../dude-collapse/dude-collapse.html">
 <link rel="import" href="../../dude-property/dude-property.html">
 <!--
 `dude-graph-edit-block` is a panel used to add a new blocks/variables to the graph.
@@ -12,24 +14,35 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 @element dude-graph-edit-block-group
 @demo demo/index.html
 -->
-<dom-module id="dude-graph-edit-block">
+<dom-module id="dude-graph-edit-block">r
+    <style>
+        .toolbar {
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+    </style>
     <template>
-        <dude-property property-name="[[ data.selectedRenderBlock._block.blockName ]]"
-                       property-type="String"
-                       property-value="{{ data.selectedRenderBlock.nodeName }}">
-        </dude-property>
-        <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
-            <dude-property property-name="[[ point.pointName ]]"
-                           property-type="[[ point.pointValueType ]]"
-                           property-value="{{ point.pointValue }}">
+        <div class="toolbar">
+            <dude-toolbar id="toolbar"></dude-toolbar>
+        </div>
+        <dude-collapse heading="[[ data.selectedRenderBlock._block.blockName ]]">
+            <dude-property property-name="[[ data.selectedRenderBlock._block.blockName ]]"
+                           property-type="String"
+                           property-value="{{ data.selectedRenderBlock.nodeName }}">
             </dude-property>
-        </template>
-        <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockOutputs ]]" as="point">
-            <dude-property property-name="[[ point.pointName ]]"
-                           property-type="[[ point.pointValueType ]]"
-                           property-value="{{ point.pointValue }}">
-            </dude-property>
-        </template>
+            <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
+                <dude-property property-name="[[ point.pointName ]]"
+                               property-type="[[ point.pointValueType ]]"
+                               property-value="{{ point.pointValue }}">
+                </dude-property>
+            </template>
+            <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockOutputs ]]" as="point">
+                <dude-property property-name="[[ point.pointName ]]"
+                               property-type="[[ point.pointValueType ]]"
+                               property-value="{{ point.pointValue }}">
+                </dude-property>
+            </template>
+        </dude-collapse>
     </template>
     <script>
         /**
@@ -54,8 +67,38 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Notifies the dude-stack
              */
             attached: function () {
+                var panel = this;
+                this.$.toolbar.set("commands", []); // TODO: debug why commands are "global"
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-compress",
+                    description: "Zoom to selection",
+                    shortcut: ["ctrl+0", "meta+0"],
+                    action: function () {
+                        panel.get("data").get("renderer").zoomToFitSelection();
+                    }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-trash",
+                    description: "Remove selection",
+                    shortcut: ["ctrl+delete", "meta+backspace"],
+                    action: function () {
+                        panel.get("data").get("renderer").removeSelection();
+                    }.bind(this)
+                });
+                this.$.toolbar.addCommand({
+                    icon: "fa fa-object-group",
+                    description: "Group selection",
+                    shortcut: ["ctrl+g", "meta+g"],
+                    action: function () {
+                        panel.get("data").get("renderer").createRenderGroupForSelection("Group");
+                    }.bind(this)
+                });
                 this.fire("dude-inspector-attached");
             },
+
+            ready: function () {
+
+        },
 
             /**
              * Called when the panel is opened

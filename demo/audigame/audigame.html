@@ -91,7 +91,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
             listeners: {
                 "dude-graph-error": "_error",
-                "dude-graph-save": "_save"
+                "dude-graph-save": "_save",
+                "dude-graph-build": "_build"
             },
 
             /**
@@ -117,6 +118,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _save: function (e) {
                 this.set("graphData", e.detail.graphData);
                 this.set("rendererData", e.detail.rendererData);
+            },
+
+            /**
+             * Saves the graph and renderer data to local storage
+             * @private
+             */
+            _build: function () {
                 console.log(JSON.stringify(new CelestoryBuilder(this.$.context.get("graph")).build(), null, ' '));
             }
         });
