@@ -82,6 +82,16 @@ CelestoryBuilder.prototype.buildVariable = function (variable) {
 /**
  * @param {dudeGraph.InstructionBlock} assign
  */
+CelestoryBuilder.prototype.buildgo = function (assign) {
+    return _.merge({
+        "type": "go",
+        "out": this._connectedStream(assign.outputByName("out"))
+    });
+};
+
+/**
+ * @param {dudeGraph.InstructionBlock} assign
+ */
 CelestoryBuilder.prototype.buildassign = function (assign) {
     return _.merge({
         "type": "assign",

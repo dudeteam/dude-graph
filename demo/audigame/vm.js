@@ -243,6 +243,8 @@ CelestoryVM.prototype._evaluateStream = function (blockId) {
                 return this._evaluateStream(block.true.blockId);
             }
             return this._evaluateStream(block.false.blockId);
+        case "go":
+            return this._evaluateStream(block.out.blockId);
         case "assign":
             this._variables[this._blocks[block.variable.blockId].name] = this._evaluateValue(block.value);
             return this._evaluateStream(block.out.blockId);
