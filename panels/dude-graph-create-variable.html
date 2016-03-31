@@ -3,75 +3,125 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../../dude-toolbar/dude-toolbar.html">
+<link rel="import" href="../../dude-collapse/dude-collapse.html">
 <link rel="import" href="../../dude-property/dude-property.html">
+<script src="dude-graph-toolbar.js"></script>
 <!--
-`dude-graph-create-variable` is a panel used to add a new group to the graph.
+`dude-graph-edit-block` is a panel used to add a new blocks/variables to the graph.
 
 @group dude-graph
-@element dude-graph-create-variable
+@element dude-graph-edit-block-group
 @demo demo/index.html
 -->
-<dom-module id="dude-graph-create-variable">
+<dom-module id="dude-graph-create-variable">r
     <style>
-        :host {
-            @apply(--layout-vertical);
-            @apply(--layout-flex);
-            overflow: auto;
-            padding: 10px;
+        .toolbar {
+            margin-top: 16px;
+            margin-bottom: 16px;
         }
     </style>
     <template>
-        <dude-property property-name="Variable type"
-                       property-type="Choice"
-                       property-value="{{ _variableType }}"
-                       property-choices="{{ _types }}"
-                       no-menu>
-        </dude-property>
-        <dude-property property-name="Variable name"
-                       property-type="String"
-                       property-value="{{ _variableName }}"
-                       no-menu>
-        </dude-property>
-        <template is="dom-if" if="[[ _variableType ]]">
-            <dude-property property-name="Variable value"
-                           property-type="{{ _variableType }}"
-                           property-value="{{ _variableValue }}">
+        <div class="toolbar">
+            <dude-toolbar id="toolbar"></dude-toolbar>
+        </div>
+        <dude-collapse heading="Create variable">
+            <dude-property
+                    property-type="String"
+                    property-name="Variable name"
+                    property-value="{{ variable.name }}">
             </dude-property>
-        </template>
-        <br />
-        <paper-button on-click="_createButtonClicked">Create</paper-button>
+            <dude-property
+                    property-type="String"
+                    property-name="Variable type"
+                    property-value="{{ variable.type }}">
+            </dude-property>
+            <dude-property
+                    property-type="[[ variable.type ]]"
+                    property-name="Variable value"
+                    property-value="{{ variable.value }}">
+            </dude-property>
+            <button on-click="_createVariable">Create variable</button>
+        </dude-collapse>
     </template>
     <script>
+        /**
+         * @extends {DudeInspectorItemElement}
+         */
         Polymer({
             is: "dude-graph-create-variable",
-
             properties: {
-                data: {
-                    type: Object
+                "inspector": {
+                    "type": "DudeInspectorElement",
+                    "readonly": true
+                },
+                "data": {
+                    "type": "DudeGraphElement",
+                    "readonly": true
+                },
+                "panelTitle": {
+                    "type": String,
+                    "value": "Create variable",
+                    "readonly": true
+                },
+                "variable": {
+                    "type": Object
                 }
             },
 
-            ready: function () {
-                this.set("_types", ["String", "Number", "Boolean"]);
+            /**
+             * Called when the panel is attached to the DOM
+             * Notifies the dude-stack
+             */
+            attached: function () {
+                dudeGraph.ToolbarHelper.clearToolbar(this);
+                this.fire("dude-inspector-attached");
             },
 
-            _validate: function () {
-                return this.get("_variableName") && this.get("_variableType") && this.get("_variableValue");
+            /**
+             * Called when the panel is opened
+             */
+            opened: function () {
+                this.set("variable", {
+                    "name": "",
+                    "type": "String",
+                    "value": null
+                });
             },
 
-            _createButtonClicked: function () {
-                if (this._validate()) {
-                    this.get("data").createVariable(
-                            this.get("_variableName"),
-                            this.get("_variableType"),
-                            this.get("_variableValue")
-                    );
-                    this.get("data").showSuccess("Variable `" + this.get("_variableName") + "` created!");
-                    this.get("data").openPanel("createPanel");
-                    this.set("_variableName", null);
-                    this.set("_variableType", null);
-                    this.set("_variableValue", null);
+            /**
+             * Called when the panel is the top of the stack
+             */
+            resumed: function () {},
+
+            /**
+             * Called when the panel is not anymore the top of the stack
+             */
+            paused: function () {},
+
+            /**
+             * Called when the panel is closed
+             */
+            closed: function () {},
+
+            /**
+             * Creates the variable
+             * @private
+             */
+            _createVariable: function () {
+                var variable = this.get("variable");
+                if (!_.isString(variable.name) || _.isEmpty(variable.name)) {
+                    throw new Error("Variable name must be a non empty string");
+                }
+                if (!_.isString(variable.type) || _.isEmpty(variable.type)) {
+                    throw new Error("Variable type must be a non empty string");
+                }
+                try {
+                    this.get("data").createVariable(variable);
+                    this.get("inspector").clearStack();
+                } catch (e) {
+                    console.error(e);
                 }
             }
         });
