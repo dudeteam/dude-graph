@@ -6,6 +6,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
 <link rel="import" href="../../dude-toolbar/dude-toolbar.html">
 <link rel="import" href="../../dude-collapse/dude-collapse.html">
+<script src="dude-graph-toolbar.js"></script>
 <!--
 `dude-graph-create` is a panel used to add a new blocks/variables to the graph.
 
@@ -56,32 +57,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Notifies the dude-stack
              */
             attached: function () {
-                var panel = this;
-                this.$.toolbar.set("commands", []); // TODO: debug why commands are "global"
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-save",
-                    description: "Save graph",
-                    shortcut: ["ctrl+s", "meta+s"],
-                    action: function () {
-                        panel._save();
-                    }.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-play",
-                    description: "Build graph",
-                    shortcut: ["ctrl+b", "meta+b"],
-                    action: function () {
-                        panel._build();
-                    }.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Zoom to fit",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: function () {
-                        panel.get("data").get("renderer").zoomToFit();
-                    }.bind(this)
-                });
+                dudeGraph.ToolbarHelper.clearToolbar(this);
+                dudeGraph.ToolbarHelper.saveGraph(this);
+                dudeGraph.ToolbarHelper.buildGraph(this);
+                dudeGraph.ToolbarHelper.zoomToFit(this);
                 this.fire("dude-inspector-attached");
             },
 
@@ -118,22 +97,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (e.detail.item.data) {
                     this.get("data").createBlock(e.detail.item.data);
                 }
-            },
-
-            /**
-             * Saves the graph and renderer
-             * @private
-             */
-            _save: function () {
-                this.get("data").emitSave();
-            },
-
-            /**
-             * Builds the graph and renderer
-             * @private
-             */
-            _build: function () {
-                this.get("data").emitBuild();
             }
         });
     </script>

@@ -6,6 +6,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../dude-toolbar/dude-toolbar.html">
 <link rel="import" href="../../dude-collapse/dude-collapse.html">
 <link rel="import" href="../../dude-property/dude-property.html">
+<script src="dude-graph-toolbar.js"></script>
 <!--
 `dude-graph-edit-group` is a panel used to edit an existing group.
 
@@ -57,24 +58,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Notifies the dude-stack
              */
             attached: function () {
-                var panel = this;
-                this.$.toolbar.set("commands", []); // TODO: debug why commands are "global"
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Zoom to selection",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: function () {
-                        panel.get("data").get("renderer").zoomToFitSelection();
-                    }.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-trash",
-                    description: "Remove selection",
-                    shortcut: ["ctrl+delete", "meta+backspace"],
-                    action: function () {
-                        panel.get("data").get("renderer").removeSelection();
-                    }.bind(this)
-                });
+                dudeGraph.ToolbarHelper.clearToolbar(this);
+                dudeGraph.ToolbarHelper.zoomToSelection(this);
+                dudeGraph.ToolbarHelper.removeSelection(this);
                 this.fire("dude-inspector-attached");
             },
 
