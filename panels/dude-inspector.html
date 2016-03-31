@@ -136,7 +136,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                  * The top panel
                  */
                 "topPanel": {
-                    "type": "DudeStackItemElement",
+                    "type": "DudeInspectorItemElement",
                     "readonly": true,
                     "value": null
                 }
@@ -147,7 +147,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * The panels stack
-             * @type {Array<DudeStackItemElement>}
+             * @type {Array<DudeInspectorItemElement>}
              * @private
              */
             _panels: [],
@@ -167,7 +167,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Pushes a panel on the stack, becoming the top panel
              * The previous top panel will be hidden and paused
              * @param {String} panelElementName
-             * @returns {DudeStackItemElement}
+             * @returns {DudeInspectorItemElement}
              */
             pushStack: function (panelElementName) {
                 if (this.get("topPanel") !== null) {
@@ -185,7 +185,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Pops the top panel and shows the previous one
              * If the top panel is the root panel, the inspector will be closed instead
-             * @returns {DudeStackItemElement|null}
+             * @returns {DudeInspectorItemElement|null}
              */
             popStack: function () {
                 if (this._panels.length === 1) {
@@ -221,7 +221,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Returns the stacked element index if it exists, throws otherwise
-             * @param {DudeStackItemElement} stackElement
+             * @param {DudeInspectorItemElement} stackElement
              * @returns {Number}
              * @private
              */
@@ -236,13 +236,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Called when a panel is attached to the DOM
              * @param {CustomEvent} e
-             * @param {DudeStackItemElement} e.target
+             * @param {DudeInspectorItemElement} e.target
              * @private
              */
             _panelAttached: function (e) {
                 var stackElement = e.target;
                 this._safePanelIndex(stackElement);
-                stackElement.set("stack", this);
+                stackElement.set("inspector", this);
                 stackElement.set("data", this.get("data"));
                 if (typeof stackElement.opened === "function") {
                     stackElement.opened();
@@ -278,14 +278,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         });
 
         /**
-         * @typedef {Element} DudeStackElement
+         * @typedef {Element} DudeInspectorElement
          * @property {Function} pushStack
          * @property {Function} popStack
          * @property {Function} removeStack
          */
 
         /**
-         * @typedef {Element} DudeStackItemElement
+         * @typedef {Element} DudeInspectorItemElement
          * @property {Function} opened
          * @property {Function} resumed
          * @property {Function} paused

@@ -4,14 +4,14 @@ dudeGraph.ToolbarHelper = (function () {
 
     /**
      * Clears the toolbar to circumvent a bug in dude-toolbar
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.clearToolbar = function (panel) {
         panel.$.toolbar.set("commands", []);
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.saveGraph = function (panel) {
         panel.$.toolbar.addCommand({
@@ -25,7 +25,7 @@ dudeGraph.ToolbarHelper = (function () {
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.buildGraph = function (panel) {
         panel.$.toolbar.addCommand({
@@ -39,7 +39,21 @@ dudeGraph.ToolbarHelper = (function () {
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
+     */
+    dudeToolbarHelper.createVariable = function (panel) {
+        panel.$.toolbar.addCommand({
+            icon: "fa fa-cogs",
+            description: "Create variable",
+            shortcut: ["ctrl+g", "meta+g"],
+            action: function () {
+                // panel.get("data").get("renderer").zoomToFit();
+            }.bind(this)
+        });
+    };
+
+    /**
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.zoomToFit = function (panel) {
         panel.$.toolbar.addCommand({
@@ -53,7 +67,7 @@ dudeGraph.ToolbarHelper = (function () {
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.zoomToSelection = function (panel) {
         panel.$.toolbar.addCommand({
@@ -67,7 +81,7 @@ dudeGraph.ToolbarHelper = (function () {
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.removeSelection = function (panel) {
         panel.$.toolbar.addCommand({
@@ -81,7 +95,7 @@ dudeGraph.ToolbarHelper = (function () {
     };
 
     /**
-     * @param {DudeStackItemElement} panel
+     * @param {DudeInspectorItemElement} panel
      */
     dudeToolbarHelper.groupSelection = function (panel) {
         panel.$.toolbar.addCommand({

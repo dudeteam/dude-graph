@@ -36,11 +36,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     </template>
     <script>
         /**
-         * @extends {DudeStackItemElement}
+         * @extends {DudeInspectorItemElement}
          */
         Polymer({
             is: "dude-graph-create",
             properties: {
+                "inspector": {
+                    "type": "",
+                    "readonly": true
+                },
                 "data": {
                     "type": "DudeGraphElement",
                     "readonly": true
@@ -61,6 +65,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 dudeGraph.ToolbarHelper.saveGraph(this);
                 dudeGraph.ToolbarHelper.buildGraph(this);
                 dudeGraph.ToolbarHelper.zoomToFit(this);
+                dudeGraph.ToolbarHelper.createVariable(this);
                 this.fire("dude-inspector-attached");
             },
 
