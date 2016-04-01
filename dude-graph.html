@@ -285,7 +285,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @param {Object} variableData
              */
             createVariable: function (variableData) {
-                throw new Error("not yet implemented", variableData);
+                var variable = new dudeGraph.Variable(variableData);
+                this.get("graph").addVariable(variable);
+                // TODO: create variable block
             },
 
             /**

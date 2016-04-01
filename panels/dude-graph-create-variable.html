@@ -30,17 +30,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <dude-property
                     property-type="String"
                     property-name="Variable name"
-                    property-value="{{ variable.name }}">
+                    property-value="{{ variable.variableName }}">
             </dude-property>
             <dude-property
                     property-type="String"
-                    property-name="Variable type"
-                    property-value="{{ variable.type }}">
+                    property-name="Variable value type"
+                    property-value="{{ variable.variableValueType }}">
             </dude-property>
             <dude-property
-                    property-type="[[ variable.type ]]"
+                    property-type="[[ variable.variableValueType ]]"
                     property-name="Variable value"
-                    property-value="{{ variable.value }}">
+                    property-value="{{ variable.variableValue }}">
             </dude-property>
             <button on-click="_createVariable">Create variable</button>
         </dude-collapse>
@@ -84,9 +84,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             opened: function () {
                 this.set("variable", {
-                    "name": "",
-                    "type": "String",
-                    "value": null
+                    "variableName": "",
+                    "variableValueType": "String",
+                    "variableValue": null
                 });
             },
 
@@ -111,11 +111,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _createVariable: function () {
                 var variable = this.get("variable");
-                if (!_.isString(variable.name) || _.isEmpty(variable.name)) {
+                if (!_.isString(variable.variableName) || _.isEmpty(variable.variableName)) {
                     throw new Error("Variable name must be a non empty string");
                 }
-                if (!_.isString(variable.type) || _.isEmpty(variable.type)) {
-                    throw new Error("Variable type must be a non empty string");
+                if (!_.isString(variable.variableValueType) || _.isEmpty(variable.variableValueType)) {
+                    throw new Error("Variable value type must be a non empty string");
                 }
                 try {
                     this.get("data").createVariable(variable);
