@@ -974,12 +974,37 @@
             expect(graph.variableByName("Hello")).to.be.null;
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
-                graph.addVariable(new dudeGraph.Variable());
+                graph.addVariable(new dudeGraph.Variable({
+                    // variableType is missing
+                    // variableName is missing
+                }));
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                graph.addVariable(new dudeGraph.Variable({
+                    "variableType": 32, // variableType is not a String
+                    "variableName": "not"
+                }));
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                graph.addVariable(new dudeGraph.Variable({
+                    "variableType": "String",
+                    "variableName": 32 // variableName is not a String
+                }));
             }).to.throw();
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
                 graph.addVariable(new dudeGraph.Variable({
                     "variableType": "String"
+                    // variableName is missing
+                }));
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                graph.addVariable(new dudeGraph.Variable({
+                    // variableType is missing
+                    "variableName": "no_type"
                 }));
             }).to.throw();
             expect(function () {
@@ -1080,6 +1105,29 @@
                 block.updateTemplate("Test", "String");
                 sinon.assert.calledWith(graphSpy, block, "Test", "String", "Number");
                 sinon.assert.calledWith(blockSpy, "Test", "String", "Number");
+            });
+            test("variable-add", function () {
+                var spy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var variable = new dudeGraph.Variable({
+                    "variableType": "String",
+                    "variableName": "variable"
+                });
+                graph.on("variable-add", spy);
+                graph.addVariable(variable);
+                sinon.assert.calledWith(spy, variable);
+            });
+            test("variable-remove", function () {
+                var spy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var variable = new dudeGraph.Variable({
+                    "variableType": "String",
+                    "variableName": "variable"
+                });
+                graph.on("variable-remove", spy);
+                graph.addVariable(variable);
+                graph.removeVariable(variable);
+                sinon.assert.calledWith(spy, variable);
             });
         });
     });
