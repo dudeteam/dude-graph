@@ -974,6 +974,9 @@
                 graph.addVariable(variable); // Duplicate name
             }).to.throw();
             graph.removeVariable(variable);
+            expect(function () {
+                graph.removeVariable(variable); // Already removed
+            }).to.throw();
             expect(graph.graphVariables).to.have.length(0);
             expect(graph.variableByName("Hello")).to.be.null;
             expect(function () {
@@ -1039,6 +1042,14 @@
             }).to.throw();
             graph.removeBlock(variableBlock);
             expect(variable.variableBlock).to.be.null;
+            variableBlock = new dudeGraph.VariableBlock({
+                "blockName": "Hello"
+            });
+            graph.addBlock(variableBlock);
+            expect(graph.graphBlocks).to.have.length(1);
+            expect(variable.variableBlock).to.be.equal(variableBlock);
+            graph.removeVariable(variable); // Should remove all related blocks
+            expect(graph.graphBlocks).to.have.length(0);
         });
         suite("dude-graph events", function () {
             test("block-add", function () {
