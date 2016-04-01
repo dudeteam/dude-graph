@@ -26,7 +26,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     name="dude-graph-renderer-data"
                     value="{{ rendererData }}">
             </iron-localstorage>
-            <dude-graph id="context"
+            <dude-graph id="dudeGraphElement"
                         class="container"
                         graph-data="[[ graphData ]]"
                         renderer-data="[[ rendererData ]]"
@@ -96,6 +96,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Initializes dude-graph
+             */
+            attached: function () {
+              this.$.dudeGraphElement.initialize();
+            },
+
+            /**
              * Shows errors
              * @param {CustomEvent} e
              * @param {Object} e.detail
@@ -125,7 +132,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _build: function () {
-                console.log(JSON.stringify(new CelestoryBuilder(this.$.context.get("graph")).build(), null, ' '));
+                console.log(JSON.stringify(new CelestoryBuilder(this.$.dudeGraphElement.get("graph")).build(), null, ' '));
             }
         });
     </script>

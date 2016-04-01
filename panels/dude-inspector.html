@@ -126,12 +126,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             is: "dude-inspector",
             properties: {
                 /**
+                 * The DudeGraphElement
+                 */
+                "data": {
+                   "type": "DudeGraphElement",
+                    "observer": "_dudeGraphElementReady"
+                },
+                /**
                  * The first panel to create
                  */
                 "rootPanel": {
                     "type": "String"
                 },
-
                 /**
                  * The top panel
                  */
@@ -271,9 +277,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Returns the panel title
              * @returns {String}
+             * @private
              */
             _panelTitle: function (topPanel, panelTitle) {
                 return panelTitle || "None";
+            },
+
+            /**
+             * Upgrades the dudeGraphElement when it is ready
+             * @private
+             */
+            _dudeGraphElementReady: function () {
+                for (var i = 0; i < this._panels.length; i++) {
+                    this._panels[i].set("data", this.get("data"));
+                }
             }
         });
 
