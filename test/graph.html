@@ -944,7 +944,7 @@
             var pointValueChangedSpy = sinon.spy();
             var blockRemovedSpy = sinon.spy();
             var CustomBlock = function () {
-              dudeGraph.Block.apply(this, arguments);
+                dudeGraph.Block.apply(this, arguments);
             };
             CustomBlock.prototype = _.create(dudeGraph.Block.prototype, {
                 "constructor": CustomBlock,
