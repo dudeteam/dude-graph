@@ -183,6 +183,12 @@
                     "pointValueType": "String"
                 }));
             }).to.throw();
+            expect(function () {
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "unknown_type", // But still cannot add 2 inputs with the same name
+                    "pointValueType": "UnknownType"
+                }));
+            }).to.throw();
         });
         test("create block point at positions", function () {
             var graph = new dudeGraph.Graph();
@@ -950,6 +956,38 @@
             customBlock.addPoint(point);
             point.pointValue = 32;
             sinon.assert.calledWith(pointValueChangedSpy, point, 32, null);
+        });
+        test("create/remove variable", function () {
+            var graph = new dudeGraph.Graph();
+            var variable = new dudeGraph.Variable({
+                "variableType": "String",
+                "variableName": "Hello"
+            });
+            graph.addVariable(variable);
+            expect(graph.graphVariables).to.have.length(1);
+            expect(graph.variableByName("Hello")).to.be.equal(variable);
+            expect(function () {
+                graph.addVariable(variable); // Duplicate name
+            }).to.throw();
+            graph.removeVariable(variable);
+            expect(graph.graphVariables).to.have.length(0);
+            expect(graph.variableByName("Hello")).to.be.null;
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                graph.addVariable(new dudeGraph.Variable());
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                graph.addVariable(new dudeGraph.Variable({
+                    "variableType": "String"
+                }));
+            }).to.throw();
+            expect(function () {
+                graph.addVariable(new dudeGraph.Variable({
+                    "variableType": "UnknownType",
+                    "variableName": "no_type"
+                }));
+            }).to.throw();
         });
         suite("dude-graph events", function () {
             test("block-add", function () {
