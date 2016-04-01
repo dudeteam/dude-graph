@@ -960,8 +960,8 @@
         test("create/remove variable", function () {
             var graph = new dudeGraph.Graph();
             var variable = new dudeGraph.Variable({
-                "variableType": "String",
-                "variableName": "Hello"
+                "variableName": "Hello",
+                "variableValueType": "String"
             });
             graph.addVariable(variable);
             expect(graph.graphVariables).to.have.length(1);
@@ -982,29 +982,31 @@
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
                 graph.addVariable(new dudeGraph.Variable({
-                    "variableType": 32, // variableType is not a String
-                    "variableName": "not"
+                    "variableName": "not",
+                    "variableValueType": 32 // variableType is not a String
                 }));
             }).to.throw();
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
                 graph.addVariable(new dudeGraph.Variable({
-                    "variableType": "String",
-                    "variableName": 32 // variableName is not a String
+                    "variableName": 32, // variableName is not a String
+                    "variableValueType": "String"
                 }));
             }).to.throw();
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
                 graph.addVariable(new dudeGraph.Variable({
-                    "variableType": "String"
                     // variableName is missing
+                    "variableValueType": "String"
                 }));
             }).to.throw();
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
                 graph.addVariable(new dudeGraph.Variable({
-                    // variableType is missing
                     "variableName": "no_type"
+                    // variableType is missing
+
+
                 }));
             }).to.throw();
             expect(function () {
@@ -1110,8 +1112,8 @@
                 var spy = sinon.spy();
                 var graph = new dudeGraph.Graph();
                 var variable = new dudeGraph.Variable({
-                    "variableType": "String",
-                    "variableName": "variable"
+                    "variableName": "variable",
+                    "variableValueType": "String"
                 });
                 graph.on("variable-add", spy);
                 graph.addVariable(variable);
@@ -1121,8 +1123,8 @@
                 var spy = sinon.spy();
                 var graph = new dudeGraph.Graph();
                 var variable = new dudeGraph.Variable({
-                    "variableType": "String",
-                    "variableName": "variable"
+                    "variableName": "variable",
+                    "variableValueType": "String"
                 });
                 graph.on("variable-remove", spy);
                 graph.addVariable(variable);
