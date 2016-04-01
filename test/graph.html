@@ -942,6 +942,7 @@
             expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.AssignationBlock).to.be.true;
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.StreamPoint).to.be.true;
             var pointValueChangedSpy = sinon.spy();
+            var blockRemovedSpy = sinon.spy();
             var CustomBlock = function () {
               dudeGraph.Block.apply(this, arguments);
             };
@@ -950,12 +951,15 @@
                 "className": "CustomBlock"
             });
             CustomBlock.prototype.pointValueChanged = pointValueChangedSpy;
+            CustomBlock.prototype.removed = blockRemovedSpy;
             var customBlock = new CustomBlock();
             graph.addBlock(customBlock);
             var point = new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Number"});
             customBlock.addPoint(point);
             point.pointValue = 32;
             sinon.assert.calledWith(pointValueChangedSpy, point, 32, null);
+            graph.removeBlock(customBlock);
+            sinon.assert.called(blockRemovedSpy);
         });
         test("create/remove variable", function () {
             var graph = new dudeGraph.Graph();
@@ -1015,6 +1019,26 @@
                     "variableName": "no_type"
                 }));
             }).to.throw();
+        });
+        test("bind VariableBlock to graph variable", function () {
+            var graph = new dudeGraph.Graph();
+            var variable = new dudeGraph.Variable({
+                "variableName": "Hello",
+                "variableValueType": "String"
+            });
+            graph.addVariable(variable);
+            var variableBlock = new dudeGraph.VariableBlock({
+                "blockName": "Hello"
+            });
+            graph.addBlock(variableBlock);
+            expect(variable.variableBlock).to.be.equal(variableBlock);
+            expect(function () {
+                graph.addBlock(new dudeGraph.VariableBlock({
+                    "blockName": "Hello" // Duplicate VariableBlock for Hello
+                }));
+            }).to.throw();
+            graph.removeBlock(variableBlock);
+            expect(variable.variableBlock).to.be.null;
         });
         suite("dude-graph events", function () {
             test("block-add", function () {
