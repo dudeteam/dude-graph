@@ -91,6 +91,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
             listeners: {
                 "dude-graph-error": "_error",
+                "dude-graph-success": "_success",
                 "dude-graph-save": "_save",
                 "dude-graph-build": "_build"
             },
@@ -103,7 +104,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Shows errors
+             * Shows error
              * @param {CustomEvent} e
              * @param {Object} e.detail
              * @param {Error} e.detail.error
@@ -112,6 +113,16 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _error: function (e) {
                 console.error(e.detail.error.message);
+            },
+
+            /**
+             * Shows success
+             * @param {CustomEvent} e
+             * @param {String} e.detail
+             * @private
+             */
+            _success: function (e) {
+                console.log(e.detail);
             },
 
             /**

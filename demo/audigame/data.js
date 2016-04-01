@@ -168,53 +168,6 @@ const DUDE_GRAPH_MODELS = [
     },
     {
         "group": {
-            "name": "Variables",
-            "items": [
-                {
-                    "item": {
-                        "name": "has_key",
-                        "icon": "fa fa-circle",
-                        "data": {
-                            "blockType": "VariableBlock",
-                            "blockValueType": "Boolean",
-                            "blockValue": "has_key",
-                            "blockName": "has_key",
-                            "blockInputs": [],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "Point",
-                                    "pointValueType": "Boolean",
-                                    "pointName": "value"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "item": {
-                        "name": "nb_coins",
-                        "icon": "fa fa-circle",
-                        "data": {
-                            "blockType": "VariableBlock",
-                            "blockValueType": "Number",
-                            "blockValue": "nb_coins",
-                            "blockName": "nb_coins",
-                            "blockInputs": [],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "Point",
-                                    "pointValueType": "Number",
-                                    "pointName": "value"
-                                }
-                            ]
-                        }
-                    }
-                }
-            ]
-        }
-    },
-    {
-        "group": {
             "name": "Functions",
             "items": [
                 {

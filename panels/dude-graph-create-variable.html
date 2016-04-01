@@ -120,6 +120,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 try {
                     this.get("data").createVariable(variable);
                     this.get("inspector").clearStack();
+                    this.get("inspector").updateDudeGraphElement(true);
                 } catch (e) {
                     console.error(e);
                 }

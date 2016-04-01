@@ -247,6 +247,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.get("loader").load(this.get("graph"), this.get("graphData") || {});
                 this.get("renderer").load(this.get("rendererData") || {});
                 this._listenDudeGraphEvents();
+                this.$.inspector.updateDudeGraphElement();
             },
 
             /**
@@ -287,6 +288,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             createVariable: function (variableData) {
                 var variable = new dudeGraph.Variable(variableData);
                 this.get("graph").addVariable(variable);
+                this.fire("dude-graph-success", "Variable " + variable.variableName + " created");
             },
 
             /**

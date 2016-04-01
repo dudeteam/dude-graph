@@ -129,8 +129,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                  * The DudeGraphElement
                  */
                 "data": {
-                   "type": "DudeGraphElement",
-                    "observer": "_dudeGraphElementReady"
+                   "type": "DudeGraphElement"
                 },
                 /**
                  * The first panel to create
@@ -226,6 +225,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Updates the dudeGraphElement
+             * @param {Boolean} [force=false]
+             */
+            updateDudeGraphElement: function (force) {
+                for (var i = 0; i < this._panels.length; i++) {
+                    if (force) {
+                        this._panels[i].set("data", {});
+                    }
+                    this._panels[i].set("data", this.get("data"));
+                }
+            },
+
+            /**
              * Returns the stacked element index if it exists, throws otherwise
              * @param {DudeInspectorItemElement} stackElement
              * @returns {Number}
@@ -281,16 +293,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _panelTitle: function (topPanel, panelTitle) {
                 return panelTitle || "None";
-            },
-
-            /**
-             * Upgrades the dudeGraphElement when it is ready
-             * @private
-             */
-            _dudeGraphElementReady: function () {
-                for (var i = 0; i < this._panels.length; i++) {
-                    this._panels[i].set("data", this.get("data"));
-                }
             }
         });
 

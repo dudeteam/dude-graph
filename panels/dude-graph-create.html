@@ -25,11 +25,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="toolbar">
             <dude-toolbar id="toolbar"></dude-toolbar>
         </div>
-        <dude-collapse heading="Create block">
+        <dude-collapse heading="Blocks">
             <dude-hierarchy
                     id="modelsHierarchy"
                     placeholder="Search block..."
-                    items="{{ data.models }}"
+                    items="{{ models }}"
+                    on-dude-hierarchy-item-submit="_createBlock">
+            </dude-hierarchy>
+        </dude-collapse>
+        <dude-collapse heading="Variables">
+            <dude-hierarchy
+                    id="variablesHierarchy"
+                    placeholder="Search variable..."
+                    items="{{ variables }}"
                     on-dude-hierarchy-item-submit="_createBlock">
             </dude-hierarchy>
         </dude-collapse>
@@ -53,12 +61,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": String,
                     "value": "Inspector",
                     "readonly": true
+                },
+                "models": {
+                    "computed": "_models(data.models)"
+                },
+                "variables": {
+                    "computed": "_variables(data.graph)"
                 }
             },
 
             /**
              * Called when the panel is attached to the DOM
-             * Notifies the dude-stack
+             * Notifies the dude-inspector
              */
             attached: function () {
                 dudeGraph.ToolbarHelper.clearToolbar(this);
@@ -102,6 +116,44 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (e.detail.item.data) {
                     this.get("data").createBlock(e.detail.item.data);
                 }
+            },
+
+            /**
+             *
+             * @returns {dudeGraph.Models.modelsTypedef}
+             * @private
+             */
+            _models: function () {
+                return this.get("data.models") || [];
+            },
+
+            /**
+             *
+             * @returns {dudeGraph.Models.modelsTypedef}
+             * @private
+             */
+            _variables: function () {
+                var variables = this.get("data.graph.graphVariables");
+                return _.map(variables, function (variable) {
+                    return {
+                        "item": {
+                            "name": variable.variableName,
+                            "icon": "fa fa-circle",
+                            "data": {
+                                "blockType": "VariableBlock",
+                                "blockName": variable.variableName,
+                                "blockInputs": [],
+                                "blockOutputs": [
+                                    {
+                                        "pointType": "Point",
+                                        "pointValueType": variable.variableValueType,
+                                        "pointName": "value"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                });
             }
         });
     </script>
