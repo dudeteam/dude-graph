@@ -246,6 +246,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }.bind(this));
                 this.get("loader").load(this.get("graph"), this.get("graphData") || {});
                 this.get("renderer").load(this.get("rendererData") || {});
+                this.get("graph").graphModels = this.get("models");
                 this._listenDudeGraphEvents();
                 this.$.inspector.updateDudeGraphElement();
             },
@@ -360,7 +361,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
                 this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                     var fromRenderPoint = renderConnection.realRenderPoint;
-                    var eligibleModels = dudeGraph.Models.query(dudeGraphElement.get("models"), fromRenderPoint.point);
+                    var eligibleModels = dudeGraphElement.get("graph").queryModels(fromRenderPoint.point);
                     var autocompleteModels = [];
                     _.forEach(eligibleModels, function (eligibleModel) {
                         _.forEach(eligibleModel.modelPoints, function (modelPoint) {

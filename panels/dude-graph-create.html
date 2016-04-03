@@ -63,7 +63,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "readonly": true
                 },
                 "models": {
-                    "computed": "_models(data.models)"
+                    "computed": "_models(data.graph)"
                 },
                 "variables": {
                     "computed": "_variables(data.graph)"
@@ -119,17 +119,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             *
-             * @returns {dudeGraph.Models.modelsTypedef}
+             * @returns {Array<dudeGraph.Graph.modelBlockTypedef>}
              * @private
              */
             _models: function () {
-                return this.get("data.models") || [];
+                return this.get("data.graph.graphModels") || [];
             },
 
             /**
-             *
-             * @returns {dudeGraph.Models.modelsTypedef}
+             * @returns {Array<dudeGraph.Graph.modelBlockTypedef>}
              * @private
              */
             _variables: function () {

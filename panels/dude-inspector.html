@@ -231,7 +231,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             updateDudeGraphElement: function (force) {
                 for (var i = 0; i < this._panels.length; i++) {
                     if (force) {
-                        this._panels[i].set("data", {});
+                        this._panels[i].set("data", null);
                     }
                     this._panels[i].set("data", this.get("data"));
                 }
