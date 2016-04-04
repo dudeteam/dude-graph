@@ -61,7 +61,7 @@ dudeGraph.ToolbarHelper = (function () {
             description: "Zoom to fit",
             shortcut: ["ctrl+shift+0", "meta+shift+0"],
             action: function () {
-                panel.get("data").get("renderer").zoomToFit();
+                panel.get("data.renderer").zoomToFit();
             }.bind(this)
         });
     };
@@ -75,7 +75,7 @@ dudeGraph.ToolbarHelper = (function () {
             description: "Zoom to selection",
             shortcut: ["ctrl+shift+0", "meta+shift+0"],
             action: function () {
-                panel.get("data").get("renderer").zoomToFitSelection();
+                panel.get("data.renderer").zoomToFitSelection();
             }.bind(this)
         });
     };
@@ -89,7 +89,7 @@ dudeGraph.ToolbarHelper = (function () {
             description: "Remove selection",
             shortcut: ["ctrl+delete", "meta+backspace"],
             action: function () {
-                panel.get("data").get("renderer").removeSelection();
+                panel.get("data.renderer").removeSelection();
             }.bind(this)
         });
     };
@@ -103,7 +103,7 @@ dudeGraph.ToolbarHelper = (function () {
             description: "Group selection",
             shortcut: ["ctrl+shift+g", "meta+shift+g"],
             action: function () {
-                panel.get("data").get("renderer").createRenderGroupForSelection("Group");
+                panel.get("data.renderer").createRenderGroupForSelection("Group");
             }.bind(this)
         });
     };

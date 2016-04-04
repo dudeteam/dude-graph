@@ -131,27 +131,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _variables: function () {
-                var variables = this.get("data.graph.graphVariables");
-                return _.map(variables, function (variable) {
-                    return {
-                        "item": {
-                            "name": variable.variableName,
-                            "icon": "fa fa-circle",
-                            "data": {
-                                "blockType": "VariableBlock",
-                                "blockName": variable.variableName,
-                                "blockInputs": [],
-                                "blockOutputs": [
-                                    {
-                                        "pointType": "Point",
-                                        "pointValueType": variable.variableValueType,
-                                        "pointName": "value"
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                });
+                return this.get("data.graph").variableModels();
             }
         });
     </script>
