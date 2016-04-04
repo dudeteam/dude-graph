@@ -1,5 +1,5 @@
 /**
- * Builds a computable graph
+ * Celestory Builder to create interactive audio stories
  * @param {dudeGraph.Graph} graph
  * @class
  */
@@ -9,20 +9,36 @@ var CelestoryBuilder = function (graph) {
 
 CelestoryBuilder.prototype.build = function () {
     var builder = this;
-    var blocks = {};
+    var build = {
+        "startId": null,
+        "variables": {},
+        "blocks": {}
+    };
+    var starts = this._graph.blocksByType("Start");
+    if (starts.length === 0) {
+        throw new Error("Story must have one `Start`");
+    }
+    if (starts.length > 1) {
+        throw new Error("Story must have only one `Start` block");
+    }
+    var start = starts[0];
+    build.startId = start.blockId;
     _.forEach(this._graph.graphBlocks, function (block) {
         if (block instanceof dudeGraph.VariableBlock) {
-            blocks[block.blockId] = builder.buildVariable(block);
+            build.blocks[block.blockId] = builder.buildVariable(block);
         } else {
             var blockName = block.blockName;
             var blockSaver = builder["build" + blockName];
             if (_.isUndefined(blockSaver)) {
                 throw new Error("build" + blockName + "() is not overloaded");
             }
-            blocks[block.blockId] = blockSaver.call(builder, block);
+            build.blocks[block.blockId] = blockSaver.call(builder, block);
         }
     });
-    return blocks;
+    _.forEach(this._graph.graphVariables, function (variable) {
+        build.variables[variable.variableName] = variable.variableValue;
+    });
+    return build;
 };
 
 /**
@@ -108,7 +124,7 @@ CelestoryBuilder.prototype.buildformat = function (format) {
     // TODO: format
     return {
         "type": "format"
-    }
+    };
 };
 
 /**
@@ -189,3 +205,10 @@ CelestoryBuilder.prototype._connectedStream = function (point) {
     }
     throw new Error("`" + point.pointFancyName + "` must be connected");
 };
+
+/**
+ * NodeJS export
+ */
+if (typeof module !== "undefined") {
+    module.exports = CelestoryBuilder;
+}
