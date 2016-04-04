@@ -3,10 +3,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../paper-button/paper-button.html">
-<link rel="import" href="../../dude-property/dude-property.html">
 <!--
-`dude-graph-create-function` is a panel used to add a new group to the graph.
+`dude-graph-create-function` is a panel used to add a new function to the graph.
 
 @group dude-graph
 @element dude-graph-create-function
@@ -22,28 +20,24 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
     </style>
     <template>
-        <dude-property property-name="Function name"
-                       property-type="String"
-                       property-value="{{ _functionName }}"
-                       no-menu>
-        </dude-property>
-        <br />
-        <paper-button on-click="_createButtonClicked">Create</paper-button>
     </template>
     <script>
         Polymer({
             is: "dude-graph-create-function",
-
             properties: {
-                data: {
-                    type: Object
+                "inspector": {
+                    "type": "DudeInspectorElement",
+                    "readonly": true
+                },
+                "data": {
+                    "type": "DudeGraphElement",
+                    "readonly": true
+                },
+                "panelTitle": {
+                    "type": String,
+                    "value": "Inspector",
+                    "readonly": true
                 }
-            },
-
-            _createButtonClicked: function () {
-//                this.get("data").$["editor"].get("renderer").createRenderGroupForSelection(this.get("_groupName"));
-                this.set("_functionName", null);
-                this.parentNode.parentNode.close();
             }
         });
     </script>
