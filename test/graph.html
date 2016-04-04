@@ -16,8 +16,8 @@
          *
          * `Number` ===> `Number` - Direct connection
          * `Number` =~=> `String` - Compatible connection
-         * `Template:String` =#=> `Number` - Template connection
          * `String` =/=> `Number` - Impossible connection
+         * `Template:String` =#=> `Number` - Template connection
          * `Template:String` =/=> `Array` - Impossible template connection
          */
         /**
@@ -1021,6 +1021,24 @@
                     "variableType": "UnknownType",
                     "variableName": "no_type"
                 }));
+            }).to.throw();
+        });
+        test("variable value", function () {
+            var graph = new dudeGraph.Graph();
+            var variable = new dudeGraph.Variable({
+                "variableName": "Hello",
+                "variableValueType": "String"
+            });
+            expect(function (){
+                variable.variableValue = 32; // Cannot change variableValue when not bound to graph
+            }).to.throw();
+            graph.addVariable(variable);
+            variable.variableValue = "Hello"; // `String` ===> `String`
+            expect(variable.variableValue).to.be.equal("Hello");
+            variable.variableValue = 32; // `Number` =~=> `String`
+            expect(variable.variableValue).to.be.equal("32");
+            expect(function () {
+                variable.variableValue = {}; // `Object` =/=> `String`
             }).to.throw();
         });
         test("bind VariableBlock to graph variable", function () {
