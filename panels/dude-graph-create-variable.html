@@ -33,8 +33,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     property-value="{{ variable.variableName }}">
             </dude-property>
             <dude-property
-                    property-type="String"
+                    property-type="Choice"
                     property-name="Variable value type"
+                    property-data="[[ variableTypes ]]"
                     property-value="{{ variable.variableValueType }}">
             </dude-property>
             <dude-property
@@ -67,6 +68,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
                 "variable": {
                     "type": Object
+                },
+                "variableTypes": {
+                    "type": Array,
+                    "value": ["String", "Number", "Boolean"]
                 }
             },
 

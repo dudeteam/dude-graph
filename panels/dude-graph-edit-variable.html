@@ -30,21 +30,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="toolbar">
             <dude-toolbar id="toolbar"></dude-toolbar>
         </div>
-        <dude-collapse heading="[[ data.block.blockName ]]">
-            <dude-property property-name="Variable type"
-                           property-type="Choice"
-                           property-value="{{ data.block.blockOutputs.0.pointValueType }}"
-                           property-choices="{{ _types }}"
-                           no-menu>
-            </dude-property>
-            <dude-property property-name="Variable name"
-                           property-type="String"
-                           property-value="{{ data.block.blockName }}"
-                           no-menu>
-            </dude-property>
-            <dude-property property-name="Variable value"
-                           property-type="{{ data.block.blockOutputs.0.pointValueType }}"
-                           property-value="{{ data.block.blockOutputs.0.pointValue }}">
+        <dude-collapse heading="[[ variable.variableName ]]">
+            <dude-property
+                    property-type="[[ variable.variableValueType ]]"
+                    property-name="Variable value"
+                    property-value="{{ variable.variableValue }}">
             </dude-property>
         </dude-collapse>
     </template>
@@ -64,6 +54,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "type": String,
                     "value": "Edit block",
                     "readonly": true
+                },
+                "variable": {
+                    "type": dudeGraph.Variable
                 }
             },
 
@@ -72,57 +65,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Notifies the dude-stack
              */
             attached: function () {
-                this.set("_types", ["String", "Number", "Boolean", "Object", "Resource"]);
-                var panel = this;
-                this.$.toolbar.set("commands", []); // TODO: debug why commands are "global"
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-compress",
-                    description: "Zoom to selection",
-                    shortcut: ["ctrl+0", "meta+0"],
-                    action: function () {
-                        panel.get("data").get("renderer").zoomToFitSelection();
-                    }.bind(this)
-                });
-                this.$.toolbar.addCommand({
-                    icon: "fa fa-trash",
-                    description: "Remove selection",
-                    shortcut: ["ctrl+delete", "meta+backspace"],
-                    action: function () {
-                        panel.get("data").get("renderer").removeSelection();
-                    }.bind(this)
-                });
+                dudeGraph.ToolbarHelper.clearToolbar(this);
+                dudeGraph.ToolbarHelper.zoomToSelection(this);
+                dudeGraph.ToolbarHelper.removeSelection(this);
+                dudeGraph.ToolbarHelper.groupSelection(this);
                 this.fire("dude-inspector-attached");
             },
 
             /**
-             *
-             * @returns {*}
-             * @private
+             * Called when the panel is opened
              */
-            _validate: function () {
-                return this.get("_variableName") && this.get("_variableType") && this.get("_variableValue");
-            },
-
-            /**
-             *
-             * @private
-             */
-            _editButtonClicked: function () {
-                if (this._validate()) {
-                    console.log(this.get("_variableName"),
-                            this.get("_variableType"),
-                            this.get("_variableValue"));
-//                    this.get("data").editVariable(
-//                            this.get("_variableName"),
-//                            this.get("_variableType"),
-//                            this.get("_variableValue")
-//                    );
-//                    this.get("data").showSuccess("Variable `" + this.get("_variableName") + "` editd!");
-//                    this.get("data").openPanel("editPanel");
-                    this.set("_variableName", null);
-                    this.set("_variableType", null);
-                    this.set("_variableValue", null);
-                }
+            opened: function () {
+                this.set("variable", this.get("data.graph").variableByName(this.get("data.selectedRenderBlock._block.blockName")));
             }
         });
     </script>
