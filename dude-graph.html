@@ -33,9 +33,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             background: var(--dude-primary-background-color);
             height: 100%;
         }
+
         #svg {
             @apply(--layout-flex-3);
         }
+
         #inspector {
             @apply(--layout-flex);
         }
@@ -48,10 +50,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             fill: var(--dude-content-text-color);
             font-family: var(--dude-primary-text-font);
         }
+
         ::content .dude-graph-title {
             fill: var(--dude-title-text-color);
             font-weight: bold;
         }
+
         /**
          * Select brush
          */
@@ -59,31 +63,38 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             fill: hsla(0, 0%, 80%, 0.1);
             stroke: hsla(0, 0%, 80%, 0.2);
         }
+
         /**
          * Blocks
          */
         ::content .dude-graph-block > rect {
             @apply(--dude-graph-block);
         }
+
         ::content .dude-graph-block:hover > rect {
             @apply(--dude-graph-block-hover);
         }
+
         ::content .dude-graph-block.dude-graph-selected > rect {
             @apply(--dude-graph-block-selected);
         }
+
         /**
          * Groups
          */
         ::content .dude-graph-group > rect {
             @apply(--dude-graph-group);
         }
+
         ::content .dude-graph-group:hover > rect {
             @apply(--dude-graph-group-hover)
         }
+
         ::content .dude-graph-group.dude-graph-selected > rect,
         ::content .dude-graph-group.dude-graph-active > rect {
             @apply(--dude-graph-group-selected);
         }
+
         /**
          * Connections
          */
@@ -91,6 +102,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             stroke-width: 2px;
             fill: transparent;
         }
+
         /**
          * Cursors block, groups and points
          */
@@ -98,6 +110,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ::content .dude-graph-group {
             cursor: move;
         }
+
         ::content .dude-graph-point,
         ::content .dude-graph-point {
             cursor: pointer;
@@ -106,7 +119,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="container">
             <svg id="svg"></svg>
-            <dude-inspector id="inspector" data="{{ dudeGraphElement }}" root-panel="dude-graph-create"></dude-inspector>
+            <dude-inspector id="inspector" data="{{ dudeGraphElement }}"
+                            root-panel="dude-graph-create"></dude-inspector>
             <dude-popup id="autocompletePopup">
                 <dude-hierarchy
                         id="autocomplete"
@@ -272,8 +286,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (blockType === "VariableBlock") {
                     var variablesFound = this.get("graph").blocksByName(blockData.blockName);
                     var variableFound = _.find(variablesFound, function (variable) {
-                        return variable instanceof dudeGraph.VariableBlock;
-                    }) || null;
+                                return variable instanceof dudeGraph.VariableBlock;
+                            }) || null;
                     if (variableFound) {
                         return createRenderBlock(variableFound);
                     }
@@ -360,19 +374,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 });
                 this.get("renderer").on("drop-connection", function (renderConnection, __, position) {
                     var fromRenderPoint = renderConnection.realRenderPoint;
-                    var eligibleModels = dudeGraphElement.get("graph").queryModels(fromRenderPoint.point);
-                    var autocompleteModels = [];
-                    _.forEach(eligibleModels, function (eligibleModel) {
-                        _.forEach(eligibleModel.modelPoints, function (modelPoint) {
-                            var model = _.cloneDeep(eligibleModel.model);
-                            model.item.name += "#" + modelPoint;
-                            model.item.data.modelPoint = modelPoint;
-                            autocompleteModels.push(model);
-                        });
-                    });
-                    if (!_.isEmpty(autocompleteModels)) {
+                    var queryModels = dudeGraphElement.get("graph").queryModels(fromRenderPoint.point);
+                    if (!_.isEmpty(queryModels)) {
                         dudeGraphElement.set("autocompleteRenderConnection", renderConnection);
-                        dudeGraphElement.set("autocompleteModels", autocompleteModels);
+                        dudeGraphElement.set("autocompleteModels", queryModels);
                         dudeGraphElement.$["autocompletePopup"].open(position[0], position[1]);
                         dudeGraphElement.$["autocomplete"].focus();
                     }
@@ -392,7 +397,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 var toRenderBlock = this.createBlock(model.item.data);
                 toRenderBlock.nodePosition = _.clone(draggingRenderPoint.pointAbsolutePosition);
                 toRenderBlock.update();
-                var toRenderPoint = fromRenderPoint.point.pointOutput ? toRenderBlock.block.inputByName(model.item.data.modelPoint) : toRenderBlock.block.outputByName(model.item.data.modelPoint);
+                var toRenderPoint = fromRenderPoint.point.pointOutput ?
+                        toRenderBlock.block.inputByName(model.item.data.modelPointName) :
+                        toRenderBlock.block.outputByName(model.item.data.modelPointName);
                 var connection = fromRenderPoint.point.connect(toRenderPoint);
                 this.get("renderer").createRenderConnection({
                     connection: connection,
