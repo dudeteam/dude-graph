@@ -39,9 +39,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             </iron-localstorage>
             <dude-graph id="dudeGraphElement"
                         class="container"
+                        models="[[ models ]]"
                         graph-data="[[ graphData ]]"
                         renderer-data="[[ rendererData ]]"
-                        models="[[ models ]]"
                         block-types="[[ blockTypes ]]"
                         point-types="[[ pointTypes ]]"
                         render-block-types="[[ renderBlockTypes ]]">
@@ -101,10 +101,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 }
             },
             listeners: {
-                "dude-graph-error": "_error",
-                "dude-graph-success": "_success",
-                "dude-graph-save": "_save",
-                "dude-graph-build": "_build"
+                "dude-graph-error": "_graphError",
+                "dude-graph-success": "_graphSuccess",
+                "dude-graph-save": "_graphSave",
+                "dude-graph-build": "_graphBuild"
             },
 
             /**
@@ -115,27 +115,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Shows error
+             * Shows graph error
              * @param {CustomEvent} e
              * @param {Object} e.detail
              * @param {Error} e.detail.error
              * @param {String} e.detail.error.message
              * @private
              */
-            _error: function (e) {
-                this.$.error.text = e.detail.error.message;
-                this.$.error.open();
+            _graphError: function (e) {
+                this._error(e.detail.error.message);
             },
 
             /**
-             * Shows success
+             * Shows graph success
              * @param {CustomEvent} e
              * @param {String} e.detail
              * @private
              */
-            _success: function (e) {
-                this.$.success.text = e.detail;
-                this.$.success.open();
+            _graphSuccess: function (e) {
+                this._success(e.detail);
             },
 
             /**
@@ -146,17 +144,44 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @param {Object} e.detail.rendererData
              * @private
              */
-            _save: function (e) {
+            _graphSave: function (e) {
                 this.set("graphData", e.detail.graphData);
                 this.set("rendererData", e.detail.rendererData);
+                this._success("Story saved!");
             },
 
             /**
-             * Saves the graph and renderer data to local storage
+             * Builds the graph
              * @private
              */
-            _build: function () {
-                console.log(JSON.stringify(new CelestoryBuilder(this.$.dudeGraphElement.get("graph")).build(), null, ' '));
+            _graphBuild: function () {
+                try {
+                    var vm = new CelestoryBuilder(this.$.dudeGraphElement.get("graph")).build();
+                    this._success(JSON.stringify(vm, null, ' '));
+                    console.log(JSON.stringify(vm, null, ' '));
+                } catch (e) {
+                    this._error(e);
+                }
+            },
+
+            /**
+             * Handles the error and shows an error toast
+             * @param {String} message
+             * @private
+             */
+            _error: function (message) {
+                this.$.error.text = message;
+                this.$.error.open();
+            },
+
+            /**
+             * Handles the success and shows a success toast
+             * @param {String} message
+             * @private
+             */
+            _success: function (message) {
+                this.$.success.text = message;
+                this.$.success.open();
             }
         });
     </script>
