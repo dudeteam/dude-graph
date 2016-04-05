@@ -173,7 +173,7 @@ const DUDE_GRAPH_MODELS = [
                 {
                     "item": {
                         "name": "assign",
-                        "icon": "fa fa-pencil-square-o",
+                        "icon": "fa fa-long-arrow-left",
                         "data": {
                             "blockType": "InstructionBlock",
                             "blockName": "assign",
@@ -391,11 +391,11 @@ const DUDE_GRAPH_MODELS = [
                 },
                 {
                     "item": {
-                        "name": "Loop",
+                        "name": "Repeat",
                         "icon": "fa fa-repeat",
                         "data": {
                             "blockType": "RangeBlock",
-                            "blockName": "Loop",
+                            "blockName": "Repeat",
                             "blockInputs": [
                                 {
                                     "pointType": "StreamPoint",
