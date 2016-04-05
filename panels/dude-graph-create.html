@@ -40,6 +40,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     items="{{ variables }}"
                     on-dude-hierarchy-item-submit="_createBlock">
             </dude-hierarchy>
+            <!-- <button on-click="_deleteVariable">Delete variable</button> -->
         </dude-collapse>
     </template>
     <script>
@@ -116,6 +117,22 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (e.detail.item.data) {
                     this.get("data").createBlock(e.detail.item.data);
                 }
+            },
+
+            /**
+             * Deletes the selected variable
+             * @private
+             */
+            _deleteVariable: function () {
+                /*
+                var variableModel = this.$.variablesHierarchy._selectedItem.item;
+                if (typeof variableModel.data.blockName !== "undefined") {
+                    if (confirm("Are you sure you want to delete " + variableModel.data.blockName + "?")) {
+                        var variable = this.get("data.graph").variableByName(variableModel.data.blockName);
+                        this.get("data.graph").removeVariable();
+                    }
+                }
+                */
             },
 
             /**

@@ -170,6 +170,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _error: function (message) {
+                this.$.error.close();
                 this.$.error.text = message;
                 this.$.error.open();
             },
@@ -180,6 +181,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _success: function (message) {
+                this.$.success.open();
                 this.$.success.text = message;
                 this.$.success.open();
             }
