@@ -140,7 +140,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _models: function () {
-                return this.get("data.graph.graphModels") || [];
+                var graph = this.get("data.graph");
+                if (typeof graph !== "undefined") {
+                    return graph.graphModels;
+                }
+                return [];
             },
 
             /**
@@ -148,7 +152,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _variables: function () {
-                return this.get("data.graph").variableModels();
+                var graph = this.get("data.graph");
+                if (typeof graph !== "undefined") {
+                    return graph.variableModels();
+                }
+                return [];
             }
         });
     </script>
