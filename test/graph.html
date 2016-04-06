@@ -886,6 +886,70 @@
             expect(inputPoint1_2.pointValue).to.be.equal("false");
             expect(inputPoint1_3.pointValue).to.be.equal("true");
         });
+        test("point templates and connections and pointCanConvert = false", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block({
+                "blockTemplates": {
+                    "TemplateTest": {
+                        "valueType": "String",
+                        "templates": ["Number", "String", "Boolean"]
+                    }
+                }
+            });
+            graph.addBlock(block1);
+            var inputPoint1_1 = new dudeGraph.Point(false, {
+                "pointName": "in",
+                "pointTemplate": "TemplateTest"
+            });
+            var inputPoint1_2 = new dudeGraph.Point(false, {
+                "pointName": "in2",
+                "pointTemplate": "TemplateTest"
+            });
+            var inputPoint1_3 = new dudeGraph.Point(false, {
+                "pointName": "in3",
+                "pointTemplate": "TemplateTest"
+            });
+            block1.addPoint(inputPoint1_1);
+            expect(inputPoint1_1.pointValueType).to.be.equals("String");
+            block1.addPoint(inputPoint1_2);
+            expect(inputPoint1_2.pointValueType).to.be.equals("String");
+            block1.addPoint(inputPoint1_3);
+            expect(inputPoint1_3.pointValueType).to.be.equals("String");
+            var block2 = new dudeGraph.Block();
+            graph.addBlock(block2);
+            var outputPointString = new dudeGraph.Point(true, {
+                "pointName": "out1",
+                "pointValueType": "Number"
+            });
+            var outputPointStringNoConvert = new dudeGraph.Point(true, {
+                "pointName": "out2",
+                "pointValueType": "Number",
+                "pointCanConvert": false
+            });
+            var outputPointString3 = new dudeGraph.Point(true, {
+                "pointName": "out3",
+                "pointValueType": "Array",
+                "pointCanConvert": false
+            });
+            block2.addPoint(outputPointString);
+            expect(outputPointString.pointValueType).to.be.equals("Number");
+            block2.addPoint(outputPointStringNoConvert);
+            expect(outputPointStringNoConvert.pointValueType).to.be.equals("Number");
+            outputPointString.connect(inputPoint1_1);
+            expect(outputPointString.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_1.pointValueType).to.be.equals("String");
+            outputPointStringNoConvert.connect(inputPoint1_2);
+            expect(outputPointString.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_1.pointValueType).to.be.equals("Number");
+            expect(outputPointStringNoConvert.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_2.pointValueType).to.be.equals("Number");
+            expect(inputPoint1_3.pointValueType).to.be.equals("Number");
+            outputPointString.disconnect(inputPoint1_1);
+            outputPointStringNoConvert.disconnect(inputPoint1_2);
+            expect(function () {
+                outputPointString3.connect(inputPoint1_3);
+            }).to.throw();
+        });
         test("remove block", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block({
