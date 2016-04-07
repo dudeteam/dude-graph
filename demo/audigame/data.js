@@ -335,7 +335,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "go",
                         "icon": "fa fa-road",
                         "data": {
-                            "blockType": "Block",
+                            "blockType": "InstructionBlock",
                             "blockName": "go",
                             "blockInputs": [
                                 {
