@@ -168,6 +168,123 @@ const DUDE_GRAPH_MODELS = [
     },
     {
         "group": {
+            "name": "Controls",
+            "items": [
+                {
+                    "item": {
+                        "name": "Go",
+                        "icon": "fa fa-road",
+                        "data": {
+                            "blockType": "InstructionBlock",
+                            "blockName": "Go",
+                            "blockInputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "in",
+                                    "pointValueType": "Stream",
+                                    "pointSingleConnection": false
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "out",
+                                    "pointValueType": "Stream"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "item": {
+                        "name": "Condition",
+                        "icon": "fa fa-question",
+                        "data": {
+                            "blockType": "ConditionBlock",
+                            "blockName": "Condition",
+                            "blockInputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "in",
+                                    "pointValueType": "Stream",
+                                    "pointSingleConnection": false
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "test",
+                                    "pointValueType": "Boolean"
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "true",
+                                    "pointValueType": "Stream"
+                                },
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "false",
+                                    "pointValueType": "Stream"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "item": {
+                        "name": "Repeat",
+                        "icon": "fa fa-repeat",
+                        "data": {
+                            "blockType": "RangeBlock",
+                            "blockName": "Repeat",
+                            "blockInputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "in",
+                                    "pointValueType": "Stream",
+                                    "pointSingleConnection": false
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "from",
+                                    "pointValueType": "Number"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "to",
+                                    "pointValueType": "Number"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "step",
+                                    "pointValueType": "Number"
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "iteration",
+                                    "pointValueType": "Stream"
+                                },
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "end",
+                                    "pointValueType": "Stream"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "index",
+                                    "pointValueType": "Number"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "group": {
             "name": "Functions",
             "items": [
                 {
@@ -318,123 +435,6 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "out",
                                     "pointValueType": "Stream"
-                                }
-                            ]
-                        }
-                    }
-                }
-            ]
-        }
-    },
-    {
-        "group": {
-            "name": "Built-ins",
-            "items": [
-                {
-                    "item": {
-                        "name": "go",
-                        "icon": "fa fa-road",
-                        "data": {
-                            "blockType": "InstructionBlock",
-                            "blockName": "go",
-                            "blockInputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "in",
-                                    "pointValueType": "Stream",
-                                    "pointSingleConnection": false
-                                }
-                            ],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "out",
-                                    "pointValueType": "Stream"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "item": {
-                        "name": "Condition",
-                        "icon": "fa fa-question",
-                        "data": {
-                            "blockType": "ConditionBlock",
-                            "blockName": "Condition",
-                            "blockInputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "in",
-                                    "pointValueType": "Stream",
-                                    "pointSingleConnection": false
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "test",
-                                    "pointValueType": "Boolean"
-                                }
-                            ],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "true",
-                                    "pointValueType": "Stream"
-                                },
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "false",
-                                    "pointValueType": "Stream"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "item": {
-                        "name": "Repeat",
-                        "icon": "fa fa-repeat",
-                        "data": {
-                            "blockType": "RangeBlock",
-                            "blockName": "Repeat",
-                            "blockInputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "in",
-                                    "pointValueType": "Stream",
-                                    "pointSingleConnection": false
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "from",
-                                    "pointValueType": "Number"
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "to",
-                                    "pointValueType": "Number"
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "step",
-                                    "pointValueType": "Number"
-                                }
-                            ],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "iteration",
-                                    "pointValueType": "Stream"
-                                },
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "end",
-                                    "pointValueType": "Stream"
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "index",
-                                    "pointValueType": "Number"
                                 }
                             ]
                         }
