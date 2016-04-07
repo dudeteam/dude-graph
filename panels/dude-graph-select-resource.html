@@ -1,0 +1,86 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../dude-hierarchy/dude-hierarchy.html">
+<link rel="import" href="../../dude-resource-manager/dude-resource-manager.html">
+<script src="dude-graph-toolbar.js"></script>
+<!--
+`dude-graph-select-resource` is a panel to select resource.
+
+@group dude-graph
+@element dude-graph-edit-block-group
+@demo demo/index.html
+-->
+<dom-module id="dude-graph-select-resource">
+    <template>
+        <dude-resource-manager
+            resources="[[ data.graph.graphData.resources ]]"
+            resource="{{ data.graph.graphData.resourceProperty.propertyValue }}">
+        </dude-resource-manager>
+    </template>
+    <script>
+        /**
+         * @extends {DudeInspectorItemElement}
+         */
+        Polymer({
+            is: "dude-graph-select-resource",
+            properties: {
+                "inspector": {
+                    "type": "DudeInspectorElement",
+                    "readonly": true
+                },
+                "data": {
+                    "type": "DudeGraphElement",
+                    "readonly": true
+                },
+                "panelTitle": {
+                    "type": String,
+                    "value": "Select resource",
+                    "readonly": true
+                }
+            },
+            listeners: {
+                "dude-resource-manager-submit": "_resourceSubmitted"
+            },
+
+            /**
+             * Called when the panel is attached to the DOM
+             * Notifies the dude-stack
+             */
+            attached: function () {
+                this.fire("dude-inspector-attached");
+            },
+
+            /**
+             * Called when the panel is opened
+             */
+            opened: function () {},
+
+            /**
+             * Called when the panel is the top of the stack
+             */
+            resumed: function () {},
+
+            /**
+             * Called when the panel is not anymore the top of the stack
+             */
+            paused: function () {},
+
+            /**
+             * Called when the panel is closed
+             */
+            closed: function () {},
+
+            /**
+             * Called when a resource is selected
+             * @param {CustomEvent }e
+             * @private
+             */
+            _resourceSubmitted: function (e) {
+                this.get("inspector").popStack();
+            }
+        });
+    </script>
+</dom-module>

@@ -22,6 +22,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="panels/dude-graph-edit-block.html">
 <link rel="import" href="panels/dude-graph-edit-group.html">
 <link rel="import" href="panels/dude-graph-edit-variable.html">
+<link rel="import" href="panels/dude-graph-select-resource.html">
 <!--
 `dude-graph` is a Polymer element which creates a dude-graph SVG renderer.
 -->
@@ -312,6 +313,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             saveGraphData: function () {
                 return this.get("saver").save(this.get("graph"));
             },
+
             /**
              * Saves the renderer data
              * @returns {Object}

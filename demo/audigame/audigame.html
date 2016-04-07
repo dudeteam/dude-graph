@@ -112,6 +112,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             attached: function () {
               this.$.dudeGraphElement.initialize();
+              this.$.dudeGraphElement.set("graph.graphData.resources", [
+                  {"item": {"name": "test.png", "data": {"file_name": "http://lorempixel.com/512/512/", "size": 1234567890}}},
+                  {"item": {"name": "cover.png", "data": {"file_name": "http://lorempixel.com/320/220/", "size": 12345}}},
+                  {"item": {"name": "skull.png", "data": {"file_name": "http://lorempixel.com/320/210/", "size": 34}}}
+              ]);
             },
 
             /**

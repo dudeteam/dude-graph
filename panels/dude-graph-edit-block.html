@@ -66,6 +66,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "readonly": true
                 }
             },
+            listeners: {
+                "dude-property-resource-open": "_openResourceManager"
+            },
 
             /**
              * Called when the panel is attached to the DOM
@@ -97,7 +100,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             /**
              * Called when the panel is closed
              */
-            closed: function () {}
+            closed: function () {},
+
+            /**
+             * OPens the resource manager
+             * @private
+             */
+            _openResourceManager: function (e) {
+                var dudeResourceProperty = e.target;
+                this.set("data.graph.graphData.resourceProperty", dudeResourceProperty.get("property"));
+                this.get("inspector").pushStack("dude-graph-select-resource");
+            }
         });
     </script>
 </dom-module>
