@@ -59,7 +59,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-compress",
             description: "Zoom to fit",
-            shortcut: ["ctrl+shift+0", "meta+shift+0"],
+            shortcut: ["ctrl+shift+0", "meta+shift+0"], // TODO: Windows
             action: function () {
                 panel.get("data.renderer").zoomToFit();
             }.bind(this)
@@ -73,7 +73,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-compress",
             description: "Zoom to selection",
-            shortcut: ["ctrl+shift+0", "meta+shift+0"],
+            shortcut: ["ctrl+shift+0", "meta+shift+0"], // TODO: Windows
             action: function () {
                 panel.get("data.renderer").zoomToFitSelection();
             }.bind(this)
@@ -87,7 +87,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-trash",
             description: "Remove selection",
-            shortcut: ["ctrl+delete", "meta+backspace"],
+            shortcut: ["shift+backspace", "meta+backspace"],
             action: function () {
                 panel.get("data.renderer").removeSelection();
             }.bind(this)

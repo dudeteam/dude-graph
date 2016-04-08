@@ -64,6 +64,6 @@ gulp.task("watch", ["build"], function () {
     gulp.watch(SOURCES, ["jshint", "build"]);
 });
 
-gulp.task("serve", ["watch"], shell.task("polyserve"));
+gulp.task("serve", ["watch"], shell.task("polyserve -H 0.0.0.0"));
 
 gulp.task("default", ["serve"]);
