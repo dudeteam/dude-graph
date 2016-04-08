@@ -279,21 +279,14 @@ const DUDE_GRAPH_MODELS = [
                             ]
                         }
                     }
-                }
-            ]
-        }
-    },
-    {
-        "group": {
-            "name": "Functions",
-            "items": [
+                },
                 {
                     "item": {
-                        "name": "assign",
+                        "name": "Assign",
                         "icon": "fa fa-long-arrow-left",
                         "data": {
                             "blockType": "InstructionBlock",
-                            "blockName": "assign",
+                            "blockName": "Assign",
                             "blockTemplates": {
                                 "AssignTemplate": {
                                     "valueType": "Number",
@@ -331,6 +324,43 @@ const DUDE_GRAPH_MODELS = [
                         }
                     }
                 },
+                {
+                    "item": {
+                        "name": "Print",
+                        "icon": "fa fa-bug",
+                        "data": {
+                            "blockType": "InstructionBlock",
+                            "blockName": "Print",
+                            "blockInputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "in",
+                                    "pointValueType": "Stream",
+                                    "pointSingleConnection": false
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "message",
+                                    "pointValueType": "String"
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "StreamPoint",
+                                    "pointName": "out",
+                                    "pointValueType": "Stream"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "group": {
+            "name": "Functions",
+            "items": [
                 {
                     "item": {
                         "name": "format",
@@ -405,36 +435,6 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "Point",
                                     "pointName": "value",
                                     "pointValueType": "Number"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "item": {
-                        "name": "print",
-                        "icon": "fa fa-bug",
-                        "data": {
-                            "blockType": "InstructionBlock",
-                            "blockName": "print",
-                            "blockInputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "in",
-                                    "pointValueType": "Stream",
-                                    "pointSingleConnection": false
-                                },
-                                {
-                                    "pointType": "Point",
-                                    "pointName": "message",
-                                    "pointValueType": "String"
-                                }
-                            ],
-                            "blockOutputs": [
-                                {
-                                    "pointType": "StreamPoint",
-                                    "pointName": "out",
-                                    "pointValueType": "Stream"
                                 }
                             ]
                         }
