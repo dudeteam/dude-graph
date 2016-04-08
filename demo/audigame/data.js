@@ -444,6 +444,16 @@ const DUDE_GRAPH_MODELS = [
         }
     }
 ];
+const DUDE_GRAPH_GRAPH_TYPES = [
+    {
+        "type": "Success",
+        "typeInfo": {
+            "convert": function (value) {
+                return value;
+            }
+        }
+    }
+];
 const DUDE_GRAPH_DEFAULT_GRAPH_DATA = {};
 const DUDE_GRAPH_DEFAULT_RENDERER_DATA = {};
 const DUDE_GRAPH_BLOCK_TYPES = dudeGraph.defaultBlocks;
@@ -472,6 +482,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         Start.prototype.validatePoints = function () {
+            this.upgradePoints();
             if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
                 throw new Error("Start `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
             }
@@ -491,6 +502,11 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                 throw new Error("Start `" + this.blockFancyName + "` must have an output `second` of type `Stream`");
             }
         };
+
+        /**
+         * Upgrade missing points in older versions
+         */
+        Start.prototype.upgradePoints = function () {};
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "Start", "type": Start});
     })();
@@ -515,6 +531,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         Step.prototype.validatePoints = function () {
+            this.upgradePoints();
             if (!(this.inputByName("in") instanceof dudeGraph.StreamPoint)) {
                 throw new Error("Step `" + this.blockFancyName + "` must have an input `in` of type `Stream`");
             }
@@ -538,6 +555,18 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             }
             if (!(this.outputByName("second") instanceof dudeGraph.StreamPoint)) {
                 throw new Error("Step `" + this.blockFancyName + "` must have an output `second` of type `Stream`");
+            }
+        };
+
+        /**
+         * Upgrade missing points in older versions
+         */
+        Step.prototype.upgradePoints = function () {
+            if (!(this.inputByName("success") instanceof dudeGraph.Point)) {
+                this.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "success",
+                    "pointValueType": "Success"
+                }));
             }
         };
 
@@ -565,6 +594,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         End.prototype.validatePoints = function () {
+            this.upgradePoints();
             if (!(this.inputByName("in") instanceof dudeGraph.StreamPoint)) {
                 throw new Error("End `" + this.blockFancyName + "` must have an input `in` of type `Stream`");
             }
@@ -579,6 +609,18 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             }
             if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
                 throw new Error("End `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
+            }
+        };
+
+        /**
+         * Upgrade missing points in older versions
+         */
+        End.prototype.upgradePoints = function () {
+            if (!(this.inputByName("success") instanceof dudeGraph.Point)) {
+                this.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "success",
+                    "pointValueType": "Success"
+                }));
             }
         };
 

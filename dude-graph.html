@@ -191,14 +191,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "value": []
                 },
                 /**
-                 * The block types handled by the graph loader
+                 * The graph types handled by the graph
+                 */
+                "graphTypes": {
+                    "type": Array,
+                    "value": []
+                },
+                /**
+                 * The block types handled by the graph
                  */
                 "blockTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultBlocks
                 },
                 /**
-                 * The point types handled by the graph loader
+                 * The point types handled by the graph
                  */
                 "pointTypes": {
                     "type": Array,
@@ -246,6 +253,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("loader", new dudeGraph.GraphLoader());
                 this.set("saver", new dudeGraph.GraphSaver());
                 this.get("renderer").initialize(this.get("graph"), this.$.svg);
+                _.forEach(this.get("graphTypes"), function (graphType) {
+                    this.get("graph").addType(graphType.type, graphType.typeInfo);
+                }.bind(this));
                 _.forEach(this.get("blockTypes"), function (blockType) {
                     this.get("graph").registerCustomBlock(blockType.block, blockType.type);
                 }.bind(this));
