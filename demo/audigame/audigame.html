@@ -35,7 +35,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     </style>
     <template>
         <div class="container">
-            <paper-toast id="success"></paper-toast>
             <paper-toast id="error">
                 <template is="dom-if" if="[[ jumpToBlockId ]]">
                    <div id="jumpToBlockId">
@@ -43,6 +42,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                    </div>
                 </template>
             </paper-toast>
+            <paper-toast id="success"></paper-toast>
             <iron-localstorage
                     name="dude-graph-data"
                     value="{{ graphData }}">
@@ -112,13 +112,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "renderBlockTypes": {
                     "type": Array,
                     "value": DUDE_GRAPH_RENDER_BLOCK_TYPES
+                },
+
+                /**
+                 * The blockId to jump to if there is an error
+                 */
+                "jumpToBlockId": {
+                    "type": String
                 }
             },
             listeners: {
-                "dude-graph-error": "_graphError",
-                "dude-graph-success": "_graphSuccess",
                 "dude-graph-save": "_graphSave",
-                "dude-graph-build": "_graphBuild"
+                "dude-graph-build": "_graphBuild",
+                "dude-graph-error": "_graphError",
+                "dude-graph-success": "_graphSuccess"
             },
 
             /**
@@ -131,28 +138,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                   {"item": {"name": "cover.png", "data": {"file_name": "http://lorempixel.com/320/220/", "size": 12345}}},
                   {"item": {"name": "skull.png", "data": {"file_name": "http://lorempixel.com/320/210/", "size": 34}}}
               ]);
-            },
-
-            /**
-             * Shows graph error
-             * @param {CustomEvent} e
-             * @param {Object} e.detail
-             * @param {Error} e.detail.error
-             * @param {String} e.detail.error.message
-             * @private
-             */
-            _graphError: function (e) {
-                this._error(e.detail.error.message);
-            },
-
-            /**
-             * Shows graph success
-             * @param {CustomEvent} e
-             * @param {String} e.detail
-             * @private
-             */
-            _graphSuccess: function (e) {
-                this._success(e.detail);
             },
 
             /**
@@ -184,6 +169,28 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Shows graph error
+             * @param {CustomEvent} e
+             * @param {Object} e.detail
+             * @param {Error} e.detail.error
+             * @param {String} e.detail.error.message
+             * @private
+             */
+            _graphError: function (e) {
+                this._error(e.detail.error.message);
+            },
+
+            /**
+             * Shows graph success
+             * @param {CustomEvent} e
+             * @param {String} e.detail
+             * @private
+             */
+            _graphSuccess: function (e) {
+                this._success(e.detail);
+            },
+
+            /**
              * Handles the error and shows an error toast
              * @param {String} message
              * @private
@@ -207,7 +214,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _success: function (message) {
-                this.$.success.open();
+                this.$.success.close();
                 this.$.success.text = message;
                 this.$.success.open();
             },
