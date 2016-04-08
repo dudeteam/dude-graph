@@ -446,11 +446,9 @@ const DUDE_GRAPH_MODELS = [
 ];
 const DUDE_GRAPH_GRAPH_TYPES = [
     {
-        "type": "Success",
-        "typeInfo": {
-            "convert": function (value) {
-                return value;
-            }
+        "typeName": "Success",
+        "typeConvert": function (value) {
+            return value;
         }
     }
 ];

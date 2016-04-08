@@ -30,11 +30,11 @@
             var graph = new dudeGraph.Graph();
             expect(graph.graphBlocks).to.have.length(0);
             expect(graph.graphConnections).to.have.length(0);
-            expect(graph.hasType("Number")).to.be.true;
-            expect(graph.hasType("String")).to.be.true;
-            expect(graph.hasType("Boolean")).to.be.true;
-            expect(graph.hasType("Object")).to.be.true;
-            expect(graph.hasType("Array")).to.be.true;
+            expect(graph.hasGraphType("Number")).to.be.true;
+            expect(graph.hasGraphType("String")).to.be.true;
+            expect(graph.hasGraphType("Boolean")).to.be.true;
+            expect(graph.hasGraphType("Object")).to.be.true;
+            expect(graph.hasGraphType("Array")).to.be.true;
         });
         test("create block", function () {
             var block = new dudeGraph.Block({
@@ -302,8 +302,9 @@
                     "pointValueType": "UnknownValueType" // Unknown type
                 }));
             }).to.throw();
-            graph.addType("NewType", {
-                "convert": function (value) {
+            graph.addGraphType({
+                "typeName": "NewType",
+                "typeConvert": function (value) {
                     if (value === "NewValue") {
                         return "ThisIsACorrectNewValue";
                     }
@@ -311,7 +312,10 @@
                 }
             });
             expect(function () {
-                graph.addType("NewType", _.noop); // Cannot add twice the same type name
+                graph.addGraphType({
+                    "typeName": "NewType", // Cannot add twice the same type name
+                    "typeConvert": _.noop
+                });
             }).to.throw();
             inputPoint.pointValue = null;
             inputPoint.pointValueType = "NewType";
