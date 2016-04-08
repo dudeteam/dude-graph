@@ -254,7 +254,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("saver", new dudeGraph.GraphSaver());
                 this.get("renderer").initialize(this.get("graph"), this.$.svg);
                 _.forEach(this.get("graphTypes"), function (graphType) {
-                    this.get("graph").addGraphType(graphType);
+                    this.get("graph").addGraphValueType(graphType);
                 }.bind(this));
                 _.forEach(this.get("blockTypes"), function (blockType) {
                     this.get("graph").registerCustomBlock(blockType.block, blockType.type);

@@ -30,11 +30,11 @@
             var graph = new dudeGraph.Graph();
             expect(graph.graphBlocks).to.have.length(0);
             expect(graph.graphConnections).to.have.length(0);
-            expect(graph.graphTypeByName("Number")).to.be.not.null;
-            expect(graph.graphTypeByName("String")).to.be.not.null;
-            expect(graph.graphTypeByName("Boolean")).to.be.not.null;
-            expect(graph.graphTypeByName("Object")).to.be.not.null;
-            expect(graph.graphTypeByName("Array")).to.be.not.null;
+            expect(graph.graphValueTypeByName("Number")).to.be.not.null;
+            expect(graph.graphValueTypeByName("String")).to.be.not.null;
+            expect(graph.graphValueTypeByName("Boolean")).to.be.not.null;
+            expect(graph.graphValueTypeByName("Object")).to.be.not.null;
+            expect(graph.graphValueTypeByName("Array")).to.be.not.null;
         });
         test("create block", function () {
             var block = new dudeGraph.Block({
@@ -302,7 +302,7 @@
                     "pointValueType": "UnknownValueType" // Unknown type
                 }));
             }).to.throw();
-            graph.addGraphType({
+            graph.addGraphValueType({
                 "typeName": "NewType",
                 "typeConvert": function (value) {
                     if (value === "NewValue") {
@@ -312,7 +312,7 @@
                 }
             });
             expect(function () {
-                graph.addGraphType({
+                graph.addGraphValueType({
                     "typeName": "NewType", // Cannot add twice the same type name
                     "typeConvert": _.noop
                 });
