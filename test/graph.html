@@ -30,11 +30,11 @@
             var graph = new dudeGraph.Graph();
             expect(graph.graphBlocks).to.have.length(0);
             expect(graph.graphConnections).to.have.length(0);
-            expect(graph.hasGraphType("Number")).to.be.true;
-            expect(graph.hasGraphType("String")).to.be.true;
-            expect(graph.hasGraphType("Boolean")).to.be.true;
-            expect(graph.hasGraphType("Object")).to.be.true;
-            expect(graph.hasGraphType("Array")).to.be.true;
+            expect(graph.graphTypeByName("Number")).to.be.not.null;
+            expect(graph.graphTypeByName("String")).to.be.not.null;
+            expect(graph.graphTypeByName("Boolean")).to.be.not.null;
+            expect(graph.graphTypeByName("Object")).to.be.not.null;
+            expect(graph.graphTypeByName("Array")).to.be.not.null;
         });
         test("create block", function () {
             var block = new dudeGraph.Block({
