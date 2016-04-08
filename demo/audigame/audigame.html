@@ -24,11 +24,25 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         #error {
             --paper-toast-background-color: var(--paper-red-500);
         }
+
+        #jumpToBlockId {
+            margin-top: 10px;
+        }
+
+        #jumpToBlockId a {
+            color: var(--paper-yellow-500);
+        }
     </style>
     <template>
         <div class="container">
             <paper-toast id="success"></paper-toast>
-            <paper-toast id="error"></paper-toast>
+            <paper-toast id="error">
+                <template is="dom-if" if="[[ jumpToBlockId ]]">
+                   <div id="jumpToBlockId">
+                       <a href="#" on-click="_jumpToBlockId">Jump to block</a>
+                   </div>
+                </template>
+            </paper-toast>
             <iron-localstorage
                     name="dude-graph-data"
                     value="{{ graphData }}">
@@ -175,6 +189,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _error: function (message) {
+                var blockRegex = /Block \(`([\w-]+)`\)/;
+                var blockIdFound = blockRegex.exec(message);
+                if (blockIdFound !== null && typeof blockIdFound[1] !== "undefined") {
+                    this.set("jumpToBlockId", blockIdFound[1]);
+                } else {
+                    this.set("jumpToBlockId", null);
+                }
                 this.$.error.close();
                 this.$.error.text = message;
                 this.$.error.open();
@@ -189,6 +210,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.$.success.open();
                 this.$.success.text = message;
                 this.$.success.open();
+            },
+
+            /**
+             * Zooms to the "jumpToBlockId" blockId
+             * @private
+             */
+            _jumpToBlockId: function () {
+                var blockId = this.get("jumpToBlockId");
+                var graph = this.$.dudeGraphElement.get("graph");
+                var renderer = this.$.dudeGraphElement.get("renderer");
+                var block = graph.blockById(blockId);
+                if (block !== null) {
+                    var renderBlocks = renderer.renderBlocksByBlock(block);
+                    renderer.zoomToFitRenderNodes(renderBlocks);
+                }
             }
         });
     </script>
