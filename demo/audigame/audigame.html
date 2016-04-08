@@ -54,12 +54,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <dude-graph id="dudeGraphElement"
                         class="container"
                         models="[[ models ]]"
-                        graph-types="[[ graphTypes ]]"
+                        graph-data="[[ graphData ]]"
+                        renderer-data="[[ rendererData ]]"
                         block-types="[[ blockTypes ]]"
                         point-types="[[ pointTypes ]]"
-                        render-block-types="[[ renderBlockTypes ]]"
-                        graph-data="[[ graphData ]]"
-                        renderer-data="[[ rendererData ]]">
+                        graph-value-types="[[ graphValueTypes ]]"
+                        render-block-types="[[ renderBlockTypes ]]">
             </dude-graph>
         </div>
     </template>
@@ -92,14 +92,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
 
                 /**
-                 * The graph types
-                 */
-                "graphTypes": {
-                    "type": Array,
-                    "value": DUDE_GRAPH_GRAPH_TYPES
-                },
-
-                /**
                  * The custom block types
                  */
                 "blockTypes": {
@@ -113,6 +105,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "pointTypes": {
                     "type": Array,
                     "value": DUDE_GRAPH_POINT_TYPES
+                },
+
+                /**
+                 * The graph value types
+                 */
+                "graphValueTypes": {
+                    "type": Array,
+                    "value": DUDE_GRAPH_GRAPH_VALUE_TYPES
                 },
 
                 /**

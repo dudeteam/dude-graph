@@ -191,13 +191,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "value": []
                 },
                 /**
-                 * The graph types handled by the graph
-                 */
-                "graphTypes": {
-                    "type": Array,
-                    "value": []
-                },
-                /**
                  * The block types handled by the graph
                  */
                 "blockTypes": {
@@ -210,6 +203,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "pointTypes": {
                     "type": Array,
                     "value": dudeGraph.defaultPoints
+                },
+                /**
+                 * The graph value types handled by the graph
+                 */
+                "graphValueTypes": {
+                    "type": Array,
+                    "value": []
                 },
                 /**
                  * Assign custom renderBlocks to blocks
@@ -253,8 +253,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("loader", new dudeGraph.GraphLoader());
                 this.set("saver", new dudeGraph.GraphSaver());
                 this.get("renderer").initialize(this.get("graph"), this.$.svg);
-                _.forEach(this.get("graphTypes"), function (graphType) {
-                    this.get("graph").addGraphValueType(graphType);
+                _.forEach(this.get("graphValueTypes"), function (graphValueType) {
+                    this.get("graph").addGraphValueType(graphValueType);
                 }.bind(this));
                 _.forEach(this.get("blockTypes"), function (blockType) {
                     this.get("graph").registerCustomBlock(blockType.block, blockType.type);
