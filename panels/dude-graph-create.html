@@ -129,10 +129,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 if (typeof variableModel.data.blockName !== "undefined") {
                     if (confirm("Are you sure you want to delete " + variableModel.data.blockName + "?")) {
                         var variable = this.get("data.graph").variableByName(variableModel.data.blockName);
-                        this.get("data.graph").removeVariable();
+                        this.get("data.graph").removeVariable(variable);
                     }
                 }
-                */
+                 **/
             },
 
             /**
