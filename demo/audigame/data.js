@@ -743,7 +743,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          */
         AudigameBlock.prototype.createSuccessStar = function () {
             this._d3SuccessStar = this._d3Node.append("svg:polygon")
-                .attr("fill", this._renderer.config.typeColors.Object);
+                .attr("fill", this._renderer.config.typeColors.Success);
             this._d3SuccessStar.attr("points", function () {
                 var starPoints = [];
                 var pins = 5;
@@ -781,3 +781,5 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
         DUDE_GRAPH_RENDER_BLOCK_TYPES.push({"renderBlock": "End", "type": AudigameBlock});
     })();
 })();
+
+dudeGraph.Renderer.defaultConfig.typeColors["Success"] = "#f1c40f";
