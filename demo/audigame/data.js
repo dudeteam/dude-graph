@@ -23,7 +23,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Sound"
+                            "resourceValueType": "Sound"
                         }
                     },
                     {
@@ -90,7 +90,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Sound"
+                            "resourceValueType": "Sound"
                         }
                     },
                     {
@@ -98,7 +98,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Image"
+                            "resourceValueType": "Image"
                         }
                     }
                 ],
@@ -151,7 +151,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "sound",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Sound"
+                            "resourceValueType": "Sound"
                         }
                     },
                     {
@@ -159,7 +159,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Image"
+                            "resourceValueType": "Image"
                         }
                     }
                 ]
@@ -500,6 +500,24 @@ const DUDE_GRAPH_POINT_TYPES = dudeGraph.defaultPoints;
 const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
 
 (function Blocks() {
+
+    /**
+     * Upgrades cover.pointValue.resourceType => cover.pointValue.resourceValueType
+     * Upgrades sound.pointValue.resourceType => sound.pointValue.resourceValueType
+     */
+    const upgradeResources = function () {
+        var cover = this.inputByName("cover");
+        var sound = this.inputByName("sound");
+        if (typeof cover.pointValue.resourceType !== "undefined") {
+            cover.pointValue.resourceValueType = cover.pointValue.resourceType;
+            delete cover.pointValue.resourceType;
+        }
+        if (typeof sound.pointValue.resourceType !== "undefined") {
+            cover.pointValue.resourceValueType = sound.pointValue.resourceType;
+            delete sound.pointValue.resourceType;
+        }
+    };
+
     (function Start() {
         /**
          * Represents the start of a story
@@ -545,10 +563,13 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
         /**
          * Upgrade missing points in older versions
          */
-        Start.prototype.upgradePoints = function () {};
+        Start.prototype.upgradePoints = function () {
+            upgradeResources.call(this);
+        };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "Start", "type": Start});
     })();
+
     (function Step() {
         /**
          * Represents a step in a story with two choices
@@ -607,11 +628,13 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                     "pointValueType": "Success"
                 }));
             }
+            upgradeResources.call(this);
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "Step", "type": Step});
 
     })();
+
     (function End() {
         /**
          * Represents a terminal node of a story
@@ -661,13 +684,16 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                     "pointValueType": "Success"
                 }));
             }
+            upgradeResources.call(this);
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "End", "type": End});
 
     })();
 })();
+
 (function RenderBlocks() {
+
     (function AudigameBlock() {
         /**
          * Renders blocks with custom colors
@@ -782,4 +808,5 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
     })();
 })();
 
+// TODO: renderer API
 dudeGraph.Renderer.defaultConfig.typeColors["Success"] = "#f1c40f";

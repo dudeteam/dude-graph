@@ -17,8 +17,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <dude-resource-manager
             resources="[[ data.graph.graphData.resources ]]"
-            resource="{{ data.graph.graphData.resourceProperty.propertyValue }}">
+            suf="[[ data.graph.graphData.resourceProperty.propertyValue.resourceValueType ]]">
         </dude-resource-manager>
+        <!-- resource="data.graph.graphData.resourceProperty.propertyValue.resourceValue"> -->
     </template>
     <script>
         /**
@@ -79,6 +80,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _resourceSubmitted: function (e) {
+                this.set("data.graph.graphData.resourceProperty.propertyValue", {
+                    "resourceValueType": this.get("data.graph.graphData.resourceProperty.resourceValueType"),
+                    "resourceValue": e.detail
+                });
                 this.get("inspector").popStack();
             }
         });
