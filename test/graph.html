@@ -1210,6 +1210,43 @@
                 sinon.assert.calledWith(graphSpy, point, 42, null);
                 sinon.assert.calledWith(pointSpy, 42, null);
             });
+            test("point-connect", function () {
+                var graphSpy = sinon.spy();
+                var pointSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block1 = new dudeGraph.Block();
+                var block2 = new dudeGraph.Block();
+                var point1 = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                var point2 = new dudeGraph.Point(false, {"pointName": "in", "pointValueType": "Number"});
+                graph.addBlock(block1);
+                graph.addBlock(block2);
+                block1.addPoint(point1);
+                block2.addPoint(point2);
+                graph.on("point-connect", graphSpy);
+                point1.on("connect", pointSpy);
+                var connection = point1.connect(point2);
+                sinon.assert.calledWith(graphSpy, point1, connection);
+                sinon.assert.calledWith(pointSpy, connection);
+            });
+            test("point-disconnect", function () {
+                var graphSpy = sinon.spy();
+                var pointSpy = sinon.spy();
+                var graph = new dudeGraph.Graph();
+                var block1 = new dudeGraph.Block();
+                var block2 = new dudeGraph.Block();
+                var point1 = new dudeGraph.Point(true, {"pointName": "out", "pointValueType": "Number"});
+                var point2 = new dudeGraph.Point(false, {"pointName": "in", "pointValueType": "Number"});
+                graph.addBlock(block1);
+                graph.addBlock(block2);
+                block1.addPoint(point1);
+                block2.addPoint(point2);
+                graph.on("point-disconnect", graphSpy);
+                point1.on("disconnect", pointSpy);
+                var connection = point1.connect(point2);
+                point1.disconnect(point2);
+                sinon.assert.calledWith(graphSpy, point1, connection);
+                sinon.assert.calledWith(pointSpy, connection);
+            });
             test("block-template-update", function () {
                 var graphSpy = sinon.spy();
                 var blockSpy = sinon.spy();
