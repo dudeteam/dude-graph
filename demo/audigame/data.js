@@ -442,6 +442,47 @@ const DUDE_GRAPH_MODELS = [
                 }
             ]
         }
+    },
+    {
+        "group": {
+            "name": "Trophy",
+            "items": [
+                {
+                    "item": {
+                        "name": "trophy",
+                        "icon": "fa fa-trophy",
+                        "data": {
+                            "blockType": "Block",
+                            "blockName": "trophy",
+                            "blockInputs": [
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "type",
+                                    "pointValueType": "String"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "name",
+                                    "pointValueType": "String"
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "icon",
+                                    "pointValueType": "String"
+                                }
+                            ],
+                            "blockOutputs": [
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "success",
+                                    "pointValueType": "Success"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
     }
 ];
 const DUDE_GRAPH_GRAPH_VALUE_TYPES = [
@@ -634,6 +675,13 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @extends {dudeGraph.RenderBlock}
          */
         var AudigameBlock = function () {
+            /**
+             * The success star
+             * @type {d3.selection}
+             * @private
+             */
+            this._d3SuccessStar = null;
+
             dudeGraph.RenderBlock.apply(this, arguments);
         };
 
@@ -642,10 +690,19 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             "className": "AudigameBlock"
         });
 
-        AudigameBlock.buildRenderBlock = function () {
-            return dudeGraph.RenderBlock.buildRenderBlock.apply(this, arguments);
+        /**
+         * Creates the d3Block for this renderBlock
+         * @override
+         */
+        AudigameBlock.prototype.create = function () {
+            dudeGraph.RenderBlock.prototype.create.apply(this, arguments);
+            this.onSuccessStar();
         };
 
+        /**
+         * Updates the d3Block for this renderBlock
+         * @override
+         */
         AudigameBlock.prototype.update = function () {
             dudeGraph.RenderBlock.prototype.update.apply(this, arguments);
             switch (this._block.className) {
@@ -656,6 +713,67 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                     this._d3Rect.attr("style", "fill: #600000;");
                     break;
             }
+        };
+
+        /**
+         * Creates the success star if the success point is connected
+         */
+        AudigameBlock.prototype.onSuccessStar = function () {
+            var success = this._block.inputByName("success");
+            if (success !== null) {
+                if (!success.emptyConnection() && this._d3SuccessStar === null) {
+                    this.createSuccessStar();
+                }
+                success.on("connect", function () {
+                    if (this._d3SuccessStar === null) {
+                        this.createSuccessStar();
+                    }
+                }.bind(this));
+                success.on("disconnect", function () {
+                    if (this._d3SuccessStar !== null) {
+                        this._d3SuccessStar.remove();
+                        this._d3SuccessStar = null;
+                    }
+                }.bind(this));
+            }
+        };
+
+        /**
+         * Creates the success star
+         */
+        AudigameBlock.prototype.createSuccessStar = function () {
+            this._d3SuccessStar = this._d3Node.append("svg:polygon")
+                .attr("fill", this._renderer.config.typeColors.Object);
+            this._d3SuccessStar.attr("points", function () {
+                var starPoints = [];
+                var pins = 5;
+                var angle = Math.PI / pins;
+                for (var i = 0; i < pins * 2; i++) {
+                    var radius = (i % 2) === 0 ? 5 : 10;
+                    var x = 5 + Math.cos(i * angle) * radius;
+                    var y = 5 + Math.sin(i * angle) * radius;
+                    starPoints.push([x, y]);
+                }
+                return starPoints;
+            });
+        };
+
+        /**
+         * Removes the success star
+         */
+        AudigameBlock.prototype.removeSuccessStar = function () {
+            if (this._d3SuccessStar !== null) {
+                this._d3SuccessStar.remove();
+                this._d3SuccessStar = null;
+            }
+        };
+
+        /**
+         * RenderBlock factory
+         * @override
+         */
+        AudigameBlock.buildRenderBlock = function () {
+            return dudeGraph.RenderBlock.buildRenderBlock.apply(this, arguments);
         };
 
         DUDE_GRAPH_RENDER_BLOCK_TYPES.push({"renderBlock": "Start", "type": AudigameBlock});
