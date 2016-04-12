@@ -508,11 +508,11 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
     const upgradeResources = function () {
         var cover = this.inputByName("cover");
         var sound = this.inputByName("sound");
-        if (cover.pointValue !== null && typeof cover.pointValue.resourceType !== "undefined") {
+        if (cover.pointValue !== null) {
             cover.pointValue.resourceValueType = "Image";
             delete cover.pointValue.resourceType;
         }
-        if (sound.pointValue !== null && typeof sound.pointValue.resourceType !== "undefined") {
+        if (sound.pointValue !== null) {
             sound.pointValue.resourceValueType = "Sound";
             delete sound.pointValue.resourceType;
         }
