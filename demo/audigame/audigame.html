@@ -28,17 +28,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         #jumpToBlockId {
             margin-top: 10px;
         }
-
-        #jumpToBlockId a {
-            color: var(--paper-yellow-500);
-        }
     </style>
     <template>
         <div class="container">
             <paper-toast id="error">
                 <template is="dom-if" if="[[ jumpToBlockId ]]">
                    <div id="jumpToBlockId">
-                       <a href="#" on-click="_jumpToBlockId">Jump to block</a>
+                       <button on-click="_jumpToBlockId">Jump to block</button>
                    </div>
                 </template>
             </paper-toast>
