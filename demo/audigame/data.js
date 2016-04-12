@@ -508,12 +508,12 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
     const upgradeResources = function () {
         var cover = this.inputByName("cover");
         var sound = this.inputByName("sound");
-        if (typeof cover.pointValue.resourceType !== "undefined") {
-            cover.pointValue.resourceValueType = cover.pointValue.resourceType;
+        if (cover.pointValue !== null && typeof cover.pointValue.resourceType !== "undefined") {
+            cover.pointValue.resourceValueType = "Image";
             delete cover.pointValue.resourceType;
         }
-        if (typeof sound.pointValue.resourceType !== "undefined") {
-            cover.pointValue.resourceValueType = sound.pointValue.resourceType;
+        if (sound.pointValue !== null && typeof sound.pointValue.resourceType !== "undefined") {
+            sound.pointValue.resourceValueType = "Sound";
             delete sound.pointValue.resourceType;
         }
     };
