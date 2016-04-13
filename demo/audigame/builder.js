@@ -133,7 +133,7 @@ CelestoryBuilder.prototype.buildRepeat = function (repeat) {
  */
 CelestoryBuilder.prototype.buildAssign = function (assign) {
     return _.merge({
-        "type": "assign",
+        "type": "Assign",
         "variable": this._connectedStream(assign.inputByName("variable"), true),
         "value": this._connectedValue(assign.inputByName("value"), true),
         "out": this._connectedStream(assign.outputByName("out"), true)
@@ -145,7 +145,7 @@ CelestoryBuilder.prototype.buildAssign = function (assign) {
  */
 CelestoryBuilder.prototype.buildPrint = function (print) {
     return {
-        "type": "print",
+        "type": "Print",
         "message": this._connectedValue(print.inputByName("message"), true),
         "out": this._connectedStream(print.outputByName("out"), true)
     };
