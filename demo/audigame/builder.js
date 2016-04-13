@@ -29,7 +29,7 @@ CelestoryBuilder.prototype.build = function () {
     build.startId = start.blockId;
     _.forEach(this._graph.graphBlocks, function (block) {
         if (block instanceof dudeGraph.VariableBlock) {
-            build.blocks[block.blockId] = builder.buildVariable(block);
+            build.blocks[block.blockId] = builder.buildvariable(block);
         } else {
             var blockName = block.blockName;
             var blockSaver = builder["build" + blockName];
@@ -46,45 +46,49 @@ CelestoryBuilder.prototype.build = function () {
 };
 
 /**
- * @param {dudeGraph.VariableBlock} variable
- */
-CelestoryBuilder.prototype.buildVariable = function (variable) {
-    return {
-        "type": "Variable",
-        "name": variable.blockName
-    };
-};
-
-/**
  * @param {dudeGraph.Block} start
  */
 CelestoryBuilder.prototype.buildStart = function (start) {
-    var startValues = this._connectedValues(start);
-    var startStreams = this._connectedStreams(start);
-    return _.merge({
-        "type": "Start"
-    }, startValues, startStreams);
+    return {
+        "type": "Start",
+        "text": this._connectedValue(start.inputByName("text"), false),
+        "timer": this._connectedValue(start.inputByName("timer"), false),
+        "sound": this._connectedValue(start.inputByName("sound"), false),
+        "cover": this._connectedValue(start.inputByName("cover"), false),
+        "first": this._connectedStream(start.outputByName("first"), true),
+        "second": this._connectedStream(start.outputByName("second"), true),
+        "timeout": this._connectedStream(start.outputByName("timeout"), false)
+    };
 };
 
 /**
  * @param {dudeGraph.Block} step
  */
 CelestoryBuilder.prototype.buildStep = function (step) {
-    var stepValues = this._connectedValues(step);
-    var stepStreams = this._connectedStreams(step);
-    return _.merge({
-        "type": "Step"
-    }, stepValues, stepStreams);
+    return {
+        "type": "Step",
+        "choice": this._connectedValue(step.inputByName("choice"), true),
+        "text": this._connectedValue(step.inputByName("text"), false),
+        "timer": this._connectedValue(step.inputByName("timer"), false),
+        "sound": this._connectedValue(step.inputByName("sound"), false),
+        "cover": this._connectedValue(step.inputByName("cover"), false),
+        "first": this._connectedStream(step.outputByName("first"), true),
+        "second": this._connectedStream(step.outputByName("second"), true),
+        "timeout": this._connectedStream(step.outputByName("timeout"), false)
+    };
 };
 
 /**
  * @param {dudeGraph.Block} end
  */
 CelestoryBuilder.prototype.buildEnd = function (end) {
-    var endValues = this._connectedValues(end);
-    return _.merge({
-        "type": "End"
-    }, endValues);
+    return {
+        "type": "End",
+        "choice": this._connectedValue(end.inputByName("choice"), true),
+        "text": this._connectedValue(end.inputByName("text"), false),
+        "sound": this._connectedValue(end.inputByName("sound"), false),
+        "cover": this._connectedValue(end.inputByName("cover"), false)
+    };
 };
 
 /**
@@ -93,7 +97,7 @@ CelestoryBuilder.prototype.buildEnd = function (end) {
 CelestoryBuilder.prototype.buildGo = function (go) {
     return _.merge({
         "type": "Go",
-        "out": this._connectedStream(go.outputByName("out"))
+        "out": this._connectedStream(go.outputByName("out"), true)
     });
 };
 
@@ -103,9 +107,9 @@ CelestoryBuilder.prototype.buildGo = function (go) {
 CelestoryBuilder.prototype.buildCondition = function (condition) {
     return {
         "type": "Condition",
-        "test": this._connectedValue(condition.inputByName("test")),
-        "true": this._connectedStream(condition.outputByName("true")),
-        "false": this._connectedStream(condition.outputByName("false"))
+        "test": this._connectedValue(condition.inputByName("test"), true),
+        "true": this._connectedStream(condition.outputByName("true"), true),
+        "false": this._connectedStream(condition.outputByName("false"), true)
     };
 };
 
@@ -115,11 +119,11 @@ CelestoryBuilder.prototype.buildCondition = function (condition) {
 CelestoryBuilder.prototype.buildRepeat = function (repeat) {
     return {
         "type": "Repeat",
-        "from": this._connectedValue(repeat.inputByName("from")),
-        "to": this._connectedValue(repeat.inputByName("to")),
-        "step": this._connectedValue(repeat.inputByName("step")),
-        "iteration": this._connectedStream(repeat.outputByName("iteration")),
-        "end": this._connectedStream(repeat.outputByName("end")),
+        "from": this._connectedValue(repeat.inputByName("from"), true),
+        "to": this._connectedValue(repeat.inputByName("to"), true),
+        "step": this._connectedValue(repeat.inputByName("step"), true),
+        "iteration": this._connectedStream(repeat.outputByName("iteration"), true),
+        "end": this._connectedStream(repeat.outputByName("end"), true),
         "index": 0
     };
 };
@@ -130,9 +134,9 @@ CelestoryBuilder.prototype.buildRepeat = function (repeat) {
 CelestoryBuilder.prototype.buildAssign = function (assign) {
     return _.merge({
         "type": "assign",
-        "variable": this._connectedStream(assign.inputByName("variable")),
-        "value": this._connectedValue(assign.inputByName("value")),
-        "out": this._connectedStream(assign.outputByName("out"))
+        "variable": this._connectedStream(assign.inputByName("variable"), true),
+        "value": this._connectedValue(assign.inputByName("value"), true),
+        "out": this._connectedStream(assign.outputByName("out"), true)
     });
 };
 
@@ -142,8 +146,18 @@ CelestoryBuilder.prototype.buildAssign = function (assign) {
 CelestoryBuilder.prototype.buildPrint = function (print) {
     return {
         "type": "print",
-        "message": this._connectedValue(print.inputByName("message")),
-        "out": this._connectedStream(print.outputByName("out"))
+        "message": this._connectedValue(print.inputByName("message"), true),
+        "out": this._connectedStream(print.outputByName("out"), true)
+    };
+};
+
+/**
+ * @param {dudeGraph.VariableBlock} variable
+ */
+CelestoryBuilder.prototype.buildvariable = function (variable) {
+    return {
+        "type": "variable",
+        "name": variable.blockName
     };
 };
 
@@ -167,87 +181,55 @@ CelestoryBuilder.prototype.buildexpression = function (expression) {
     };
 };
 
-
 /**
  * @param {dudeGraph.FormatBlock} random_range
  */
 CelestoryBuilder.prototype.buildrandom_range = function (random_range) {
-    // TODO: random_range
+    var from = this._connectedValue(random_range.inputByName("from"), true);
+    var to = this._connectedValue(random_range.inputByName("to"), true);
+    if (from >= to) {
+        throw new Error("`" + random_range.blockFancyName + "` `from` must be lower than `to`");
+    }
     return {
-        "type": "random_range"
+        "type": "random_range",
+        "from": from,
+        "to": to
     };
-};
-
-/**
- * @param {dudeGraph.Block} block
- * @returns {Object}
- * @private
- */
-CelestoryBuilder.prototype._connectedValues = function (block) {
-    var blockData = {
-        "sound": this._connectedValue(block.inputByName("sound")),
-        "cover": this._connectedValue(block.inputByName("cover"))
-    };
-    try {
-        blockData.choice = this._connectedValue(block.inputByName("choice"));
-    } catch (e) {
-    }
-    try {
-        blockData.text = this._connectedValue(block.inputByName("text"));
-    } catch (e) {
-    }
-    try {
-        blockData.timer = this._connectedValue(block.inputByName("timer"));
-    } catch (e) {
-    }
-    return blockData;
 };
 
 /**
  * @param {dudeGraph.Point} point
+ * @param {Boolean} [required=false]
  * @returns {Number|String|Boolean|Object}
  * @private
  */
-CelestoryBuilder.prototype._connectedValue = function (point) {
-    if (point === null) {
-        throw new Error("`" + point.pointFancyName + "` must be non null");
-    }
+CelestoryBuilder.prototype._connectedValue = function (point, required) {
     if (point.pointConnections.length > 0) {
         return this._connectedStream(point);
+    }
+    if (required && point.pointValue === null) {
+        throw new Error("`" + point.pointFancyName + "` pointValue must be non null");
     }
     return point.pointValue;
 };
 
 /**
- * @param {dudeGraph.Block} block
- * @returns {Object}
- * @private
- */
-CelestoryBuilder.prototype._connectedStreams = function (block) {
-    var blockData = {
-        "first": this._connectedStream(block.outputByName("first")),
-        "second": this._connectedStream(block.outputByName("second"))
-    };
-    try {
-        blockData.timeout = this._connectedStream(block.outputByName("timeout"));
-    } catch (e) {
-    }
-    return blockData;
-};
-
-/**
  * @param {dudeGraph.Point} point
+ * @param {Boolean} [required=false]
  * @returns {Object<String, String>}
  * @private
  */
-CelestoryBuilder.prototype._connectedStream = function (point) {
+CelestoryBuilder.prototype._connectedStream = function (point, required) {
     var connection = point.pointConnections[0];
     if (typeof connection !== "undefined") {
         return {
             "blockId": point.pointOutput ? connection.connectionInputPoint.pointBlock.blockId : connection.connectionOutputPoint.pointBlock.blockId
         };
     }
-    throw new Error("`" + point.pointFancyName + "` must be connected");
+    if (required) {
+        throw new Error("`" + point.pointFancyName + "` must be connected");
+    }
+    return null;
 };
 
 /**

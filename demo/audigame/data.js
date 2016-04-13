@@ -422,12 +422,20 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "from",
-                                    "pointValueType": "Number"
+                                    "pointValueType": "Number",
+                                    "pointValue": 0
                                 },
                                 {
                                     "pointType": "Point",
                                     "pointName": "to",
-                                    "pointValueType": "Number"
+                                    "pointValueType": "Number",
+                                    "pointValue": 100
+                                },
+                                {
+                                    "pointType": "Point",
+                                    "pointName": "round",
+                                    "pointValueType": "Boolean",
+                                    "pointValue": true
                                 }
                             ],
                             "blockOutputs": [
