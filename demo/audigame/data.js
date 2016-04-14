@@ -510,19 +510,27 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
 (function Blocks() {
 
     /**
-     * Upgrades cover.pointValue.resourceType => cover.pointValue.resourceValueType
-     * Upgrades sound.pointValue.resourceType => sound.pointValue.resourceValueType
+     * Upgrades cover.pointValue
+     * Upgrades sound.pointValue
      */
     const upgradeResources = function () {
-        var cover = this.inputByName("cover");
         var sound = this.inputByName("sound");
-        if (cover.pointValue !== null) {
-            cover.pointValue.resourceValueType = "Image";
-            delete cover.pointValue.resourceType;
-        }
+        var cover = this.inputByName("cover");
+        sound.pointPropertyData = {"resourceValueType": "Sound"};
+        cover.pointPropertyData = {"resourceValueType": "Image"};
         if (sound.pointValue !== null) {
-            sound.pointValue.resourceValueType = "Sound";
-            delete sound.pointValue.resourceType;
+            if (typeof sound.pointValue.resourceValue !== "undefined") {
+                sound.pointValue = sound.pointValue.resourceValue;
+            } else if (sound.pointValue !== null) {
+                sound.pointValue = null;
+            }
+        }
+        if (cover.pointValue !== null) {
+            if (typeof cover.pointValue.resourceValue !== "undefined") {
+                cover.pointValue = cover.pointValue.resourceValue;
+            } else if (cover.pointValue !== null) {
+                cover.pointValue = null;
+            }
         }
     };
 

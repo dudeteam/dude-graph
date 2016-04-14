@@ -60,7 +60,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Called when the panel is opened
              */
             opened: function () {
-                this.set("resourceType", this.get("data.graph.graphData.resourceProperty.propertyValue.resourceValueType"));
+                this.set("resourceType", this.get("data.graph.graphData.property.propertyData.resourceValueType"));
             },
 
             /**
@@ -84,10 +84,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * @private
              */
             _resourceSubmitted: function (e) {
-                this.set("data.graph.graphData.resourceProperty.propertyValue", {
-                    "resourceValueType": this.get("data.graph.graphData.resourceProperty.resourceValueType"),
-                    "resourceValue": e.detail
-                });
+                this.set("data.graph.graphData.property.propertyValue", e.detail);
                 this.get("inspector").popStack();
             }
         });

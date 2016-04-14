@@ -34,12 +34,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
                 <dude-property property-name="[[ point.pointName ]]"
                                property-type="[[ point.pointValueType ]]"
+                               property-data="[[ point.pointPropertyData ]]"
                                property-value="{{ point.pointValue }}">
                 </dude-property>
             </template>
             <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockOutputs ]]" as="point">
                 <dude-property property-name="[[ point.pointName ]]"
                                property-type="[[ point.pointValueType ]]"
+                               property-data="[[ point.pointPropertyData ]]"
                                property-value="{{ point.pointValue }}">
                 </dude-property>
             </template>
@@ -108,7 +110,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             _openResourceManager: function (e) {
                 var dudeResourceProperty = e.target;
-                this.set("data.graph.graphData.resourceProperty", dudeResourceProperty.get("property"));
+                this.set("data.graph.graphData.property", dudeResourceProperty.get("property"));
                 this.get("inspector").pushStack("dude-graph-select-resource");
             }
         });
