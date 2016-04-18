@@ -161,6 +161,12 @@ const DUDE_GRAPH_MODELS = [
                         "pointValue": {
                             "resourceValueType": "Image"
                         }
+                    },
+                    {
+                        "pointType": "Point",
+                        "pointName": "win",
+                        "pointValueType": "Boolean",
+                        "pointValue": false
                     }
                 ]
             }
@@ -510,6 +516,26 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
 (function Blocks() {
 
     /**
+     * Ensures that the point `pointName` exists
+     * @param {String} pointName
+     * @param {dudeGraph.Graph.graphValueTypeTypedef} pointValueType
+     * @param {*|null} [pointValue=null]
+     */
+    const ensurePoint = function (pointName, pointValueType, pointValue) {
+        const point = this.inputByName(pointName);
+        if (!(point instanceof dudeGraph.Point)) {
+            this.addPoint(new dudeGraph.Point(false, {
+                "pointName": pointName,
+                "pointValueType": pointValueType,
+                "pointValue": typeof pointValue !== "undefined" ? pointValue : null
+            }));
+        } else {
+            point.pointValueType = pointValueType;
+            point.pointValue = typeof pointValue !== "undefined" ? pointValue : null;
+        }
+    };
+
+    /**
      * Upgrades cover.pointValue
      * Upgrades sound.pointValue
      */
@@ -638,12 +664,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         Step.prototype.upgradePoints = function () {
-            if (!(this.inputByName("success") instanceof dudeGraph.Point)) {
-                this.addPoint(new dudeGraph.Point(false, {
-                    "pointName": "success",
-                    "pointValueType": "Success"
-                }));
-            }
+            ensurePoint.call(this, "success", "Success");
             upgradeResources.call(this);
         };
 
@@ -694,13 +715,9 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         End.prototype.upgradePoints = function () {
-            if (!(this.inputByName("success") instanceof dudeGraph.Point)) {
-                this.addPoint(new dudeGraph.Point(false, {
-                    "pointName": "success",
-                    "pointValueType": "Success"
-                }));
-            }
             upgradeResources.call(this);
+            ensurePoint.call(this, "success", "Success");
+            ensurePoint.call(this, "win", "Boolean", false);
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "End", "type": End});
