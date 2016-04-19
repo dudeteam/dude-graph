@@ -15,7 +15,8 @@
   "scripts": {
     "start": "gulp",
     "test": "wct",
-    "documentation": "gulp jsdoc"
+    "documentation": "gulp jsdoc",
+    "update": "rm -rf node_modules bower_components && npm install && bower install"
   },
   "directories": {
     "test": "tests"

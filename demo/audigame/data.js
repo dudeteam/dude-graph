@@ -662,8 +662,8 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
                 throw new Error("Step `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
             }
-            if (!(this.inputByName("success") instanceof dudeGraph.ResourcePoint) || this.inputByName("success").pointValueType !== "Success") {
-                throw new Error("End `" + this.blockFancyName + "` must have an input `success` of type `Success`");
+            if (!(this.inputByName("success") instanceof dudeGraph.Point) || this.inputByName("success").pointValueType !== "Success") {
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `success` of type `Success`");
             }
             if (!(this.outputByName("first") instanceof dudeGraph.StreamPoint)) {
                 throw new Error("Step `" + this.blockFancyName + "` must have an output `first` of type `Stream`");
