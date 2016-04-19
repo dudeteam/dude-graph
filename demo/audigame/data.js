@@ -100,6 +100,11 @@ const DUDE_GRAPH_MODELS = [
                         "pointValue": {
                             "resourceValueType": "Image"
                         }
+                    },
+                    {
+                        "pointType": "Point",
+                        "pointName": "success",
+                        "pointValueType": "Success"
                     }
                 ],
                 "blockOutputs": [
@@ -161,6 +166,11 @@ const DUDE_GRAPH_MODELS = [
                         "pointValue": {
                             "resourceValueType": "Image"
                         }
+                    },
+                    {
+                        "pointType": "Point",
+                        "pointName": "success",
+                        "pointValueType": "Success"
                     },
                     {
                         "pointType": "Point",
@@ -652,6 +662,9 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
                 throw new Error("Step `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
             }
+            if (!(this.inputByName("success") instanceof dudeGraph.ResourcePoint) || this.inputByName("success").pointValueType !== "Success") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `success` of type `Success`");
+            }
             if (!(this.outputByName("first") instanceof dudeGraph.StreamPoint)) {
                 throw new Error("Step `" + this.blockFancyName + "` must have an output `first` of type `Stream`");
             }
@@ -664,8 +677,8 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         Step.prototype.upgradePoints = function () {
-            ensurePoint.call(this, "success", "Success");
             upgradeResources.call(this);
+            ensurePoint.call(this, "success", "Success");
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "Step", "type": Step});
@@ -708,6 +721,12 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             }
             if (!(this.inputByName("cover") instanceof dudeGraph.ResourcePoint) || this.inputByName("cover").pointValueType !== "Resource") {
                 throw new Error("End `" + this.blockFancyName + "` must have an input `cover` of type `Resource`");
+            }
+            if (!(this.inputByName("success") instanceof dudeGraph.Point) || this.inputByName("success").pointValueType !== "Success") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `success` of type `Success`");
+            }
+            if (!(this.inputByName("win") instanceof dudeGraph.Point) || this.inputByName("win").pointValueType !== "Boolean") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `win` of type `Boolean`");
             }
         };
 
