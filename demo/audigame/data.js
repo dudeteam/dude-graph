@@ -175,8 +175,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "win",
-                        "pointValueType": "Boolean",
-                        "pointValue": false
+                        "pointValueType": "Boolean"
                     }
                 ]
             }
@@ -539,9 +538,6 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                 "pointValueType": pointValueType,
                 "pointValue": typeof pointValue !== "undefined" ? pointValue : null
             }));
-        } else {
-            point.pointValueType = pointValueType;
-            point.pointValue = typeof pointValue !== "undefined" ? pointValue : null;
         }
     };
 
@@ -736,7 +732,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
         End.prototype.upgradePoints = function () {
             upgradeResources.call(this);
             ensurePoint.call(this, "success", "Success");
-            ensurePoint.call(this, "win", "Boolean", false);
+            ensurePoint.call(this, "win", "Boolean");
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "End", "type": End});
