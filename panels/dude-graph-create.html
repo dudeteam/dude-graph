@@ -63,11 +63,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "value": "Inspector",
                     "readonly": true
                 },
+                "reload": {
+                    "type": Number,
+                    "value": 0
+                },
                 "models": {
-                    "computed": "_models(data.graph)"
+                    "computed": "_models(data.graph, reload)"
                 },
                 "variables": {
-                    "computed": "_variables(data.graph)"
+                    "computed": "_variables(data.graph, reload)"
                 }
             },
 
@@ -94,12 +98,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              * Called when the panel is the top of the stack
              */
             resumed: function () {
+                this.set("reload", 1);
             },
 
             /**
              * Called when the panel is not anymore the top of the stack
              */
             paused: function () {
+                this.set("reload", 0);
             },
 
             /**
