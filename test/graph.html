@@ -1011,6 +1011,7 @@
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.StreamPoint).to.be.true;
             var pointValueChangedSpy = sinon.spy();
             var pointConnectedSpy = sinon.spy();
+            var pointDisconnectedSpy = sinon.spy();
             var blockRemovedSpy = sinon.spy();
             var CustomBlock = function () {
                 dudeGraph.Block.apply(this, arguments);
@@ -1021,6 +1022,7 @@
             });
             CustomBlock.prototype.pointValueChanged = pointValueChangedSpy;
             CustomBlock.prototype.pointConnected = pointConnectedSpy;
+            CustomBlock.prototype.pointDisconnected = pointDisconnectedSpy;
             CustomBlock.prototype.removed = blockRemovedSpy;
             var customBlock = new CustomBlock();
             graph.addBlock(customBlock);
@@ -1032,6 +1034,8 @@
             sinon.assert.calledWith(pointValueChangedSpy, point1, 32, null);
             point2.connect(assignationBlock.outputByName("out"));
             sinon.assert.calledWith(pointConnectedSpy, point2, assignationBlock.outputByName("out"));
+            point2.disconnectAll();
+            sinon.assert.calledWith(pointDisconnectedSpy, point2, assignationBlock.outputByName("out"));
             graph.removeBlock(customBlock);
             sinon.assert.called(blockRemovedSpy);
         });
