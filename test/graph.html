@@ -1010,6 +1010,7 @@
             expect(graph.blockById(assignationBlock.blockId) instanceof dudeGraph.AssignationBlock).to.be.true;
             expect(assignationBlock.inputByName("in") instanceof dudeGraph.StreamPoint).to.be.true;
             var pointValueChangedSpy = sinon.spy();
+            var pointConnectedSpy = sinon.spy();
             var blockRemovedSpy = sinon.spy();
             var CustomBlock = function () {
                 dudeGraph.Block.apply(this, arguments);
@@ -1019,13 +1020,18 @@
                 "className": "CustomBlock"
             });
             CustomBlock.prototype.pointValueChanged = pointValueChangedSpy;
+            CustomBlock.prototype.pointConnected = pointConnectedSpy;
             CustomBlock.prototype.removed = blockRemovedSpy;
             var customBlock = new CustomBlock();
             graph.addBlock(customBlock);
-            var point = new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Number"});
-            customBlock.addPoint(point);
-            point.pointValue = 32;
-            sinon.assert.calledWith(pointValueChangedSpy, point, 32, null);
+            var point1 = new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Number"});
+            var point2 = new dudeGraph.Point(false, {"pointName": "in", "pointValueType": "Stream"});
+            customBlock.addPoint(point1);
+            customBlock.addPoint(point2);
+            point1.pointValue = 32;
+            sinon.assert.calledWith(pointValueChangedSpy, point1, 32, null);
+            point2.connect(assignationBlock.outputByName("out"));
+            sinon.assert.calledWith(pointConnectedSpy, point2, assignationBlock.outputByName("out"));
             graph.removeBlock(customBlock);
             sinon.assert.called(blockRemovedSpy);
         });
