@@ -761,21 +761,21 @@
                 }
             });
             expect(function () {
-                block.template("TemplateTest"); // Cannot manipulate templates while not bound to a graph
+                block.templateByName("TemplateTest"); // Cannot manipulate templates while not bound to a graph
             }).to.throw();
             expect(function () {
                 block.updateTemplate("TemplateTest", "String"); // Cannot manipulate templates while not bound to a graph
             }).to.throw();
             graph.addBlock(block);
             block.updateTemplate("TemplateTest", "String");
-            expect(block.template("TemplateTest").valueType).to.equals("String");
-            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
+            expect(block.templateByName("TemplateTest").valueType).to.equals("String");
+            expect(block.templateByName("TemplateTest").templates).to.eql(["Number", "String"]);
             block.updateTemplate("TemplateTest", "Number");
-            expect(block.template("TemplateTest").valueType).to.equals("Number");
-            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
+            expect(block.templateByName("TemplateTest").valueType).to.equals("Number");
+            expect(block.templateByName("TemplateTest").templates).to.eql(["Number", "String"]);
             block.updateTemplate("TemplateTest", "String");
-            expect(block.template("TemplateTest").valueType).to.equals("String");
-            expect(block.template("TemplateTest").templates).to.eql(["Number", "String"]);
+            expect(block.templateByName("TemplateTest").valueType).to.equals("String");
+            expect(block.templateByName("TemplateTest").templates).to.eql(["Number", "String"]);
             expect(function () {
                 block.updateTemplate("TemplateTest", "Boolean"); // `TemplateTest` has no template `Boolean`
             }).to.throw();
