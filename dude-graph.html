@@ -1,7 +1,7 @@
 <!--
 Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
-<!--suppress HtmlUnknownTarget -->
+<!--suppress HtmlUnknownTarget, HtmlUnknownTag, CssUnusedSymbol, JSUnusedGlobalSymbols -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../dude-style/dude-style.html">
@@ -31,7 +31,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         .container {
             @apply(--layout-horizontal);
             @apply(--layout-flex);
-            background: var(--dude-primary-background-color);
+            background: var(--dude-background1-color);
             height: 100%;
         }
 
@@ -41,19 +41,19 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
         #inspector {
             @apply(--layout-flex);
+            background-color: var(--dude-background2-color);
         }
-    </style>
-    <style>
+
         /**
          * Typography
          */
         ::content text {
-            fill: var(--dude-content-text-color);
-            font-family: var(--dude-primary-text-font);
+            fill: var(--dude-light1-color);
+            font-family: var(--dude-font-content);
         }
 
         ::content .dude-graph-title {
-            fill: var(--dude-title-text-color);
+            fill: var(--dude-font-content);
             font-weight: bold;
         }
 
@@ -69,31 +69,42 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Blocks
          */
         ::content .dude-graph-block > rect {
-            @apply(--dude-graph-block);
+            transition-duration: .2s;
+            transition-property: opacity, stroke;
+            fill: var(--dude-dark1-color);
+            opacity: 0.6;
         }
 
         ::content .dude-graph-block:hover > rect {
-            @apply(--dude-graph-block-hover);
+            stroke-width: 2px;
+            stroke: var(--dude-status-info-color);
+            opacity: 0.8;
         }
 
         ::content .dude-graph-block.dude-graph-selected > rect {
-            @apply(--dude-graph-block-selected);
+            stroke-width: 2px;
+            stroke: var(--dude-status-info-color);
+            opacity: 1;
         }
 
         /**
          * Groups
          */
         ::content .dude-graph-group > rect {
-            @apply(--dude-graph-group);
+            transition-duration: .2s;
+            transition-property: opacity;
+            fill: #fff;
+            stroke: #fff;
+            opacity: 0.1;
         }
 
         ::content .dude-graph-group:hover > rect {
-            @apply(--dude-graph-group-hover)
+            opacity: 0.15;
         }
 
         ::content .dude-graph-group.dude-graph-selected > rect,
         ::content .dude-graph-group.dude-graph-active > rect {
-            @apply(--dude-graph-group-selected);
+            opacity: 0.2;
         }
 
         /**
@@ -120,8 +131,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
     <template>
         <div class="container">
             <svg id="svg"></svg>
-            <dude-inspector id="inspector" data="{{ dudeGraphElement }}"
-                            root-panel="dude-graph-create"></dude-inspector>
+            <dude-inspector id="inspector"
+                            data="{{ dudeGraphElement }}"
+                            root-panel="dude-graph-create">
+            </dude-inspector>
             <dude-popup id="autocompletePopup">
                 <dude-hierarchy
                         id="autocomplete"
@@ -182,6 +195,13 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 "rendererData": {
                     "type": Object,
                     "value": {}
+                },
+                /**
+                 * The renderer config
+                 */
+                "rendererConfig": {
+                    "type": Object,
+                    "value": dudeGraph.Renderer.defaultConfig
                 },
                 /**
                  * The model data
@@ -252,7 +272,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 this.set("renderer", new dudeGraph.Renderer());
                 this.set("loader", new dudeGraph.GraphLoader());
                 this.set("saver", new dudeGraph.GraphSaver());
-                this.get("renderer").initialize(this.get("graph"), this.$.svg);
+                this.get("renderer").initialize(this.get("graph"), this.$.svg, this._rendererConfig());
                 _.forEach(this.get("graphValueTypes"), function (graphValueType) {
                     this.get("graph").addGraphValueType(graphValueType);
                 }.bind(this));
@@ -357,6 +377,21 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             emitBuild: function () {
                 this.fire("dude-graph-build");
+            },
+
+            /**
+             * Returns the renderer configuration
+             */
+            _rendererConfig: function () {
+                var config = this.get("rendererConfig");
+                config.typeColors.Stream = this.getComputedStyleValue("--dude-type-stream-color");
+                config.typeColors.String = this.getComputedStyleValue("--dude-type-string-color");
+                config.typeColors.Number = this.getComputedStyleValue("--dude-type-number-color");
+                config.typeColors.Boolean = this.getComputedStyleValue("--dude-type-boolean-color");
+                config.typeColors.Object = this.getComputedStyleValue("--dude-type-object-color");
+                config.typeColors.Array = this.getComputedStyleValue("--dude-type-array-color");
+                config.typeColors.Resource = this.getComputedStyleValue("--dude-type-resource-color");
+                return config;
             },
 
             /**

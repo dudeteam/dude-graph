@@ -4,6 +4,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <!--suppress HtmlUnknownTarget -->
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../dude-style/dude-style.html">
 <!--
 `dude-inspector` is a Polymer element which creates a closable stack of panels.
 
@@ -19,7 +20,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         #panel {
-            background: var(--dude-secondary-background-color);
             @apply(--layout-vertical);
             @apply(--layout-flex);
         }
@@ -29,12 +29,12 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         .title {
-            font-family: var(--dude-primary-text-font);
+            font-family: var(--dude-font-primary);
             text-align: center;
             padding: 10px;
             font-weight: bold;
-            color: var(--dude-content-text-color);
-            border-bottom: 2px solid var(--dude-primary-background-color);
+            color: var(--dude-dark1-color);
+            border-bottom: 2px solid var(--dude-background1-color);
         }
 
         #panel i {
@@ -43,7 +43,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             position: absolute;
             top: 10px;
             left: 10px;
-            color: var(--dude-secondary-text-color);
+            color: var(--dude-dark1-color);
         }
 
         #button {
@@ -51,14 +51,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: var(--dude-secondary-background-color);
-            color: var(--dude-secondary-text-color);
+            background: var(--dude-background1-color);
+            color: var(--dude-light2-color);
             cursor: pointer;
-            /*position: absolute;*/
-            /*width: 50px;*/
-            /*height: 50px;*/
-            /*top: 10px;*/
-            /*right: 10px;*/
         }
 
         #button i {
