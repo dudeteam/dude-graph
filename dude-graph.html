@@ -201,7 +201,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                  */
                 "rendererConfig": {
                     "type": Object,
-                    "value": dudeGraph.Renderer.defaultConfig
+                    "value": dudeGraph.defaultRendererConfig
                 },
                 /**
                  * The model data
@@ -381,6 +381,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 
             /**
              * Returns the renderer configuration
+             * @returns {dudeGraph.defaultRendererConfig}
              */
             _rendererConfig: function () {
                 var config = this.get("rendererConfig");

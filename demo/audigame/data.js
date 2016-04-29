@@ -854,5 +854,4 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
     })();
 })();
 
-// TODO: renderer API
-dudeGraph.Renderer.defaultConfig.typeColors["Success"] = "#f1c40f";
+dudeGraph.defaultRendererConfig.typeColors["Success"] = "#f1c40f";
