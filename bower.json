@@ -33,7 +33,7 @@
     "jwerty": "^0.3.2",
     "lodash": "^4.6.1",
     "eventEmitter": "^4.3.0",
-    "dude-style": "^0.2.3",
+    "dude-style": "^0.2.5",
     "dude-popup": "^0.0.3",
     "dude-toolbar": "^0.0.3",
     "dude-collapse": "^0.0.4",
@@ -50,6 +50,6 @@
   },
   "resolutions": {
     "lodash": "^4.6.1",
-    "dude-style": "^0.2.3"
+    "dude-style": "^0.2.5"
   }
 }
