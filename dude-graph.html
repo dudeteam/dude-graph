@@ -48,12 +48,17 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Typography
          */
         ::content text {
-            fill: var(--dude-light1-color);
             font-family: var(--dude-font-content);
+            fill: var(--dude-light1-color);
         }
 
-        ::content .dude-graph-title {
-            fill: var(--dude-font-content);
+        ::content .dude-graph-block-title {
+            fill: var(--dude-light1-color);
+            font-weight: bold;
+        }
+
+        ::content .dude-graph-group-title {
+            fill: var(--dude-dark1-color);
             font-weight: bold;
         }
 
@@ -61,8 +66,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          * Select brush
          */
         ::content .dude-graph-select {
-            fill: hsla(0, 0%, 80%, 0.1);
-            stroke: hsla(0, 0%, 80%, 0.2);
+            stroke: var(--dude-status-info-color);
+            fill: var(--dude-status-info-color);
+            fill-opacity: 0.1;
         }
 
         /**
@@ -70,21 +76,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         ::content .dude-graph-block > rect {
             transition-duration: .2s;
-            transition-property: opacity, stroke;
+            transition-property: stroke;
             fill: var(--dude-dark1-color);
-            opacity: 0.6;
         }
 
         ::content .dude-graph-block:hover > rect {
-            stroke-width: 2px;
             stroke: var(--dude-status-info-color);
-            opacity: 0.8;
+            stroke-width: 2px;
         }
 
         ::content .dude-graph-block.dude-graph-selected > rect {
-            stroke-width: 2px;
             stroke: var(--dude-status-info-color);
-            opacity: 1;
+            stroke-width: 2px;
         }
 
         /**
@@ -92,19 +95,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
          */
         ::content .dude-graph-group > rect {
             transition-duration: .2s;
-            transition-property: opacity;
-            fill: #fff;
-            stroke: #fff;
-            opacity: 0.1;
+            transition-property: stroke;
+            fill: var(--dude-background2-color);
+            stroke: var(--dude-background2-color);
         }
 
         ::content .dude-graph-group:hover > rect {
-            opacity: 0.15;
+            stroke: var(--dude-status-info-color);
+            stroke-width: 2px;
         }
 
         ::content .dude-graph-group.dude-graph-selected > rect,
         ::content .dude-graph-group.dude-graph-active > rect {
-            opacity: 0.2;
+            stroke: var(--dude-status-info-color);
+            stroke-width: 2px;
         }
 
         /**
