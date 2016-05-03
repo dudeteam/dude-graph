@@ -77,7 +77,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         ::content .dude-graph-block > rect {
             transition-duration: .2s;
             transition-property: stroke;
-            fill: var(--dude-dark1-color);
         }
 
         ::content .dude-graph-block:hover > rect {
@@ -396,6 +395,20 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 config.typeColors.Object = this.getComputedStyleValue("--dude-type-object-color");
                 config.typeColors.Array = this.getComputedStyleValue("--dude-type-array-color");
                 config.typeColors.Resource = this.getComputedStyleValue("--dude-type-resource-color");
+
+                config.blockColors.Start = this.getComputedStyleValue("--dude-block-start-color");
+                config.blockColors.Step = this.getComputedStyleValue("--dude-block-step-color");
+                config.blockColors.End = this.getComputedStyleValue("--dude-block-end-color");
+                config.blockColors.GoBlock = this.getComputedStyleValue("--dude-block-go-color");
+                config.blockColors.RepeatBlock = this.getComputedStyleValue("--dude-block-repeat-color");
+                config.blockColors.AssignBlock = this.getComputedStyleValue("--dude-block-assign-color");
+                config.blockColors.ConditionBlock = this.getComputedStyleValue("--dude-block-condition-color");
+                config.blockColors.PrintBlock = this.getComputedStyleValue("--dude-block-print-color");
+                config.blockColors.FormatBlock = this.getComputedStyleValue("--dude-block-format-color");
+                config.blockColors.ExpressionBlock = this.getComputedStyleValue("--dude-block-expression-color");
+                config.blockColors.RandomRangeBlock = this.getComputedStyleValue("--dude-block-random-range-color");
+                config.blockColors.TrophyBlock = this.getComputedStyleValue("--dude-block-trophy-color");
+
                 return config;
             },
 

@@ -772,22 +772,6 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
         };
 
         /**
-         * Updates the d3Block for this renderBlock
-         * @override
-         */
-        AudigameBlock.prototype.update = function () {
-            dudeGraph.RenderBlock.prototype.update.apply(this, arguments);
-            switch (this._block.className) {
-                case "Start":
-                    this._d3Rect.attr("style", "fill: #006000;");
-                    break;
-                case "End":
-                    this._d3Rect.attr("style", "fill: #600000;");
-                    break;
-            }
-        };
-
-        /**
          * Creates the success star if the success point is connected
          */
         AudigameBlock.prototype.onSuccessStar = function () {
