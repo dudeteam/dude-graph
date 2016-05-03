@@ -5,6 +5,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 <link rel="import" href="../../../iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../paper-toast/paper-toast.html">
+<link rel="import" href="../../../dude-style/dude-style.html">
 <link rel="import" href="../../dude-graph.html">
 <script src="builder.js"></script>
 <script src="data.js"></script>
@@ -18,11 +19,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
 
         #success {
-            --paper-toast-background-color: var(--paper-green-500);
+            --paper-toast-background-color: var(--dude-status-success-color);
         }
 
         #error {
-            --paper-toast-background-color: var(--paper-red-500);
+            --paper-toast-background-color: var(--dude-status-error-color);
         }
 
         #jumpToBlockId {
