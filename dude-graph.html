@@ -323,11 +323,15 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     }));
                 };
                 var createRenderBlock = function (block) {
-                    return dudeGraphElement.renderer.createRenderBlock({
+                    var renderBlock = dudeGraphElement.renderer.createRenderBlock({
                         "id": dudeGraphElement.get("graph").nextBlockId(),
                         "block": block.blockId,
                         "position": dudeGraphElement.renderer.centerWorld()
                     }, true);
+                    renderBlock.nodePosition[0] -= renderBlock.nodeSize[0] / 2;
+                    renderBlock.nodePosition[1] -= renderBlock.nodeSize[1] / 2;
+                    renderBlock.update();
+                    return renderBlock;
                 };
                 var blockType = blockData.blockType;
                 if (blockType === "VariableBlock") {
