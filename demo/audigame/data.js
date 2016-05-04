@@ -10,7 +10,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "text",
-                        "pointValueType": "String"
+                        "pointValueType": "Text"
                     },
                     {
                         "pointType": "Point",
@@ -77,7 +77,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "text",
-                        "pointValueType": "String"
+                        "pointValueType": "Text"
                     },
                     {
                         "pointType": "Point",
@@ -149,7 +149,7 @@ const DUDE_GRAPH_MODELS = [
                     {
                         "pointType": "Point",
                         "pointName": "text",
-                        "pointValueType": "String"
+                        "pointValueType": "Text"
                     },
                     {
                         "pointType": "ResourcePoint",
@@ -542,12 +542,15 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
     };
 
     /**
+     * Upgrades text.pointValueType
      * Upgrades cover.pointValue
      * Upgrades sound.pointValue
      */
-    const upgradeResources = function () {
+    const upgradeStoryPoints = function () {
+        var text = this.inputByName("text");
         var sound = this.inputByName("sound");
         var cover = this.inputByName("cover");
+        text.pointValueType = "Text";
         sound.pointPropertyData = {"resourceValueType": "Sound"};
         cover.pointPropertyData = {"resourceValueType": "Image"};
         if (sound.pointValue !== null && typeof sound.pointValue.resourceValue !== "undefined") {
@@ -586,8 +589,8 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          */
         Start.prototype.validatePoints = function () {
             this.upgradePoints();
-            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("Start `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
+            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "Text") {
+                throw new Error("Start `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `Text`");
             }
             if (!(this.inputByName("timer") instanceof dudeGraph.Point) || this.inputByName("timer").pointValueType !== "Number") {
                 throw new Error("Start `" + this.blockFancyName + "` must have an input `timer` of type `Point` of pointValueType `Number`");
@@ -610,7 +613,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         Start.prototype.upgradePoints = function () {
-            upgradeResources.call(this);
+            upgradeStoryPoints.call(this);
         };
 
         DUDE_GRAPH_BLOCK_TYPES.push({"block": "Start", "type": Start});
@@ -644,8 +647,8 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             if (!(this.inputByName("choice") instanceof dudeGraph.Point) || this.inputByName("choice").pointValueType !== "String") {
                 throw new Error("Step `" + this.blockFancyName + "` must have an input `choice` of type `Point` of pointValueType `String`");
             }
-            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("Step `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
+            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "Text") {
+                throw new Error("Step `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `Text`");
             }
             if (!(this.inputByName("timer") instanceof dudeGraph.Point) || this.inputByName("timer").pointValueType !== "Number") {
                 throw new Error("Step `" + this.blockFancyName + "` must have an input `timer` of type `Point` of pointValueType `Number`");
@@ -671,7 +674,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         Step.prototype.upgradePoints = function () {
-            upgradeResources.call(this);
+            upgradeStoryPoints.call(this);
             ensurePoint.call(this, "success", "Success");
         };
 
@@ -707,8 +710,8 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
             if (!(this.inputByName("choice") instanceof dudeGraph.Point) || this.inputByName("choice").pointValueType !== "String") {
                 throw new Error("End `" + this.blockFancyName + "` must have an input `choice` of type `Point` of pointValueType `String`");
             }
-            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "String") {
-                throw new Error("End `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `String`");
+            if (!(this.inputByName("text") instanceof dudeGraph.Point) || this.inputByName("text").pointValueType !== "Text") {
+                throw new Error("End `" + this.blockFancyName + "` must have an input `text` of type `Point` of pointValueType `Text`");
             }
             if (!(this.inputByName("sound") instanceof dudeGraph.ResourcePoint) || this.inputByName("sound").pointValueType !== "Resource") {
                 throw new Error("End `" + this.blockFancyName + "` must have an input `sound` of type `Resource`");
@@ -728,7 +731,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * Upgrade missing points in older versions
          */
         End.prototype.upgradePoints = function () {
-            upgradeResources.call(this);
+            upgradeStoryPoints.call(this);
             ensurePoint.call(this, "success", "Success");
             ensurePoint.call(this, "win", "Boolean");
         };
