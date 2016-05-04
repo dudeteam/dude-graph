@@ -325,7 +325,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 var createRenderBlock = function (block) {
                     return dudeGraphElement.renderer.createRenderBlock({
                         "id": dudeGraphElement.get("graph").nextBlockId(),
-                        "block": block.blockId
+                        "block": block.blockId,
+                        "position": dudeGraphElement.renderer.centerWorld()
                     }, true);
                 };
                 var blockType = blockData.blockType;
