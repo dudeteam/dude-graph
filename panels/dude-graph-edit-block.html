@@ -26,10 +26,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="toolbar">
             <dude-toolbar id="toolbar"></dude-toolbar>
         </div>
-        <dude-collapse heading="[[ data.selectedRenderBlock._block.blockName ]]">
+        <dude-collapse heading="Block [[ data.selectedRenderBlock._block.blockName ]]">
             <dude-property property-name="Block name"
                            property-type="String"
-                           property-value="{{ data.selectedRenderBlock.nodeName }}">
+                           property-value="{{ data.selectedRenderBlock.nodeName }}"
+                           property-hide-clear>
             </dude-property>
             <template is="dom-repeat" items="[[ data.selectedRenderBlock._block.blockInputs ]]" as="point">
                 <dude-property property-name="[[ point.pointName ]]"

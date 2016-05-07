@@ -15,12 +15,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="dude-graph-edit-variable">
     <style>
-        :host {
-            @apply(--layout-vertical);
-            @apply(--layout-flex);
-            overflow: auto;
-            padding: 10px;
-        }
         .toolbar {
             margin-top: 16px;
             margin-bottom: 16px;
@@ -30,10 +24,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <div class="toolbar">
             <dude-toolbar id="toolbar"></dude-toolbar>
         </div>
-        <dude-collapse heading="[[ variable.variableName ]]">
+        <dude-collapse heading="Variable [[ variable.variableName ]]">
             <dude-property
                     property-type="[[ variable.variableValueType ]]"
-                    property-name="Variable value"
+                    property-name="Default value"
                     property-value="{{ variable.variableValue }}">
             </dude-property>
         </dude-collapse>
@@ -52,7 +46,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                 },
                 "panelTitle": {
                     "type": String,
-                    "value": "Edit block",
+                    "value": "Edit variable",
                     "readonly": true
                 },
                 "variable": {

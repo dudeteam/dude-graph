@@ -16,12 +16,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
 -->
 <dom-module id="dude-graph-edit-group">
     <style>
-        :host {
-            @apply(--layout-vertical);
-            @apply(--layout-flex);
-            overflow: auto;
-            padding: 10px;
-        }
         .toolbar {
             margin-top: 16px;
             margin-bottom: 16px;
@@ -34,7 +28,8 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         <dude-collapse heading="[[ data.selectedRenderGroup.nodeName ]]">
             <dude-property property-name="Group name"
                            property-type="String"
-                           property-value="{{ data.selectedRenderGroup.nodeName }}">
+                           property-value="{{ data.selectedRenderGroup.nodeName }}"
+                           property-hide-clear>
             </dude-property>
         </dude-collapse>
     </template>
