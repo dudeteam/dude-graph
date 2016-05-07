@@ -757,10 +757,10 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
              */
             this._d3SuccessStar = null;
 
-            dudeGraph.RenderBlock.apply(this, arguments);
+            dudeGraph.RenderFancyBlock.apply(this, arguments);
         };
 
-        AudigameBlock.prototype = _.create(dudeGraph.RenderBlock.prototype, {
+        AudigameBlock.prototype = _.create(dudeGraph.RenderFancyBlock.prototype, {
             "constructor": AudigameBlock,
             "className": "AudigameBlock"
         });
@@ -770,7 +770,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         AudigameBlock.prototype.create = function () {
-            dudeGraph.RenderBlock.prototype.create.apply(this, arguments);
+            dudeGraph.RenderFancyBlock.prototype.create.apply(this, arguments);
             this.onSuccessStar();
         };
 
@@ -832,7 +832,7 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
          * @override
          */
         AudigameBlock.buildRenderBlock = function () {
-            return dudeGraph.RenderBlock.buildRenderBlock.apply(this, arguments);
+            return dudeGraph.RenderFancyBlock.buildRenderBlock.apply(this, arguments);
         };
 
         DUDE_GRAPH_RENDER_BLOCK_TYPES.push({"renderBlock": "Start", "type": AudigameBlock});
