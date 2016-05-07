@@ -31,7 +31,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointName": "cover",
                         "pointValueType": "Resource",
                         "pointValue": {
-                            "resourceType": "Image"
+                            "resourceValueType": "Image"
                         }
                     }
                 ],
