@@ -107,7 +107,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         }
     </style>
     <template>
-        <div id="show-button" on-click="_openPanel">
+        <div id="show-button" on-click="_openInspector">
             <i class="fa fa-info"></i>
         </div>
         <div id="inspector-panel">
@@ -153,14 +153,14 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             _panels: [],
 
             /**
-             *
+             * Creates the rootPanel
              */
             ready: function () {
                 if (!this.get("rootPanel")) {
                     throw new Error("`dude-inspector` must have a rootPanel");
                 }
                 this.pushStack(this.get("rootPanel"));
-                this._openPanel();
+                this._openInspector();
             },
 
             /**
@@ -189,7 +189,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
              */
             popStack: function () {
                 if (this._panels.length === 1) {
-                    this._closePanel();
+                    this._closeInspector();
                     return null;
                 }
                 if (this.get("topPanel") !== null) {
@@ -266,18 +266,18 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Opens the panel
+             * Opens the inspector and shows the current panel
              * @private
              */
-            _openPanel: function () {
+            _openInspector: function () {
                 this.toggleClass("closed", false);
             },
 
             /**
-             * Closes the panel
+             * Closes the inspector
              * @private
              */
-            _closePanel: function () {
+            _closeInspector: function () {
                 this.toggleClass("closed", true);
             },
 

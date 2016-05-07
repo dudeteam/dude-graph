@@ -40,7 +40,6 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     items="{{ variables }}"
                     on-dude-hierarchy-item-submit="_createBlock">
             </dude-hierarchy>
-            <!-- <button on-click="_deleteVariable">Delete variable</button> -->
         </dude-collapse>
     </template>
     <script>
@@ -71,7 +70,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     "computed": "_models(data.graph, reload)"
                 },
                 "variables": {
-                    "computed": "_variables(data.graph, reload)"
+                    "computed": "_variableModels(data.graph, reload)"
                 }
             },
 
@@ -126,22 +125,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
-             * Deletes the selected variable
-             * @private
-             */
-            _deleteVariable: function () {
-                /*
-                var variableModel = this.$.variablesHierarchy._selectedItem.item;
-                if (typeof variableModel.data.blockName !== "undefined") {
-                    if (confirm("Are you sure you want to delete " + variableModel.data.blockName + "?")) {
-                        var variable = this.get("data.graph").variableByName(variableModel.data.blockName);
-                        this.get("data.graph").removeVariable(variable);
-                    }
-                }
-                 **/
-            },
-
-            /**
+             * Returns the graph models
              * @returns {Array<dudeGraph.Graph.modelBlockTypedef>}
              * @private
              */
@@ -154,10 +138,11 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             },
 
             /**
+             * Returns the variable models
              * @returns {Array<dudeGraph.Graph.modelBlockTypedef>}
              * @private
              */
-            _variables: function () {
+            _variableModels: function () {
                 var graph = this.get("data.graph");
                 if (typeof graph !== "undefined") {
                     return graph.variableModels();
