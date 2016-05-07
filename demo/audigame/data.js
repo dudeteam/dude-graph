@@ -475,7 +475,7 @@ const DUDE_GRAPH_MODELS = [
                         "name": "trophy",
                         "icon": "fa fa-trophy",
                         "data": {
-                            "blockType": "Block",
+                            "blockType": "FunctionBlock",
                             "blockName": "trophy",
                             "blockInputs": [
                                 {
@@ -808,9 +808,9 @@ const DUDE_GRAPH_RENDER_BLOCK_TYPES = dudeGraph.defaultRenderBlocks;
                 var pins = 5;
                 var angle = Math.PI / pins;
                 for (var i = 0; i < pins * 2; i++) {
-                    var radius = (i % 2) === 0 ? 5 : 10;
-                    var x = 5 + Math.cos(i * angle) * radius;
-                    var y = 5 + Math.sin(i * angle) * radius;
+                    var radius = (i % 2) === 0 ? 4 : 8;
+                    var x = 10 + Math.cos(i * angle) * radius;
+                    var y = 12 + Math.sin(i * angle) * radius;
                     starPoints.push([x, y]);
                 }
                 return starPoints;

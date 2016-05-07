@@ -76,20 +76,10 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
         /**
          * Blocks
          */
-
-        ::content .dude-graph-block > rect {
-            transition-duration: .2s;
-            transition-property: stroke;
-        }
-
-        ::content .dude-graph-block:hover > rect {
+        ::content .dude-graph-block:hover > rect.dude-graph-block-wrapper,
+        ::content .dude-graph-block.dude-graph-selected > rect.dude-graph-block-wrapper {
             stroke: var(--dude-status-info-color);
-            stroke-width: 2px;
-        }
-
-        ::content .dude-graph-block.dude-graph-selected > rect {
-            stroke: var(--dude-status-info-color);
-            stroke-width: 2px;
+            stroke-width: 4px;
         }
 
         ::content .dude-graph-block-light {
