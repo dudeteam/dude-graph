@@ -45,7 +45,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-cogs",
             description: "Create variable",
-            shortcut: ["ctrl+shift+a", "meta+shift+a"],
+            shortcut: ["ctrl+alt+a", "meta+alt+a"],
             action: function () {
                 panel.get("inspector").pushStack("dude-graph-create-variable");
             }.bind(this)
@@ -59,7 +59,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-compress",
             description: "Zoom to fit",
-            shortcut: ["ctrl+shift+0", "meta+shift+0"], // TODO: Windows
+            shortcut: ["ctrl+alt+0", "meta+alt+0"],
             action: function () {
                 panel.get("data.renderer").zoomToFit();
             }.bind(this)
@@ -73,7 +73,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-compress",
             description: "Zoom to selection",
-            shortcut: ["ctrl+shift+0", "meta+shift+0"], // TODO: Windows
+            shortcut: ["ctrl+alt+0", "meta+alt+0"],
             action: function () {
                 panel.get("data.renderer").zoomToFitSelection();
             }.bind(this)
@@ -101,7 +101,7 @@ dudeGraph.ToolbarHelper = (function () {
         panel.$.toolbar.addCommand({
             icon: "fa fa-object-group",
             description: "Group selection",
-            shortcut: ["ctrl+shift+g", "meta+shift+g"],
+            shortcut: ["ctrl+alt+g", "meta+alt+g"],
             action: function () {
                 panel.get("data.renderer").createRenderGroupForSelection("Group");
             }.bind(this)
