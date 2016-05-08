@@ -21,6 +21,9 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
             margin-top: 16px;
             margin-bottom: 16px;
         }
+        paper-button {
+            @apply(--dude-button);
+        }
     </style>
     <template>
         <div class="toolbar">
@@ -43,7 +46,7 @@ Copyright (c) 2015 DudeTeam. All rights reserved.
                     property-name="Variable value"
                     property-value="{{ variable.variableValue }}">
             </dude-property>
-            <button on-click="_createVariable">Create variable</button>
+            <paper-button on-click="_createVariable">Create variable</paper-button>
         </dude-collapse>
     </template>
     <script>
