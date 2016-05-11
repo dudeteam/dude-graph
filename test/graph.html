@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress BadExpressionStatementJS -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -106,10 +107,15 @@
             expect(outputPoint.pointType).to.be.equal("Point");
             expect(outputPoint.pointName).to.be.equal("output");
             expect(outputPoint.pointValueType).to.be.equal("Whatever");
+            expect(outputPoint.hasPolicy(dudeGraph.PointPolicy.VALUE)).to.be.true;
+            expect(outputPoint.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.true;
+            expect(outputPoint.hasPolicy(dudeGraph.PointPolicy.MULTIPLE_CONNECTIONS)).to.be.false;
+            expect(outputPoint.hasPolicy(dudeGraph.PointPolicy.CONVERSION)).to.be.true;
             var inputPoint = new dudeGraph.Point(false, {
                 "pointName": "input",
                 "pointValueType": "WhateverAgain", // pointValueType is enforced only when adding to a block
-                "pointValue": {"whatever": true} // pointValue is enforced to valueType only when adding to a block
+                "pointValue": {"whatever": true}, // pointValue is enforced to valueType only when adding to a block,
+                "pointPolicy": ["VALUE", "CONVERSION"]
             });
             expect(inputPoint.pointBlock).to.be.null;
             expect(inputPoint.pointOutput).to.be.false;
@@ -117,6 +123,10 @@
             expect(inputPoint.pointName).to.be.equal("input");
             expect(inputPoint.pointValueType).to.be.equal("WhateverAgain");
             expect(inputPoint.pointValue).to.be.eql({"whatever": true});
+            expect(inputPoint.hasPolicy(dudeGraph.PointPolicy.VALUE)).to.be.true;
+            expect(inputPoint.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.false;
+            expect(inputPoint.hasPolicy(dudeGraph.PointPolicy.MULTIPLE_CONNECTIONS)).to.be.false;
+            expect(inputPoint.hasPolicy(dudeGraph.PointPolicy.CONVERSION)).to.be.true;
             // Ill-formed points
             expect(function () {
                 //noinspection JSCheckFunctionSignatures
@@ -148,6 +158,14 @@
                 new dudeGraph.Point(true, {
                     "pointName": "output",
                     "pointValueType": new dudeGraph.Graph() // pointValueType must be a String
+                });
+            }).to.throw();
+            expect(function () {
+                //noinspection JSCheckFunctionSignatures
+                new dudeGraph.Point(true, {
+                    "pointName": "output",
+                    "pointValueType": "String",
+                    "pointPolicy": ["UNKNOWN_POLICY"] // Unknown point policy
                 });
             }).to.throw();
         });
@@ -574,15 +592,16 @@
             var outputPoint1 = new dudeGraph.Point(true, {
                 "pointName": "out",
                 "pointValueType": "Number",
-                "pointSingleConnection": false
+                "pointSingleConnection": false,
+                "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
             });
-            expect(outputPoint1.pointSingleConnection).to.be.false;
+            expect(outputPoint1.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.false;
             var outputPoint2 = new dudeGraph.Point(true, {
                 "pointName": "out2",
                 "pointValueType": "Number",
-                "pointSingleConnection": true
+                "pointPolicy": ["VALUE", "SINGLE_CONNECTION", "CONVERSION"]
             });
-            expect(outputPoint2.pointSingleConnection).to.be.true;
+            expect(outputPoint2.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.true;
             graph.addBlock(block1);
             block1.addPoint(outputPoint1);
             var block2 = new dudeGraph.Block();
@@ -590,12 +609,12 @@
                 "pointName": "in",
                 "pointValueType": "Number"
             });
-            expect(inputPoint1.pointSingleConnection).to.be.true;
+            expect(inputPoint1.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.true;
             var inputPoint2 = new dudeGraph.Point(false, {
                 "pointName": "in2",
                 "pointValueType": "Number"
             });
-            expect(inputPoint2.pointSingleConnection).to.be.true;
+            expect(inputPoint2.hasPolicy(dudeGraph.PointPolicy.SINGLE_CONNECTION)).to.be.true;
             graph.addBlock(block2);
             block2.addPoint(inputPoint1);
             block2.addPoint(inputPoint2);
@@ -890,7 +909,7 @@
             expect(inputPoint1_2.pointValue).to.be.equal("false");
             expect(inputPoint1_3.pointValue).to.be.equal("true");
         });
-        test("point templates and connections and pointCanConvert = false", function () {
+        test("point templates and connections w/o conversion", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block({
                 "blockTemplates": {
@@ -921,37 +940,38 @@
             expect(inputPoint1_3.pointValueType).to.be.equals("String");
             var block2 = new dudeGraph.Block();
             graph.addBlock(block2);
-            var outputPointString = new dudeGraph.Point(true, {
+            var outputPointNumberConversion = new dudeGraph.Point(true, {
                 "pointName": "out1",
                 "pointValueType": "Number"
             });
-            var outputPointStringNoConvert = new dudeGraph.Point(true, {
+            var outputPointNumberNoConversion = new dudeGraph.Point(true, {
                 "pointName": "out2",
                 "pointValueType": "Number",
-                "pointCanConvert": false
+                "pointPolicy": ["VALUE", "SINGLE_CONNECTION"]
             });
-            var outputPointString3 = new dudeGraph.Point(true, {
+            var outputPointArrayNoConversion = new dudeGraph.Point(true, {
                 "pointName": "out3",
                 "pointValueType": "Array",
-                "pointCanConvert": false
+                "pointPolicy": ["VALUE", "SINGLE_CONNECTION"]
             });
-            block2.addPoint(outputPointString);
-            expect(outputPointString.pointValueType).to.be.equals("Number");
-            block2.addPoint(outputPointStringNoConvert);
-            expect(outputPointStringNoConvert.pointValueType).to.be.equals("Number");
-            outputPointString.connect(inputPoint1_1);
-            expect(outputPointString.pointValueType).to.be.equals("Number");
+            block2.addPoint(outputPointNumberConversion);
+            expect(outputPointNumberConversion.pointValueType).to.be.equals("Number");
+            block2.addPoint(outputPointNumberNoConversion);
+            expect(outputPointNumberNoConversion.pointValueType).to.be.equals("Number");
+            block2.addPoint(outputPointArrayNoConversion);
+            expect(outputPointArrayNoConversion.pointValueType).to.be.equals("Array");
+            outputPointNumberConversion.connect(inputPoint1_1);
+            expect(block1.templateByName("TemplateTest").valueType).to.be.equals("String");
+            expect(outputPointNumberConversion.pointValueType).to.be.equals("Number");
             expect(inputPoint1_1.pointValueType).to.be.equals("String");
-            outputPointStringNoConvert.connect(inputPoint1_2);
-            expect(outputPointString.pointValueType).to.be.equals("Number");
+            outputPointNumberNoConversion.connect(inputPoint1_2);
+            expect(block1.templateByName("TemplateTest").valueType).to.be.equals("Number");
+            expect(outputPointNumberConversion.pointValueType).to.be.equals("Number");
             expect(inputPoint1_1.pointValueType).to.be.equals("Number");
-            expect(outputPointStringNoConvert.pointValueType).to.be.equals("Number");
             expect(inputPoint1_2.pointValueType).to.be.equals("Number");
             expect(inputPoint1_3.pointValueType).to.be.equals("Number");
-            outputPointString.disconnect(inputPoint1_1);
-            outputPointStringNoConvert.disconnect(inputPoint1_2);
             expect(function () {
-                outputPointString3.connect(inputPoint1_3);
+                outputPointArrayNoConversion.connect(inputPoint1_3);
             }).to.throw();
         });
         test("remove block", function () {
