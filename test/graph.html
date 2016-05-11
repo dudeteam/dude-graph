@@ -974,6 +974,102 @@
                 outputPointArrayNoConversion.connect(inputPoint1_3);
             }).to.throw();
         });
+        test("point policy", function () {
+            var graph = new dudeGraph.Graph();
+            var block1 = new dudeGraph.Block();
+            var block2 = new dudeGraph.Block();
+            var inputPoint1 = new dudeGraph.Point(false, {
+                "pointName": "in1",
+                "pointValueType": "String"
+            });
+            var inputPoint2 = new dudeGraph.Point(false, {
+                "pointName": "in2",
+                "pointValueType": "String",
+                "pointPolicy": ["VALUE"]
+            });
+            var inputPoint3 = new dudeGraph.Point(false, {
+                "pointName": "in3",
+                "pointValueType": "String",
+                "pointPolicy": ["SINGLE_CONNECTION"]
+            });
+            var inputPoint4 = new dudeGraph.Point(false, {
+                "pointName": "in4",
+                "pointValueType": "String",
+                "pointPolicy": ["MULTIPLE_CONNECTIONS"]
+            });
+            var inputPoint5 = new dudeGraph.Point(false, {
+                "pointName": "in5",
+                "pointValueType": "String",
+                "pointPolicy": ["VALUE", "SINGLE_CONNECTION"]
+            });
+            var inputPoint6 = new dudeGraph.Point(false, {
+                "pointName": "in6",
+                "pointValueType": "String",
+                "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS"]
+            });
+            var outputPoint1 = new dudeGraph.Point(true, {
+                "pointName": "out1",
+                "pointValueType": "String"
+            });
+            var outputPoint2 = new dudeGraph.Point(true, {
+                "pointName": "out2",
+                "pointValueType": "String"
+            });
+            graph.addBlock(block1);
+            graph.addBlock(block2);
+            block1.addPoint(inputPoint1);
+            block1.addPoint(inputPoint2);
+            block1.addPoint(inputPoint3);
+            block1.addPoint(inputPoint4);
+            block1.addPoint(inputPoint5);
+            block1.addPoint(inputPoint6);
+            block2.addPoint(outputPoint1);
+            block2.addPoint(outputPoint2);
+            // Default policy (VALUE | SINGLE_CONNECTION | CONVERSION)
+            expect(inputPoint1.pointPolicy).to.be.equals(
+                    dudeGraph.PointPolicy.VALUE |
+                    dudeGraph.PointPolicy.SINGLE_CONNECTION |
+                    dudeGraph.PointPolicy.CONVERSION
+            );
+            // VALUE
+            inputPoint2.pointValue = "Hello there";
+            inputPoint2.pointValue = null;
+            expect(function () {
+                inputPoint2.connect(outputPoint1);
+            }).to.throw();
+            // SINGLE_CONNECTION
+            expect(function () {
+                inputPoint3.pointValue = "Hello there";
+            }).to.throw();
+            inputPoint3.connect(outputPoint1);
+            expect(function () {
+                inputPoint3.connect(outputPoint2);
+            }).to.throw();
+            inputPoint3.disconnect(outputPoint1);
+            // MULTIPLE_CONNECTIONS
+            expect(function () {
+                inputPoint4.pointValue = "Hello there";
+            }).to.throw();
+            inputPoint4.connect(outputPoint1);
+            inputPoint4.connect(outputPoint2);
+            inputPoint4.disconnect(outputPoint1);
+            inputPoint4.disconnect(outputPoint2);
+            // VALUE, SINGLE_CONNECTION
+            inputPoint5.pointValue = "Hello there";
+            inputPoint5.pointValue = null;
+            inputPoint5.connect(outputPoint1);
+            expect(function () {
+                inputPoint5.connect(outputPoint2);
+            }).to.throw();
+            inputPoint5.disconnect(outputPoint1);
+            // VALUE, MULTIPLE_CONNECTIONS
+            inputPoint6.pointValue = "Hello there";
+            inputPoint6.pointValue = null;
+            inputPoint6.connect(outputPoint1);
+            inputPoint6.connect(outputPoint2);
+            inputPoint6.disconnect(outputPoint1);
+            inputPoint6.disconnect(outputPoint2);
+        });
         test("remove block", function () {
             var graph = new dudeGraph.Graph();
             var block1 = new dudeGraph.Block({

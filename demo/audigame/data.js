@@ -67,7 +67,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointType": "StreamPoint",
                         "pointName": "in",
                         "pointValueType": "Stream",
-                        "pointSingleConnection": false
+                        "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                     },
                     {
                         "pointType": "Point",
@@ -139,7 +139,7 @@ const DUDE_GRAPH_MODELS = [
                         "pointType": "StreamPoint",
                         "pointName": "in",
                         "pointValueType": "Stream",
-                        "pointSingleConnection": false
+                        "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                     },
                     {
                         "pointType": "Point",
@@ -197,7 +197,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 }
                             ],
                             "blockOutputs": [
@@ -222,7 +222,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 },
                                 {
                                     "pointType": "Point",
@@ -257,7 +257,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 },
                                 {
                                     "pointType": "Point",
@@ -313,14 +313,14 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 },
                                 {
                                     "pointType": "Point",
                                     "pointName": "variable",
                                     "pointTemplate": "AssignTemplate",
                                     "pointValueType": "Number",
-                                    "pointCanConvert": false
+                                    "pointPolicy": ["SINGLE_CONNECTION"]
                                 },
                                 {
                                     "pointType": "Point",
@@ -351,7 +351,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "StreamPoint",
                                     "pointName": "in",
                                     "pointValueType": "Stream",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 },
                                 {
                                     "pointType": "Point",
@@ -395,7 +395,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "Point",
                                     "pointName": "value",
                                     "pointValueType": "String",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 }
                             ]
                         }
@@ -420,7 +420,7 @@ const DUDE_GRAPH_MODELS = [
                                     "pointType": "Point",
                                     "pointName": "value",
                                     "pointValueType": "Number",
-                                    "pointSingleConnection": false
+                                    "pointPolicy": ["VALUE", "MULTIPLE_CONNECTIONS", "CONVERSION"]
                                 }
                             ]
                         }
