@@ -1069,6 +1069,14 @@
             inputPoint6.connect(outputPoint2);
             inputPoint6.disconnect(outputPoint1);
             inputPoint6.disconnect(outputPoint2);
+            // Cannot mix SINGLE_CONNECTION and MULTIPLE_CONNECTIONS
+            expect(function () {
+                new dudeGraph.Point(false, {
+                    "pointName": "invalid1",
+                    "pointValueType": "String",
+                    "pointPolicy": ["SINGLE_CONNECTION", "MULTIPLE_CONNECTIONS"]
+                });
+            }).to.throw();
         });
         test("remove block", function () {
             var graph = new dudeGraph.Graph();
