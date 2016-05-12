@@ -387,7 +387,8 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "format",
-                                    "pointValueType": "String"
+                                    "pointValueType": "String",
+                                    "pointPolicy": ["VALUE"]
                                 }
                             ],
                             "blockOutputs": [
@@ -412,7 +413,8 @@ const DUDE_GRAPH_MODELS = [
                                 {
                                     "pointType": "Point",
                                     "pointName": "expression",
-                                    "pointValueType": "String"
+                                    "pointValueType": "String",
+                                    "pointPolicy": ["VALUE"]
                                 }
                             ],
                             "blockOutputs": [
