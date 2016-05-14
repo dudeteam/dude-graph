@@ -168,6 +168,34 @@
                     "pointPolicy": ["UNKNOWN_POLICY"] // Unknown point policy
                 });
             }).to.throw();
+            expect(function () {
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                graph.addBlock(block);
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "input2",
+                    "pointValueType": "WhateverAgain"
+                }));
+            }).to.throw();
+            expect(function () {
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block();
+                graph.addBlock(block);
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "input2",
+                    "pointValueType": "String",
+                    "pointValue": Object
+                }));
+            }).to.throw();
+            expect(function () {
+                var graph = new dudeGraph.Graph();
+                var block = new dudeGraph.Block({});
+                graph.addBlock(block);
+                block.addPoint(new dudeGraph.Point(false, {
+                    "pointName": "input2",
+                    "pointTemplate": "Whatever template"
+                }));
+            }).to.throw();
         });
         test("create block point", function () {
             var graph = new dudeGraph.Graph();
@@ -1150,16 +1178,16 @@
             CustomBlock.prototype.removed = blockRemovedSpy;
             var customBlock = new CustomBlock();
             graph.addBlock(customBlock);
-            var point1 = new dudeGraph.Point(false, {"pointName": "this", "pointValueType": "Number"});
-            var point2 = new dudeGraph.Point(false, {"pointName": "in", "pointValueType": "Stream"});
+            var point1 = new dudeGraph.Point(false, {"pointName": "in", "pointValueType": "Stream"});
+            var point2 = new dudeGraph.Point(false, {"pointName": "number", "pointValueType": "Number"});
             customBlock.addPoint(point1);
             customBlock.addPoint(point2);
-            point1.pointValue = 32;
-            sinon.assert.calledWith(pointValueChangedSpy, point1, 32, null);
-            point2.connect(assignationBlock.outputByName("out"));
-            sinon.assert.calledWith(pointConnectedSpy, point2, assignationBlock.outputByName("out"));
-            point2.disconnectAll();
-            sinon.assert.calledWith(pointDisconnectedSpy, point2, assignationBlock.outputByName("out"));
+            point1.connect(assignationBlock.outputByName("out"));
+            sinon.assert.calledWith(pointConnectedSpy, point1, assignationBlock.outputByName("out"));
+            point2.pointValue = 32;
+            sinon.assert.calledWith(pointValueChangedSpy, point2, 32, null);
+            point1.disconnectAll();
+            sinon.assert.calledWith(pointDisconnectedSpy, point1, assignationBlock.outputByName("out"));
             graph.removeBlock(customBlock);
             sinon.assert.called(blockRemovedSpy);
         });
