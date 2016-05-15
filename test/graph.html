@@ -1283,6 +1283,7 @@
             });
             graph.addBlock(variableBlock);
             expect(variable.variableBlock).to.be.equal(variableBlock);
+            expect(graph.graphBlocks).to.have.length(1);
             expect(function () {
                 graph.addBlock(new dudeGraph.VariableBlock({
                     "blockName": "Hello" // Duplicate VariableBlock for Hello
@@ -1290,12 +1291,13 @@
             }).to.throw();
             graph.removeBlock(variableBlock);
             expect(variable.variableBlock).to.be.null;
+            expect(graph.graphBlocks).to.have.length(0);
             variableBlock = new dudeGraph.VariableBlock({
                 "blockName": "Hello"
             });
             graph.addBlock(variableBlock);
-            expect(graph.graphBlocks).to.have.length(1);
             expect(variable.variableBlock).to.be.equal(variableBlock);
+            expect(graph.graphBlocks).to.have.length(1);
             graph.removeVariable(variable); // Should remove all related blocks
             expect(graph.graphBlocks).to.have.length(0);
         });
